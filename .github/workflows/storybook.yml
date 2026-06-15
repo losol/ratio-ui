@@ -17,6 +17,11 @@ jobs:
   deploy:
     name: Build & deploy Storybook
     runs-on: ubuntu-latest
+    # Track the production deploy as a "storybook" deployment (live URL + history
+    # in the Environments tab). Empty name on PRs => no environment is attached.
+    environment:
+      name: ${{ github.event_name == 'push' && 'storybook' || '' }}
+      url: https://ratio-ui.pages.dev
     permissions:
       contents: read
       pull-requests: write
