@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@eventuras/eslint-config", "@eventuras/typescript-config", "@eventuras/vite-config"]
+  "ignore": ["@ratio-ui/eslint-config", "@ratio-ui/typescript-config", "@ratio-ui/vite-config"]
 }

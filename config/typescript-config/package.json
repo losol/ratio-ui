@@ -1,8 +1,8 @@
 {
-  "name": "@eventuras/typescript-config",
+  "name": "@ratio-ui/typescript-config",
   "version": "1.0.0",
   "private": true,
-  "description": "Shared TypeScript configurations for Eventuras projects",
+  "description": "Shared TypeScript configurations for Ratio UI projects",
   "homepage": "https://github.com/losol/ratio-ui/tree/main/config/typescript-config#readme",
   "bugs": {
     "url": "https://github.com/losol/ratio-ui/issues"

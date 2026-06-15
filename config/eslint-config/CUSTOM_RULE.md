@@ -1,4 +1,4 @@
-# Custom ESLint Rule: `eventuras/no-invalid-testid`
+# Custom ESLint Rule: `ratio-ui/no-invalid-testid`
 
 ## Overview
 
@@ -6,7 +6,7 @@ Added a custom ESLint rule to enforce correct test ID usage across the codebase.
 
 ## Rule Details
 
-The rule `eventuras/no-invalid-testid` ensures that:
+The rule `ratio-ui/no-invalid-testid` ensures that:
 - HTML elements use `data-testid` attribute (not `testId` or `data-test-id`)
 - React components use `testId` prop
 - The old `data-test-id` convention is not used

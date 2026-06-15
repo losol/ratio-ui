@@ -15,10 +15,10 @@ importers:
       '@changesets/cli':
         specifier: ^2.30.0
         version: 2.31.0(@types/node@24.13.0)
-      '@eventuras/eslint-config':
+      '@ratio-ui/eslint-config':
         specifier: workspace:*
         version: link:config/eslint-config
-      '@eventuras/typescript-config':
+      '@ratio-ui/typescript-config':
         specifier: workspace:*
         version: link:config/typescript-config
       '@types/node':
@@ -137,13 +137,13 @@ importers:
         specifier: ^2.1.0
         version: 2.1.1(tailwindcss@4.3.0)
     devDependencies:
-      '@eventuras/eslint-config':
+      '@ratio-ui/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint-config
-      '@eventuras/typescript-config':
+      '@ratio-ui/typescript-config':
         specifier: workspace:*
         version: link:../../config/typescript-config
-      '@eventuras/vite-config':
+      '@ratio-ui/vite-config':
         specifier: workspace:*
         version: link:../../config/vite-config
       '@storybook/addon-a11y':
@@ -225,13 +225,13 @@ importers:
         specifier: workspace:*
         version: link:../ratio-ui
     devDependencies:
-      '@eventuras/eslint-config':
+      '@ratio-ui/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint-config
-      '@eventuras/typescript-config':
+      '@ratio-ui/typescript-config':
         specifier: workspace:*
         version: link:../../config/typescript-config
-      '@eventuras/vite-config':
+      '@ratio-ui/vite-config':
         specifier: workspace:*
         version: link:../../config/vite-config
       '@types/react':

@@ -14,9 +14,9 @@ history.
 The repository also bundles the shared build configuration used by the
 packages above as private workspace packages:
 
-- `@eventuras/eslint-config`
-- `@eventuras/typescript-config`
-- `@eventuras/vite-config`
+- `@ratio-ui/eslint-config`
+- `@ratio-ui/typescript-config`
+- `@ratio-ui/vite-config`
 
 ## Getting started
 

@@ -1,4 +1,4 @@
-import { defineReactLibConfig } from '@eventuras/vite-config/react-lib';
+import { defineReactLibConfig } from '@ratio-ui/vite-config/react-lib';
 
 export default defineReactLibConfig({
   entry: 'src/**/index.{ts,tsx}',

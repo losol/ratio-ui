@@ -1,4 +1,4 @@
-import { config as baseConfig } from '@eventuras/eslint-config/base';
+import { config as baseConfig } from '@ratio-ui/eslint-config/base';
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [

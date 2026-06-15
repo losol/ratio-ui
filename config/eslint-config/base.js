@@ -3,7 +3,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 import turboPlugin from 'eslint-plugin-turbo';
 import tseslint from 'typescript-eslint';
 import onlyWarn from 'eslint-plugin-only-warn';
-import eventurasPlugin from './rules/index.js';
+import ratioUiPlugin from './rules/index.js';
 
 /**
  * A shared ESLint configuration for the repository.
@@ -24,10 +24,10 @@ export const config = [
   },
   {
     plugins: {
-      eventuras: eventurasPlugin,
+      'ratio-ui': ratioUiPlugin,
     },
     rules: {
-      'eventuras/no-invalid-testid': 'error',
+      'ratio-ui/no-invalid-testid': 'error',
     },
   },
   {

@@ -1,5 +1,5 @@
 /**
- * Custom ESLint rules for Eventuras
+ * Custom ESLint rules for Ratio UI
  */
 
 import noInvalidTestId from './no-invalid-testid.js';

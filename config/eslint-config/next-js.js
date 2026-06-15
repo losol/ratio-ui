@@ -49,8 +49,8 @@ export const nextJsConfig = [
             ['^node:', `^(${builtinModules.join('|')})(/|$)`],
             // 2. Packages (react first)
             ['^react', String.raw`^@?\w`],
-            // 3. Eventuras packages
-            ['^@eventuras/'],
+            // 3. Internal packages
+            ['^@ratio-ui/', '^@eventuras/'],
             // 4. Absolute imports (Next.js aliases etc.)
             ['^(@|~)/'],
             // 5. Relative imports

@@ -1,10 +1,10 @@
-# `@eventuras/eslint-config`
+# `@ratio-ui/eslint-config`
 
 Collection of internal eslint configurations.
 
 ## Custom Rules
 
-### `eventuras/no-invalid-testid`
+### `ratio-ui/no-invalid-testid`
 
 Enforces the correct usage of test IDs on HTML elements.
 

@@ -1,6 +1,6 @@
-# `@eventuras/typescript-config`
+# `@ratio-ui/typescript-config`
 
-Shared TypeScript configurations used across Eventuras projects.
+Shared TypeScript configurations used across Ratio UI projects.
 
 ## Presets
 
@@ -17,14 +17,14 @@ Shared TypeScript configurations used across Eventuras projects.
 Install:
 
 ```sh
-npm install -D @eventuras/typescript-config
+npm install -D @ratio-ui/typescript-config
 ```
 
 Extend from your `tsconfig.json`:
 
 ```json
 {
-  "extends": "@eventuras/typescript-config/base.json",
+  "extends": "@ratio-ui/typescript-config/base.json",
   "include": ["src"]
 }
 ```

@@ -1,10 +1,10 @@
-# @eventuras/vite-config
+# @ratio-ui/vite-config
 
-Shared Vite configurations for Eventuras monorepo libraries.
+Shared Vite configurations for Ratio UI libraries.
 
 ## Overview
 
-This package provides reusable Vite configuration presets for different types of libraries in the Eventuras monorepo. It helps maintain consistency, reduces duplication, and makes it easier to update build configurations across all libraries.
+This package provides reusable Vite configuration presets for different types of libraries in the Ratio UI repository. It helps maintain consistency, reduces duplication, and makes it easier to update build configurations across all libraries.
 
 ## Presets
 
@@ -14,7 +14,7 @@ For plain TypeScript libraries without React.
 
 ```typescript
 // vite.config.ts
-import { defineVanillaLibConfig } from '@eventuras/vite-config/vanilla-lib';
+import { defineVanillaLibConfig } from '@ratio-ui/vite-config/vanilla-lib';
 import { resolve } from 'path';
 
 export default defineVanillaLibConfig({
@@ -30,7 +30,7 @@ For React component libraries and utilities.
 
 ```typescript
 // vite.config.ts
-import { defineReactLibConfig } from '@eventuras/vite-config/react-lib';
+import { defineReactLibConfig } from '@ratio-ui/vite-config/react-lib';
 import { resolve } from 'path';
 
 export default defineReactLibConfig({
@@ -58,7 +58,7 @@ For React libraries compatible with Next.js (includes Next.js externals).
 
 ```typescript
 // vite.config.ts
-import { defineNextLibConfig } from '@eventuras/vite-config/next-lib';
+import { defineNextLibConfig } from '@ratio-ui/vite-config/next-lib';
 import { resolve } from 'path';
 
 export default defineNextLibConfig({
@@ -140,7 +140,7 @@ export default defineConfig({
 
 ```typescript
 // libs/my-lib/vite.config.ts
-import { defineReactLibConfig } from '@eventuras/vite-config/react-lib';
+import { defineReactLibConfig } from '@ratio-ui/vite-config/react-lib';
 
 export default defineReactLibConfig({
   entry: 'src/index.ts',
