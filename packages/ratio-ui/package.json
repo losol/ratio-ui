@@ -1,14 +1,14 @@
 {
   "name": "@eventuras/ratio-ui",
   "version": "2.7.0",
-  "homepage": "https://github.com/losol/ratio-ui/tree/main/libs/ratio-ui#readme",
+  "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/ratio-ui#readme",
   "bugs": {
     "url": "https://github.com/losol/ratio-ui/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/losol/ratio-ui.git",
-    "directory": "libs/ratio-ui"
+    "directory": "packages/ratio-ui"
   },
   "type": "module",
   "exports": {

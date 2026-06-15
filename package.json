@@ -8,7 +8,8 @@
     "url": "https://github.com/losol/ratio-ui.git"
   },
   "workspaces": [
-    "libs/**"
+    "packages/*",
+    "config/*"
   ],
   "scripts": {
     "build": "turbo run build",

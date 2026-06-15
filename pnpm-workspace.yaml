@@ -1,5 +1,6 @@
 packages:
-  - libs/**
+  - packages/*
+  - config/*
   - '!**/dist'
   - '!**/node_modules'
 

@@ -17,10 +17,10 @@ importers:
         version: 2.31.0(@types/node@24.13.0)
       '@eventuras/eslint-config':
         specifier: workspace:*
-        version: link:libs/eslint-config
+        version: link:config/eslint-config
       '@eventuras/typescript-config':
         specifier: workspace:*
-        version: link:libs/typescript-config
+        version: link:config/typescript-config
       '@types/node':
         specifier: ^24.12.0
         version: 24.13.0
@@ -37,7 +37,7 @@ importers:
         specifier: ^6.0.2
         version: 6.0.3
 
-  libs/eslint-config:
+  config/eslint-config:
     dependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -74,7 +74,34 @@ importers:
         specifier: ^6.0.2
         version: 6.0.3
 
-  libs/ratio-ui:
+  config/typescript-config: {}
+
+  config/vite-config:
+    dependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.2.2
+        version: 4.3.0(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
+      '@vitejs/plugin-react':
+        specifier: ^6.0.1
+        version: 6.0.2(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
+      '@vitejs/plugin-react-swc':
+        specifier: ^4.3.0
+        version: 4.3.1(@swc/helpers@0.5.23)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
+      glob:
+        specifier: ^13.0.6
+        version: 13.0.6
+      vite-plugin-dts:
+        specifier: ^5.0.0
+        version: 5.0.2(esbuild@0.28.0)(rolldown@1.0.3)(typescript@6.0.3)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
+    devDependencies:
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.3
+      vite:
+        specifier: ^8.0.8
+        version: 8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)
+
+  packages/ratio-ui:
     dependencies:
       '@eventuras/logger':
         specifier: ^0.8.1
@@ -112,13 +139,13 @@ importers:
     devDependencies:
       '@eventuras/eslint-config':
         specifier: workspace:*
-        version: link:../eslint-config
+        version: link:../../config/eslint-config
       '@eventuras/typescript-config':
         specifier: workspace:*
-        version: link:../typescript-config
+        version: link:../../config/typescript-config
       '@eventuras/vite-config':
         specifier: workspace:*
-        version: link:../vite-config
+        version: link:../../config/vite-config
       '@storybook/addon-a11y':
         specifier: ^10.3.5
         version: 10.4.2(storybook@10.4.2(@testing-library/dom@10.4.1)(@types/react@19.2.16)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))
@@ -192,7 +219,7 @@ importers:
         specifier: ^4.1.4
         version: 4.1.8(@types/node@24.13.0)(@vitest/browser-playwright@4.1.8)(@vitest/coverage-v8@4.1.8)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
 
-  libs/ratio-ui-next:
+  packages/ratio-ui-next:
     dependencies:
       '@eventuras/ratio-ui':
         specifier: workspace:*
@@ -200,13 +227,13 @@ importers:
     devDependencies:
       '@eventuras/eslint-config':
         specifier: workspace:*
-        version: link:../eslint-config
+        version: link:../../config/eslint-config
       '@eventuras/typescript-config':
         specifier: workspace:*
-        version: link:../typescript-config
+        version: link:../../config/typescript-config
       '@eventuras/vite-config':
         specifier: workspace:*
-        version: link:../vite-config
+        version: link:../../config/vite-config
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.16
@@ -221,33 +248,6 @@ importers:
         version: 6.0.3
       vite:
         specifier: 8.0.16
-        version: 8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)
-
-  libs/typescript-config: {}
-
-  libs/vite-config:
-    dependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.2.2
-        version: 4.3.0(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
-      '@vitejs/plugin-react':
-        specifier: ^6.0.1
-        version: 6.0.2(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
-      '@vitejs/plugin-react-swc':
-        specifier: ^4.3.0
-        version: 4.3.1(@swc/helpers@0.5.23)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
-      glob:
-        specifier: ^13.0.6
-        version: 13.0.6
-      vite-plugin-dts:
-        specifier: ^5.0.0
-        version: 5.0.2(esbuild@0.28.0)(rolldown@1.0.3)(typescript@6.0.3)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4))
-    devDependencies:
-      typescript:
-        specifier: ^6.0.2
-        version: 6.0.3
-      vite:
-        specifier: ^8.0.8
         version: 8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)
 
 packages:

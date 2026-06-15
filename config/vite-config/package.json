@@ -27,13 +27,13 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/losol/ratio-ui/tree/main/libs/vite-config#readme",
+  "homepage": "https://github.com/losol/ratio-ui/tree/main/config/vite-config#readme",
   "bugs": {
     "url": "https://github.com/losol/ratio-ui/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/losol/ratio-ui.git",
-    "directory": "libs/vite-config"
+    "directory": "config/vite-config"
   }
 }
