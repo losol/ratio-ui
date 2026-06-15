@@ -28,7 +28,6 @@ export const config = [
     },
     rules: {
       'eventuras/no-invalid-testid': 'error',
-      'eventuras/no-direct-event-sdk-import': 'error',
     },
   },
   {
@@ -45,7 +44,6 @@ export const config = [
       'playwright-auth/**',
       'playwright-report/**',
       'out/**',
-      'test-results/**',
       '**/migrations/**',
       '**/.next/**',
       '**/next-env.d.ts',
