@@ -15,9 +15,6 @@
   "license": "MIT",
   "files": [
     "base.json",
-    "library.json",
-    "nextjs.json",
-    "node.json",
     "react-library.json",
     "README.md"
   ],

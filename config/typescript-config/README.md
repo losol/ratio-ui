@@ -7,10 +7,7 @@ Shared TypeScript configurations used across Ratio UI projects.
 | File                  | Use for                                                    |
 | --------------------- | ---------------------------------------------------------- |
 | `base.json`           | Default preset — strict, modern Node/ESM baseline.         |
-| `library.json`        | Libraries that emit declarations and JS.                   |
 | `react-library.json`  | React component libraries (JSX, DOM lib).                  |
-| `nextjs.json`         | Next.js apps.                                              |
-| `node.json`           | Node-only apps and scripts.                                |
 
 ## Usage
 
