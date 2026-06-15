@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Version or tag
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Check for pending changesets
+        id: changesets
+        run: |
+          COUNT=$(find .changeset -name '*.md' ! -name 'README.md' 2>/dev/null | wc -l | tr -d ' ')
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Found $COUNT pending changeset(s)"
+
+      # Pending changesets -> open / update the "Version Packages" PR.
+      - name: Create or update version PR
+        if: steps.changesets.outputs.count != '0'
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        with:
+          version: pnpm changeset:version
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # No pending changesets (e.g. the version PR was just merged) -> tag the
+      # released versions. The publish workflows below do the actual npm publish.
+      - name: Tag released packages
+        if: steps.changesets.outputs.count == '0'
+        id: tag
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        with:
+          publish: pnpm changeset:tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub releases
+        if: steps.tag.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISHED: ${{ steps.tag.outputs.publishedPackages }}
+        run: |
+          echo "$PUBLISHED" | jq -c '.[]' | while read -r pkg; do
+            NAME=$(echo "$pkg" | jq -r '.name')
+            VERSION=$(echo "$pkg" | jq -r '.version')
+            TAG="${NAME}@${VERSION}"
+            TITLE="$(echo "$NAME" | sed 's|@eventuras/||') v${VERSION}"
+
+            echo "Creating release for ${TAG}"
+            gh release create "$TAG" --title "$TITLE" --generate-notes \
+              || echo "Failed to create release for ${TAG}"
+          done
+
+      # GITHUB_TOKEN-pushed tags do not cascade into other workflows, so the
+      # publish jobs are dispatched explicitly here.
+      - name: Trigger npm publish for released packages
+        if: steps.tag.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISHED: ${{ steps.tag.outputs.publishedPackages }}
+        run: |
+          echo "$PUBLISHED" | jq -c '.[]' | while read -r pkg; do
+            NAME=$(echo "$pkg" | jq -r '.name')
+            TAG="${NAME}@$(echo "$pkg" | jq -r '.version')"
+
+            case "$NAME" in
+              @eventuras/ratio-ui)
+                gh workflow run ratio-ui-publish.yml -f "tag=${TAG}" ;;
+              @eventuras/ratio-ui-next)
+                gh workflow run ratio-ui-next-publish.yml -f "tag=${TAG}" ;;
+              *)
+                echo "No publish workflow configured for ${NAME}" ;;
+            esac
+          done

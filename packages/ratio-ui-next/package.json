@@ -32,7 +32,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@eventuras/ratio-ui": "workspace:*"

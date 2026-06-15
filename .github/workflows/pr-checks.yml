@@ -1,0 +1,40 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+concurrency:
+  group: pr-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changeset-check:
+    name: Changeset check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Check for changesets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          IS_FORK: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          if ls .changeset/*.md 2>/dev/null | grep -qv README; then
+            echo "Changesets found"
+          else
+            echo "::warning::No changeset found."
+            # Fork PRs get a read-only token, so skip commenting there.
+            if [ "$IS_FORK" = "true" ]; then
+              echo "Fork PR — skipping PR comment (token is read-only)."
+            else
+              BODY="No changeset found. Consider running \`pnpm changeset\` locally if this PR should publish a new version."
+              gh pr comment "$PR_NUMBER" --body "$BODY" --edit-last 2>/dev/null \
+                || gh pr comment "$PR_NUMBER" --body "$BODY"
+            fi
+          fi
