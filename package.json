@@ -1,0 +1,46 @@
+{
+  "name": "ratio-ui",
+  "version": "0.0.0",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/losol/ratio-ui.git"
+  },
+  "workspaces": [
+    "libs/**"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:tag": "changeset tag",
+    "clean": "pnpm clean:build && pnpm clean:deps",
+    "clean:build": "npx rimraf \"**/{.turbo,dist,storybook-static}\" \"!**/node_modules/**\"",
+    "clean:deps": "pnpm -r exec rm -rf node_modules && rm -rf node_modules pnpm-lock.yaml",
+    "dev": "turbo dev",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "release": "changeset publish",
+    "storybook": "turbo run storybook --filter=@eventuras/ratio-ui",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.30.0",
+    "@eventuras/eslint-config": "workspace:*",
+    "@eventuras/typescript-config": "workspace:*",
+    "@types/node": "^24.12.0",
+    "eslint": "^10.2.0",
+    "prettier": "^3.8.3",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "turbo": "^2.9.14"
+  },
+  "packageManager": "pnpm@11.5.1",
+  "engines": {
+    "node": ">=24.0.0 <25.0.0",
+    "pnpm": ">=11.0.0"
+  }
+}

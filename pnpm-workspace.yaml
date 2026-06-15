@@ -1,0 +1,23 @@
+packages:
+  - libs/**
+  - '!**/dist'
+  - '!**/node_modules'
+
+# Allow-list of packages whose install scripts may run.
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+
+# Supply-chain protection: do not resolve packages published less than
+# 10 days ago. Mirrors the window used in the eventuras monorepo.
+minimumReleaseAge: 14400
+minimumReleaseAgeStrict: false
+
+peerDependencyRules:
+  ignoreMissing:
+    - '@types/react'
+    - '@types/react-dom'
+
+pmOnFail: ignore
