@@ -1,5 +1,11 @@
 # @eventuras/ratio-ui-next
 
+## 0.2.0
+
+### Minor Changes
+
+- b58f89d: Make `@eventuras/ratio-ui` a peer dependency (was a regular dependency). Consumers now provide a single shared copy of ratio-ui, avoiding duplicate-instance issues (e.g. mismatched React context). Install `@eventuras/ratio-ui` (>=2.7.0) alongside this package.
+
 ## 0.1.29
 
 ### Patch Changes
