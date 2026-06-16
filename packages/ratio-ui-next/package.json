@@ -35,10 +35,8 @@
     "build": "tsc && vite build",
     "lint": "eslint ."
   },
-  "dependencies": {
-    "@eventuras/ratio-ui": "workspace:*"
-  },
   "devDependencies": {
+    "@eventuras/ratio-ui": "workspace:*",
     "@ratio-ui/eslint-config": "workspace:*",
     "@ratio-ui/typescript-config": "workspace:*",
     "@ratio-ui/vite-config": "workspace:*",
@@ -49,6 +47,7 @@
     "vite": "8.0.16"
   },
   "peerDependencies": {
+    "@eventuras/ratio-ui": "^2.7.0",
     "next": "^16.0.0"
   }
 }
