@@ -73,8 +73,11 @@
     font-size: var(--font-size-base);
   }
 
-  html[data-theme="dark"],
-  html[data-theme="light"] {
+  /* Any resolved theme (dark, light, bureau, …) reveals the page.
+     Matched by attribute presence so new named palettes don't have to
+     be added here — previously this listed only dark/light, which left
+     bureau (and any future theme) stuck at opacity:0 → blank white. */
+  html[data-theme] {
     opacity: 1;
   }
 

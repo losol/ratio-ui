@@ -267,8 +267,14 @@
 
 /* --------------------------------------------
    Semantic tokens (dark)
-   -------------------------------------------- */
-:root[data-theme="dark"] {
+   --------------------------------------------
+   Standard-theme dark. Responds to BOTH the legacy compound
+   data-theme="dark" and the new orthogonal data-color-scheme="dark"
+   axis, so this doubles as the universal dark fallback for partial
+   named themes. The data-theme="dark" arm is dropped in the contract
+   step (see docs/bureau-theme-spec.md). */
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"] {
   /* Surface = Linseed-950, not black. Same DNA, different gravity.
      Anchors lift one step lighter so they glow on the dark surface:
      primary 600→400, accent 700→300. Text stays in the Linen family. */

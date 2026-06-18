@@ -44,7 +44,8 @@
   --debug-text:      var(--color-neutral-700);
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"] {
   --debug-bg:     rgba(100, 100, 100, 0.16);
   --debug-border: rgba(100, 100, 100, 0.28);
   --debug-text:   var(--color-neutral-300);
