@@ -1,0 +1,120 @@
+/*
+ * bureau theme — "moderne retro" / retro-bureaucratic palette.
+ *
+ * Plugs into the existing data-theme mechanism: [data-theme="bureau"]
+ * overrides the semantic var() tokens globally, so existing components
+ * (Button, Badge, Card, …) adopt the look with no component changes.
+ *
+ * Axes (named-theme convention, see docs/bureau-theme-spec.md):
+ *   palette  → data-theme="bureau"
+ *   mode     → data-color-scheme="light|dark"
+ * A bureau element with no data-color-scheme falls back to bureau light.
+ * The standard theme keeps the legacy compound data-theme="dark".
+ *
+ * Round 1 = tokens only. Chrome utilities (hard shadow / stamp /
+ * press-down) and the window-frame component land in later PRs.
+ *
+ * Token sources: K4 handoff (.kmr light, .neo--dark dark). Values marked
+ * "derived" are NOT in the spec's role table — they were mapped to fill
+ * out the full semantic set and are the first thing to review.
+ */
+
+/* --------------------------------------------
+   bureau — light (K4 .kmr)
+   -------------------------------------------- */
+:root[data-theme="bureau"] {
+  color-scheme: light;
+
+  /* Brand */
+  --primary: #20304d;            /* navy */
+  --secondary: #d9d2bf;          /* derived: muted paper, a step down from surface */
+  --accent: #f0b429;             /* ochre */
+
+  /* Text */
+  --text: #20242c;
+  --text-muted: #837c6a;
+  --text-subtle: #a79d80;
+  --text-light: #f4efe2;         /* derived: paper-light, mirrors text-on-primary */
+  --text-dark: #20242c;          /* derived */
+
+  --text-on-primary: #f4efe2;
+  --text-on-secondary: #20242c;  /* derived: ink on muted paper */
+  --text-on-accent: #20242c;     /* derived: ink reads on ochre */
+
+  /* Surfaces */
+  --surface: #e6e0d1;            /* paper */
+  --card: #fffdf7;
+  --card-hover: #fbf6ea;         /* derived: slightly warmer than card */
+
+  /* Borders */
+  --border-1: #ddd6c5;
+  --border-2: #20304d;           /* navy hairline-strong */
+
+  --focus-ring: rgba(32, 48, 77, 0.45);   /* navy @ ~45% */
+
+  /* Tighter radii — no rounded-full in bureau. */
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;              /* derived: clamp xl to the same hard edge */
+
+  /* Fonts — family tokens only; consumer embeds the files
+     (see bureau-fonts.css, a later opt-in PR). */
+  --font-display: "Pixelify Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;  /* derived: body == sans */
+  --font-mono: "Space Mono", ui-monospace, monospace;
+
+  /* Status — error is the only spec'd family (brick = haster/avvik).
+     success / info / warning intentionally inherit the base :root
+     values for now; a bureau-native status palette is a later PR. */
+  --error-solid: #b53026;        /* brick */
+  --error-on-solid: #f4efe2;     /* derived */
+  --error-bg: #f7e6e3;           /* derived: brick tint on paper */
+  --error-border: #e3b3ac;       /* derived */
+  --error-text: #8a241c;         /* derived: darker brick for text */
+}
+
+/* --------------------------------------------
+   bureau — dark (K4 .neo--dark)
+   -------------------------------------------- */
+:root[data-theme="bureau"][data-color-scheme="dark"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --primary: #6c8bff;            /* blue */
+  --secondary: #20231b;          /* derived: card-toned secondary */
+  --accent: #ffc23d;             /* gold */
+
+  /* Text */
+  --text: #f0e7d2;               /* ink */
+  --text-muted: #a39c86;         /* muted */
+  --text-subtle: #837c64;        /* derived: a step below muted */
+  --text-light: #f0e7d2;         /* derived */
+  --text-dark: #14140f;          /* derived */
+
+  --text-on-primary: #14140f;    /* derived: ink on light blue */
+  --text-on-secondary: #f0e7d2;  /* derived */
+  --text-on-accent: #14140f;     /* derived: ink on gold */
+
+  /* Surfaces */
+  --surface: #14140f;            /* paper/bg */
+  --card: #20231b;
+  --card-hover: #272b20;         /* derived: a step lighter than card */
+
+  /* Borders */
+  --border-1: #2c2c22;           /* derived: subtle hairline */
+  --border-2: #565341;           /* derived: visible step */
+
+  --focus-ring: rgba(108, 139, 255, 0.45);  /* primary blue @ ~45% */
+
+  /* Overlays flip to light ink on the dark field. */
+  --overlay-ink: 240 231 210;
+
+  /* Status — coral error from .neo--dark; rest inherit for now. */
+  --error-solid: #ff6e52;        /* coral */
+  --error-on-solid: #14140f;     /* derived */
+  --error-bg: rgba(255, 110, 82, 0.18);   /* derived */
+  --error-border: rgba(255, 110, 82, 0.32); /* derived */
+  --error-text: #ffb3a4;         /* derived */
+}
