@@ -37,8 +37,11 @@
 @source inline("{p,px,py,pt,pb,m,mx,my,mt,mb,gap}-{xs,sm,md,lg,xl}");
 @source inline("{p,px,py,pt,pb,m,mx,my,mt,mb,gap}-0");
 
-/* Dark mode variant */
-@custom-variant dark (&:where(html[data-theme="dark"] &, body[data-theme="dark"] &, [data-theme="dark"] *));
+/* Dark mode variant.
+   Named themes (e.g. bureau) carry mode on a separate axis
+   (data-color-scheme), so match that arm too — additive, the
+   legacy data-theme="dark" arms are untouched. */
+@custom-variant dark (&:where(html[data-theme="dark"] &, body[data-theme="dark"] &, [data-theme="dark"] *, [data-color-scheme="dark"] *));
 
 /* Design tokens */
 @import "./tokens/index.css";
