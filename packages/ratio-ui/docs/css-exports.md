@@ -90,6 +90,10 @@ named palettes like `bureau` work without extra wiring. If you import
 `components.css` only (no `global.css`), this rule is not included and the
 page is never hidden — you own theme init entirely.
 
+> **Building your own palette?** See
+> [authoring-themes.md](./authoring-themes.md) for the token
+> contract and a copy-paste template ([`tokens/theme-template.css`](../src/tokens/theme-template.css)).
+
 ## Migration Example
 
 If you're currently using `ratio-ui.css` but want to avoid global styles:

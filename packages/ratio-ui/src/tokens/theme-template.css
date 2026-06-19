@@ -1,0 +1,116 @@
+/*
+ * ============================================================
+ * ratio-ui — CUSTOM THEME TEMPLATE
+ * ============================================================
+ *
+ * Copy this file into your app, rename the theme, and fill in values.
+ * DO NOT @import this file directly — the values below are placeholders.
+ *
+ * How themes work:
+ *   - palette axis      → data-theme="<your-theme>"   (this file)
+ *   - light/dark axis   → data-color-scheme="light|dark"
+ *
+ * Activate by setting the attributes on <html> (early, to avoid a blank
+ * page — see the FOUC note at the bottom):
+ *     <html data-theme="acme" data-color-scheme="light">
+ *
+ * You only need to override what differs from the standard theme.
+ * Anything you leave out inherits the standard token, so the smallest
+ * useful theme is just a handful of brand + surface values.
+ *
+ * Full token reference + guidance: docs/authoring-themes.md
+ * Worked example: src/tokens/bureau.css
+ * ============================================================
+ */
+
+/* ---- LIGHT (the base for your theme) ---------------------- */
+:root[data-theme="acme"] {
+  /* Native color-scheme so browser chrome (scrollbars, form controls,
+     light-dark()) follows. */
+  color-scheme: light;
+
+  /* Brand */
+  --primary:   #2563eb;   /* primary actions, links */
+  --secondary: #e5e7eb;   /* secondary surfaces/buttons */
+  --accent:    #f59e0b;   /* highlights, the playful note */
+
+  /* Text on brand fills (must contrast the fill above) */
+  --text-on-primary:   #ffffff;
+  --text-on-secondary: #111827;
+  --text-on-accent:    #111827;
+
+  /* Text */
+  --text:        #111827; /* body text */
+  --text-muted:  #4b5563; /* secondary text */
+  --text-subtle: #9ca3af; /* hints, placeholders */
+
+  /* Surfaces */
+  --surface:    #f8fafc;  /* page background */
+  --card:       #ffffff;  /* raised cards/panels */
+  --card-hover: #f1f5f9;  /* card hover state */
+
+  /* Borders — hairline (1) and a stronger step (2) */
+  --border-1: #e5e7eb;
+  --border-2: #cbd5e1;
+
+  /* Focus ring (used by the focus shadow) */
+  --focus-ring: rgba(37, 99, 235, 0.45);
+
+  /* Rounding — applies to every rounded-* utility. Set to 0 for sharp,
+     9999px for fully round. */
+  --radius-sm: 0.25rem;
+  --radius:    0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Fonts — family stacks only; embed the font files in your app.
+     ratio-ui never loads font files for you. */
+  --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    ui-monospace, monospace;
+
+  /* --- OPTIONAL: status families (info / success / warning / error).
+     Omit to inherit the standard palette. Each family takes 5 tokens. ---
+  --error-solid: #dc2626; --error-on-solid: #ffffff;
+  --error-bg: #fee2e2; --error-border: #fecaca; --error-text: #991b1b;
+  */
+
+  /* --- OPTIONAL: chip tokens (core/Chip). Omit to inherit. ---
+  --chip-bg: var(--card); --chip-fg: var(--text-muted);
+  --chip-border: var(--border-1); --chip-on-solid: #ffffff;
+  --chip-radius: 9999px;
+  */
+}
+
+/* ---- DARK variant ----------------------------------------- */
+/* Only override what changes for dark; the rest cascades from your
+   light block above. */
+:root[data-theme="acme"][data-color-scheme="dark"] {
+  color-scheme: dark;
+
+  --primary:   #60a5fa;
+  --accent:    #fbbf24;
+
+  --text:        #f3f4f6;
+  --text-muted:  #9ca3af;
+  --text-subtle: #6b7280;
+
+  --surface:    #0b0f19;
+  --card:       #111827;
+  --card-hover: #1f2937;
+
+  --border-1: #1f2937;
+  --border-2: #374151;
+
+  --focus-ring: rgba(96, 165, 250, 0.45);
+}
+
+/*
+ * FOUC NOTE
+ * ---------
+ * ratio-ui's global.css hides <html> (opacity:0) until any data-theme is
+ * set, then reveals it. Set data-theme as early as possible — a blocking
+ * inline <script> in <head> before first paint — or the page renders
+ * blank/white until your theme attribute lands.
+ */
