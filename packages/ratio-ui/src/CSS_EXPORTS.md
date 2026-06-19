@@ -61,6 +61,35 @@ import '@eventuras/ratio-ui/global.css';
 - You want the page structure but will use custom components
 - Building a custom design system on top of ratio-ui foundations
 
+## ⚠️ Required: set `data-theme` early (FOUC protection)
+
+`global.css` (and `ratio-ui.css`, which includes it) hides the page until a
+theme is chosen, to prevent a flash of unstyled/wrong-theme content:
+
+```css
+html { opacity: 0; }
+html[data-theme] { opacity: 1; }   /* revealed once a theme is set */
+```
+
+**Your app must set `data-theme` on `<html>` before first paint** — otherwise
+the page stays invisible and renders blank/white. Use a small blocking inline
+script in `<head>`, before the stylesheet-driven content shows:
+
+```html
+<script>
+  // Resolve from storage / system preference, then set the attributes.
+  // data-theme = palette (e.g. "light", "dark", "bureau")
+  // data-color-scheme = light|dark (named themes; optional for the
+  //                     standard theme where dark is a data-theme value)
+  document.documentElement.setAttribute('data-theme', resolvedTheme);
+</script>
+```
+
+Any `data-theme` value reveals the page (matched by attribute presence), so
+named palettes like `bureau` work without extra wiring. If you import
+`components.css` only (no `global.css`), this rule is not included and the
+page is never hidden — you own theme init entirely.
+
 ## Migration Example
 
 If you're currently using `ratio-ui.css` but want to avoid global styles:
