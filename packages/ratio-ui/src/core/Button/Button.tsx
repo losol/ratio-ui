@@ -11,19 +11,19 @@ const ANIMATION_CLASSES = [
 ].join(' ');
 
 export const buttonStyles = {
-  primary: `border border-transparent font-medium bg-(--primary) hover:opacity-90 text-(--text-on-primary) rounded-full ${ANIMATION_CLASSES}`,
+  primary: `border border-transparent font-medium bg-(--primary) hover:opacity-90 text-(--text-on-primary) rounded-[var(--button-radius,9999px)] ${ANIMATION_CLASSES}`,
   secondary:
     `border border-border-1 font-medium text-(--text) bg-card hover:bg-card-hover hover:border-border-2 ` +
-    `rounded-full ${ANIMATION_CLASSES}`,
+    `rounded-[var(--button-radius,9999px)] ${ANIMATION_CLASSES}`,
   light: `font-medium bg-primary-100 text-(--text) hover:bg-primary-200 dark:bg-primary-800 dark:hover:bg-primary-700 ` +
-    `rounded-full ${ANIMATION_CLASSES}`,
-  text: `font-medium bg-transparent hover:bg-primary-200 hover:bg-opacity-20 rounded-full ${ANIMATION_CLASSES}`,
+    `rounded-[var(--button-radius,9999px)] ${ANIMATION_CLASSES}`,
+  text: `font-medium bg-transparent hover:bg-primary-200 hover:bg-opacity-20 rounded-[var(--button-radius,9999px)] ${ANIMATION_CLASSES}`,
   outline:
     `border border-border-2 font-medium hover:border-(--primary) hover:bg-card-hover ` +
-    `rounded-full ${ANIMATION_CLASSES}`,
+    `rounded-[var(--button-radius,9999px)] ${ANIMATION_CLASSES}`,
   danger:
     `border border-transparent font-medium bg-error hover:opacity-90 ` +
-    `text-error-on rounded-full ${ANIMATION_CLASSES}`,
+    `text-error-on rounded-[var(--button-radius,9999px)] ${ANIMATION_CLASSES}`,
 };
 
 export const buttonSizes = {

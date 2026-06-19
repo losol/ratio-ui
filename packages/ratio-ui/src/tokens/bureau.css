@@ -57,6 +57,7 @@
   --radius: 3px;
   --radius-lg: 4px;
   --radius-xl: 4px;              /* derived: clamp xl to the same hard edge */
+  --button-radius: var(--radius); /* tighten pill buttons to bureau's small radius */
 
   /* Fonts — family tokens only; consumer embeds the files
      (see bureau-fonts.css, a later opt-in PR). */
