@@ -1,6 +1,6 @@
 # `bureau` theme — specification
 
-Status: **planned, no code written**. Naming + architecture + round-1 plan agreed 2026-06-14. Token paths verified against the repo 2026-06-18.
+Status: **in progress (PR #6).** Round-1 tokens shipped: `bureau.css` (light + dark) wired into the token bundle, and the light/dark axis "expand" step landed (standard dark tokens respond to `data-color-scheme="dark"`). Still pending: chrome utilities, the window-frame component, fonts opt-in, the consumer migration, and the breaking "contract" step. Naming + architecture agreed 2026-06-14; verified against the repo 2026-06-18.
 
 ## Summary
 
@@ -37,7 +37,7 @@ Why dark is more entangled than plain tokens: the Tailwind `dark:` variant is bo
 
 **Migration strategy — expand → migrate consumer → contract** (so no single breaking big-bang):
 
-1. **Expand (non-breaking, done in PR 1):** make `data-color-scheme="dark"` *also* trigger dark, alongside the legacy `data-theme="dark"`. The `@custom-variant dark` now matches both arms. NOTE: still incomplete for the standard theme — `theme.css`'s token swap is still keyed only on `[data-theme="dark"]`, so `data-color-scheme="dark"` alone gives dark `dark:` utilities but light semantic tokens. A follow-up expand step must add `:root[data-color-scheme="dark"]` to the `theme.css` dark block so standard-theme tokens swap on the new axis too.
+1. **Expand (non-breaking, done in PR #6):** make `data-color-scheme="dark"` *also* trigger dark, alongside the legacy `data-theme="dark"`. Two parts, both landed: (a) the `@custom-variant dark` in `global.css` + `components.css` now matches `[data-color-scheme="dark"]`, so `dark:` utilities respond; (b) the standard-theme semantic-token swaps now respond too — `:root[data-color-scheme="dark"]` was added alongside `:root[data-theme="dark"]` in `theme.css`, `chip.css`, and `retro.css`. Any token file that adds a `:root[data-theme="dark"]` override must add the `data-color-scheme` arm as well, or consumers on the new axis get mismatched tokens in dark mode.
 2. **Migrate consumer:** update eventuras `ThemeProvider`/`InitTheme` to write `data-theme="standard"` + `data-color-scheme` for the light/dark toggle (instead of `data-theme="dark"`).
 3. **Contract (breaking, major):** drop the `data-theme="dark"` arm from `@custom-variant dark` and rename the `theme.css` dark block selector to `:root[data-color-scheme="dark"]`. One convention remains.
 

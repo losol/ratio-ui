@@ -36,7 +36,7 @@ export const ModeDecorator = (Story: any, context: any) => {
 
   useEffect(() => {
     apply(variant);
-  }, [index]);
+  }, [variant]);
 
   return (
     <>
