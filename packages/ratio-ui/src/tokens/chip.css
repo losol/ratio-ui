@@ -16,7 +16,8 @@
   --chip-radius: 9999px;
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"] {
   --chip-bg: rgba(255, 255, 255, 0.06);
   --chip-fg: var(--text-muted);
   --chip-border: var(--border-1);
