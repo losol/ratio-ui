@@ -1,0 +1,20 @@
+/*
+ * Button chrome rules — consume the --button-* tokens (defaults in
+ * tokens/button.css, overridden per theme e.g. tokens/bureau.css) so a
+ * theme can reskin shape, shadow, and press feedback without touching
+ * the component. Kept here (not in tokens/) because these are component
+ * behavior, not theme knobs.
+ */
+.ratio-button {
+  box-shadow: var(--button-shadow, none);
+}
+
+/* Single source of truth for the press feedback (the standard theme's
+   grow lives in --button-transform-active, so there's no Tailwind
+   active:scale utility competing with it). */
+.ratio-button:active {
+  transform: var(--button-transform-active, scale(1.04));
+  /* Falls back to the resting shadow, so a theme that only sets
+     --button-shadow keeps it on press; bureau sets none to drop it. */
+  box-shadow: var(--button-shadow-active, var(--button-shadow, none));
+}

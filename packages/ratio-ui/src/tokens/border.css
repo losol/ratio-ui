@@ -5,10 +5,3 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
 }
-
-/* Component radius knobs — runtime-overridable per theme so a named
-   palette can reshape components (e.g. bureau squares the buttons).
-   Default is the standard component shape; mirror of `--chip-radius`. */
-:root {
-  --button-radius: 9999px; /* pill */
-}
