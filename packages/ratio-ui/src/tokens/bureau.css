@@ -52,12 +52,27 @@
 
   --focus-ring: rgba(32, 48, 77, 0.45);   /* navy @ ~45% */
 
+  /* Hard offset shadow — no blur. The bureau signature, reusable by any
+     component (e.g. the future window-frame). Uses the ink color
+     (--text) at reduced alpha, so it always contrasts both the surface
+     and the (differently-coloured) element without reading as a stark
+     solid block. 2px offset matches the press-down distance, so the
+     button covers the shadow cleanly when pressed. */
+  --shadow-hard: 2px 2px 0 color-mix(in srgb, var(--text) 62%, transparent);
+
+  /* Button chrome — drive the generic --button-* knobs (see Button.css):
+     square-ish corners, the hard shadow at rest, and a "press down"
+     (shift into the shadow, shadow gone) instead of the standard grow. */
+  --button-radius: var(--radius);
+  --button-shadow: var(--shadow-hard);
+  --button-shadow-active: none;
+  --button-transform-active: translate(2px, 2px);
+
   /* Tighter radii — no rounded-full in bureau. */
   --radius-sm: 2px;
   --radius: 3px;
   --radius-lg: 4px;
   --radius-xl: 4px;              /* derived: clamp xl to the same hard edge */
-  --button-radius: var(--radius); /* tighten pill buttons to bureau's small radius */
 
   /* Fonts — family tokens only; consumer embeds the files
      (see bureau-fonts.css, a later opt-in PR). */
@@ -118,4 +133,7 @@
   --error-bg: rgba(255, 110, 82, 0.18);   /* derived */
   --error-border: rgba(255, 110, 82, 0.32); /* derived */
   --error-text: #ffb3a4;         /* derived */
+  /* --shadow-hard / --button-shadow inherit from the light block;
+     var(--text) inside re-resolves to the dark ink (cream) automatically,
+     so the hard shadow stays contrasty in dark mode. */
 }

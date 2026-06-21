@@ -1,0 +1,17 @@
+/*
+ * Button tokens — defaults consumed by `core/Button` (via the
+ * `.ratio-button` rules in core/Button/Button.css). Override per theme
+ * to reskin every Button without touching the component; the defaults
+ * here preserve the standard look (pill, no shadow, grow on press).
+ *
+ * See tokens/bureau.css for a worked override.
+ */
+:root {
+  --button-radius: 9999px;                 /* pill */
+  --button-shadow: none;                   /* resting shadow */
+  --button-transform-active: scale(1.04);  /* press feedback */
+  /* --button-shadow-active is intentionally unset: the pressed shadow
+     defaults to --button-shadow (see Button.css), so a theme that only
+     sets a resting shadow keeps it while pressed. Set it explicitly
+     (e.g. bureau: none) to change the shadow on press. */
+}

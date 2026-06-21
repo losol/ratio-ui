@@ -1,13 +1,18 @@
 import React, { forwardRef } from 'react';
 import { LoaderCircle } from '../../icons';
 import { cn } from '../../utils/cn';
+import './Button.css';
 
-// Animation constants
+// Classes shared by every button variant. Includes the `.ratio-button`
+// theming hook so all consumers of `buttonStyles` (Button, Link,
+// SplitButton, …) get token-driven chrome — shadow + press feedback live
+// in --button-* tokens (see Button.css), so there's no active:scale
+// utility here that would compete with them.
 const ANIMATION_CLASSES = [
+  'ratio-button',
   'transition-all',
   'duration-200',
   'ease-in-out',
-  'active:scale-[1.04]',
 ].join(' ');
 
 export const buttonStyles = {
@@ -76,6 +81,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const disabledClasses = (disabled || loading) ? 'opacity-75 cursor-not-allowed' : '';
 
   const classes = cn(
+    // `.ratio-button` comes in via variantClass (see ANIMATION_CLASSES)
+    // so Link/SplitButton share it too.
     sizeClasses,
     displayClass,
     variantClass,
