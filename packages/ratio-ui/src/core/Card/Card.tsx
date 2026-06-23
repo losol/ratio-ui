@@ -7,6 +7,7 @@ import { buildSpacingClasses } from '../../tokens/spacing';
 import { buildBorderClasses } from '../../tokens/borders';
 import { buildCoverImageStyle } from '../../utils/buildCoverImageStyle';
 import { cn } from '../../utils/cn';
+import './Card.css';
 
 export type CardShadow = 'none' | 'xs' | 'sm' | 'md';
 
@@ -43,11 +44,13 @@ export interface CardProps extends SpacingProps, BorderProps {
   testId?: string;
 }
 
+// Token-driven so themes can reskin card elevation (see tokens/card.css
+// + Card.css). Defaults mirror the previous Tailwind shadow-xs/sm/md.
 const SHADOW_CLASSES: Record<CardShadow, string> = {
   none: '',
-  xs: 'shadow-xs',
-  sm: 'shadow-sm',
-  md: 'shadow-md',
+  xs: 'card-shadow-xs',
+  sm: 'card-shadow-sm',
+  md: 'card-shadow-md',
 };
 
 export const Card: React.FC<CardProps> = ({
@@ -108,6 +111,8 @@ export const Card: React.FC<CardProps> = ({
   return (
     <Component
       className={cn(
+        // .ratio-card: stable hook for theme-scoped card chrome.
+        'ratio-card',
         'relative',
         bgClasses,
         borderClasses,
