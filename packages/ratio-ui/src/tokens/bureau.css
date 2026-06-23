@@ -68,6 +68,12 @@
   --button-shadow-active: none;
   --button-transform-active: translate(2px, 2px);
 
+  /* Card elevation — all tiers get the hard offset shadow (the `none`
+     tier stays flat since it applies no shadow class). */
+  --card-shadow-xs: var(--shadow-hard);
+  --card-shadow-sm: var(--shadow-hard);
+  --card-shadow-md: var(--shadow-hard);
+
   /* Tighter radii — no rounded-full in bureau. */
   --radius-sm: 2px;
   --radius: 3px;
