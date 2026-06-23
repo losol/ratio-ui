@@ -1,0 +1,12 @@
+/*
+ * Card chrome rules — consume the --card-shadow-* tokens (defaults in
+ * tokens/card.css, overridden per theme e.g. tokens/bureau.css) so a
+ * theme can reskin card elevation without touching the component. The
+ * `none` tier applies no class, so it never carries a shadow.
+ *
+ * `.ratio-card` is the stable hook for any future theme-scoped card
+ * rules (parallel to `.ratio-button`).
+ */
+.ratio-card.card-shadow-xs { box-shadow: var(--card-shadow-xs, 0 1px 2px 0 #0000000d); }
+.ratio-card.card-shadow-sm { box-shadow: var(--card-shadow-sm, 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a); }
+.ratio-card.card-shadow-md { box-shadow: var(--card-shadow-md, 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a); }
