@@ -1,0 +1,132 @@
+/*
+ * DataTree — recursive term/value renderer. Tokens are Ratio UI CSS
+ * variables (theme.css); they flip automatically under dark mode.
+ *
+ * Collapsing uses native <details>/<summary> (no JS). The left rule
+ * colour is `--rule`, neutral by default and ochre when `accentRule`.
+ */
+.datatree {
+  container-type: inline-size;
+}
+.datatree,
+.datatree__dl,
+.datatree__level {
+  margin: 0;
+  padding: 0;
+}
+
+/* --accent flips the nested left rule to ochre; otherwise it falls back
+   to --border-2 via the var() fallback on .datatree__nest. */
+.datatree--accent {
+  --rule: var(--color-accent-400);
+}
+
+/* ---- leaf term/value row ---- */
+.datatree__row {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 34%) 1fr;
+  gap: 1px 18px;
+  align-items: start;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-1);
+}
+.datatree--no-dividers .datatree__row {
+  border-bottom: none;
+}
+
+.datatree__term {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.datatree__value {
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.datatree__dash {
+  color: var(--text-subtle);
+}
+
+/* ---- nested group ---- */
+/* A little breathing room above each group so it reads as a new section,
+   not crowded against the row above. Reset for a leading group so the
+   tree doesn't start with a gap. */
+.datatree__group {
+  margin-top: 14px;
+  margin-bottom: 8px; /* less below than above */
+}
+.datatree__dl > .datatree__group:first-child,
+.datatree__level > .datatree__group:first-child {
+  margin-top: 0;
+}
+.datatree__dl > .datatree__group:last-child,
+.datatree__level > .datatree__group:last-child {
+  margin-bottom: 0;
+}
+.datatree__term--group {
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.datatree__nest {
+  margin: 0 0 0 2px;
+  padding-left: var(--space-s);
+  border-left: 1.5px solid var(--rule, var(--border-2));
+}
+
+/* ---- collapsible group (native <details>) ---- */
+.datatree__group > summary.datatree__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 2px 0;
+  margin: 0 0 5px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  /* match the group term */
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  color: var(--text);
+  list-style: none; /* hide the default disclosure triangle */
+}
+.datatree__toggle::-webkit-details-marker {
+  display: none;
+}
+.datatree__toggle-label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.datatree__chev {
+  flex: none;
+  opacity: 0.55;
+  transition: transform 150ms ease;
+}
+.datatree__group[open] > summary > .datatree__chev {
+  transform: rotate(90deg);
+}
+
+/* ---- responsive: stack on narrow containers ---- */
+@container (max-width: 360px) {
+  .datatree__row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .datatree__nest {
+    padding-left: 11px;
+    margin-left: 0;
+  }
+}
