@@ -1,0 +1,38 @@
+/*
+ * Code surface tokens — a solid, calm, cool surface for code/JSON/XML,
+ * deliberately outside the Linen/Linseed surfaces so code reads with
+ * neutral contrast. Consumed by core/CodeBlock. Dark values respond to
+ * both data-theme="dark" and the orthogonal data-color-scheme="dark".
+ */
+:root {
+  --code-surface: #ffffff;
+  --code-body: #ffffff;
+  --code-text: #2a313b;
+  --code-gutter: #b6bec8;
+  --code-header-bg: #f6f2ea;
+  --code-border: #e5dfd2;
+  --code-header-border: #e8e2d5;
+  --code-muted: #7a8896; /* filename */
+  --code-badge-bg: #e7eff4;
+  --code-badge-text: #2b5d78;
+  --code-icon: #697582;
+  --code-icon-hover: #2a313b;
+  --code-accent: #2f6f8f; /* copied confirmation; near --primary */
+}
+
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"] {
+  --code-surface: #11161c;
+  --code-body: #11161c;
+  --code-text: #c7d2de;
+  --code-gutter: #46535f;
+  --code-header-bg: #161c24;
+  --code-border: rgba(255, 255, 255, 0.08);
+  --code-header-border: rgba(255, 255, 255, 0.06);
+  --code-muted: #7c8a98;
+  --code-badge-bg: rgba(125, 178, 214, 0.16);
+  --code-badge-text: #a6cce6;
+  --code-icon: #8a98a6;
+  --code-icon-hover: #e6edf3;
+  --code-accent: #7fb2d6;
+}
