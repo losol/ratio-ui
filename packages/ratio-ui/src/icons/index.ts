@@ -14,6 +14,8 @@ export {
   Eye,
   Pencil,
   CircleX,
+  Copy,
+  WrapText,
 
   // Search
   Search,
