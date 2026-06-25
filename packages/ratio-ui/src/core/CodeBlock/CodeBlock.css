@@ -1,0 +1,198 @@
+/*
+ * CodeBlock — a self-framed code/JSON/XML surface. Uses the --code-*
+ * tokens (tokens/code.css), which flip with the theme. The component
+ * does not highlight; it frames raw text (or caller-provided
+ * highlightedLines). The toolbar re-skins ActionButton via its tokens.
+ */
+.codeblock {
+  --radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-lg);
+  background: var(--code-surface);
+  box-shadow: 0 1px 2px rgba(20, 30, 40, 0.07), 0 6px 18px rgba(20, 30, 40, 0.05);
+  overflow: hidden;
+  font-family: var(--font-sans);
+}
+:root[data-theme="dark"] .codeblock,
+:root[data-color-scheme="dark"] .codeblock {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- header ---- */
+.codeblock__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px 8px 14px;
+  background: var(--code-header-bg);
+  border-bottom: 1px solid var(--code-header-border);
+}
+.codeblock--collapsed .codeblock__header {
+  border-bottom: 0;
+}
+
+.codeblock__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: var(--code-text);
+  text-align: left;
+  cursor: pointer;
+}
+.codeblock__toggle--static {
+  cursor: default;
+}
+.codeblock__toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--radius-sm);
+}
+
+.codeblock__chevron {
+  flex: none;
+  color: var(--code-icon);
+  transition: transform 200ms ease;
+}
+.codeblock--collapsed .codeblock__chevron {
+  transform: rotate(-90deg);
+}
+
+.codeblock__badge {
+  flex: none;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: var(--radius-full, 999px);
+  background: var(--code-badge-bg);
+  color: var(--code-badge-text);
+}
+.codeblock__filename {
+  font-size: 12px;
+  color: var(--code-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.codeblock__count {
+  flex: none;
+  font-size: 12px;
+  color: var(--code-muted);
+}
+
+/* ---- toolbar: re-skin ActionButton to a ghost code-icon button ---- */
+.codeblock__actions {
+  --action-button-bg: transparent;
+  --action-button-border: transparent;
+  --action-button-fg: var(--code-icon);
+  --action-button-fg-hover: var(--code-icon-hover);
+  --action-button-bg-hover: var(--overlay-hover);
+  --action-button-radius: 7px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+.codeblock__actions [aria-pressed="true"] {
+  background: var(--overlay-press);
+  color: var(--code-icon-hover);
+}
+.codeblock__copy {
+  font-size: 12px;
+  font-weight: 600;
+  gap: 6px;
+}
+.codeblock__copy[data-copied] {
+  --action-button-fg: var(--text-on-primary, #fff);
+  --action-button-bg: var(--code-accent);
+  --action-button-bg-hover: var(--code-accent);
+  --action-button-fg-hover: var(--text-on-primary, #fff);
+}
+
+/* ---- body ---- */
+.codeblock__body {
+  position: relative;
+  max-height: 340px;
+  overflow: auto;
+  padding: 12px 0;
+  background: var(--code-body);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.62;
+  color: var(--code-text);
+  tab-size: 2;
+}
+.codeblock__pre {
+  margin: 0;
+  min-width: max-content; /* lines extend → horizontal scroll when not wrapping */
+}
+.codeblock--wrap .codeblock__pre {
+  min-width: 0;
+}
+
+.codeblock__line {
+  display: flex;
+  align-items: flex-start;
+}
+.codeblock__ln {
+  position: sticky;
+  left: 0;
+  flex: none;
+  box-sizing: border-box;
+  width: 44px;
+  padding: 0 14px 0 16px;
+  text-align: right;
+  color: var(--code-gutter);
+  background: var(--code-body);
+  user-select: none;
+}
+.codeblock__cell {
+  flex: 1;
+  min-width: 0;
+  padding-right: 18px;
+  white-space: pre;
+}
+.codeblock--no-ln .codeblock__cell {
+  padding-left: 16px;
+}
+.codeblock--wrap .codeblock__cell {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ---- show more ---- */
+.codeblock__fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--code-body));
+}
+.codeblock__more {
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  border-top: 1px solid var(--code-header-border);
+  background: var(--code-header-bg);
+  color: var(--code-accent);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.codeblock__more:hover {
+  background: var(--code-header-bg);
+  filter: brightness(0.98);
+}
