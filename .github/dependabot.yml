@@ -1,0 +1,87 @@
+# Dependabot — replaces the previous Renovate setup.
+# Grouping, a 10-day cooldown (supply-chain delay, mirrors the old
+# minimumReleaseAge), and github-actions updates are kept; the dashboard
+# and pnpmDedupe were Renovate-only. Dependabot security updates run
+# separately and bypass the cooldown (enable them in repo settings).
+version: 2
+
+updates:
+  # ---- npm (pnpm workspace; root lockfile covers packages/* + config/*) ----
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      timezone: "Europe/Oslo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+    # Don't open PRs for releases younger than 10 days (supply-chain delay).
+    cooldown:
+      default-days: 10
+    # A dependency joins the FIRST group it matches (file order = precedence),
+    # so specific groups come before the broad minor/patch catch-all.
+    groups:
+      storybook:
+        patterns:
+          - "storybook"
+          - "@storybook/*"
+      typescript-eslint:
+        patterns:
+          - "typescript-eslint"
+          - "@typescript-eslint/*"
+      eslint:
+        patterns:
+          - "*eslint*"
+        exclude-patterns:
+          - "typescript-eslint"
+          - "@typescript-eslint/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      next:
+        patterns:
+          - "next"
+          - "@next/*"
+      vite:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "vitest"
+          - "@vitest/*"
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "tailwind-merge"
+          - "tailwindcss-react-aria-components"
+          - "autoprefixer"
+          - "postcss"
+      # Everything else: bundle minor + patch into one PR; majors stay solo.
+      minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # ---- GitHub Actions (low churn — monthly is plenty) ----
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      timezone: "Europe/Oslo"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+    cooldown:
+      default-days: 10
+    groups:
+      github-actions:
+        patterns:
+          - "*"
