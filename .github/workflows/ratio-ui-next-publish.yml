@@ -47,7 +47,7 @@ jobs:
         run: pnpm install --filter @eventuras/ratio-ui-next... --frozen-lockfile --ignore-scripts
 
       - name: Build package
-        run: pnpm --filter @eventuras/ratio-ui-next build
+        run: pnpm --filter @eventuras/ratio-ui-next... build
 
       - name: Publish to npm
         run: pnpm --filter @eventuras/ratio-ui-next publish --access public --provenance --no-git-checks
