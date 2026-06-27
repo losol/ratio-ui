@@ -1,40 +1,59 @@
 # @eventuras/ratio-ui-next
 
-Next.js-specific components for the Eventuras Ratio UI library.
-
-This package provides Next.js optimized wrappers for Ratio UI components that integrate seamlessly with Next.js features like:
-
-- `next/image` for optimized image loading
-- `next/link` for client-side navigation
+Next.js-specific wrappers for Ratio UI. Use this package alongside
+`@eventuras/ratio-ui` when an app needs components that integrate with Next.js
+routing or image optimization.
 
 ## Installation
 
 ```bash
-pnpm add @eventuras/ratio-ui-next
+pnpm add @eventuras/ratio-ui @eventuras/ratio-ui-next
+```
+
+Install the peer dependencies expected by the package:
+
+```bash
+pnpm add next react react-dom
 ```
 
 ## Usage
 
-### Image
+Import Ratio UI styles from the core package in your app root:
+
+```tsx
+import '@eventuras/ratio-ui/ratio-ui.css';
+```
+
+Then import the Next.js wrappers by subpath:
 
 ```tsx
 import { Image } from '@eventuras/ratio-ui-next/Image';
-
-<Image src="/photo.jpg" alt="Description" width={800} height={600} />
-```
-
-### Link
-
-```tsx
 import { Link } from '@eventuras/ratio-ui-next/Link';
 
-<Link href="/about">About Us</Link>
+export function Example() {
+  return (
+    <>
+      <Image src="/photo.jpg" alt="Description" width={800} height={600} />
+      <Link href="/about">About us</Link>
+    </>
+  );
+}
 ```
 
-## Dependencies
+The package also exports both components from its root entry:
 
-This package depends on:
+```tsx
+import { Image, Link } from '@eventuras/ratio-ui-next';
+```
 
-- `@eventuras/ratio-ui` - Core UI components
-- `next` - Next.js framework (peer dependency)
-- `react` - React library (peer dependency)
+## Local Development
+
+From the repository root:
+
+```bash
+pnpm --filter @eventuras/ratio-ui-next build
+pnpm --filter @eventuras/ratio-ui-next lint
+```
+
+The package build is handled by the shared `@ratio-ui/vite-config` library
+preset.
