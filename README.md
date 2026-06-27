@@ -42,4 +42,4 @@ pnpm release            # publish to npm
 
 ## License
 
-[GPL-3.0-or-later](LICENSE)
+[MIT](LICENSE)
