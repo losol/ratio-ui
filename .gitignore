@@ -1,3 +1,6 @@
+# handoffs
+handoffs/
+
 # dependencies
 node_modules/
 .pnpm-store/
