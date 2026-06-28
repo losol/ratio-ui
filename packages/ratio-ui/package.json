@@ -1,6 +1,7 @@
 {
   "name": "@eventuras/ratio-ui",
   "version": "2.8.0",
+  "license": "MIT",
   "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/ratio-ui#readme",
   "bugs": {
     "url": "https://github.com/losol/ratio-ui/issues"
