@@ -12,6 +12,7 @@ const meta: Meta<typeof TextField> = {
     placeholder: { control: 'text' },
     disabled: { control: 'boolean' },
     multiline: { control: 'boolean' },
+    showCopyToClipboard: { control: 'boolean' },
   },
 };
 
@@ -45,6 +46,18 @@ export const WithError: Story = {
     label: 'Email Address',
     placeholder: 'Enter your email',
     errors: { email: 'Invalid email address' },
+  },
+};
+
+/** Read-only field with a copy-to-clipboard button in the trailing slot */
+export const ReadOnlyWithCopy: Story = {
+  args: {
+    name: 'apiKey',
+    label: 'API key',
+    defaultValue: 'demo_api_key_1234567890abcdef',
+    readOnly: true,
+    showCopyToClipboard: true,
+    description: 'Read-only value with one-tap copy.',
   },
 };
 
