@@ -1,0 +1,26 @@
+/*
+ * Motion tokens — shared, reusable animations.
+ *
+ * Defined as Tailwind v4 `--animate-*` theme tokens, so each one generates a
+ * real utility (e.g. `animate-pop`) instead of an arbitrary `animate-[...]`.
+ * This is the home for animations used across more than one component.
+ */
+@theme {
+  /* Quick scale + fade "pop" — a success affordance appearing after an action
+     completes (copy ✓, save ✓, …). Use via the `animate-pop` utility. */
+  --animate-pop: pop 0.32s ease-out;
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.15);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
