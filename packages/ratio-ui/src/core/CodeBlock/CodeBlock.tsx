@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Check, ChevronDown, Copy, Download, WrapText } from '../../icons';
 import { ActionButton } from '../ActionButton';
 import { cn } from '../../utils/cn';
+import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import './CodeBlock.css';
 
 export interface CodeBlockProps {
@@ -71,31 +72,14 @@ export function CodeBlock({
 }: CodeBlockProps): React.ReactElement {
   const [collapsed, setCollapsed] = useState(startCollapsed);
   const [wrapped, setWrapped] = useState(wrap);
-  const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const { copied, copy } = useCopyToClipboard();
 
   const lines = useMemo(() => code.split(/\r\n|\r|\n/), [code]);
   const lineCount = lines.length;
 
   const clipped = showMore && !expanded && lineCount > maxLines;
   const visibleCount = clipped ? maxLines : lineCount;
-
-  // Clear a pending "Copied" reset if the block unmounts first.
-  useEffect(() => () => clearTimeout(copyTimer.current), []);
-
-  const copy = useCallback(() => {
-    // `?.` on both clipboard and the returned promise — no-op when the
-    // Clipboard API is unavailable or blocked, instead of throwing.
-    navigator.clipboard?.writeText(code)?.then(
-      () => {
-        setCopied(true);
-        clearTimeout(copyTimer.current);
-        copyTimer.current = setTimeout(() => setCopied(false), 1600);
-      },
-      () => {}
-    );
-  }, [code]);
 
   const download = useCallback(() => {
     const mime = MIME_BY_LANGUAGE[language.toLowerCase()] ?? 'text/plain';
@@ -143,7 +127,7 @@ export function CodeBlock({
           ariaLabel="Copy code"
           data-copied={copied || undefined}
           className="codeblock__copy enabled:active:scale-100"
-          onClick={copy}
+          onClick={() => copy(code)}
         >
           {copied ? <Check {...ICON} /> : <Copy {...ICON} />}
           <span>{copied ? 'Copied' : 'Copy'}</span>
