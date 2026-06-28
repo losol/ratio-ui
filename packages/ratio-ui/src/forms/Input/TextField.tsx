@@ -8,11 +8,20 @@ import { formStyles } from '../styles/formStyles';
 import { Label } from '../common/Label';
 import { InputError } from '../common/InputError';
 import { InputDescription } from '../common/InputDescription';
+import { CopyButton } from '../../core/CopyButton';
 
 interface ExtendedInputProps extends InputFieldProps {
   multiline?: boolean;
   rows?: number;
   cols?: number;
+  /**
+   * Show a copy-to-clipboard button in the field's trailing slot. Copies the
+   * `value` / `defaultValue`. Typically paired with `readOnly` for showing a
+   * generated value (API key, share link) among editable fields.
+   *
+   * @beta Experimental — renders the beta `CopyButton`; behaviour may change.
+   */
+  showCopyToClipboard?: boolean;
 }
 
 type CommonProps = InputHTMLAttributes<HTMLInputElement> &
@@ -61,6 +70,7 @@ export const TextField = forwardRef<HTMLElement, ExtendedInputProps>(
       cols,
       noMargin = false,
       noWrapper = false,
+      showCopyToClipboard = false,
       testId,
       ...rest
     },
@@ -70,7 +80,9 @@ export const TextField = forwardRef<HTMLElement, ExtendedInputProps>(
 
     let inputClassName = `${className ?? formStyles.defaultInputStyle} ${
       hasError ? formStyles.inputErrorGlow : ''
-    } ${disabled ? 'cursor-not-allowed' : ''}`;
+    } ${disabled ? 'cursor-not-allowed' : ''} ${
+      showCopyToClipboard ? 'pr-10' : ''
+    }`;
 
     if (multiline) {
       inputClassName = `${inputClassName} ${formStyles.textarea}`;
@@ -115,11 +127,31 @@ export const TextField = forwardRef<HTMLElement, ExtendedInputProps>(
       />
     );
 
+    const copyValue = rest.value ?? rest.defaultValue ?? '';
+    const fieldControl = showCopyToClipboard ? (
+      <div className="relative">
+        {inputElement}
+        <span
+          className={`absolute right-1 ${
+            multiline ? 'top-1' : 'inset-y-0 flex items-center'
+          }`}
+        >
+          <CopyButton
+            value={String(copyValue)}
+            size="sm"
+            ariaLabel={label ? `Copy ${label}` : 'Copy to clipboard'}
+          />
+        </span>
+      </div>
+    ) : (
+      inputElement
+    );
+
     const content = (
       <>
         {label && <Label htmlFor={id}>{label}</Label>}
         {description && <InputDescription>{description}</InputDescription>}
-        {inputElement}
+        {fieldControl}
         {hasError && <InputError errors={errors} name={name} />}
       </>
     );
