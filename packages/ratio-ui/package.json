@@ -65,6 +65,10 @@
       "types": "./dist/console/index.d.ts",
       "import": "./dist/console/index.js"
     },
+    "./hooks": {
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.js"
+    },
     "./tokens": {
       "types": "./dist/tokens/index.d.ts",
       "import": "./dist/tokens/index.js"
