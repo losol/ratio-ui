@@ -2,7 +2,7 @@
   "name": "@ratio-ui/vite-config",
   "version": "0.2.2",
   "private": true,
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "type": "module",
   "exports": {
     "./base": "./src/base.ts",
