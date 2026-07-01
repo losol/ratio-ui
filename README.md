@@ -104,4 +104,16 @@ component authoring expectations, and pull request checklist.
 
 ## License
 
-[MIT](LICENSE).
+Copyright (C) 2026 Losol AS
+
+Ratio UI is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+Ratio UI is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+See [`LICENSE`](LICENSE) for the LGPL-3.0 terms and
+[`LICENSE.GPL-3.0.txt`](LICENSE.GPL-3.0.txt) for the GPL-3.0 terms it builds on.

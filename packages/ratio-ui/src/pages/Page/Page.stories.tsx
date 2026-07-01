@@ -114,7 +114,7 @@ const PageDemo: React.FC<{ title: string }> = ({ title }) => (
             Built for content that <em className="font-serif text-(--accent)">lasts</em>
           </Heading>
           <p className="max-w-[56ch] mx-auto mb-8 text-(--text-muted)">
-            The system is open source, MIT licensed, and shipped from the same monorepo as
+            The system is open source, LGPL-3.0 licensed, and shipped from the same monorepo as
             Eventuras itself. No build step required, just install and import.
           </p>
           <Button variant="primary" size="lg">View on GitHub</Button>
