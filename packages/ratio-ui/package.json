@@ -117,7 +117,7 @@
     "react-aria-components": "^1.17.0",
     "react-stately": "^3.46.0",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss-react-aria-components": "^2.1.0"
+    "tailwindcss-react-aria-components": "^2.2.0"
   },
   "devDependencies": {
     "@ratio-ui/eslint-config": "workspace:*",
@@ -130,8 +130,8 @@
     "@storybook/react": "^10.3.5",
     "@storybook/react-vite": "^10.3.5",
     "@swc/helpers": "^0.5.21",
-    "@tailwindcss/postcss": "^4.2.2",
-    "@tailwindcss/vite": "^4.2.2",
+    "@tailwindcss/postcss": "^4.3.1",
+    "@tailwindcss/vite": "^4.3.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitest/browser-playwright": "^4.1.4",
@@ -143,7 +143,7 @@
     "postcss": "^8.5.10",
     "react-dom": "^19.2.5",
     "storybook": "^10.3.5",
-    "tailwindcss": "^4.2.2",
+    "tailwindcss": "^4.3.1",
     "typescript": "6.0.3",
     "vite": "8.0.16",
     "vitest": "^4.1.4"
