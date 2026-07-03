@@ -31,7 +31,7 @@
     "@ratio-ui/eslint-config": "workspace:*",
     "@ratio-ui/typescript-config": "workspace:*",
     "@types/node": "^24.12.0",
-    "eslint": "^10.2.0",
+    "eslint": "^10.5.0",
     "prettier": "^3.8.4",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"

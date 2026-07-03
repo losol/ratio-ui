@@ -41,11 +41,11 @@
     "@ratio-ui/eslint-config": "workspace:*",
     "@ratio-ui/typescript-config": "workspace:*",
     "@ratio-ui/vite-config": "workspace:*",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "next": "16.2.9",
     "typescript": "6.0.3",
-    "vite": "8.0.16"
+    "vite": "8.1.0"
   },
   "peerDependencies": {
     "@eventuras/ratio-ui": "^2.8.0",
