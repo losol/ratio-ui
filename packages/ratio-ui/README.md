@@ -96,3 +96,8 @@ Bureau theme documented in [`docs/bureau-theme-spec.md`](docs/bureau-theme-spec.
 If you import `ratio-ui.css` or `global.css`, set `data-theme` on `<html>`
 before first paint. The CSS export guide includes a small initialization
 example.
+
+## License
+
+Licensed under the [Mozilla Public License 2.0](LICENSE)
+(`MPL-2.0`). Copyright (c) 2026 Losol AS.

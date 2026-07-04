@@ -12,7 +12,7 @@
     "url": "https://github.com/losol/ratio-ui.git",
     "directory": "config/eslint-config"
   },
-  "license": "MIT",
+  "license": "MPL-2.0",
   "type": "module",
   "exports": {
     "./base": "./base.js",

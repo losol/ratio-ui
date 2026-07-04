@@ -1,7 +1,7 @@
-Ratio UI — design system for knowledge sharing
+Ratio UI for Next.js — Next.js integration for the Ratio UI design system
 Copyright (c) 2026 Losol AS.
 
-Ratio UI is licensed under the Mozilla Public License, Version 2.0 (MPL-2.0).
+@eventuras/ratio-ui-next is licensed under the Mozilla Public License, Version 2.0 (MPL-2.0).
 The full license text is reproduced below and is also available at
 https://mozilla.org/MPL/2.0/.
 
