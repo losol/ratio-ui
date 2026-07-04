@@ -104,4 +104,5 @@ component authoring expectations, and pull request checklist.
 
 ## License
 
-[MIT](LICENSE).
+Licensed under the [Mozilla Public License 2.0](LICENSE)
+(`MPL-2.0`). Copyright (c) 2026 Losol AS.

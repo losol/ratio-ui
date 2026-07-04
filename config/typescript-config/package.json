@@ -12,7 +12,7 @@
     "url": "https://github.com/losol/ratio-ui.git",
     "directory": "config/typescript-config"
   },
-  "license": "MIT",
+  "license": "MPL-2.0",
   "files": [
     "base.json",
     "react-library.json",
