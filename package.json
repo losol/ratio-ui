@@ -30,14 +30,14 @@
     "@changesets/cli": "^2.30.0",
     "@ratio-ui/eslint-config": "workspace:*",
     "@ratio-ui/typescript-config": "workspace:*",
-    "@types/node": "^24.12.0",
-    "eslint": "^10.5.0",
-    "prettier": "^3.8.4",
+    "@types/node": "^24.13.2",
+    "eslint": "^10.6.0",
+    "prettier": "^3.9.3",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   },
   "dependencies": {
-    "turbo": "^2.9.18"
+    "turbo": "^2.10.0"
   },
   "packageManager": "pnpm@11.5.1",
   "engines": {
