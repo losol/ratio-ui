@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 import { defineConfig, type UserConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -38,7 +42,13 @@ function preserveUseClient() {
           });
 
           if (hasClientDirective) {
-            const codeStart = chunkData.code.trimStart();
+            // Ignore a leading banner/license comment (e.g. Rollup's
+            // output.banner) when checking for the directive, so we don't
+            // prepend a duplicate above a directive that's already there.
+            const codeStart = chunkData.code
+              .replace(/^\s+/, '')
+              .replace(/^(\/\*[\s\S]*?\*\/\s*)+/, '')
+              .replace(/^(\/\/.*(\r?\n|$)\s*)+/, '');
             if (!codeStart.startsWith("'use client'") && !codeStart.startsWith('"use client"')) {
               chunkData.code = `'use client';\n${chunkData.code}`;
             }

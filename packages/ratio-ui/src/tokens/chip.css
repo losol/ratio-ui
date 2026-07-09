@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * Chip tokens — defaults consumed by `core/Chip` and any component that
  * composes it. Overridable per-scope (any ancestor can set `--chip-bg`
  * etc. to re-skin chips inside its subtree without forking the

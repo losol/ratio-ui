@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * LiveIndicator tokens — only the dot color lives here. The chip chrome
  * (bg/fg/border) is set locally on `.live-indicator` so we don't pollute
  * the global `--chip-*` defaults for every chip on the page.

@@ -1,3 +1,9 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 /* Reset heading margins inside schedule items */
 .schedule-item :is(h1, h2, h3, h4, h5, h6) {
   margin-top: 0;

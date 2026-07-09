@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 export { Checkbox, CheckBoxDescription, CheckBoxLabel } from './Input/Checkbox';
 export { Fieldset } from './common/Fieldset';
 export { Form } from './common/Form';

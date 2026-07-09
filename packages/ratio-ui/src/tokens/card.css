@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * Card tokens — the shadow elevation scale, consumed by `core/Card`
  * (via the .card-shadow-* rules in core/Card/Card.css). Defaults mirror
  * the previous Tailwind shadow-xs/sm/md exactly, so the standard theme

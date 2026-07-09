@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * Motion tokens — shared, reusable animations.
  *
  * Defined as Tailwind v4 `--animate-*` theme tokens, so each one generates a

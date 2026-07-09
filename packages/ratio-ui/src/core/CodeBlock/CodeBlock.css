@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * CodeBlock — a self-framed code/JSON/XML surface. Uses the --code-*
  * tokens (tokens/code.css), which flip with the theme. The component
  * does not highlight; it frames raw text (or caller-provided

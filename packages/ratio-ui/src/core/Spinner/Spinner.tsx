@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 export const Spinner = () => (
   <svg
     className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"

@@ -1,3 +1,9 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 @theme {
   /* Fluid spacing - @link https://utopia.fyi/space/calculator?c=360,14,1.2,1240,16,1.25,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
   --space-3xs: clamp(0.25rem, 0.25rem + 0vw, 0.25rem);

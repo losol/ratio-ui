@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 /** 6-step semantic spacing scale backed by fluid CSS tokens */
 export type Space = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 

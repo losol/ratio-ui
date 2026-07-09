@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * ActionButton tokens — defaults consumed by `core/ActionButton` and
  * anywhere it's composed. Overridable per-scope (any ancestor can set
  * `--action-button-bg` etc. to re-skin the button inside its subtree
