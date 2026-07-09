@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * Chip — only the dot's pulse keyframe lives here. Everything else
  * (chip surface, layout, variants, dot base styling) is expressed via
  * Tailwind utilities in Chip.tsx.

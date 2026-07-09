@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 /**
  * Defines the types of input elements supported, based on standard HTML input types.
  * This type restriction helps in ensuring that only valid HTML input types can be used.

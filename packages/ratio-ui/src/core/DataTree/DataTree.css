@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * DataTree — recursive term/value renderer. Tokens are Ratio UI CSS
  * variables (theme.css); they flip automatically under dark mode.
  *

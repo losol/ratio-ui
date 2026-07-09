@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * Button chrome rules — consume the --button-* tokens (defaults in
  * tokens/button.css, overridden per theme e.g. tokens/bureau.css) so a
  * theme can reskin shape, shadow, and press feedback without touching

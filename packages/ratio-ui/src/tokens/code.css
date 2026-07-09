@@ -1,4 +1,10 @@
 /*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
  * Code surface tokens — a solid, calm, cool surface for code/JSON/XML,
  * deliberately outside the Linen/Linseed surfaces so code reads with
  * neutral contrast. Consumed by core/CodeBlock. Dark values respond to

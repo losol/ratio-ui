@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 import React from 'react';
 import { ToggleButton as AriaToggleButton, ToggleButtonProps as AriaToggleButtonProps } from 'react-aria-components';
 import { cn } from '../../utils/cn';

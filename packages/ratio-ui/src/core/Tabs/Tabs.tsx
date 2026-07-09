@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 import React, { ReactElement } from 'react';
 import { Tab, TabList, TabPanel, Tabs as AriaTabs } from 'react-aria-components';
 

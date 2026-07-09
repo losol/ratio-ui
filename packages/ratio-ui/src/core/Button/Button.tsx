@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 import React, { forwardRef } from 'react';
 import { LoaderCircle } from '../../icons';
 import { cn } from '../../utils/cn';

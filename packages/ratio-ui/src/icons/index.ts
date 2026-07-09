@@ -1,3 +1,7 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 /**
  * Centralized icon exports for the Eventuras design system.
  * All icons are sourced from lucide-react for consistency.
