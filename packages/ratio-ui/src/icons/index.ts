@@ -20,6 +20,7 @@ export {
   CircleX,
   Copy,
   WrapText,
+  GripVertical,
 
   // Search
   Search,
@@ -37,6 +38,9 @@ export {
   // Content
   FileText,
   File,
+  Folder,
+  FolderOpen,
+  Tag,
   Image as ImageIcon,
   Calendar,
   MapPin,
