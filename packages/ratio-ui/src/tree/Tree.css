@@ -1,0 +1,181 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Tree — sortable hierarchical tree. Colours are Ratio UI tokens
+ * (theme.css) so it flips under dark mode. Indentation is driven by the
+ * per-row `--tree-level` custom property (1 = top level).
+ */
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  outline: none;
+}
+
+.tree__item {
+  outline: none;
+  /*
+   * Fallback depth for rows past the enumerated levels below: anything deeper
+   * than 8 clamps to level-8 indentation rather than snapping back to level 1.
+   */
+  --tree-level: 8;
+}
+
+/*
+ * Indentation is driven by React Aria's `data-level` (1 = top). Declaring the
+ * `--tree-level` custom property per level on the item lets each row inherit
+ * its own depth from the nearest ancestor — works whether RAC renders the tree
+ * flat or nested, and needs no inline styles. Levels 1–8 are enumerated;
+ * deeper rows use the level-8 fallback above.
+ */
+.tree__item[data-level='1'] { --tree-level: 1; }
+.tree__item[data-level='2'] { --tree-level: 2; }
+.tree__item[data-level='3'] { --tree-level: 3; }
+.tree__item[data-level='4'] { --tree-level: 4; }
+.tree__item[data-level='5'] { --tree-level: 5; }
+.tree__item[data-level='6'] { --tree-level: 6; }
+.tree__item[data-level='7'] { --tree-level: 7; }
+.tree__item[data-level='8'] { --tree-level: 8; }
+
+.tree__row {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  min-height: 2.25rem;
+  padding-block: 0.25rem;
+  padding-inline-end: 0.375rem;
+  padding-inline-start: calc(0.375rem + (var(--tree-level, 1) - 1) * 1.25rem);
+  border-radius: 0.5rem;
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.2;
+  transition: background 100ms ease;
+}
+
+/*
+ * Row state is set as data-attributes on the row itself (from React Aria
+ * render props), not via `.tree__item[…] > .tree__row`: the row is not a
+ * direct child of the item, so a child combinator would never match.
+ */
+.tree__row[data-hovered] {
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+}
+
+.tree__row[data-selected] {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+/* Keyboard focus — a clear 2px ring in the focus-ring token colour. */
+.tree__row[data-focus-visible] {
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+/* Reparent target (drop "on" a row) — inset ring + subtle tint. */
+.tree__row[data-drop-target] {
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+/* Dim the row being dragged. */
+.tree__row[data-dragging] {
+  opacity: 0.4;
+}
+
+/* Compact density — tighter rows. */
+.tree--compact .tree__row {
+  min-height: 2rem;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+}
+
+.tree__handle {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: var(--text-subtle, var(--text-muted));
+  cursor: grab;
+  line-height: 1;
+}
+
+.tree__handle[data-dragging],
+.tree__handle[data-pressed] {
+  cursor: grabbing;
+}
+
+.tree__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.tree__chevron svg {
+  transition: transform 150ms ease;
+}
+
+/* One chevron that rotates on expand, instead of swapping two icons. */
+.tree__chevron[data-open] svg {
+  transform: rotate(90deg);
+}
+
+.tree__chevron--leaf {
+  cursor: default;
+}
+
+.tree__checkbox {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.tree__checkbox-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 1.5px solid var(--color-neutral-400);
+  border-radius: 5px;
+  color: var(--text-on-primary, #fff);
+  font-size: 0.75rem;
+  line-height: 1;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.tree__checkbox-box[data-selected],
+.tree__checkbox-box[data-indeterminate] {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.tree__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Reorder line (drop "before"/"after"). */
+.tree__drop-indicator {
+  outline: none;
+}
+
+.tree__drop-indicator[data-drop-target] {
+  display: block;
+  height: 2px;
+  margin-inline: 0.5rem;
+  background: var(--primary);
+  border-radius: 1px;
+}

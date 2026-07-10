@@ -42,6 +42,10 @@
       "types": "./dist/forms/*/index.d.ts",
       "import": "./dist/forms/*/index.js"
     },
+    "./tree": {
+      "types": "./dist/tree/index.d.ts",
+      "import": "./dist/tree/index.js"
+    },
     "./visuals/*": {
       "types": "./dist/visuals/*/index.d.ts",
       "import": "./dist/visuals/*/index.js"
