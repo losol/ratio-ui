@@ -3,24 +3,13 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "storybook-static/**"]
+      "outputs": ["dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "lint:fix": {
       "dependsOn": ["^lint:fix"]
-    },
-    "test": {
-      "dependsOn": ["^build"]
-    },
-    "storybook": {
-      "cache": false,
-      "persistent": true
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
     }
   }
 }

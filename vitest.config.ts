@@ -15,9 +15,9 @@ export default defineConfig({
       : {
           projects: [
             {
-              extends: './vite.config.ts',
               plugins: [
                 storybookTest({
+                  configDir: '.storybook',
                   storybookScript: 'pnpm run storybook -- --ci',
                 }),
               ],
