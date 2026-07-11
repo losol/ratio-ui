@@ -7,5 +7,8 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@ratio-ui/eslint-config", "@ratio-ui/typescript-config", "@ratio-ui/vite-config"]
+  "ignore": ["@ratio-ui/eslint-config", "@ratio-ui/typescript-config", "@ratio-ui/vite-config"],
+  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+    "onlyUpdatePeerDependentsWhenOutOfRange": true
+  }
 }
