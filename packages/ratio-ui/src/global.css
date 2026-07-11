@@ -12,7 +12,12 @@
  */
 
 /* Tailwind + plugins */
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* Design tokens — kept with the imports so every @import precedes the
+   @plugin/@source statements below.  */
+@import './tokens/index.css';
+
 @plugin 'tailwindcss-react-aria-components';
 @source '**/*.tsx';
 
@@ -49,8 +54,7 @@
    legacy data-theme="dark" arms are untouched. */
 @custom-variant dark (&:where(html[data-theme="dark"] &, body[data-theme="dark"] &, [data-theme="dark"] *, [data-color-scheme="dark"] *));
 
-/* Design tokens */
-@import "./tokens/index.css";
+/* (Design tokens are imported at the top, with the other @import rules.) */
 
 /* Surface tone overrides. Composes with the theme-aware default `--text`
    from tokens/theme.css: in unmarked containers `--text` follows the
