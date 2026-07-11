@@ -43,6 +43,31 @@ const Template: ButtonStory = ({ icon, ...args }) => (
 export const Playground = Template.bind({});
 Playground.storyName = 'Playground';
 
+/**
+ * Trigger pill — a flush leading avatar + name (e.g. a user/account menu
+ * trigger). `Button.Avatar` sits concentric with the pill's rounded edge and
+ * keeps the token-driven Button chrome, instead of a hand-copied class string.
+ * Also shows the new `onPress` handler alongside the sizes.
+ */
+export const TriggerPill: StoryFn = () => (
+  <div className="flex flex-wrap items-center gap-4">
+    <Button variant="primary" size="sm" onPress={() => {}}>
+      <Button.Avatar name="Hypatia" />
+      <Button.Label>Hypatia</Button.Label>
+    </Button>
+    <Button variant="primary" onPress={() => {}}>
+      <Button.Avatar name="Ada Lovelace" />
+      <Button.Label>Ada Lovelace</Button.Label>
+    </Button>
+    {/* Long name truncates instead of blowing the pill out. */}
+    <Button variant="secondary" size="lg" onPress={() => {}}>
+      <Button.Avatar name="Gottfried Wilhelm Leibniz" />
+      <Button.Label maxWidth="14ch">Gottfried Wilhelm Leibniz</Button.Label>
+    </Button>
+  </div>
+);
+TriggerPill.storyName = 'Trigger pill (Button.Avatar)';
+
 export const Primary = Template.bind({});
 Primary.args = {
   variant: 'primary',

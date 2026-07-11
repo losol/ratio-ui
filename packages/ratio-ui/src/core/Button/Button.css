@@ -17,8 +17,12 @@
 
 /* Single source of truth for the press feedback (the standard theme's
    grow lives in --button-transform-active, so there's no Tailwind
-   active:scale utility competing with it). */
-.ratio-button:active {
+   active:scale utility competing with it). `:active` covers non-RAC
+   consumers of `.ratio-button` (Link, SplitButton); `[data-pressed]`
+   covers React Aria's Button, which drives press state via that
+   attribute rather than the native :active pseudo. */
+.ratio-button:active,
+.ratio-button[data-pressed] {
   transform: var(--button-transform-active, scale(1.04));
   /* Falls back to the resting shadow, so a theme that only sets
      --button-shadow keeps it on press; bureau sets none to drop it. */
