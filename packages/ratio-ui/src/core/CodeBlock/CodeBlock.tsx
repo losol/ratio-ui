@@ -19,6 +19,16 @@ export interface CodeBlockProps {
   /** Optional filename, shown muted next to the badge. */
   filename?: string;
   /**
+   * Interactive language picker rendered in the header's right-hand toolbar
+   * (alongside copy / wrap / download). Plug in a `ToggleButtonGroup` (a few
+   * languages) or a `Select` (many) — you own the selection state and swap
+   * `code` **and `language`** accordingly (`language` also drives the download
+   * filename + MIME type). The static language badge is dropped while it's
+   * present (the selector already shows the language). Kept as a slot so
+   * `CodeBlock` stays in `core` without depending on `forms`.
+   */
+  languageSelector?: React.ReactNode;
+  /**
    * Optional per-line highlighted content — one node per line — rendered in
    * the code cells instead of the raw line text. The gutter stays outside,
    * so alignment holds when wrapping. Produce these from any highlighter
@@ -46,6 +56,31 @@ const MIME_BY_LANGUAGE: Record<string, string> = {
   xml: 'application/xml',
 };
 
+/**
+ * Download file extension per language label (lower-cased). Falls back to the
+ * label itself when unmapped, so `language="TypeScript"` downloads as `.ts`,
+ * not `.typescript`.
+ */
+const EXTENSION_BY_LANGUAGE: Record<string, string> = {
+  typescript: 'ts',
+  javascript: 'js',
+  json: 'json',
+  xml: 'xml',
+  python: 'py',
+  csharp: 'cs',
+  'c#': 'cs',
+  html: 'html',
+  css: 'css',
+  markdown: 'md',
+  yaml: 'yml',
+  bash: 'sh',
+  shell: 'sh',
+  sql: 'sql',
+  java: 'java',
+  go: 'go',
+  rust: 'rs',
+};
+
 const ICON = { size: 15, strokeWidth: 2 } as const;
 
 /**
@@ -61,6 +96,7 @@ export function CodeBlock({
   code,
   language = 'TypeScript',
   filename,
+  languageSelector,
   highlightedLines,
   showHeader = true,
   showLineNumbers = true,
@@ -86,12 +122,16 @@ export function CodeBlock({
   const visibleCount = clipped ? maxLines : lineCount;
 
   const download = useCallback(() => {
-    const mime = MIME_BY_LANGUAGE[language.toLowerCase()] ?? 'text/plain';
+    const key = language.toLowerCase();
+    const mime = MIME_BY_LANGUAGE[key] ?? 'text/plain';
+    // Map the label to a real extension (TypeScript → ts); fall back to the
+    // label itself for anything unmapped.
+    const ext = EXTENSION_BY_LANGUAGE[key] ?? key;
     const blob = new Blob([code], { type: mime });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = filename ?? `code.${language.toLowerCase()}`;
+    a.download = filename ?? `code.${ext}`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -140,10 +180,13 @@ export function CodeBlock({
     </div>
   );
 
+  // The whole leading row is the collapse target. The static language badge is
+  // dropped when a `languageSelector` is provided — the selector (rendered with
+  // the toolbar on the right) already shows the language.
   const leading = (
     <>
       {showCollapse && <ChevronDown {...ICON} className="codeblock__chevron" aria-hidden />}
-      <span className="codeblock__badge">{language}</span>
+      {!languageSelector && <span className="codeblock__badge">{language}</span>}
       {filename && <span className="codeblock__filename">{filename}</span>}
       {collapsed && <span className="codeblock__count">· {lineCount} lines</span>}
     </>
@@ -172,6 +215,18 @@ export function CodeBlock({
             </button>
           ) : (
             <div className="codeblock__toggle codeblock__toggle--static">{leading}</div>
+          )}
+          {/* The selector sits with the toolbar on the right, whatever form it
+              takes. Its own wrapper isolates clicks so they don't toggle
+              collapse (like `actions`). */}
+          {languageSelector && (
+            <div
+              className="codeblock__language"
+              onClick={(e) => e.stopPropagation()}
+              role="presentation"
+            >
+              {languageSelector}
+            </div>
           )}
           {actions}
         </div>

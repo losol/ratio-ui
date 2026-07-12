@@ -1,5 +1,11 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
+import { useState } from 'react';
+import type { Key } from 'react-aria-components';
 import { CodeBlock } from './CodeBlock';
+import { ToggleButtonGroup } from '../ToggleButtonGroup';
+// Cross-layer import is fine here: this is a story (a composition demo), not
+// part of CodeBlock's shipped graph — CodeBlock itself never imports `forms`.
+import { Select } from '../../forms/Select';
 
 const meta: Meta<typeof CodeBlock> = {
   title: 'Core/CodeBlock',
@@ -33,7 +39,8 @@ const json = `{
   "title": "Intro to Recursion",
   "capacity": 30,
   "tags": ["course", "beginner"],
-  "instructor": { "ref": "Practitioner/ada-l" }
+  "instructor": { "ref": "Practitioner/ada-l" },
+  "prerequisite": { "ref": "Event/evt_019ea2ce" }
 }`;
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -44,6 +51,8 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
     <tag>course</tag>
     <tag>beginner</tag>
   </tags>
+  <!-- To attend Intro to Recursion, first attend Intro to Recursion. -->
+  <prerequisite ref="Event/evt_019ea2ce" />
 </event>`;
 
 export const TypeScript = Template.bind({});
@@ -80,4 +89,101 @@ Minimal.args = {
   language: 'JSON',
   showHeader: false,
   showLineNumbers: false,
+};
+
+// —— Language selector plugged into the header via `languageSelector` ——
+// The same greeting in four languages, so the switch reads as "one idea,
+// different syntaxes" rather than filler.
+
+const greetJs = `export function greet(name) {
+  return \`Hello, \${name}!\`;
+}`;
+
+const greetTs = `export function greet(name: string): string {
+  return \`Hello, \${name}!\`;
+}`;
+
+const greetCs = `public static string Greet(string name) =>
+    $"Hello, {name}!";`;
+
+const greetPy = `def greet(name: str) -> str:
+    return f"Hello, {name}!"`;
+
+/**
+ * A few languages → a `ToggleButtonGroup` in the header slot. The story owns
+ * the selection and swaps `code`; `CodeBlock` just renders whatever selector
+ * you hand it.
+ */
+export const WithLanguageToggle: StoryFn<typeof CodeBlock> = () => {
+  const samples = {
+    json: { code: json, label: 'JSON' },
+    xml: { code: xml, label: 'XML' },
+  } as const;
+  type Lang = keyof typeof samples;
+  const [selected, setSelected] = useState<Set<Key>>(() => new Set<Key>(['json']));
+  const current = (([...selected][0] ?? 'json') as Lang);
+  const active = samples[current];
+
+  return (
+    <div style={{ maxWidth: 720 }}>
+      <CodeBlock
+        code={active.code}
+        language={active.label}
+        filename={`event.${current}`}
+        languageSelector={
+          <ToggleButtonGroup
+            size="sm"
+            aria-label="Language"
+            disallowEmptySelection
+            selectedKeys={selected}
+            onSelectionChange={setSelected}
+            options={[
+              { value: 'json', label: 'JSON' },
+              { value: 'xml', label: 'XML' },
+            ]}
+          />
+        }
+      />
+    </div>
+  );
+};
+
+/**
+ * Many languages → a `Select` in the header slot. Same wiring; the consumer
+ * picks whichever control fits the option count.
+ */
+export const WithLanguageSelect: StoryFn<typeof CodeBlock> = () => {
+  const samples = {
+    javascript: { code: greetJs, label: 'JavaScript' },
+    typescript: { code: greetTs, label: 'TypeScript' },
+    csharp: { code: greetCs, label: 'C#' },
+    python: { code: greetPy, label: 'Python' },
+  } as const;
+  type Lang = keyof typeof samples;
+  const [lang, setLang] = useState<Lang>('typescript');
+  const active = samples[lang];
+
+  return (
+    <div style={{ maxWidth: 720 }}>
+      <CodeBlock
+        code={active.code}
+        language={active.label}
+        languageSelector={
+          <div style={{ width: 170 }}>
+            <Select
+              aria-label="Language"
+              value={lang}
+              onSelectionChange={(v) => setLang(v as Lang)}
+              options={[
+                { value: 'javascript', label: 'JavaScript' },
+                { value: 'typescript', label: 'TypeScript' },
+                { value: 'csharp', label: 'C#' },
+                { value: 'python', label: 'Python' },
+              ]}
+            />
+          </div>
+        }
+      />
+    </div>
+  );
 };
