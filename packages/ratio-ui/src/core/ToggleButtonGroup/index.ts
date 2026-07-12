@@ -2,4 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-export { ToggleButtonGroup, type ToggleButtonGroupProps, type ToggleButtonOption } from './ToggleButtonGroup';
+export { ToggleButtonGroup } from './ToggleButtonGroup';
+export type {
+  ToggleButtonGroupProps,
+  ToggleButtonOption,
+  ToggleButtonGroupSize,
+} from './ToggleButtonGroup';
