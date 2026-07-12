@@ -9,7 +9,7 @@ const packagesDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'package
 if (!existsSync(packagesDir)) {
   throw new Error(
     `[.storybook/main.ts] No "packages/" directory found at ${packagesDir}. ` +
-      'Storybook expects to run from a repo with a packages/ workspace.',
+    'Storybook expects to run from a repo with a packages/ workspace.',
   );
 }
 
@@ -30,8 +30,9 @@ const config: StorybookConfig = {
   addons: [
     '@storybook/addon-a11y',
     '@storybook/addon-docs',
+    '@storybook/addon-mcp',
     '@storybook/addon-themes',
-    '@storybook/addon-vitest',
+    '@storybook/addon-vitest'
   ],
   framework: {
     name: '@storybook/react-vite',

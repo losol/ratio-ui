@@ -12,8 +12,12 @@ updates:
     commit-message:
       prefix: "Deps"
     # Don't open PRs for releases younger than 10 days (supply-chain delay).
+    # Storybook is dev-only, excluded from this rule.
     cooldown:
       default-days: 10
+      exclude:
+        - "storybook"
+        - "@storybook/*"
     groups:
       npm:
         patterns:

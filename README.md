@@ -38,6 +38,15 @@ pnpm test           # run package test suites
 pnpm dev            # run package dev tasks configured for Turbo
 ```
 
+## Storybook MCP
+
+This repo now includes a root MCP config in `.mcp.json` for Storybook.
+
+```bash
+pnpm storybook      # start Storybook on http://127.0.0.1:6006
+pnpm storybook:mcp  # run the Storybook MCP server
+```
+
 For focused package work, run commands through pnpm's filter support:
 
 ```bash

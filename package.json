@@ -24,6 +24,7 @@
     "lint:fix": "turbo run lint:fix",
     "release": "changeset publish",
     "storybook": "storybook dev -p 6006 --no-open",
+    "storybook:mcp": "npx -y storybook@latest mcp --storybook-url http://127.0.0.1:6006",
     "storybook:build": "storybook build",
     "test": "vitest run"
   },
@@ -33,6 +34,7 @@
     "@ratio-ui/typescript-config": "workspace:*",
     "@storybook/addon-a11y": "^10.4.6",
     "@storybook/addon-docs": "^10.4.6",
+    "@storybook/addon-mcp": "^0.7.0",
     "@storybook/addon-themes": "^10.4.6",
     "@storybook/addon-vitest": "^10.4.6",
     "@storybook/react": "^10.4.6",
