@@ -14,6 +14,11 @@ allowBuilds:
 # Supply-chain protection: do not resolve packages published less than
 # 10 days ago. Mirrors the window used in the eventuras monorepo.
 minimumReleaseAge: 14400
+# Storybook is a dev-only dependency (never shipped to consumers) and moves
+# fast
+minimumReleaseAgeExclude:
+  - 'storybook'
+  - '@storybook/*'
 minimumReleaseAgeStrict: false
 
 peerDependencyRules:
