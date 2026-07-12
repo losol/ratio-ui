@@ -64,6 +64,16 @@
   border-radius: var(--radius-sm);
 }
 
+/* Wrapper around the plugged-in language selector — it sits with the toolbar
+   on the right; this isolates its clicks from collapse and keeps it from
+   stretching. */
+.codeblock__language {
+  display: flex;
+  align-items: center;
+  flex: none;
+  min-width: 0;
+}
+
 .codeblock__chevron {
   flex: none;
   color: var(--code-icon);
