@@ -148,8 +148,12 @@ export function ToggleButtonGroup({
 
   const handleSelectionChange = (keys: Set<Key>) => {
     onSelectionChange?.(keys);
-    // Bridge the deprecated scalar callback (first active key, or null).
-    onChange?.(keys.size ? String([...keys][0]) : null);
+    // Bridge the deprecated scalar callback — but only in single mode, the
+    // only shape it can represent. In multiple mode a lone value would
+    // misreport the selection, so we don't call it (use `onSelectionChange`).
+    if (selectionMode === 'single') {
+      onChange?.(keys.size ? String([...keys][0]) : null);
+    }
   };
 
   return (
