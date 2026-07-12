@@ -138,6 +138,33 @@ export const Display: Story = {
   ),
 };
 
+const sizeLabel = {
+  margin: '0 0 8px',
+  fontSize: 12,
+  fontWeight: 600,
+  color: 'var(--text-muted)',
+} as const;
+
+/** The three sizes: `sm` · `md` (default) · `lg` — same scale as Button. */
+export const Sizes: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+      <div className="max-w-105">
+        <p style={sizeLabel}>Small</p>
+        <Tree<Subject> {...shared} size="sm" aria-label="Branches of science (small)" />
+      </div>
+      <div className="max-w-105">
+        <p style={sizeLabel}>Medium (default)</p>
+        <Tree<Subject> {...shared} size="md" aria-label="Branches of science (medium)" />
+      </div>
+      <div className="max-w-105">
+        <p style={sizeLabel}>Large</p>
+        <Tree<Subject> {...shared} size="lg" aria-label="Branches of science (large)" />
+      </div>
+    </div>
+  ),
+};
+
 /** Single selection — click a discipline to select it. */
 export const SingleSelect: Story = {
   render: () => (
@@ -184,15 +211,15 @@ export const SortableAreasOnly: Story = {
   ),
 };
 
-/** Compact density + whole-row drag (no handle) — the leaner look. */
-export const CompactNoHandle: Story = {
+/** Small size + whole-row drag (no handle) — the leaner look. */
+export const SmallNoHandle: Story = {
   render: () => (
     <div className="max-w-105">
       <Tree<Subject>
         {...shared}
         sortable
         dragHandle={false}
-        density="compact"
+        size="sm"
         selectionMode="multiple"
         showCheckboxes
       />
