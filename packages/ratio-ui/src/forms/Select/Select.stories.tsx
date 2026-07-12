@@ -1,6 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react';
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
-import React, { useState } from 'react';
 import { Select } from './Select';
 
 const meta = {
@@ -11,20 +15,22 @@ const meta = {
     docs: {
       description: {
         component:
-          'Accessible select dropdown built on react-aria-components. Provides keyboard navigation, proper ARIA attributes, and focus management.',
+          'Accessible select dropdown built on React Aria. Keyboard navigation, focus management, and RAC-aligned selection props (`selectedKey` / `defaultSelectedKey` / `onSelectionChange`).',
       },
     },
   },
   argTypes: {
     label: { control: 'text' },
     placeholder: { control: 'text' },
-    disabled: { control: 'boolean' },
-    required: { control: 'boolean' },
+    size: { control: 'radio', options: ['sm', 'md', 'lg'] },
+    isDisabled: { control: 'boolean' },
+    isRequired: { control: 'boolean' },
+    isInvalid: { control: 'boolean' },
     onSelectionChange: { action: 'selectionChanged' },
   },
   decorators: [
     (Story) => (
-      <div style={{ minWidth: '300px' }}>
+      <div style={{ minWidth: 280 }}>
         <Story />
       </div>
     ),
@@ -34,234 +40,159 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const fruitOptions = [
-  { value: 'apple', label: 'Apple' },
-  { value: 'banana', label: 'Banana' },
-  { value: 'orange', label: 'Orange' },
-  { value: 'mango', label: 'Mango' },
-  { value: 'strawberry', label: 'Strawberry' },
+// Demo data teaches something: the branches of philosophy, and the thinkers
+// behind them — not filler.
+const disciplines = [
+  { value: 'logic', label: 'Logic' },
+  { value: 'ethics', label: 'Ethics' },
+  { value: 'metaphysics', label: 'Metaphysics' },
+  { value: 'epistemology', label: 'Epistemology' },
+  { value: 'aesthetics', label: 'Aesthetics' },
 ];
 
-const countryOptions = [
-  { value: 'us', label: 'United States' },
-  { value: 'ca', label: 'Canada' },
-  { value: 'uk', label: 'United Kingdom' },
-  { value: 'de', label: 'Germany' },
-  { value: 'fr', label: 'France' },
-  { value: 'no', label: 'Norway' },
-  { value: 'se', label: 'Sweden' },
-  { value: 'dk', label: 'Denmark' },
+const philosophers = [
+  { value: 'socrates', label: 'Socrates' },
+  { value: 'plato', label: 'Plato' },
+  { value: 'aristotle', label: 'Aristotle' },
+  { value: 'descartes', label: 'Descartes' },
+  { value: 'spinoza', label: 'Spinoza' },
+  { value: 'hume', label: 'Hume' },
+  { value: 'kant', label: 'Kant' },
+  { value: 'hegel', label: 'Hegel' },
+  { value: 'nietzsche', label: 'Nietzsche' },
+  { value: 'arendt', label: 'Arendt' },
+  { value: 'wittgenstein', label: 'Wittgenstein' },
 ];
 
-/** Basic usage with label - click to open, select an option, verify it shows */
+/** Basic usage — click to open, pick an option, verify it shows. */
 export const Basic: Story = {
   args: {
-    label: 'Choose a fruit',
-    placeholder: 'Select a fruit...',
-    options: fruitOptions,
-    testId: 'fruit-select',
+    label: 'Branch of philosophy',
+    placeholder: 'Choose a branch…',
+    options: disciplines,
+    testId: 'discipline-select',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const trigger = canvas.getByTestId('discipline-select');
+    await expect(trigger).toHaveTextContent('Choose a branch…');
 
-    // Should show placeholder initially
-    const trigger = canvas.getByTestId('fruit-select');
-    await expect(trigger).toHaveTextContent('Select a fruit...');
-
-    // Open dropdown and select "Orange"
     await userEvent.click(trigger);
-    const option = within(document.body).getByRole('option', { name: 'Orange' });
+    const option = within(document.body).getByRole('option', { name: 'Ethics' });
     await userEvent.click(option);
 
-    // Should now display the selected value
-    await expect(trigger).toHaveTextContent('Orange');
+    await expect(trigger).toHaveTextContent('Ethics');
   },
 };
 
-/** Without label (using aria-label) */
+/** The three sizes: `sm` · `md` (default) · `lg` — same scale as Button. */
+export const Sizes: Story = {
+  args: { options: disciplines },
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {(['sm', 'md', 'lg'] as const).map((s) => (
+        <Select key={s} label={s} size={s} options={disciplines} defaultSelectedKey="logic" />
+      ))}
+    </div>
+  ),
+};
+
+/** Without a visible label — pass `aria-label` instead. */
 export const WithoutLabel: Story = {
   args: {
-    'aria-label': 'Select a fruit',
-    placeholder: 'Select a fruit...',
-    options: fruitOptions,
+    'aria-label': 'Branch of philosophy',
+    placeholder: 'Choose a branch…',
+    options: disciplines,
   },
 };
 
-/** With default value - verifies pre-selected value shows and can be changed */
-export const WithDefaultValue: Story = {
+/** Pre-selected via `defaultSelectedKey` (uncontrolled). */
+export const DefaultSelected: Story = {
   args: {
-    label: 'Favorite fruit',
-    defaultValue: 'banana',
-    options: fruitOptions,
-    testId: 'default-select',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Should show the default value
-    const trigger = canvas.getByTestId('default-select');
-    await expect(trigger).toHaveTextContent('Banana');
-
-    // Change selection to Mango
-    await userEvent.click(trigger);
-    const option = within(document.body).getByRole('option', { name: 'Mango' });
-    await userEvent.click(option);
-
-    await expect(trigger).toHaveTextContent('Mango');
+    label: 'Branch of philosophy',
+    options: disciplines,
+    defaultSelectedKey: 'metaphysics',
   },
 };
 
-/** Disabled state */
+/** Disabled control. */
 export const Disabled: Story = {
   args: {
-    label: 'Disabled select',
-    placeholder: 'Cannot select...',
-    options: fruitOptions,
-    disabled: true,
+    label: 'Branch of philosophy',
+    placeholder: 'Unavailable…',
+    options: disciplines,
+    isDisabled: true,
   },
 };
 
-/** With some disabled options */
-export const WithDisabledOptions: Story = {
+/** Individual options can be disabled — e.g. not offered this term. */
+export const DisabledOptions: Story = {
   args: {
-    label: 'Choose a fruit',
-    placeholder: 'Select...',
+    label: 'Seminar',
+    placeholder: 'Choose…',
     options: [
-      { value: 'apple', label: 'Apple' },
-      { value: 'banana', label: 'Banana (Out of stock)', disabled: true },
-      { value: 'orange', label: 'Orange' },
-      { value: 'mango', label: 'Mango (Out of stock)', disabled: true },
-      { value: 'strawberry', label: 'Strawberry' },
+      { value: 'logic', label: 'Logic' },
+      { value: 'ethics', label: 'Ethics (full)', disabled: true },
+      { value: 'metaphysics', label: 'Metaphysics' },
+      { value: 'aesthetics', label: 'Aesthetics (full)', disabled: true },
     ],
   },
 };
 
-/** Long list of options */
+/** Invalid state — red border + `aria-invalid`. */
+export const Invalid: Story = {
+  args: {
+    label: 'Branch of philosophy',
+    placeholder: 'Selection required…',
+    options: disciplines,
+    isInvalid: true,
+  },
+};
+
+/** A longer list scrolls within the popover. */
 export const LongList: Story = {
   args: {
-    label: 'Select a country',
-    placeholder: 'Choose...',
-    options: countryOptions,
+    label: 'Favourite thinker',
+    placeholder: 'Choose a philosopher…',
+    options: philosophers,
   },
 };
 
-/** Required field */
-export const Required: Story = {
-  args: {
-    label: 'Country (required)',
-    placeholder: 'Select your country...',
-    options: countryOptions,
-    required: true,
-  },
-};
-
-/** Controlled component */
+/**
+ * Controlled via `selectedKey` + `onSelectionChange`. The play test picks an
+ * option and asserts the mirrored state updates — locking in that
+ * `onSelectionChange` actually fires (it didn't before the refresh).
+ */
 const ControlledExample = () => {
-  const [value, setValue] = useState<string>('');
-
+  const [field, setField] = useState<string | null>(null);
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <Select
-        label="Controlled select"
-        placeholder="Select..."
-        options={fruitOptions}
-        value={value}
-        onSelectionChange={setValue}
+        label="Primary field"
+        placeholder="Choose…"
+        options={disciplines}
+        selectedKey={field}
+        onSelectionChange={setField}
+        testId="controlled-select"
       />
-      <div className="text-sm text-gray-600 dark:text-gray-400">
-        Selected value: <span className="font-mono">{value || 'none'}</span>
-      </div>
-      <button
-        onClick={() => setValue('orange')}
-        className="px-3 py-1 text-sm bg-primary-600 text-white rounded hover:bg-primary-700"
-      >
-        Set to Orange
-      </button>
+      <p data-testid="selected-field" style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+        Selected: {field ?? 'none'}
+      </p>
     </div>
   );
 };
 
 export const Controlled: Story = {
-  args: {
-    label: 'Controlled select',
-    placeholder: 'Select...',
-    options: fruitOptions,
-  },
+  args: { options: disciplines },
   render: () => <ControlledExample />,
-};
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId('selected-field')).toHaveTextContent('Selected: none');
 
-/** With change handler */
-const WithChangeHandlerExample = () => {
-  const [selectedValue, setSelectedValue] = useState<string>('');
+    await userEvent.click(canvas.getByTestId('controlled-select'));
+    const option = within(document.body).getByRole('option', { name: 'Epistemology' });
+    await userEvent.click(option);
 
-  return (
-    <div className="space-y-4">
-      <Select
-        label="Choose a fruit"
-        placeholder="Select..."
-        options={fruitOptions}
-        onSelectionChange={(value) => {
-          setSelectedValue(value);
-          console.log('Selected:', value);
-        }}
-      />
-      {selectedValue && (
-        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
-          <p className="text-sm text-green-900 dark:text-green-100">
-            You selected: <strong>{selectedValue}</strong>
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export const WithChangeHandler: Story = {
-  args: {
-    label: 'Choose a fruit',
-    placeholder: 'Select...',
-    options: fruitOptions,
-  },
-  render: () => <WithChangeHandlerExample />,
-};
-
-/** Multiple selects in a form */
-export const FormExample: Story = {
-  args: {
-    label: 'Form example',
-    options: fruitOptions,
-  },
-  render: () => {
-    return (
-      <form className="space-y-4 w-80">
-        <Select
-          label="First name"
-          placeholder="Choose..."
-          options={[
-            { value: 'john', label: 'John' },
-            { value: 'jane', label: 'Jane' },
-            { value: 'bob', label: 'Bob' },
-          ]}
-          required
-        />
-        <Select
-          label="Country"
-          placeholder="Select your country..."
-          options={countryOptions}
-          required
-        />
-        <Select
-          label="Favorite fruit"
-          placeholder="Optional selection..."
-          options={fruitOptions}
-        />
-        <button
-          type="submit"
-          className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-        >
-          Submit
-        </button>
-      </form>
-    );
+    await expect(canvas.getByTestId('selected-field')).toHaveTextContent('Selected: epistemology');
   },
 };
