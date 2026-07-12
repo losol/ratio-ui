@@ -55,8 +55,8 @@ export interface TreeProps<T extends TreeNode> {
    * drag source (matches designs without a visible handle). Default true.
    */
   dragHandle?: boolean;
-  /** Row density. `compact` tightens row height. Default `comfortable`. */
-  density?: 'comfortable' | 'compact';
+  /** Row size — `sm | md | lg`, same scale as Button. @default 'md' */
+  size?: 'sm' | 'md' | 'lg';
   /** Whether a node may accept children dropped onto it. Default: always. */
   canHaveChildren?: (node: T) => boolean;
   selectionMode?: 'none' | 'single' | 'multiple';
@@ -107,7 +107,7 @@ export function Tree<T extends TreeNode>(props: TreeProps<T>): ReactElement {
     getLabel,
     sortable = false,
     dragHandle = true,
-    density = 'comfortable',
+    size = 'md',
     canHaveChildren,
     selectionMode = 'none',
     selectionBehavior,
@@ -222,7 +222,7 @@ export function Tree<T extends TreeNode>(props: TreeProps<T>): ReactElement {
       expandedKeys={expandedKeys}
       defaultExpandedKeys={expandedKeys === undefined ? defaultExpandedKeys : undefined}
       onExpandedChange={onExpandedChange}
-      className={cn('tree', density === 'compact' && 'tree--compact', className)}
+      className={cn('tree', size !== 'md' && `tree--${size}`, className)}
     >
       {renderItem}
     </AriaTree>
