@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Select } from './Select';
-export type { SelectProps, SelectOption } from './Select';
+export type { SelectProps, SelectOption, SelectSize } from './Select';
