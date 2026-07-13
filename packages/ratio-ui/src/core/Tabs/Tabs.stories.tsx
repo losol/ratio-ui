@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 import { Tabs } from '../Tabs';
 
@@ -20,27 +20,36 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** 1) Basic usage */
+/** Basic usage — one subject, three angles: the life of Marie Curie. */
 export const Basic: Story = {
   args: {
     children: (
       <>
-        <Tabs.Item id="overview" title="Overview">
-            <p className="mb-2 font-semibold">Overview</p>
-            <p>Keep general information here.</p>
+        <Tabs.Item id="life" title="Life">
+          <p className="mb-2 font-semibold">Maria Skłodowska (1867–1934)</p>
+          <p>
+            Born in Warsaw, she moved to Paris to study at the Sorbonne — one of
+            few universities then open to women — and worked from a shed-turned-lab
+            with her husband Pierre.
+          </p>
         </Tabs.Item>
 
-        <Tabs.Item id="details" title="Details">
-          <p className="mb-2 font-semibold">Details</p>
-          <ul className="list-disc pl-5">
-              <li>Specification A</li>
-              <li>Specification B</li>
-            </ul>
+        <Tabs.Item id="discoveries" title="Discoveries">
+          <p className="mb-2 font-semibold">Polonium and radium, 1898</p>
+          <p>
+            Curie isolated two new elements and coined the term{' '}
+            <em>radioactivity</em> for the radiation they emitted — showing it was
+            a property of the atom itself, not a chemical reaction.
+          </p>
         </Tabs.Item>
 
-        <Tabs.Item id="activity" title="Activity">
-          <p className="mb-2 font-semibold">Activity</p>
-          <p>Recent events and logs.</p>
+        <Tabs.Item id="legacy" title="Legacy">
+          <p className="mb-2 font-semibold">Two Nobel Prizes, two sciences</p>
+          <p>
+            Physics (1903) and Chemistry (1911) — still the only person awarded
+            Nobel Prizes in two different sciences. Her notebooks remain
+            radioactive to this day.
+          </p>
         </Tabs.Item>
       </>
     ),
@@ -52,15 +61,29 @@ export const Basic: Story = {
   ),
 };
 
-/** 2) Many tabs to demonstrate horizontal scroll/overflow */
+/**
+ * Many tabs demonstrate horizontal scroll/overflow — a small gallery of
+ * knowledge heroes, one contribution each.
+ */
 export const ManyTabsOverflow: Story = {
   args: {
-    children: Array.from({ length: 12 }).map((_, idx) => (
-      <Tabs.Item key={idx} id={`t-${idx + 1}`} title={`Section ${idx + 1}`}>
-          <p className="mb-2 font-semibold">Section {idx + 1}</p>
-          <p>
-            This tab bar is scrollable (uses <code>overflow-x-auto</code> on the list).
-          </p>
+    children: [
+      { name: 'Hypatia', fact: 'Taught mathematics and astronomy in Alexandria around 400 CE.' },
+      { name: 'Ibn al-Haytham', fact: 'Put optics on an experimental footing — an early scientific method.' },
+      { name: 'Galileo', fact: 'Turned the telescope on Jupiter and found its moons.' },
+      { name: 'Newton', fact: 'Unified falling apples and orbiting planets under one law of gravitation.' },
+      { name: 'Euler', fact: 'Gave mathematics much of its modern notation, including e, i and f(x).' },
+      { name: 'Darwin', fact: 'Explained the diversity of life through natural selection.' },
+      { name: 'Maxwell', fact: 'Wrote four equations that made light an electromagnetic wave.' },
+      { name: 'Curie', fact: 'Discovered polonium and radium; coined the word radioactivity.' },
+      { name: 'Einstein', fact: 'Showed that time and space bend — and that E = mc².' },
+      { name: 'Noether', fact: 'Proved every symmetry of nature hides a conservation law.' },
+      { name: 'Turing', fact: 'Defined what a computer can compute — before computers existed.' },
+      { name: 'Franklin', fact: 'Photographed the X-ray diffraction pattern that revealed the DNA helix.' },
+    ].map(({ name, fact }) => (
+      <Tabs.Item key={name} id={name.toLowerCase().replace(/\s+/g, '-')} title={name}>
+        <p className="mb-2 font-semibold">{name}</p>
+        <p>{fact}</p>
       </Tabs.Item>
     )),
   },
@@ -71,78 +94,39 @@ export const ManyTabsOverflow: Story = {
   ),
 };
 
-/** 3) Dynamic tabs from data */
-export const DynamicFromData: Story = {
-  args: {
-    children: (() => {
-      // In a real app this could be fetched/config-driven
-      const sections = [
-        { id: 'intro', label: 'Intro', content: 'Welcome to the feature.' },
-        { id: 'setup', label: 'Setup', content: 'Installation and configuration.' },
-        { id: 'api', label: 'API', content: 'Endpoints and usage.' },
-      ];
-
-      return sections.map(s => (
-        <Tabs.Item key={s.id} id={s.id} title={s.label}>
-          <p className="mb-2 font-semibold">{s.label}</p>
-          <p>{s.content}</p>
-        </Tabs.Item>
-      ));
-    })(),
-  },
-  render: (args) => (
-    <div className="w-[720px] max-w-full">
-      <Tabs {...args} />
-    </div>
-  ),
-};
-
-/** 4) Rich content inside panels (forms, lists, actions) */
-export const RichPanels: Story = {
+/**
+ * Switching one record between representations — here Kepler's third law
+ * as prose, JSON, and XML.
+ */
+export const Representations: Story = {
   args: {
     children: (
       <>
-        <Tabs.Item id="profile" title="Profile">
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                alert('Saved!');
-              }}
-              className="grid gap-3"
-            >
-              <label className="grid gap-1">
-                <span className="text-sm">Display name</span>
-                <input className="rounded border px-3 py-2" placeholder="Ada Lovelace" />
-              </label>
-              <label className="grid gap-1">
-                <span className="text-sm">Email</span>
-                <input className="rounded border px-3 py-2" placeholder="ada@example.com" />
-              </label>
-              <div className="flex gap-2">
-                <button type="submit" className="rounded bg-black px-3 py-2 text-white">
-                  Save
-                </button>
-                <button type="button" className="rounded border px-3 py-2">
-                  Cancel
-                </button>
-              </div>
-            </form>
+        <Tabs.Item id="view" title="View">
+          <p className="mb-1 font-semibold">Kepler&apos;s third law (1619)</p>
+          <p>
+            The square of a planet&apos;s orbital period is proportional to the
+            cube of its semi-major axis: <em>T² ∝ a³</em>. Published in{' '}
+            <em>Harmonices Mundi</em>.
+          </p>
         </Tabs.Item>
-
-        <Tabs.Item id="teams" title="Teams">
-            <ul className="divide-y rounded border">
-              {['Core', 'Platform', 'Design'].map(team => (
-                <li key={team} className="flex items-center justify-between px-3 py-2">
-                  <span>{team}</span>
-                  <button className="rounded border px-2 py-1 text-sm">Manage</button>
-                </li>
-              ))}
-            </ul>
+        <Tabs.Item id="json" title="JSON">
+          <pre className="font-mono text-sm leading-relaxed">
+{`{
+  "law": "Kepler's third law",
+  "statement": "T² ∝ a³",
+  "published": 1619,
+  "source": "Harmonices Mundi"
+}`}
+          </pre>
         </Tabs.Item>
-
-        <Tabs.Item id="billing" title="Billing">
-            <p className="mb-3">Current plan: <strong>Pro</strong></p>
-            <button className="rounded bg-black px-3 py-2 text-white">Upgrade</button>
+        <Tabs.Item id="xml" title="XML">
+          <pre className="font-mono text-sm leading-relaxed">
+{`<law name="Kepler's third law" published="1619">
+  <statement>T² ∝ a³</statement>
+  <source>Harmonices Mundi</source>
+</law>`}
+          </pre>
         </Tabs.Item>
       </>
     ),
@@ -154,19 +138,22 @@ export const RichPanels: Story = {
   ),
 };
 
-/** 5) Duplicate titles but unique IDs (recommended for i18n or similar labels) */
-export const DuplicateTitlesWithIds: Story = {
+/**
+ * A single tab can be disabled — skipped by pointer and keyboard alike.
+ * Newton's alchemical notebooks stayed private until auctioned in 1936.
+ */
+export const DisabledTab: Story = {
   args: {
     children: (
       <>
-        {/* Titles can collide; use explicit IDs to keep keys/states stable */}
-        <Tabs.Item id="users-active" title="Users">
-            <p className="mb-2 font-semibold">Users (Active)</p>
-            <p>List of active users.</p>
+        <Tabs.Item id="principia" title="Principia (1687)">
+          <p>Laws of motion and universal gravitation, in Latin and geometry.</p>
         </Tabs.Item>
-        <Tabs.Item id="users-archived" title="Users">
-            <p className="mb-2 font-semibold">Users (Archived)</p>
-            <p>List of archived users.</p>
+        <Tabs.Item id="opticks" title="Opticks (1704)">
+          <p>Light split by prisms — colour as a property of light itself.</p>
+        </Tabs.Item>
+        <Tabs.Item id="alchemy" title="Alchemical notebooks" isDisabled>
+          <p>Kept private during his lifetime; sold at auction in 1936.</p>
         </Tabs.Item>
       </>
     ),
