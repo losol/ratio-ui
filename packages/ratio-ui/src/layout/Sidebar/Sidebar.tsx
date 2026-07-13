@@ -28,6 +28,11 @@ export interface SidebarProps {
   /** Accessible label for the aside landmark. */
   'aria-label'?: string;
   className?: string;
+  /**
+   * Merged last, so it can override the computed `width`/`height` — e.g.
+   * `style={{ height: '100%' }}` inside a fixed-height container.
+   */
+  style?: React.CSSProperties;
   testId?: string;
 }
 
@@ -73,6 +78,7 @@ const Sidebar: SidebarComponent = ({
   top = 0,
   'aria-label': ariaLabel,
   className,
+  style,
   testId,
 }) => (
   <aside
@@ -84,7 +90,7 @@ const Sidebar: SidebarComponent = ({
       'transition-[width] duration-200 ease-out',
       className,
     )}
-    style={{ width: collapsed ? collapsedWidth : width, top, height: `calc(100vh - ${top}px)` }}
+    style={{ width: collapsed ? collapsedWidth : width, top, height: `calc(100vh - ${top}px)`, ...style }}
   >
     {children}
   </aside>
