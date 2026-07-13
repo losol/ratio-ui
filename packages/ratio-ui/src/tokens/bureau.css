@@ -38,8 +38,10 @@
 
   /* Text */
   --text: #20242c;
-  --text-muted: #837c6a;
-  --text-subtle: #a79d80;
+  /* Muted/subtle darkened for WCAG AA on the mid-tone paper: the previous
+     #837c6a / #a79d80 sat at ~3.2:1 and ~2.1:1 against the surface. */
+  --text-muted: #5c5644;
+  --text-subtle: #6b6450;
   --text-light: #f4efe2;         /* derived: paper-light, mirrors text-on-primary */
   --text-dark: #20242c;          /* derived */
 
@@ -117,7 +119,7 @@
   /* Text */
   --text: #f0e7d2;               /* ink */
   --text-muted: #a39c86;         /* muted */
-  --text-subtle: #837c64;        /* derived: a step below muted */
+  --text-subtle: #938b75;        /* a step below muted; lifted from #837c64 (~3.8:1 on cards) to pass AA */
   --text-light: #f0e7d2;         /* derived */
   --text-dark: #14140f;          /* derived */
 

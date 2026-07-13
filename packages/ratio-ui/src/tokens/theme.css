@@ -215,7 +215,10 @@
 
   --text: var(--color-neutral-900);
   --text-muted: var(--color-neutral-700);
-  --text-subtle: var(--color-neutral-500);
+  /* Subtle lifted a step (500 → 600): neutral-500 sat just under the WCAG AA
+     floor against the Linen surface (~4.0:1). 600 lands ~6.7:1 (surface) /
+     ~7.5:1 (card) — hints stay readable, still clearly below muted. */
+  --text-subtle: var(--color-neutral-600);
   --text-light: var(--color-secondary-100);
   --text-dark: var(--color-neutral-900);
 
@@ -289,7 +292,10 @@
 
   --text: var(--color-secondary-200);
   --text-muted: var(--color-secondary-500);
-  --text-subtle: var(--color-secondary-700);
+  /* Subtle lifted a step (700 → 600): secondary-700 was far below AA over
+     cards (~2.6:1). 600 — the pre-lift muted value — lands ~5.7:1 (surface) /
+     ~4.8:1 (card), a clear step below muted (~9.8:1). */
+  --text-subtle: var(--color-secondary-600);
   --text-light: var(--color-secondary-100);
   --text-dark: var(--color-neutral-900);
 
