@@ -4,3 +4,13 @@
 
 
 export { default as Menu } from './Menu';
+export type {
+  MenuProps,
+  MenuTriggerProps,
+  MenuLinkProps,
+  MenuButtonProps,
+  MenuSectionProps,
+  MenuOptionProps,
+  MenuSeparatorProps,
+  MenuThemeToggleProps,
+} from './Menu';

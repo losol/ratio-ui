@@ -1,0 +1,17 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Menu tokens — defaults consumed by `core/Menu`. Overridable per theme or
+ * per scope (any ancestor can set `--menu-font-size` to re-tune menus in its
+ * subtree without forking the component).
+ *
+ */
+
+:root {
+  --menu-font-size: 14px;
+  --menu-font-weight: 400;
+}

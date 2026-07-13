@@ -14,18 +14,24 @@ import {
 } from 'react';
 import {
   Button as AriaButton,
+  Header as AriaHeader,
   Menu as AriaMenu,
   MenuItem,
   MenuItemProps,
+  MenuSection as AriaMenuSection,
   MenuTrigger as AriaMenuTrigger,
   Popover,
+  type PopoverProps,
+  Separator as AriaSeparator,
+  type Key,
+  type Selection,
 } from 'react-aria-components';
-import { ChevronDown, Sun, Moon } from '../../icons';
+import { Check, ChevronDown, Sun, Moon } from '../../icons';
 import { cn } from '../../utils/cn';
 
 const styles = {
   popover: cn(
-    'min-w-[280px] max-w-sm origin-top-right border border-border-1 rounded-xl overflow-hidden',
+    'flex flex-col min-w-[280px] max-w-sm origin-top-right border border-border-1 rounded-xl overflow-hidden',
     // Light-mode glow: multi-layer primary-tinted box-shadow gives the
     // popover a soft editorial lift on the light surface.
     'shadow-[0_1px_0_color-mix(in_oklch,var(--primary)_6%,transparent),0_12px_28px_color-mix(in_oklch,var(--primary)_18%,transparent),0_4px_8px_color-mix(in_oklch,var(--primary)_12%,transparent)]',
@@ -41,11 +47,44 @@ const styles = {
     'data-[entering]:opacity-0 data-[entering]:-translate-y-1 data-[entering]:scale-[0.98]',
     'data-[exiting]:opacity-0 data-[exiting]:-translate-y-1 data-[exiting]:scale-[0.98]',
   ),
-  menuItemsList: 'bg-card focus:outline-hidden',
-  menuItem:
-    'cursor-pointer group flex w-full items-center px-2 py-3 border-b border-border-1 last:border-b-0 hover:bg-card-hover text-(--text)',
-  triggerDefault:
-    'inline-flex items-center gap-2 border border-transparent font-bold bg-(--primary) hover:opacity-90 text-(--text-on-primary) rounded-full px-4 py-1 m-1 transition-all duration-500 transform ease-in-out active:scale-110 hover:shadow-sm',
+  menuItemsList: 'bg-card focus:outline-hidden p-1.5 min-h-0 flex-1 overflow-y-auto overscroll-contain',
+  // Rounded, icon-friendly rows (no per-row borders). `data-current` draws the
+  // accent bar + tint for the active row; `group` lets the icon slot follow
+  // hover/current color.
+  menuItem: cn(
+    'cursor-pointer group relative flex w-full items-center gap-[11px] rounded-lg px-[11px] py-[9px]',
+    '[font-size:var(--menu-font-size,14px)] [font-weight:var(--menu-font-weight,400)] text-(--text) transition-colors hover:bg-card-hover',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring)',
+    'data-[current]:text-(--primary) data-[current]:bg-[color-mix(in_oklch,var(--accent)_12%,transparent)]',
+    'data-[current]:before:content-[""] data-[current]:before:absolute data-[current]:before:left-[3px]',
+    'data-[current]:before:top-2 data-[current]:before:bottom-2 data-[current]:before:w-[3px]',
+    'data-[current]:before:rounded-[3px] data-[current]:before:bg-(--accent)',
+  ),
+  menuItemDanger: cn(
+    'text-(--error-solid)',
+    'hover:bg-[color-mix(in_oklch,var(--error-solid)_14%,transparent)] hover:text-(--error-solid)',
+  ),
+  itemIcon: cn(
+    'shrink-0 text-(--text-subtle) transition-colors group-hover:text-(--text)',
+    'group-data-[current]:text-(--primary)',
+    '[&>svg]:h-[17px] [&>svg]:w-[17px]',
+  ),
+  itemIconDanger: 'text-(--error-solid) group-hover:text-(--error-solid)',
+  // T2 trigger: outline pill that fills with primary and glows when open;
+  // the chevron cap rotates via `in-aria-expanded` (see MenuChevron).
+  triggerDefault: cn(
+    'group inline-flex min-w-[150px] cursor-pointer items-center justify-between gap-3',
+    'rounded-full border-[1.5px] py-2 pl-4 pr-2.5 [font-size:var(--menu-font-size,14px)] font-semibold',
+    'border-primary-400 text-primary-700 dark:border-primary-500 dark:text-primary-300 bg-transparent',
+    'transition-all duration-200 active:scale-[0.96]',
+    'hover:bg-[color-mix(in_oklch,var(--color-primary-400)_14%,transparent)] hover:text-primary-800 dark:hover:text-primary-200',
+    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-(--focus-ring)',
+    'aria-expanded:bg-primary-300 aria-expanded:border-primary-300 aria-expanded:text-primary-950',
+    'aria-expanded:shadow-[0_0_0_4px_color-mix(in_oklch,var(--color-primary-400)_30%,transparent),0_4px_14px_-2px_color-mix(in_oklch,var(--color-primary-400)_55%,transparent)]',
+  ),
+  section: '',
+  sectionLabel:
+    'block px-3 pt-2 pb-1 text-[10.5px] font-bold uppercase tracking-[0.07em] text-(--text-subtle)',
 };
 
 type MenuActionsApi = {
@@ -82,23 +121,61 @@ MenuTrigger.displayName = 'Menu.Trigger';
 export type MenuLinkProps = {
   href: string;
   children: ReactNode;
+  /** Leading icon — pass any element; sized to 17px (e.g. `<User />`). */
+  icon?: ReactNode;
+  /** Mark as the current page — accent bar + tint, `aria-current="page"`. */
+  isCurrent?: boolean;
+  /** `danger` renders the row in the error color (e.g. "Log out"). */
+  variant?: 'default' | 'danger';
   testId?: string;
 };
 
-const MenuLink = (props: MenuLinkProps & MenuItemProps) => (
-  <MenuItem {...props} data-testid={props.testId} className={styles.menuItem}>
-    {props.children}
+const MenuLink = ({ icon, isCurrent, variant, children, testId, ...rest }: MenuLinkProps & MenuItemProps) => (
+  <MenuItem
+    {...rest}
+    aria-current={isCurrent ? 'page' : undefined}
+    data-current={isCurrent || undefined}
+    data-testid={testId}
+    className={cn(styles.menuItem, variant === 'danger' && styles.menuItemDanger)}
+  >
+    {icon && (
+      <span aria-hidden className={cn(styles.itemIcon, variant === 'danger' && styles.itemIconDanger)}>
+        {icon}
+      </span>
+    )}
+    <span className="min-w-0 flex-1">{children}</span>
   </MenuItem>
 );
 
 export type MenuProps = {
   children: ReactNode;
+  /**
+   * Where the popover opens relative to the trigger — e.g. `'top end'` for a
+   * menu in a sidebar footer. Mirrors React Aria's Popover. @default 'bottom end'
+   */
+  placement?: PopoverProps['placement'];
+  /** Controlled open state. Mirrors React Aria's MenuTrigger. */
+  isOpen?: boolean;
+  /** Uncontrolled initial open state. */
+  defaultOpen?: boolean;
+  /** Fires when the menu opens or closes. */
+  onOpenChange?: (isOpen: boolean) => void;
+  /**
+   * Cap the popover height in px. Without it the menu still caps itself to
+   * the available viewport space (React Aria) — either way the item list
+   * scrolls while the identity header stays pinned. Mirrors React Aria.
+   */
+  maxHeight?: number;
 };
 
 export type MenuButtonProps = {
   id: string;
   children: ReactNode;
   onClick: () => void;
+  /** Leading icon — pass any element; sized to 17px (e.g. `<LogOut />`). */
+  icon?: ReactNode;
+  /** `danger` renders the row in the error color (e.g. "Log out"). */
+  variant?: 'default' | 'danger';
   testId?: string;
 };
 
@@ -109,7 +186,7 @@ export type MenuThemeToggleProps = {
   darkLabel?: string;
 };
 
-const Menu = ({ children }: MenuProps) => {
+const Menu = ({ children, placement = 'bottom end', isOpen, defaultOpen, onOpenChange, maxHeight }: MenuProps) => {
   const actionsRef = useRef(new Map<string, () => void>());
   const headerLabelId = useId();
 
@@ -147,10 +224,10 @@ const Menu = ({ children }: MenuProps) => {
   }
 
   return (
-    <AriaMenuTrigger>
+    <AriaMenuTrigger isOpen={isOpen} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       {trigger}
-      <Popover placement="bottom end" className={styles.popover}>
-        {header && <div id={headerLabelId}>{header}</div>}
+      <Popover placement={placement} maxHeight={maxHeight} className={styles.popover}>
+        {header && <div id={headerLabelId} className="shrink-0 bg-card">{header}</div>}
         <MenuActionsContext.Provider value={api}>
           <AriaMenu
             className={styles.menuItemsList}
@@ -180,9 +257,22 @@ const MenuButton = (props: MenuButtonProps & MenuItemProps) => {
     return () => unregister(props.id);
   }, [props.id, props.onClick, register, unregister]);
 
+  // `onClick` fires via the actions registry (registered in the effect
+  // above), so it must not reach the DOM spread.
+  const { icon, variant, children, testId, onClick, ...rest } = props;
+  void onClick;
   return (
-    <MenuItem {...props} className={styles.menuItem} data-testid={props.testId}>
-      {props.children}
+    <MenuItem
+      {...rest}
+      className={cn(styles.menuItem, variant === 'danger' && styles.menuItemDanger)}
+      data-testid={testId}
+    >
+      {icon && (
+        <span aria-hidden className={cn(styles.itemIcon, variant === 'danger' && styles.itemIconDanger)}>
+          {icon}
+        </span>
+      )}
+      <span className="min-w-0 flex-1">{children}</span>
     </MenuItem>
   );
 };
@@ -217,22 +307,120 @@ const MenuThemeToggle = ({
   );
 };
 
+export type MenuSectionProps = {
+  /** Uppercase eyebrow label above the section's items (e.g. "Language"). */
+  label?: string;
+  children: ReactNode;
+  /**
+   * Make the section selectable — selected `Menu.Option`s get a check mark.
+   * Mirrors React Aria's section-level selection.
+   */
+  selectionMode?: 'single' | 'multiple';
+  /** Controlled selection (the set of active option `id`s). */
+  selectedKeys?: Iterable<Key>;
+  /** Uncontrolled initial selection. */
+  defaultSelectedKeys?: Iterable<Key>;
+  /** Mirrors React Aria: `Selection` is `'all' | Set<Key>`. */
+  onSelectionChange?: (keys: Selection) => void;
+  /** Forbid clearing the last selected option — "exactly one". */
+  disallowEmptySelection?: boolean;
+  /**
+   * Whether picking an option closes the menu. Set `false` for pickers the
+   * user may want to compare (e.g. themes) without reopening. Mirrors React
+   * Aria. @default true
+   */
+  shouldCloseOnSelect?: boolean;
+  className?: string;
+};
+
+/**
+ * Group of menu items with an optional uppercase eyebrow label. Pass
+ * `selectionMode` to make the section selectable — pair it with
+ * {@link MenuOption} rows, which render a check mark when selected
+ * (the language-picker / view-as pattern in user menus).
+ *
+ * @beta API may evolve before release.
+ */
+const MenuSection = ({ label, children, className, ...selection }: MenuSectionProps) => (
+  <AriaMenuSection {...selection} className={cn(styles.section, className)}>
+    {label && <AriaHeader className={styles.sectionLabel}>{label}</AriaHeader>}
+    {children}
+  </AriaMenuSection>
+);
+MenuSection.displayName = 'Menu.Section';
+
+export type MenuOptionProps = {
+  /** Identity within the selectable section — reported in `selectedKeys`. */
+  id: string;
+  children: ReactNode;
+  /** Disable just this option. */
+  isDisabled?: boolean;
+  /** Plain-text value for typeahead when `children` isn't plain text. */
+  textValue?: string;
+  testId?: string;
+};
+
+/**
+ * Selectable row for a `Menu.Section` with `selectionMode` — shows a
+ * primary-colored check mark when selected.
+ *
+ * @beta API may evolve before release.
+ */
+const MenuOption = ({ id, children, isDisabled, textValue, testId }: MenuOptionProps) => (
+  <MenuItem
+    id={id}
+    isDisabled={isDisabled}
+    textValue={textValue ?? (typeof children === 'string' ? children : undefined)}
+    className={styles.menuItem}
+    data-testid={testId}
+  >
+    {({ isSelected }) => (
+      <>
+        <span className="min-w-0 flex-1 truncate">{children}</span>
+        {isSelected && (
+          <Check aria-hidden="true" className="ml-2 h-4 w-4 shrink-0 text-(--primary)" />
+        )}
+      </>
+    )}
+  </MenuItem>
+);
+MenuOption.displayName = 'Menu.Option';
+
+export type MenuSeparatorProps = {
+  className?: string;
+};
+
+/**
+ * Semantic divider between menu regions (announced as a separator, not just
+ * drawn) — e.g. before a "Log out" action. Wraps React Aria's `Separator`.
+ *
+ * @beta API may evolve before release.
+ */
+const MenuSeparator = ({ className }: MenuSeparatorProps) => (
+  <AriaSeparator className={cn('mx-2 my-1.5 h-px border-0 bg-border-1 opacity-70', className)} />
+);
+MenuSeparator.displayName = 'Menu.Separator';
+
 /**
  * Convenience: the chevron used by the default trigger pattern. Exported
  * so consumers can drop it into a custom `Menu.Trigger` without having to
  * reach into `../icons` themselves.
  */
 const MenuChevron = ({ className }: { className?: string }) => (
-  <ChevronDown
+  <span
     aria-hidden="true"
     className={cn(
-      'ml-1 h-5 w-5 transition-transform duration-200',
-      // When the chevron sits inside a trigger with aria-expanded=true
-      // (i.e. the menu is open), flip it 180° so the arrow points up.
-      'in-aria-expanded:rotate-180',
+      // The "cap": a small circle that carries the chevron. It rotates and
+      // brightens when the trigger it sits in is expanded (menu open).
+      'flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
+      'bg-[color-mix(in_oklch,var(--color-primary-400)_22%,transparent)]',
+      'transition-all duration-300 in-aria-expanded:rotate-180 in-aria-expanded:bg-white/30',
       className,
     )}
-  />
+  >
+    {/* Sized relative to the cap so consumer overrides of the wrapper scale the icon too. */}
+    <ChevronDown className="h-[62.5%] w-[62.5%]" strokeWidth={2.4} />
+  </span>
 );
 MenuChevron.displayName = 'Menu.Chevron';
 
@@ -240,7 +428,7 @@ MenuChevron.displayName = 'Menu.Chevron';
 //
 // Identity block at the top of a user-menu dropdown. Composes the
 // `Avatar` (or any leading node) with three meta slots — Name, Email,
-// Role — into a flex row over a primary-tinted background.
+// Role — into a flex row above a hairline border.
 
 interface MenuHeaderSlotProps {
   children?: ReactNode;
@@ -256,7 +444,7 @@ interface MenuHeaderSlotProps {
 const MenuHeaderName = ({ children, className }: MenuHeaderSlotProps) => (
   <h4
     className={cn(
-      'font-serif font-medium text-base leading-tight tracking-tight',
+      'font-serif font-semibold text-[16px] leading-tight tracking-tight',
       'text-(--text) m-0 truncate',
       className,
     )}
@@ -275,7 +463,7 @@ MenuHeaderName.displayName = 'Menu.Header.Name';
 const MenuHeaderEmail = ({ children, className }: MenuHeaderSlotProps) => (
   <p
     className={cn(
-      'text-sm text-(--text-muted) m-0 truncate mt-0.5',
+      'text-[12.5px] text-(--text-muted) m-0 truncate mt-0.5',
       className,
     )}
   >
@@ -285,19 +473,18 @@ const MenuHeaderEmail = ({ children, className }: MenuHeaderSlotProps) => (
 MenuHeaderEmail.displayName = 'Menu.Header.Email';
 
 /**
- * Optional role / permission chip beneath the name + email — accent-
- * tinted pill in mono caps. Use for short labels like "Admin", "Owner",
- * or org-role descriptors.
+ * Optional role / permission chip beneath the name + email — an outline
+ * accent badge in caps. Use for short labels like "Admin", "Owner", or
+ * org-role descriptors.
  *
  * @beta API may evolve before release.
  */
 const MenuHeaderRole = ({ children, className }: MenuHeaderSlotProps) => (
   <span
     className={cn(
-      'self-start mt-2 inline-flex items-center px-2 py-0.5 rounded-full',
-      'font-mono text-[10px] uppercase tracking-wider font-bold',
-      'text-(--accent) bg-[color-mix(in_oklch,var(--accent)_18%,var(--surface))]',
-      'border border-[color-mix(in_oklch,var(--accent)_35%,transparent)]',
+      'self-start mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full',
+      'text-[10px] uppercase tracking-[0.06em] font-bold',
+      'text-(--accent) border border-(--accent)',
       className,
     )}
   >
@@ -346,8 +533,6 @@ const MenuHeader = ({ children, className }: MenuHeaderSlotProps) => {
     <div
       className={cn(
         'flex items-center gap-3.5 px-4 py-4',
-        'bg-[color-mix(in_oklch,var(--primary)_8%,var(--surface))]',
-        'dark:bg-[color-mix(in_oklch,var(--primary)_16%,var(--surface))]',
         'border-b border-border-1',
         className,
       )}
@@ -364,6 +549,9 @@ export default Object.assign(Menu, {
   Chevron: MenuChevron,
   Link: MenuLink,
   Button: MenuButton,
+  Section: MenuSection,
+  Option: MenuOption,
+  Separator: MenuSeparator,
   ThemeToggle: MenuThemeToggle,
   Header: Object.assign(MenuHeader, {
     Name: MenuHeaderName,
