@@ -1,53 +1,57 @@
 import React from 'react';
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { ThreeColumnLayout, ThreeColumnLayoutProps } from './ThreeColumnLayout';
-import { TreeView, TreeViewNode } from '../../core/TreeView/TreeView';
+import { NavTree, NavTreeItem } from '../../core/NavTree';
 import { TableOfContents, TocHeading } from '../../core/TableOfContents/TableOfContents';
 
-const sidebarTree: TreeViewNode[] = [
-  { title: 'Introduction', href: '#' },
+// The demo is itself a small lesson: how knowledge learned to travel — from
+// hand-copied scrolls to open access. Sidebar, article, and TOC all walk the
+// same timeline.
+
+const sidebarTree: NavTreeItem[] = [
+  { title: 'Overview', href: '#' },
   {
-    title: 'Getting Started',
+    title: 'The manuscript age',
     children: [
-      { title: 'Installation', href: '#installation' },
-      { title: 'Quick Start', href: '#quick-start' },
+      { title: 'The Library of Alexandria', href: '#alexandria' },
+      { title: 'Scriptoria', href: '#scriptoria' },
     ],
   },
   {
-    title: 'Core Concepts',
+    title: 'The printing revolution',
     children: [
-      { title: 'Components', href: '#components' },
-      { title: 'Theming', href: '#theming' },
-      { title: 'Responsive Design', href: '#responsive-design' },
+      { title: 'Gutenberg', href: '#gutenberg' },
+      { title: 'What print changed', href: '#what-print-changed' },
     ],
   },
   {
-    title: 'Advanced',
+    title: 'Scholarly exchange',
     children: [
-      { title: 'Custom Hooks', href: '#custom-hooks' },
-      { title: 'Performance', href: '#performance' },
+      { title: 'The Republic of Letters', href: '#republic-of-letters' },
+      { title: 'Scientific journals', href: '#journals' },
     ],
   },
-  { title: 'API Reference', href: '#api-reference' },
-  { title: 'FAQ', href: '#faq' },
+  {
+    title: 'Public knowledge',
+    children: [
+      { title: 'The Encyclopédie', href: '#encyclopedie' },
+      { title: 'Public libraries', href: '#libraries' },
+    ],
+  },
+  { title: 'The open era', href: '#open-access' },
 ];
 
 const tocHeadings: TocHeading[] = [
-  { id: 'installation', text: 'Installation', level: 2 },
-  { id: 'prerequisites', text: 'Prerequisites', level: 3 },
-  { id: 'package-manager', text: 'Package Manager', level: 3 },
-  { id: 'quick-start', text: 'Quick Start', level: 2 },
-  { id: 'components', text: 'Components', level: 2 },
-  { id: 'button', text: 'Button', level: 3 },
-  { id: 'card', text: 'Card', level: 3 },
-  { id: 'theming', text: 'Theming', level: 2 },
-  { id: 'color-tokens', text: 'Color Tokens', level: 3 },
-  { id: 'dark-mode', text: 'Dark Mode', level: 3 },
-  { id: 'responsive-design', text: 'Responsive Design', level: 2 },
-  { id: 'custom-hooks', text: 'Custom Hooks', level: 2 },
-  { id: 'performance', text: 'Performance', level: 2 },
-  { id: 'api-reference', text: 'API Reference', level: 2 },
-  { id: 'faq', text: 'FAQ', level: 2 },
+  { id: 'alexandria', text: 'The Library of Alexandria', level: 2 },
+  { id: 'scriptoria', text: 'Scriptoria', level: 2 },
+  { id: 'gutenberg', text: 'Gutenberg', level: 2 },
+  { id: 'what-print-changed', text: 'What print changed', level: 2 },
+  { id: 'republic-of-letters', text: 'The Republic of Letters', level: 2 },
+  { id: 'journals', text: 'Scientific journals', level: 2 },
+  { id: 'peer-review', text: 'The roots of peer review', level: 3 },
+  { id: 'encyclopedie', text: 'The Encyclopédie', level: 2 },
+  { id: 'libraries', text: 'Public libraries', level: 2 },
+  { id: 'open-access', text: 'The open era', level: 2 },
 ];
 
 const StoryLink = ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => (
@@ -57,171 +61,113 @@ const StoryLink = ({ href, children, className }: { href: string; children: Reac
 );
 
 const CodeBlock = ({ children }: { children: string }) => (
-  <pre className="my-4 overflow-x-auto rounded-lg bg-gray-100 p-4 text-sm dark:bg-gray-800">
+  <pre className="my-4 overflow-x-auto rounded-lg border border-border-1 bg-card p-4 text-sm">
     <code>{children}</code>
   </pre>
 );
 
 const SampleContent = () => (
   <article className="prose">
-    <h1>ratio-ui Documentation</h1>
-    <p className="text-lg text-gray-600 dark:text-gray-400">
-      A comprehensive design system for building modern React applications with Tailwind CSS.
+    <h1>How knowledge learned to travel</h1>
+    <p className="text-lg text-(--text-muted)">
+      Every idea you can look up tonight rode here on twenty-three centuries of
+      infrastructure: libraries, scriptoria, presses, letters, journals, and
+      open archives.
     </p>
 
-    <h2 id="installation">Installation</h2>
+    <h2 id="alexandria">The Library of Alexandria</h2>
     <p>
-      Get started by installing ratio-ui and its peer dependencies. The library is designed to work
-      seamlessly with Tailwind CSS v4 and React 18+.
+      Founded around 285 BCE, the Library of Alexandria attempted something new:
+      collecting <em>all</em> written knowledge in one place. Ships docking in
+      the harbour had their scrolls seized and copied. Callimachus&apos;s{' '}
+      <em>Pinakes</em> — 120 scroll-cases of author, title, and subject — is the
+      earliest library catalogue we know of: knowledge about where knowledge is.
     </p>
 
-    <h3 id="prerequisites">Prerequisites</h3>
-    <p>Before installing, make sure you have the following:</p>
-    <ul>
-      <li>Node.js 18 or later</li>
-      <li>React 18 or 19</li>
-      <li>Tailwind CSS v4</li>
-    </ul>
-
-    <h3 id="package-manager">Package Manager</h3>
-    <p>Install using your preferred package manager:</p>
-    <CodeBlock>pnpm add @eventuras/ratio-ui</CodeBlock>
-    <p>Then import the CSS in your root layout:</p>
-    <CodeBlock>{`import '@eventuras/ratio-ui/ratio-ui.css';
-import '@eventuras/ratio-ui/fonts.css';`}</CodeBlock>
-
-    <h2 id="quick-start">Quick Start</h2>
+    <h2 id="scriptoria">Scriptoria</h2>
     <p>
-      Import components directly from their subpath exports. This enables tree-shaking and keeps
-      your bundle size small.
+      For the next thousand years, texts survived by being copied by hand. A
+      single manuscript could take a scribe months, and every copy drifted a
+      little from its source — which is why textual scholars still compare
+      manuscript families today. Slow, expensive copying meant knowledge
+      concentrated where the copyists were.
     </p>
-    <CodeBlock>{`import { Button } from '@eventuras/ratio-ui/core/Button';
-import { Heading } from '@eventuras/ratio-ui/core/Heading';
 
-export function MyPage() {
-  return (
-    <div>
-      <Heading as="h1">Hello World</Heading>
-      <Button variant="primary">Get Started</Button>
-    </div>
-  );
+    <h2 id="gutenberg">Gutenberg</h2>
+    <p>
+      Around 1440, Johannes Gutenberg combined movable metal type, oil-based
+      ink, and a screw press. By 1500 — a single lifetime — European presses had
+      produced an estimated twenty million volumes, more than all the scribes of
+      the previous millennium. The unit cost of a page collapsed, and with it
+      the monopoly on reading.
+    </p>
+
+    <h2 id="what-print-changed">What print changed</h2>
+    <p>
+      Print did more than multiply copies. Identical copies made{' '}
+      <em>page numbers, indexes, and errata</em> meaningful — you could cite an
+      exact passage and correct a specific error. Standardised diagrams could be
+      trusted. The citation, the cornerstone of scholarship, is a child of the
+      press.
+    </p>
+
+    <h2 id="republic-of-letters">The Republic of Letters</h2>
+    <p>
+      In the seventeenth century, scholars wove a continent-wide web of
+      correspondence. Marin Mersenne forwarded so many results between Descartes,
+      Fermat, Galileo and others that he was called{' '}
+      <em>the post office of Europe</em>. A letter to Mersenne was, in effect, a
+      publication.
+    </p>
+
+    <h2 id="journals">Scientific journals</h2>
+    <p>
+      In 1665 the letter grew a spine. The <em>Journal des sçavans</em> appeared
+      in Paris in January; two months later Henry Oldenburg, secretary of the
+      Royal Society, launched <em>Philosophical Transactions</em> — still
+      published today, the world&apos;s oldest scientific journal. Structured
+      metadata about published knowledge is older than you&apos;d think:
+    </p>
+    <CodeBlock>{`{
+  "title": "Philosophical Transactions",
+  "founded": 1665,
+  "editor": "Henry Oldenburg",
+  "publisher": "Royal Society of London",
+  "innovations": ["registration", "archiving", "dissemination", "review"]
 }`}</CodeBlock>
 
-    <h2 id="components">Components</h2>
+    <h3 id="peer-review">The roots of peer review</h3>
     <p>
-      ratio-ui provides a wide range of components organized into categories: core, layout, forms,
-      and commerce.
+      Oldenburg sent submitted manuscripts to knowledgeable members before
+      printing them — registration, certification, and dissemination in one
+      workflow. Three and a half centuries later, journals still run on his
+      four functions.
     </p>
 
-    <h3 id="button">Button</h3>
+    <h2 id="encyclopedie">The Encyclopédie</h2>
     <p>
-      The Button component supports multiple variants (primary, secondary, light, text) and sizes.
-      It is built on top of React Aria for full accessibility.
-    </p>
-    <CodeBlock>{`<Button variant="primary" size="md">Click me</Button>
-<Button variant="secondary">Cancel</Button>
-<Button variant="text" size="sm">Learn more</Button>`}</CodeBlock>
-    <p>
-      Buttons support loading states, disabled states, and can render as links when given an href prop.
+      Between 1751 and 1772, Diderot and d&apos;Alembert published twenty-eight
+      volumes and roughly 74,000 articles, aiming — in Diderot&apos;s words — to
+      &quot;change the common way of thinking&quot;. It was knowledge organised
+      for citizens rather than scholars, complete with cross-references: links,
+      two centuries before hypertext.
     </p>
 
-    <h3 id="card">Card</h3>
+    <h2 id="libraries">Public libraries</h2>
     <p>
-      Cards are container components with optional hover effects, a transparent variant, semantic
-      color tints, and composable padding/border/radius props.
-    </p>
-    <CodeBlock>{`<Card transparent border hoverEffect>
-  <Heading as="h3">Feature</Heading>
-  <Text>Description of this feature.</Text>
-</Card>`}</CodeBlock>
-
-    <h2 id="theming">Theming</h2>
-    <p>
-      ratio-ui uses CSS custom properties (design tokens) for theming, making it easy to customize
-      colors, typography, and spacing across your entire application.
+      The nineteenth century turned reading into public infrastructure. Between
+      1883 and 1929, Carnegie grants alone built more than 2,500 libraries
+      worldwide. The radical idea: access to knowledge should not depend on
+      owning it.
     </p>
 
-    <h3 id="color-tokens">Color Tokens</h3>
+    <h2 id="open-access">The open era</h2>
     <p>
-      The color system is built around a primary palette with semantic aliases. All tokens are defined
-      in <code>tokens/theme.css</code> and can be overridden in your own CSS.
-    </p>
-    <CodeBlock>{`:root {
-  --color-primary-50: #eff6ff;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-900: #1e3a5f;
-}`}</CodeBlock>
-
-    <h3 id="dark-mode">Dark Mode</h3>
-    <p>
-      Dark mode is activated via <code>data-theme=&quot;dark&quot;</code> on the <code>&lt;html&gt;</code> element.
-      All components automatically adapt their colors. Use the <code>ThemeToggle</code> component to
-      let users switch between light and dark mode.
-    </p>
-    <CodeBlock>{`<ThemeToggle
-  theme={currentTheme}
-  onThemeChange={(theme) => setTheme(theme)}
-/>`}</CodeBlock>
-
-    <h2 id="responsive-design">Responsive Design</h2>
-    <p>
-      All layout components are responsive by default. The grid system supports breakpoint-specific
-      column configurations, and components like this ThreeColumnLayout automatically collapse
-      side columns on smaller screens.
-    </p>
-    <p>
-      Use Tailwind's responsive prefixes (<code>sm:</code>, <code>md:</code>, <code>lg:</code>) to
-      customize component behavior at different viewport sizes.
-    </p>
-
-    <h2 id="custom-hooks">Custom Hooks</h2>
-    <p>
-      ratio-ui exposes several hooks for common patterns like theme management, media queries, and
-      component state. These hooks integrate seamlessly with the component library.
-    </p>
-    <CodeBlock>{`import { useTheme } from './providers/theme';
-
-function MyComponent() {
-  const { theme, setTheme } = useTheme();
-  // ...
-}`}</CodeBlock>
-
-    <h2 id="performance">Performance</h2>
-    <p>
-      The library is designed for optimal performance with tree-shaking support, lazy loading of
-      heavy components, and minimal runtime overhead. Each component is built as a separate entry
-      point, so you only ship the code you use.
-    </p>
-    <p>
-      Client components are marked with <code>&apos;use client&apos;</code> directives for proper Next.js
-      App Router support, ensuring server components are used wherever possible.
-    </p>
-
-    <h2 id="api-reference">API Reference</h2>
-    <p>
-      Every component exports its props interface alongside the component itself. Import types
-      directly from the component path:
-    </p>
-    <CodeBlock>{`import { Button, type ButtonProps } from '@eventuras/ratio-ui/core/Button';
-import { Card, type CardProps } from '@eventuras/ratio-ui/core/Card';
-import { TreeView, type TreeViewProps } from '@eventuras/ratio-ui/core/TreeView';`}</CodeBlock>
-
-    <h2 id="faq">FAQ</h2>
-    <p><strong>Can I use ratio-ui without Tailwind CSS?</strong></p>
-    <p>
-      No, ratio-ui depends on Tailwind CSS v4 for its styling. The component CSS is built with
-      Tailwind utilities and custom properties.
-    </p>
-    <p><strong>Does it work with React 18?</strong></p>
-    <p>
-      Yes, ratio-ui supports both React 18 and React 19. Peer dependency is set to
-      <code>&gt;=18 &lt;20</code>.
-    </p>
-    <p><strong>How do I customize colors?</strong></p>
-    <p>
-      Override the CSS custom properties in your own stylesheet. See the Theming section above
-      for the full list of available tokens.
+      In 1991 Paul Ginsparg started arXiv, a preprint server where physicists
+      shared results before any journal saw them. Wikipedia followed in 2001,
+      and the 2002 Budapest Open Access Initiative gave the movement its name.
+      The infrastructure keeps changing; Alexandria&apos;s ambition — everything,
+      for everyone — hasn&apos;t.
     </p>
   </article>
 );
@@ -241,11 +187,11 @@ type Story = StoryObj<ThreeColumnLayoutProps>;
 export const Default: Story = {
   args: {
     left: (
-      <TreeView
-        tree={sidebarTree}
-        currentPath="#components"
+      <NavTree
+        items={sidebarTree}
+        currentPath="#journals"
         LinkComponent={StoryLink}
-        aria-label="Documentation"
+        aria-label="How knowledge travels"
       />
     ),
     right: <TableOfContents headings={tocHeadings} />,
@@ -256,11 +202,11 @@ export const Default: Story = {
 export const WithoutRightColumn: Story = {
   args: {
     left: (
-      <TreeView
-        tree={sidebarTree}
-        currentPath="#installation"
+      <NavTree
+        items={sidebarTree}
+        currentPath="#gutenberg"
         LinkComponent={StoryLink}
-        aria-label="Documentation"
+        aria-label="How knowledge travels"
       />
     ),
     children: <SampleContent />,
