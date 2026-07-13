@@ -1,5 +1,156 @@
 # @eventuras/ratio-ui
 
+## 2.11.0
+
+### Minor Changes
+
+- 75eb94f: **Menu — refreshed look, sections with selectable options, richer items.**
+
+  **Visual refresh** (no API change needed): rounded, icon-friendly rows on a
+  padded panel replace the border-divided full-bleed rows; the default trigger is
+  now an outline pill with a circled chevron "cap" that fills, glows, and rotates
+  when the menu is open; the header drops its tint and the role chip becomes an
+  outline accent badge.
+
+  **New tokens:** `--menu-font-size` (14px) and `--menu-font-weight` (400) drive
+  the row typography — absolute px on purpose, so menu chrome doesn't inflate
+  with the fluid `--font-size-base`. Override per theme or any ancestor scope.
+
+  **Richer items:**
+
+  - `Menu.Link` / `Menu.Button` accept an **`icon`** (17px leading slot that
+    follows hover/current color) and **`variant="danger"`** (error-colored row
+    for actions like "Log out").
+  - `Menu.Link` accepts **`isCurrent`** — accent bar + tint and
+    `aria-current="page"` for the active destination.
+
+  Two new compound parts complete the user-menu pattern (identity header +
+  grouped pickers + actions):
+
+  - **`Menu.Section`** — groups items under an optional uppercase eyebrow label.
+    Pass `selectionMode="single" | "multiple"` to make the section selectable;
+    selection is section-scoped (mirroring React Aria), so one menu can host
+    several independent pickers — "View as" and "Language" — alongside plain
+    action items. Controlled via `selectedKeys` / `onSelectionChange`
+    (`Selection`), with `disallowEmptySelection` and `shouldCloseOnSelect`
+    passed through.
+  - **`Menu.Option`** — selectable row for such a section; shows a
+    primary-colored check mark when selected.
+  - **`Menu.Separator`** — a semantic divider between menu regions (announced as
+    a separator, not just drawn) — e.g. before a "Log out" action. Wraps React
+    Aria's `Separator`.
+
+  ```tsx
+  <Menu.Section
+    label="Language"
+    selectionMode="single"
+    disallowEmptySelection
+    selectedKeys={language}
+    onSelectionChange={setLanguage}
+  >
+    <Menu.Option id="en">English</Menu.Option>
+    <Menu.Option id="nb">Norsk bokmål</Menu.Option>
+  </Menu.Section>
+  ```
+
+  `Menu` itself also exposes more of React Aria in the same sweep:
+
+  - **`placement`** — where the popover opens (e.g. `'top end'` for a sidebar
+    footer menu); previously hardcoded to `'bottom end'`.
+  - **`isOpen` / `defaultOpen` / `onOpenChange`** — controlled or uncontrolled
+    open state.
+  - **`Menu.Option`** accepts `isDisabled` and `textValue` (typeahead text when
+    the label isn't a plain string; inferred from string children).
+
+  The `Menu` barrel now also exports its prop types (`MenuProps`,
+  `MenuSectionProps`, `MenuOptionProps`, …).
+
+- cbf59aa: **NavTree — hierarchical navigation for sidebars, succeeding `TreeView`.**
+
+  `TreeView` grew into `NavTree` (`core/NavTree`), built for admin-console
+  sidebars and docs navigation alike:
+
+  - **Groups with eyebrow labels** — `groups={[{ label: 'Workspace', items }]}`
+    renders uppercase section labels between item lists; the ungrouped `items`
+    form still works.
+  - **Per-item icons** — `icon: <Database size={18} />` renders a leading icon.
+  - **Composable labels & adornments** — `title` is a `ReactNode` (compose
+    `<Chip.Dot />`, logos, `<Kbd>`), and `trailing` renders a right-aligned
+    adornment such as a count `<Chip>` or a live dot. An optional `id` provides
+    the list key when `title` isn't a plain string.
+  - **Split branch rows** — a branch with an `href` now renders the label as a
+    link and the chevron as a separate toggle (replacing the old auto-injected
+    "Overview" child link).
+  - Active row uses the primary-100/900 tint with `aria-current="page"`, rows
+    get visible `focus-visible` rings, and `currentPath` still auto-expands
+    ancestors.
+
+  `TreeView` remains as a **deprecated alias** (`tree` maps to `items`) and will
+  be removed in a future major:
+
+  ```tsx
+  // before
+  <TreeView tree={nodes} currentPath={path} />
+  // after
+  <NavTree items={nodes} currentPath={path} />
+  ```
+
+  Also exports a handful of new icons (`LayoutGrid`, `Database`, `ShieldCheck`,
+  `ScrollText`, `Telescope`, `FlaskConical`, `Landmark`, `BookOpen`) and adds a
+  full-page **Admin Console** demo story (`Pages/Admin Console`) composing
+  NavTree, ValueTile, Badge, and Console.
+
+- 10dad8b: **Sidebar — the sticky aside chrome for admin consoles and docs shells.**
+
+  `layout/Sidebar` wraps the pattern previously hand-rolled around every
+  `NavTree`: fixed `width` (default 236px), sticky under the app header via
+  `top`, right hairline border, and a flex column with slots (same vocabulary as
+  `Drawer`):
+
+  - `Sidebar.Header` — pinned top (logo / workspace switcher)
+  - `Sidebar.Body` — the scrollable middle
+  - `Sidebar.Footer` — pinned bottom behind a hairline
+
+  ```tsx
+  <Sidebar width={236} top={62} aria-label="Console">
+    <Sidebar.Header>…logo…</Sidebar.Header>
+    <Sidebar.Body>
+      <NavTree groups={groups} currentPath={path} />
+    </Sidebar.Body>
+    <Sidebar.Footer>…theme toggle…</Sidebar.Footer>
+  </Sidebar>
+  ```
+
+  **Icon rail:** `collapsed` (+ `collapsedWidth`, default 64) narrows the sidebar
+  with an animated width, and `NavTree` gains **`iconOnly`** — rows collapse to
+  centered icons with the title as accessible name and native tooltip, group
+  labels become hairlines, and nesting isn't rendered. One consumer-owned state
+  drives both.
+
+  Content-agnostic and deliberately thin: hide it on small screens
+  (`className="hidden lg:flex"`) and reuse the same nav inside a `Drawer` — the
+  stories show the pairing. Also exports `MenuIcon` (burger).
+
+### Patch Changes
+
+- f297c3f: **Tokens: lift `--text-subtle` contrast; fix bureau's muted/subtle.**
+
+  `--text-subtle` (hints, placeholders, timestamps) sat below WCAG AA in both
+  modes of the standard theme, and the bureau theme was weaker still — its
+  light-mode `--text-muted` also failed AA. All tones now meet AA against both
+  the surface and cards while keeping a clear hierarchy (`text` > `muted` >
+  `subtle`):
+
+  - Standard light: subtle `neutral-500` → `neutral-600` (~4.0:1 → ~6.7:1)
+  - Standard dark: subtle `secondary-700` → `secondary-600` (~2.6:1 → ~4.8:1 on
+    cards)
+  - Bureau light: muted `#837c6a` → `#5c5644`, subtle `#a79d80` → `#6b6450`
+  - Bureau dark: subtle `#837c64` → `#938b75`
+
+  A new `Tokens/Text tones` story shows the three tones on the surface and on a
+  card, for judging the hierarchy per theme. Completes the contrast pass started
+  with the dark `--text-muted` lift.
+
 ## 2.10.0
 
 ### Minor Changes
