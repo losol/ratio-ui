@@ -51,6 +51,7 @@ export {
   Database,
   ShieldCheck,
   ScrollText,
+  LogOut,
 
   // Knowledge domains
   Telescope,
