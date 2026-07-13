@@ -47,6 +47,7 @@ export {
   Home,
 
   // Admin / console navigation
+  Menu as MenuIcon,
   LayoutGrid,
   Database,
   ShieldCheck,
