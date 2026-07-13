@@ -38,6 +38,20 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
+  typescript: {
+    // The default `react-docgen` engine can't see through the `Readonly<Props>`
+    // parameter annotations used across ratio-ui, leaving the docs prop tables
+    // nearly empty (only destructured defaults). The TypeScript-based engine
+    // resolves them fully — types, JSDoc descriptions, defaults. The propFilter
+    // keeps inherited DOM/react-aria props from node_modules out of the tables.
+    reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      shouldExtractLiteralValuesFromEnum: true,
+      shouldRemoveUndefinedFromOptional: true,
+      propFilter: (prop: { parent?: { fileName: string } }) =>
+        prop.parent ? !/node_modules/.test(prop.parent.fileName) : true,
+    },
+  },
   core: {
     disableTelemetry: true,
     disableWhatsNewNotifications: true,

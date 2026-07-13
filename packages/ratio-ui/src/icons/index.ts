@@ -46,6 +46,18 @@ export {
   MapPin,
   Home,
 
+  // Admin / console navigation
+  LayoutGrid,
+  Database,
+  ShieldCheck,
+  ScrollText,
+
+  // Knowledge domains
+  Telescope,
+  FlaskConical,
+  Landmark,
+  BookOpen,
+
   // Upload
   Upload,
   CloudUpload,
