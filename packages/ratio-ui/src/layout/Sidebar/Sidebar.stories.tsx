@@ -114,7 +114,7 @@ export const AdminSidebar: Story = {
     const [collapsed, setCollapsed] = useState(false);
     return (
       <div className="flex h-[480px] items-start overflow-hidden">
-        <Sidebar aria-label="Archive console" top={0} collapsed={collapsed} className="h-full!">
+        <Sidebar aria-label="Archive console" top={0} collapsed={collapsed} style={{ height: '100%' }}>
           <Sidebar.Header>{wordmark(collapsed)}</Sidebar.Header>
           <Sidebar.Body className={collapsed ? 'px-2' : undefined}>
             {archiveNav(collapsed)}
@@ -170,7 +170,7 @@ export const ConsoleShell: Story = {
           <LiveIndicator status="live">Catalogue in sync</LiveIndicator>
         </header>
         <div className="flex min-h-0 flex-1 items-start">
-          <Sidebar aria-label="Archive console" collapsed={collapsed} className="h-full!">
+          <Sidebar aria-label="Archive console" collapsed={collapsed} style={{ height: '100%' }}>
             <Sidebar.Body className={collapsed ? 'px-2' : undefined}>
               {archiveNav(collapsed)}
             </Sidebar.Body>

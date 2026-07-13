@@ -47,6 +47,8 @@ export interface NavTreeProps {
    * accessible name and native tooltip; group labels become dividers and
    * nesting is not rendered (top-level only). Pair with a collapsed
    * `Sidebar`. Rows without an `icon` fall back to the title's first letter.
+   * Give items a string `title` or an `id` so rail rows keep an accessible
+   * name (falls back to `href`).
    */
   iconOnly?: boolean;
   /** Routing link component (e.g. Next.js Link, React Router Link). */
@@ -198,6 +200,9 @@ function NavTreeRow({ node, currentPath, iconOnly, LinkComponent, depth }: Reado
   // that contains the active page is itself marked active.
   if (iconOnly) {
     const railActive = active || containsActive;
+    // Accessible name for the icon row: string title, else id, else href —
+    // so a rail row is never announced empty.
+    const railLabel = titleText ?? node.href;
     const rowClass = cn(ROW, 'justify-center px-2', railActive ? ROW_ACTIVE : ROW_IDLE);
     const inner = node.icon ? (
       <span aria-hidden className="shrink-0">
@@ -205,7 +210,7 @@ function NavTreeRow({ node, currentPath, iconOnly, LinkComponent, depth }: Reado
       </span>
     ) : (
       <span aria-hidden className="text-sm font-semibold">
-        {(titleText ?? '·').charAt(0)}
+        {(railLabel ?? '·').charAt(0)}
       </span>
     );
     return (
@@ -213,15 +218,15 @@ function NavTreeRow({ node, currentPath, iconOnly, LinkComponent, depth }: Reado
         {node.href ? (
           <LinkTag
             href={node.href}
-            aria-label={titleText}
-            title={titleText}
+            aria-label={railLabel}
+            title={railLabel}
             aria-current={active ? 'page' : undefined}
             className={rowClass}
           >
             {inner}
           </LinkTag>
         ) : (
-          <span aria-label={titleText} title={titleText} className={cn(rowClass, 'cursor-default')}>
+          <span aria-label={railLabel} title={railLabel} className={cn(rowClass, 'cursor-default')}>
             {inner}
           </span>
         )}
