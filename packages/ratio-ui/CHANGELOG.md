@@ -1,5 +1,224 @@
 # @eventuras/ratio-ui
 
+## 2.10.0
+
+### Minor Changes
+
+- 95bfa0f: **Button — rebuilt on React Aria, with compound parts for trigger pills.**
+
+  `Button` now uses React Aria's `Button` under the hood for unified
+  pointer/keyboard/touch press handling, focus-visible, and pending-state a11y.
+  The upgrade is **non-breaking**: the previous props keep working and are marked
+  `@deprecated` alongside their successors, so you can migrate at your own pace
+  (removed only at the next major):
+
+  - `onClick` → `onPress`
+  - `disabled` → `isDisabled`
+  - `ariaLabel` → `aria-label`
+
+  `variant` / `size` / `loading` / `icon` / `block` / `className` are unchanged,
+  and `buttonStyles` / `buttonSizes` still export as before (so `Link` and
+  `SplitButton` are unaffected).
+
+  New compound parts for a trigger pill (e.g. a user/account menu trigger),
+  composed on the token-driven Button chrome instead of a hand-copied class
+  string:
+
+  - **`Button.Avatar`** — a flush leading avatar that sits concentric with the
+    pill's rounded edge.
+  - **`Button.Label`** — a truncating label that owns the flex `min-w-0` +
+    `truncate` footgun (with an optional `maxWidth`), so long names ellipsize
+    instead of blowing the pill out.
+
+  ```tsx
+  <Button variant="primary" onPress={openMenu}>
+    <Button.Avatar name={user.name} />
+    <Button.Label maxWidth="20ch">{user.name}</Button.Label>
+  </Button>
+  ```
+
+  Note: `Button` is now a Client Component (`'use client'`), as required by React
+  Aria — transparent for most apps, but relevant if you relied on it rendering in
+  a React Server Component graph.
+
+  Also fixes an `@import` ordering issue in the source `global.css`
+  (`@import "./tokens/index.css"` now precedes the `@plugin`/`@source`
+  statements) so it's spec-valid and works in strict dev CSS pipelines
+  (Vite dev / Storybook).
+
+- b475521: **CodeBlock: pluggable `languageSelector` slot.**
+
+  `CodeBlock` gains an optional `languageSelector` prop — a `ReactNode` rendered in
+  the header's right-hand toolbar (alongside copy / wrap / download). The static
+  language badge is dropped while a selector is present. Drop in any control and
+  wire the selection yourself (you own the state and swap `code` — and `language`,
+  which also drives the download filename + MIME):
+
+  - a **`ToggleButtonGroup`** for a couple of languages (e.g. JSON / XML), or
+  - a **`Select`** for many (e.g. JavaScript / TypeScript / C# / Python).
+
+  It's a slot rather than a built-in picker so `CodeBlock` stays in the `core`
+  layer without depending on `forms` (where `Select` lives) — you compose the
+  control at the call site. The selector's clicks are isolated, so interacting
+  with it doesn't collapse the block.
+
+  Downloads now map the language label to a real file extension (e.g.
+  `TypeScript` → `code.ts`, not `code.typescript`).
+
+  ```tsx
+  <CodeBlock
+    code={code}
+    language={label}
+    languageSelector={
+      <ToggleButtonGroup
+        size="sm"
+        aria-label="Language"
+        disallowEmptySelection
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+        options={[
+          { value: "json", label: "JSON" },
+          { value: "xml", label: "XML" },
+        ]}
+      />
+    }
+  />
+  ```
+
+- dbf6e22: **Select — refreshed: RAC-aligned API, sizes, and a fixed selection callback.**
+
+  `Select` now mirrors React Aria's selection model and gains a size scale and a
+  visual polish.
+
+  - **Fixed:** the selection callback and controlled value never worked — the old
+    code passed `value` / `onChange`, which are not React Aria `Select` props
+    (they collapsed onto the wrapper's DOM attributes). Selection is now wired
+    correctly, so `onSelectionChange` fires and controlled use works.
+  - **RAC-aligned props:** `selectedKey` / `defaultSelectedKey` /
+    `onSelectionChange`, plus `isDisabled` / `isRequired` / `isInvalid` / `name`.
+  - **`size`** — `'sm' | 'md' | 'lg'` (default `md`), same scale as Button.
+  - **Visual polish:** a check mark on the selected option, `focus-visible` ring,
+    and token-driven chrome throughout.
+
+  Non-breaking: the previous props keep working and are marked `@deprecated`:
+
+  - `value` → `selectedKey`
+  - `defaultValue` → `defaultSelectedKey`
+  - `disabled` → `isDisabled`
+  - `required` → `isRequired`
+
+  ```tsx
+  <Select
+    label="Discipline"
+    size="sm"
+    options={[
+      { value: "logic", label: "Logic" },
+      { value: "ethics", label: "Ethics" },
+    ]}
+    defaultSelectedKey="logic"
+    onSelectionChange={(value) => setField(value)}
+  />
+  ```
+
+  Note: `Select` is now a Client Component (`'use client'`), as required by React
+  Aria.
+
+- 129e6b4: **Tabs — refreshed to a single chrome-less underline style, plus fixes.**
+
+  `Tabs` now has one look: a 2px active underline over a hairline rule, muted
+  inactive labels, and unframed panels (content sits directly on the surface).
+  The previous filled tab list with framed panels is gone.
+
+  **Visual change (no API change):** if you relied on the old filled look —
+  tinted tab fills and the panel's border/background — your tabs will now render
+  in the lighter underline style. Props are unchanged.
+
+  ```tsx
+  <Tabs>
+    <Tabs.Item title="View">…</Tabs.Item>
+    <Tabs.Item title="JSON">…</Tabs.Item>
+    <Tabs.Item title="XML">…</Tabs.Item>
+  </Tabs>
+  ```
+
+  Also fixed and refreshed:
+
+  - **Fixed: items wrapped in a fragment rendered as one empty tab.**
+    `React.Children.toArray` doesn't flatten `<>…</>`, so
+    `<Tabs><>…items…</></Tabs>` produced a single unlabeled tab and no panel.
+    Fragments are now unwrapped when collecting `Tabs.Item` children.
+  - **Focus is visible again:** tabs and the panel show a `--focus-ring` ring on
+    keyboard focus (previously `outline-none` with no replacement).
+  - **`Tabs.Item` accepts `isDisabled`** — a disabled tab is skipped by pointer
+    and keyboard.
+  - `Tabs` is now a Client Component (`'use client'`), as required by React Aria,
+    and `className` applies to the tabs root instead of an extra wrapper `<div>`.
+
+- ac4efb0: **ToggleButtonGroup — rebuilt on React Aria, with a segmented look and multi-select.**
+
+  `ToggleButtonGroup` now wraps React Aria's `ToggleButtonGroup` under the hood,
+  so it gains real group keyboard navigation, focus management, and RAC's full
+  selection model:
+
+  - **Multiple selection** — `selectionMode="multiple"` lets several segments be
+    active at once (compact filters).
+  - **Empty selection** — clearing the last active segment is allowed by default;
+    pass `disallowEmptySelection` for radio-style "exactly one active".
+  - **RAC selection API** — `selectedKeys` / `defaultSelectedKeys` /
+    `onSelectionChange(Set<Key>)`, controlled or uncontrolled.
+  - **`size`** (`'sm' | 'md' | 'lg'`, same scale as Button) and **`fullWidth`**.
+  - Per-option `title` (tooltip) and `isDisabled`; `label` widened to `ReactNode`.
+
+  The upgrade is **non-breaking** for props — the previous scalar API keeps
+  working and is marked `@deprecated`:
+
+  - `value` → `selectedKeys` (single mode)
+  - `onChange(value | null)` → `onSelectionChange(Set<Key>)`
+
+  **Visual refresh:** the group is now a single pill track with a filled active
+  segment (iOS-style), replacing the previous connected-border look.
+
+  ```tsx
+  // Multi-select filter with counts
+  <ToggleButtonGroup
+    selectionMode="multiple"
+    options={[
+      { value: "open", label: "Open", count: 12 },
+      { value: "closed", label: "Closed", count: 4 },
+    ]}
+  />
+  ```
+
+  Note: `ToggleButtonGroup` is now a Client Component (`'use client'`), as
+  required by React Aria.
+
+### Patch Changes
+
+- 30211db: **Dark theme: lift `--text-muted` contrast.**
+
+  In the standard dark theme, `--text-muted` sat right on the WCAG AA floor over
+  cards and tinted tracks (~4.8:1). It's now a step lighter.
+
+- 42fb98e: **ToggleButtonGroup: don't fire the deprecated `onChange` in multiple mode.**
+
+  The deprecated scalar `onChange(value | null)` callback can only represent a
+  single selection, but it was invoked in `selectionMode="multiple"` too — where
+  it reported just the first key in the set, misrepresenting the selection. It now
+  fires only in single mode; multi-select consumers should use `onSelectionChange`
+  (the `Set<Key>` callback).
+
+- 4e87887: **Tree: `density` prop renamed to `size`.**
+
+  For one sizing vocabulary across the design system (matching Button, Avatar, and
+  ToggleButtonGroup), `Tree`'s `density` prop is now `size` on the `sm | md | lg`
+  scale:
+
+  - `density="comfortable"` → `size="md"` (default)
+  - `density="compact"` → `size="sm"` (now tighter than before)
+  - new `size="lg"` — roomier rows
+
+  `Tree` is pre-1.0, so this is a direct rename with no deprecation shim.
+
 ## 2.9.0
 
 ### Minor Changes
