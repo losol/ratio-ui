@@ -42,6 +42,13 @@ export interface NavTreeProps {
   items?: NavTreeItem[];
   /** Current path — highlights the active item and auto-expands its ancestors. */
   currentPath?: string;
+  /**
+   * Icon-rail mode: rows collapse to centered icons with the title as
+   * accessible name and native tooltip; group labels become dividers and
+   * nesting is not rendered (top-level only). Pair with a collapsed
+   * `Sidebar`. Rows without an `icon` fall back to the title's first letter.
+   */
+  iconOnly?: boolean;
   /** Routing link component (e.g. Next.js Link, React Router Link). */
   LinkComponent?: React.ComponentType<{
     href: string;
@@ -80,6 +87,7 @@ export function NavTree({
   groups,
   items,
   currentPath,
+  iconOnly = false,
   LinkComponent,
   'aria-label': ariaLabel = 'Navigation',
   className,
@@ -91,13 +99,20 @@ export function NavTree({
       {resolvedGroups.map((group, index) => (
         // Index is always part of the key: two groups may share a label.
         <div key={`${group.label ?? 'group'}-${index}`} className={index > 0 ? 'mt-6' : undefined}>
-          {group.label && <div className={GROUP_LABEL}>{group.label}</div>}
+          {group.label &&
+            (iconOnly ? (
+              // In the rail, a hairline stands in for the group label.
+              index > 0 && <div aria-hidden className="mx-2 mb-2 h-px bg-border-1" />
+            ) : (
+              <div className={GROUP_LABEL}>{group.label}</div>
+            ))}
           <ul className="space-y-0.5">
             {group.items.map((node, i) => (
               <NavTreeRow
                 key={nodeKey(node, i)}
                 node={node}
                 currentPath={currentPath}
+                iconOnly={iconOnly}
                 LinkComponent={LinkComponent}
                 depth={0}
               />
@@ -130,11 +145,12 @@ function hasActiveChild(node: NavTreeItem, currentPath: string | undefined): boo
 interface NavTreeRowProps {
   node: NavTreeItem;
   currentPath?: string;
+  iconOnly?: boolean;
   LinkComponent?: NavTreeProps['LinkComponent'];
   depth: number;
 }
 
-function NavTreeRow({ node, currentPath, LinkComponent, depth }: Readonly<NavTreeRowProps>) {
+function NavTreeRow({ node, currentPath, iconOnly, LinkComponent, depth }: Readonly<NavTreeRowProps>) {
   const hasChildren = !!node.children?.length;
   const active = isActive(node.href, currentPath);
   const containsActive = hasActiveChild(node, currentPath);
@@ -176,6 +192,42 @@ function NavTreeRow({ node, currentPath, LinkComponent, depth }: Readonly<NavTre
       className={cn('h-4 w-4 shrink-0 transition-transform', isOpen && 'rotate-90')}
     />
   );
+
+  // Icon rail: one centered icon per top-level row — title becomes the
+  // accessible name + native tooltip, children are not rendered, and a row
+  // that contains the active page is itself marked active.
+  if (iconOnly) {
+    const railActive = active || containsActive;
+    const rowClass = cn(ROW, 'justify-center px-2', railActive ? ROW_ACTIVE : ROW_IDLE);
+    const inner = node.icon ? (
+      <span aria-hidden className="shrink-0">
+        {node.icon}
+      </span>
+    ) : (
+      <span aria-hidden className="text-sm font-semibold">
+        {(titleText ?? '·').charAt(0)}
+      </span>
+    );
+    return (
+      <li>
+        {node.href ? (
+          <LinkTag
+            href={node.href}
+            aria-label={titleText}
+            title={titleText}
+            aria-current={active ? 'page' : undefined}
+            className={rowClass}
+          >
+            {inner}
+          </LinkTag>
+        ) : (
+          <span aria-label={titleText} title={titleText} className={cn(rowClass, 'cursor-default')}>
+            {inner}
+          </span>
+        )}
+      </li>
+    );
+  }
 
   if (!hasChildren) {
     return (
@@ -261,6 +313,7 @@ function NavTreeRow({ node, currentPath, LinkComponent, depth }: Readonly<NavTre
               key={nodeKey(child, i)}
               node={child}
               currentPath={currentPath}
+              iconOnly={iconOnly}
               LinkComponent={LinkComponent}
               depth={depth + 1}
             />
