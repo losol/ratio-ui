@@ -10,7 +10,7 @@ import {
   ModalOverlay,
 } from 'react-aria-components';
 
-import { Button } from '../../core/Button';
+import { ActionButton } from '../../core/ActionButton';
 import { X } from '../../icons';
 import { cn } from '../../utils/cn';
 
@@ -18,6 +18,12 @@ export interface DrawerProps {
   isOpen: boolean;
   onClose?: () => void;
   children: ReactNode;
+  /**
+   * Which edge the drawer slides from. Navigation sheets conventionally come
+   * from the left, detail/inspector panels from the right, action sheets
+   * from the bottom, and notification trays from the top. @default 'right'
+   */
+  side?: 'left' | 'right' | 'top' | 'bottom';
   /** Whether clicking the backdrop closes the drawer. Defaults to true. */
   isDismissable?: boolean;
   /** When true, Escape no longer closes the drawer. Defaults to false. */
@@ -34,8 +40,8 @@ interface HeaderProps extends DrawerChildProps {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
 
-interface BodyProps extends DrawerChildProps {}
-interface FooterProps extends DrawerChildProps {}
+type BodyProps = DrawerChildProps;
+type FooterProps = DrawerChildProps;
 
 interface HeadingSlotProps {
   children?: ReactNode;
@@ -55,6 +61,7 @@ const Drawer: DrawerComponent = ({
   isOpen,
   onClose,
   children,
+  side = 'right',
   isDismissable = true,
   isKeyboardDismissDisabled = false,
 }: DrawerProps) => {
@@ -68,17 +75,32 @@ const Drawer: DrawerComponent = ({
       isKeyboardDismissDisabled={isKeyboardDismissDisabled}
       className="fixed inset-0 z-30 bg-cover backdrop-blur-xs"
     >
-      <Modal className="fixed top-0 right-0 h-full w-11/12 md:w-10/12 lg:w-7/12 2xl:w-8/12 bg-(--surface) overflow-auto">
+      <Modal
+        className={cn(
+          'fixed bg-(--surface) overflow-auto',
+          // Horizontal drawers: full height, responsive width.
+          (side === 'left' || side === 'right') &&
+            'top-0 h-full w-11/12 md:w-10/12 lg:w-7/12 2xl:w-8/12',
+          side === 'left' && 'left-0',
+          side === 'right' && 'right-0',
+          // Vertical drawers (sheets): full width, content-sized up to 85vh.
+          (side === 'top' || side === 'bottom') && 'left-0 right-0 w-full max-h-[85vh]',
+          side === 'top' && 'top-0 rounded-b-xl',
+          side === 'bottom' && 'bottom-0 rounded-t-xl',
+        )}
+      >
         <AriaDialog className="relative flex flex-col p-6 outline-hidden h-full">
           {onClose && (
-            <Button
-              onClick={onClose}
-              className="absolute top-0 right-0 m-4"
-              variant="secondary"
+            <ActionButton
+              round
+              variant="ghost"
+              size="lg"
+              onPress={onClose}
+              className="absolute top-3 right-3"
               ariaLabel="Close drawer"
             >
-              <X />
-            </Button>
+              <X size={18} />
+            </ActionButton>
           )}
           {children}
         </AriaDialog>
