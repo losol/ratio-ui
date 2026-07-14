@@ -154,7 +154,15 @@ export const SearchField = React.forwardRef<HTMLDivElement, SearchFieldProps>(
           >
             <Search className={s.icon} />
           </div>
-          <Input placeholder={placeholder} className={s.input} />
+          <Input
+            placeholder={placeholder}
+            // Hide WebKit's native search-cancel button — we render our own
+            // ActionButton clear, and Safari/Chrome would otherwise show both.
+            className={cn(
+              s.input,
+              '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none',
+            )}
+          />
           {/* React Aria wires this button to clear the field (ButtonContext).
               Hidden while the field is empty. */}
           <div
