@@ -1,5 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import React, { useState } from 'react';
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
+import { NavTree, type NavTreeItem } from '../../core/NavTree';
 import { SearchField } from './SearchField';
 
 const meta: Meta<typeof SearchField> = {
@@ -10,7 +15,7 @@ const meta: Meta<typeof SearchField> = {
     docs: {
       description: {
         component:
-          'Accessible search field with built-in debouncing (300ms default) and clear button. Built on react-aria-components.',
+          'Accessible search field with built-in debouncing (300ms default) and a clear button that appears when the field has content. Built on react-aria-components.',
       },
     },
   },
@@ -26,57 +31,78 @@ const meta: Meta<typeof SearchField> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Basic usage */
+/** Basic usage — type something to see the clear button appear. */
 export const Basic: Story = {
   render: () => (
-    <SearchField
-      placeholder="Search..."
-      aria-label="Search"
-    />
+    <SearchField placeholder="Search the archive…" aria-label="Search the archive" />
   ),
 };
 
-/** With custom placeholder */
-export const WithPlaceholder: Story = {
+/** The three sizes: `sm` (sidebars/toolbars) · `md` (default) · `lg`. */
+export const Sizes: Story = {
   render: () => (
-    <SearchField
-      placeholder="Type event name"
-      aria-label="Find events"
-      className="w-full"
-    />
-  ),
-};
-
-/** Disabled state */
-export const Disabled: Story = {
-  render: () => (
-    <SearchField
-      placeholder="Search..."
-      aria-label="Search"
-      isDisabled
-    />
-  ),
-};
-
-/** Controlled value */
-const ControlledExample = () => {
-  const [value, setValue] = useState('');
-
-  return (
-    <div className="space-y-2">
-      <SearchField
-        value={value}
-        onChange={setValue}
-        placeholder="Search..."
-        aria-label="Search"
-      />
-      <div className="text-sm text-gray-600 dark:text-gray-400">
-        Current value: <span className="font-medium">{value || 'empty'}</span>
-      </div>
+    <div className="flex flex-col gap-4">
+      <SearchField size="sm" placeholder="Filter types…" aria-label="Filter (small)" />
+      <SearchField size="md" placeholder="Search manuscripts…" aria-label="Search (medium)" />
+      <SearchField size="lg" placeholder="Search everything…" aria-label="Search (large)" />
     </div>
-  );
+  ),
 };
 
-export const Controlled: Story = {
-  render: () => <ControlledExample />,
+// The scholars of the Library of Alexandria — the full catalogue, and the
+// few consulted so often they stay pinned.
+const SCHOLARS: NavTreeItem[] = [
+  { title: 'Hypatia — astronomy, mathematics', href: '/hypatia' },
+  { title: 'Euclid — geometry', href: '/euclid' },
+  { title: 'Ptolemy — astronomy, geography', href: '/ptolemy' },
+  { title: 'Eratosthenes — geodesy, chief librarian', href: '/eratosthenes' },
+  { title: 'Aristarchus — heliocentrism', href: '/aristarchus' },
+  { title: 'Callimachus — the Pinakes catalogue', href: '/callimachus' },
+  { title: 'Herophilus — anatomy', href: '/herophilus' },
+  { title: 'Zenodotus — first librarian', href: '/zenodotus' },
+];
+const PINNED = SCHOLARS.slice(0, 3);
+
+/**
+ * The sidebar-filter pattern: a compact `SearchField` live-filtering a
+ * `NavTree`. Empty query shows the pinned entries; typing switches the group
+ * to "Matches" (with an empty state when nothing matches). Filtering is plain
+ * consumer logic — NavTree is data-driven.
+ */
+export const FilterNavigation: Story = {
+  render: function FilterNavigationStory() {
+    const [query, setQuery] = useState('');
+    const q = query.trim().toLowerCase();
+    const matches = SCHOLARS.filter((s) => (s.title as string).toLowerCase().includes(q));
+
+    return (
+      // Fixed height so the centered story doesn't re-center (jump) as the
+      // list grows and shrinks — tall enough for the full 8-scholar list.
+      <div className="flex min-h-100 w-64 flex-col gap-2">
+        <SearchField
+          size="sm"
+          value={query}
+          onChange={setQuery}
+          debounce={150}
+          placeholder="Filter scholars…"
+          aria-label="Filter scholars"
+        />
+        {q && matches.length === 0 ? (
+          <p className="px-3 py-2 text-[13px] italic text-(--text-subtle)">
+            No scholars match the filter.
+          </p>
+        ) : (
+          <NavTree
+            aria-label="Scholars"
+            currentPath="/hypatia"
+            groups={[
+              q
+                ? { label: 'Matches', items: matches }
+                : { label: 'Frequently consulted', items: PINNED },
+            ]}
+          />
+        )}
+      </div>
+    );
+  },
 };

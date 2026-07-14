@@ -48,6 +48,7 @@ export {
 
   // Admin / console navigation
   Menu as MenuIcon,
+  Bell,
   LayoutGrid,
   Database,
   ShieldCheck,
@@ -79,6 +80,10 @@ export {
   // Theme
   Sun,
   Moon,
+
+  // Media
+  Pause,
+  Play,
 
   // Loading
   LoaderCircle,
