@@ -3,4 +3,16 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Navbar } from './Navbar';
-export type { NavbarProps, NavbarBrandProps, NavbarContentProps } from './Navbar';
+export type {
+  NavbarProps,
+  NavbarBrandProps,
+  NavbarContentProps,
+  NavbarRowProps,
+  NavbarRowVariant,
+  NavbarSearchProps,
+  NavbarLinksProps,
+  NavbarLinkProps,
+  NavbarActionsProps,
+  NavbarToggleProps,
+  NavbarCollapseProps,
+} from './Navbar';
