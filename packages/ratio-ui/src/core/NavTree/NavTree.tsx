@@ -25,6 +25,13 @@ export interface NavTreeItem {
   icon?: React.ReactNode;
   /** Right-aligned adornment — a count `<Chip>`, status dot, or badge. */
   trailing?: React.ReactNode;
+  /**
+   * Render arbitrary content as this item instead of a link row — e.g. a
+   * compact `SearchField` filtering the group it sits in (composed from the
+   * call site; NavTree stays in `core`). Ignored in `iconOnly` and
+   * `horizontal` modes. When set, `href`/`icon`/`children` are ignored.
+   */
+  content?: React.ReactNode;
   /** Nested items. The row gains a chevron and collapses. */
   children?: NavTreeItem[];
 }
@@ -42,6 +49,13 @@ export interface NavTreeProps {
   items?: NavTreeItem[];
   /** Current path — highlights the active item and auto-expands its ancestors. */
   currentPath?: string;
+  /**
+   * `vertical` (default) is the stacked sidebar list; `horizontal` lays the
+   * top-level items out as a row of tabs with an accent underline on the
+   * active item — the navbar nav-row form. Horizontal flattens groups
+   * (labels dropped) and renders top-level items only.
+   */
+  orientation?: 'vertical' | 'horizontal';
   /**
    * Icon-rail mode: rows collapse to centered icons with the title as
    * accessible name and native tooltip; group labels become dividers and
@@ -65,16 +79,33 @@ export interface NavTreeProps {
 // Row chrome shared by links and toggle rows. The active row is tinted with
 // the primary-100/900 pair (the same tint recipe as ToggleButton/Menu).
 const ROW =
-  'flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors outline-none ' +
+  'relative flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors outline-none ' +
   'focus-visible:ring-2 focus-visible:ring-(--focus-ring)';
-const ROW_ACTIVE = 'bg-primary-100 dark:bg-primary-900 text-(--text) font-medium';
+// Active = accent (Ochre) tint + a 3px accent bar — the same "current"
+// marker Menu uses, per the design system's navbar spec.
+const ROW_ACTIVE = cn(
+  'bg-[color-mix(in_oklch,var(--accent)_12%,transparent)] text-(--text) font-medium',
+  'before:content-[""] before:absolute before:left-[3px] before:top-2 before:bottom-2',
+  'before:w-[3px] before:rounded-[3px] before:bg-(--accent)',
+);
+// Horizontal tab: accent underline overlapping the list rule.
+const HTAB =
+  'relative flex items-center gap-2 py-3 text-[13.5px] font-medium whitespace-nowrap ' +
+  'transition-colors outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring)';
+const HTAB_ACTIVE = cn(
+  'text-(--text) font-semibold',
+  'after:content-[""] after:absolute after:left-0 after:right-0 after:-bottom-px',
+  'after:h-[2px] after:bg-(--accent)',
+);
+const HTAB_IDLE = 'text-(--text-muted) hover:text-(--text)';
 const ROW_IDLE = 'text-(--text-muted) hover:text-(--text) hover:bg-card-hover';
 
 const GROUP_LABEL =
   'px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.09em] text-(--text-subtle)';
 
 /**
- * NavTree — hierarchical navigation for sidebars and docs. Optionally grouped
+ * NavTree — hierarchical navigation for sidebars and docs, or a horizontal
+ * tab row for navbars (`orientation="horizontal"`). Optionally grouped
  * under uppercase eyebrow labels (the admin-console form), with per-item
  * icons, collapsible branches, and active-path highlighting with auto-expanded
  * ancestors.
@@ -89,12 +120,44 @@ export function NavTree({
   groups,
   items,
   currentPath,
+  orientation = 'vertical',
   iconOnly = false,
   LinkComponent,
   'aria-label': ariaLabel = 'Navigation',
   className,
 }: Readonly<NavTreeProps>) {
   const resolvedGroups = groups ?? (items ? [{ items }] : []);
+
+  if (orientation === 'horizontal') {
+    const LinkTag = (LinkComponent ?? 'a') as React.ElementType;
+    const flat = resolvedGroups.flatMap((g) => g.items).filter((n) => !n.content);
+    return (
+      <nav aria-label={ariaLabel} className={className}>
+        <ul className="m-0 flex list-none items-center gap-6 border-b border-border-1 p-0">
+          {flat.map((node, i) => {
+            const active = isActive(node.href, currentPath) || hasActiveChild(node, currentPath);
+            return (
+              <li key={nodeKey(node, i)} className="list-none">
+                <LinkTag
+                  href={node.href ?? '#'}
+                  aria-current={active ? 'page' : undefined}
+                  className={cn(HTAB, active ? HTAB_ACTIVE : HTAB_IDLE)}
+                >
+                  {node.icon && (
+                    <span aria-hidden className="shrink-0">
+                      {node.icon}
+                    </span>
+                  )}
+                  {node.title}
+                  {node.trailing && <span className="shrink-0">{node.trailing}</span>}
+                </LinkTag>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    );
+  }
 
   return (
     <nav aria-label={ariaLabel} className={cn('text-[14.5px]', className)}>
@@ -173,6 +236,18 @@ function NavTreeRow({ node, currentPath, iconOnly, LinkComponent, depth }: Reado
 
   const LinkTag = (LinkComponent ?? 'a') as React.ElementType;
   const paddingLeft = `${0.75 + depth * 0.75}rem`;
+
+  // Arbitrary content slot (e.g. a group filter) — plain node, no row chrome.
+  // The rail hides it, matching the design (the filter lives in the wide
+  // sidebar only).
+  if (node.content) {
+    if (iconOnly) return null;
+    return (
+      <li className="py-1 pr-1" style={{ paddingLeft }}>
+        {node.content}
+      </li>
+    );
+  }
 
   // Text for the chevron's accessible name. A ReactNode title can't be
   // interpolated (it would stringify to "[object Object]"), so fall back to
