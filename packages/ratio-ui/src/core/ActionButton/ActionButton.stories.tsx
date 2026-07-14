@@ -1,162 +1,132 @@
-import type * as React from 'react';
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ActionButton } from './ActionButton';
 import { Text } from '../Text';
+import { Bell, Check, Download, MenuIcon, Pause, Play, Plus } from '../../icons';
 
 const meta: Meta<typeof ActionButton> = {
   title: 'Core/ActionButton (beta)',
   component: ActionButton,
+  parameters: { layout: 'centered' },
   tags: ['autodocs'],
-  parameters: {
-    docs: {
-      description: {
-        component:
-          'Compact chrome button for toolbars, close affordances, table-row actions, and other dense surfaces. Composes children freely — works for icon-only, icon + text, or text-only. `ariaLabel` is required when there is no visible text.',
-      },
-    },
-  },
 };
 
 export default meta;
-type Story = StoryObj<typeof ActionButton>;
+type Story = StoryObj<typeof meta>;
 
-// Minimal inline icons so stories don't depend on an icon pack
-// Decorative icons — aria-hidden + focusable="false" so AT only announces
-// the button's accessible name (text label or ariaLabel), not the icon.
-const X = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-       aria-hidden="true" focusable="false">
-    <path d="M6 6l12 12M18 6 6 18"/>
-  </svg>
-);
-const Pause = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-       strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-       aria-hidden="true" focusable="false">
-    <rect x="7" y="5" width="3" height="14" rx="0.5"/>
-    <rect x="14" y="5" width="3" height="14" rx="0.5"/>
-  </svg>
-);
-const Download = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-       strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-       aria-hidden="true" focusable="false">
-    <path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/>
-  </svg>
-);
+const ICON = 15;
 
-export const IconOnly: Story = {
-  name: 'Icon-only — ariaLabel required',
-  render: () => <ActionButton ariaLabel="Close"><X /></ActionButton>,
-};
-
-export const IconAndText: Story = {
-  name: 'Icon + text — bare string child',
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'A bare string child inherits the button\'s font styling — no `<Text>` wrapper needed for the common case.',
-      },
-    },
-  },
-  render: () => (
-    <ActionButton>
-      <Pause />
-      Pause
-    </ActionButton>
-  ),
-};
-
-export const IconAndTextComponent: Story = {
-  name: 'Icon + <Text> — typography control',
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'When you want explicit typography control (size, weight, variant), compose with `<Text as="span">`. The `as="span"` keeps the layout inline; the default `<p>` would be semantically wrong inside a button.',
-      },
-    },
-  },
-  render: () => (
-    <ActionButton>
-      <Pause />
-      <Text as="span" weight="medium">Pause</Text>
-    </ActionButton>
-  ),
-};
-
-export const TextOnly: Story = {
-  render: () => <ActionButton>Publish</ActionButton>,
-};
-
-export const Subtle: Story = {
-  render: () => (
-    <ActionButton variant="subtle">
-      <Pause />
-      Pause
-    </ActionButton>
-  ),
-};
-
-export const Solid: Story = {
-  render: () => (
-    <ActionButton variant="solid">
-      <Download />
-      Download
-    </ActionButton>
-  ),
-};
-
-export const Sizes: Story = {
-  render: () => (
-    <div className="flex gap-2 items-center">
-      <ActionButton ariaLabel="Pause" size="sm"><Pause /></ActionButton>
-      <ActionButton ariaLabel="Pause" size="md"><Pause /></ActionButton>
-      <ActionButton ariaLabel="Pause" size="lg"><Pause /></ActionButton>
-    </div>
-  ),
-};
-
+/**
+ * The scriptorium toolbar: compact chrome for dense surfaces. Icon-only
+ * buttons stay square (pass `ariaLabel`!); the one prominent action per
+ * toolbar gets `variant="solid"`. (For copy-to-clipboard actions, reach for
+ * `CopyButton` instead — it owns the copied-feedback state.)
+ */
 export const Toolbar: Story = {
-  name: 'Toolbar — mixed variants and contents',
   render: () => (
-    <div className="flex gap-1 items-center">
-      <ActionButton ariaLabel="Pause"><Pause /></ActionButton>
-      <ActionButton ariaLabel="Download log"><Download /></ActionButton>
-      <ActionButton ariaLabel="Close panel"><X /></ActionButton>
+    <div className="flex items-center gap-1.5">
+      <ActionButton ariaLabel="Pause copying">
+        <Pause size={ICON} />
+      </ActionButton>
+      <ActionButton ariaLabel="Resume copying">
+        <Play size={ICON} />
+      </ActionButton>
+      <ActionButton ariaLabel="Proofread">
+        <Check size={ICON} />
+      </ActionButton>
       <ActionButton variant="solid">
-        <Download />
-        Export
+        <Plus size={ICON} />
+        Add evidence
       </ActionButton>
     </div>
   ),
 };
 
-export const Disabled: Story = {
-  render: () => <ActionButton ariaLabel="Pause" disabled><Pause /></ActionButton>,
+/**
+ * Icon + label — as a plain string or wrapped in `Text`; both get the same
+ * padding. (They didn't always: a CSS-based icon-only check missed text
+ * nodes and stripped the padding from `<Pause /> Pause`.)
+ */
+export const IconAndText: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <ActionButton>
+        <Pause size={ICON} />
+        Pause
+      </ActionButton>
+      <ActionButton>
+        <Pause size={ICON} />
+        <Text as="span" weight="medium">
+          Pause
+        </Text>
+      </ActionButton>
+    </div>
+  ),
 };
 
-export const SquareCorners: Story = {
-  name: 'Re-skinned via --action-button-radius',
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Override `--action-button-radius` on a container to flip all action buttons inside to sharp corners — useful for retro / brutalist sub-experiences.',
-      },
-    },
-  },
+/** The three variants — default (card-toned), `ghost` (transparent), `solid` — plus disabled. */
+export const Variants: Story = {
   render: () => (
-    <div
-      style={{ '--action-button-radius': '0' } as React.CSSProperties}
-      className="flex gap-2"
-    >
-      <ActionButton ariaLabel="Pause"><Pause /></ActionButton>
-      <ActionButton variant="subtle">
-        <Pause />
-        Pause
+    <div className="flex items-center gap-3">
+      <ActionButton>
+        <Download size={ICON} />
+        Download
+      </ActionButton>
+      <ActionButton variant="ghost">
+        <Download size={ICON} />
+        Download
+      </ActionButton>
+      <ActionButton variant="solid">
+        <Download size={ICON} />
+        Download
+      </ActionButton>
+      <ActionButton disabled>
+        <Download size={ICON} />
+        Originals never leave
+      </ActionButton>
+    </div>
+  ),
+};
+
+/** The three sizes: `sm` (24) · `md` (28, default) · `lg` (36). */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <ActionButton size="sm">
+        <Download size={13} />
+        Download
+      </ActionButton>
+      <ActionButton size="md">
+        <Download size={ICON} />
+        Download
+      </ActionButton>
+      <ActionButton size="lg">
+        <Download size={17} />
+        Download
+      </ActionButton>
+    </div>
+  ),
+};
+
+/**
+ * `round` makes the button fully circular — burger buttons, bell buttons,
+ * and the clear-X inside inputs. Here: the reading-room bell rung when the
+ * day's scroll deliveries arrived.
+ */
+export const Round: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <ActionButton round ariaLabel="Open menu">
+        <MenuIcon size={16} />
+      </ActionButton>
+      <ActionButton round size="lg" ariaLabel="New deliveries">
+        <Bell size={18} />
+      </ActionButton>
+      <ActionButton round variant="solid" ariaLabel="Add scroll">
+        <Plus size={16} />
       </ActionButton>
     </div>
   ),

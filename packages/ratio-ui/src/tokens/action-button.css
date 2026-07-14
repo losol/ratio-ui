@@ -15,7 +15,7 @@
  */
 
 :root {
-  --action-button-bg:        transparent;
+  --action-button-bg:        var(--card);
   --action-button-fg:        var(--text-muted);
   --action-button-border:    var(--border-1);
   --action-button-bg-hover:  var(--card-hover);

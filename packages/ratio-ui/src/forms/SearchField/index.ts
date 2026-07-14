@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { SearchField } from './SearchField';
-export type { SearchFieldProps } from './SearchField';
+export type { SearchFieldProps, SearchFieldSize } from './SearchField';
