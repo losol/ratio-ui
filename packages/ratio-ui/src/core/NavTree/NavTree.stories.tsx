@@ -2,7 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { SearchField } from '../../forms/SearchField';
 import {
   BookOpen,
   Database,
@@ -156,4 +158,90 @@ export const BranchWithOverview: Story = {
       <NavTree {...args} />
     </div>
   ),
+};
+
+/**
+ * `orientation="horizontal"` lays the top-level items out as a tab row with
+ * an accent underline on the active item — the navbar nav-row form. Groups
+ * flatten, nesting isn't rendered. The ages of knowledge, with how much of
+ * antiquity's writing survived each of them (spoiler: not much).
+ */
+export const Horizontal: Story = {
+  args: {
+    'aria-label': 'Ages of knowledge',
+    orientation: 'horizontal',
+    currentPath: '/renaissance',
+    items: [
+      { title: 'Antiquity', href: '/antiquity' },
+      { title: 'Middle Ages', href: '/middle-ages', trailing: <Chip>scriptoria</Chip> },
+      { title: 'Renaissance', href: '/renaissance', trailing: <Chip>print</Chip> },
+      { title: 'Enlightenment', href: '/enlightenment' },
+    ],
+  },
+  render: (args) => (
+    <div style={{ width: 560 }}>
+      <NavTree {...args} />
+    </div>
+  ),
+};
+
+/**
+ * The `content` slot puts arbitrary JSX inside a group — here the Ignis
+ * sidebar pattern: a compact `SearchField` living inside the expanded
+ * Manuscripts branch, live-filtering its siblings. Composition from the
+ * call site; NavTree itself never imports `forms/`.
+ */
+export const GroupFilter: Story = {
+  args: { items: [] },
+  render: function GroupFilterStory() {
+    const [query, setQuery] = useState('');
+    const q = query.trim().toLowerCase();
+    const works = [
+      { title: 'Almagest — Ptolemy', href: '/works/almagest' },
+      { title: 'Elements — Euclid', href: '/works/elements' },
+      { title: 'Conics — Apollonius', href: '/works/conics' },
+      { title: 'On Floating Bodies — Archimedes', href: '/works/floating-bodies' },
+      { title: 'Geographia — Eratosthenes', href: '/works/geographia' },
+    ].filter((w) => !q || w.title.toLowerCase().includes(q));
+
+    return (
+      <div style={{ width: 300 }}>
+        <NavTree
+          aria-label="Collections"
+          currentPath="/works/almagest"
+          groups={[
+            {
+              label: 'Collections',
+              items: [
+                {
+                  title: 'Manuscripts',
+                  href: '/works',
+                  children: [
+                    { title: 'All manuscripts', href: '/works' },
+                    {
+                      id: 'filter',
+                      title: 'Filter',
+                      content: (
+                        <SearchField
+                          size="sm"
+                          value={query}
+                          onChange={setQuery}
+                          debounce={150}
+                          placeholder="Filter works…"
+                          aria-label="Filter manuscripts"
+                        />
+                      ),
+                    },
+                    ...(works.length
+                      ? works
+                      : [{ id: 'empty', title: 'No works match.' }]),
+                  ],
+                },
+              ],
+            },
+          ]}
+        />
+      </div>
+    );
+  },
 };
