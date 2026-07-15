@@ -1,5 +1,129 @@
 # @eventuras/ratio-ui
 
+## 2.12.0
+
+### Minor Changes
+
+- e7246c5: **Navbar — composition parts for app headers.**
+
+  The navbar can now be assembled from parts (existing `Brand`/`Content` are
+  untouched):
+
+  - **`Navbar.Search`** — a growing, width-capped zone for a search control.
+    It's a slot: drop a `SearchField` in from the call site (`core/` can't
+    depend on `forms/`).
+  - **`Navbar.Links`** + **`Navbar.Link`** — horizontal pill links with `icon`,
+    `isCurrent` (tinted pill + `aria-current="page"`), and `LinkComponent`
+    injection for SPA routers.
+  - **`Navbar.Actions`** — the right-hand cluster (bell, theme, user menu).
+  - **`Navbar.Spacer`** — flexible gap.
+
+  - **`Navbar.Row`** — stack rows for the editorial 2-row layout, with
+    variants `utility` (slim tinted strip), `brand`, and `nav`. Rows are
+    separated by background tone, never borders.
+
+  Root gains **`elevated`** — elevation instead of lines, per the design
+  ("baren står på en subtil skygge"): card background and a soft shadow, never
+  borders. Centered it's a floating card (rounded from `md`, full-bleed below);
+  with **`fluid`** (full-width row for admin consoles) it's a flat app header.
+
+  `Drawer` gains a **`side`** prop (`'left' | 'right' | 'top' | 'bottom'`,
+  default `right`) — nav sheets from the left, action sheets from the bottom
+  (rounded lip, content-sized up to 85vh), notification trays from the top. Its
+  close affordance is now a round ghost `ActionButton` instead of a full
+  secondary `Button` pill.
+
+  **`Navbar.Toggle` + `Navbar.Collapse`** own the mobile pattern: a round
+  burger button that morphs into an X in place, and a disclosure panel folding
+  out under the bar — `aria-expanded`/`aria-controls` and panel ids wired
+  automatically (no state at the call site). Pairs are linked by
+  `controls`/`id` (default `'menu'`), so a navbar can host several independent
+  panels — e.g. a search toggle and a burger — with one open at a time. Panels
+  unmount when closed. `Navbar` is now a Client Component (`'use client'`).
+
+  The stories use staged collapse (search needs `lg`, links `md`) so nothing
+  wraps awkwardly at mid widths.
+
+  ```tsx
+  <Navbar sticky elevated fluid>
+    <Navbar.Brand>…logo…</Navbar.Brand>
+    <Navbar.Links>
+      <Navbar.Link href="/" isCurrent>Dashboard</Navbar.Link>
+    </Navbar.Links>
+    <Navbar.Search><SearchField size="sm" … /></Navbar.Search>
+    <Navbar.Spacer />
+    <Navbar.Actions>…bell, user menu…</Navbar.Actions>
+  </Navbar>
+  ```
+
+- b2998e4: **NavTree: horizontal orientation, accent active marker, and a content slot.**
+
+  - **`orientation="horizontal"`** — the top-level items as a tab row with an
+    accent underline on the active item (the navbar nav-row form, per the
+    design's navbar spec). Groups flatten and nesting isn't rendered.
+  - **Visual change:** the vertical active row now uses the accent (Ochre)
+    tint with a 3px accent bar — the same "current" marker as Menu — replacing
+    the primary tint.
+  - **`NavTreeItem.content`** — render arbitrary JSX as an item (no row
+    chrome), e.g. a compact `SearchField` living inside a group and filtering
+    its siblings. Composed from the call site; NavTree stays in `core`.
+    Hidden in `iconOnly` and `horizontal` modes.
+
+- 58bc0cd: **SearchField & ActionButton — sizes, a real clear button, round variant, and React Aria alignment.**
+
+  `SearchField`:
+
+  - **`size`** — `'sm' | 'md' | 'lg'` (default `md`); `sm` is the compact
+    variant for sidebars and toolbars (the "Filter types…" pattern).
+  - **The clear button now actually renders** — the docs always claimed one, but
+    React Aria only wires a clear button when the field contains a button. It's
+    an `ActionButton round` hooked up automatically through React Aria's
+    ButtonContext, shown only while the field has content (Escape still clears).
+  - More React Aria surface: `onClear`, `name`, `autoFocus`, plus `testId`.
+  - **Visual change:** `md`/`lg` now match Button's heights (~38px/~50px) instead
+    of the chunky `p-4` + `border-2` form default, so a SearchField sits level
+    with buttons in the same toolbar row.
+  - New `FilterNavigation` story shows the sidebar pattern: a small SearchField
+    live-filtering a `NavTree`.
+
+  `ActionButton`:
+
+  - **Rebuilt on React Aria's `Button`** — unified press handling and RAC
+    context participation (which is what powers the SearchField clear button).
+    `onPress` and `isDisabled` are available; `onClick`/`disabled` keep working.
+  - **`round`** — fully circular chrome for burger/bell buttons and clear-X
+    affordances.
+  - **The `subtle` look is now the default** (card-toned chrome); the former
+    transparent default is available as `variant="ghost"`, and the `subtle`
+    variant name is gone (beta). Token-scoped consumers (Console, CodeBlock)
+    re-skin via `--action-button-*` and are unaffected.
+  - **Fixed: icon + plain-text buttons lost their horizontal padding.** The
+    CSS-based icon-only check (`:only-child`) doesn't see text nodes, so
+    `<Pause /> Pause` was treated as icon-only and rendered flush. Icon-only
+    detection is now element-based; icon-only buttons still stay square.
+  - Now a Client Component (`'use client'`), as required by React Aria.
+
+  Also exports `Bell`, `Pause`, and `Play` icons, and the ActionButton stories are consolidated to five scriptorium-themed examples.
+
+- 5d57df5: **SearchField `shortcut` + a generic `useKeyboardShortcut` hook.**
+
+  New in `hooks/`: **`useKeyboardShortcut(combo, handler, options)`** — parses a
+  `'mod+k'`-style combo (`mod` = ⌘ on Apple platforms, Ctrl elsewhere), binds a
+  global listener, keeps the handler in a ref, SSR-safe. Ships with
+  `shortcutLabel(combo)` (platform-correct `⌘K` / `Ctrl+K` text for `Kbd`
+  hints) and `isApplePlatform()`. Reusable for command palettes, dialogs, and
+  anything shortcut-shaped.
+
+  `SearchField` gains **`shortcut`** as the first consumer: the combo focuses
+  the field from anywhere, and a `Kbd` hint with the platform-correct label
+  shows inside the field while it's empty and unfocused.
+
+### Patch Changes
+
+- bd4435e: **SearchField: remove the double clear button.** WebKit renders a native
+  cancel button on `input[type=search]` next to SearchField's own clear
+  `ActionButton`; the native one is now suppressed.
+
 ## 2.11.0
 
 ### Minor Changes
