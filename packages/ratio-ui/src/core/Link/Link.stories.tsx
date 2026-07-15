@@ -50,7 +50,7 @@ ExternalLink.args = {
 
 export const InternalLink = Template.bind({});
 InternalLink.args = {
-  href: '/events',
+  href: '#/events',
   children: 'Go to events',
 };
 

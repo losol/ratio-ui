@@ -54,25 +54,25 @@ export const ClassicWithChildren: FooterStory = () => (
       <div>
         <h3 className="mb-2 font-semibold">Resources</h3>
         <ul className="space-y-1">
-          <li><a href="/docs" className="hover:underline">Documentation</a></li>
-          <li><a href="/api" className="hover:underline">API</a></li>
-          <li><a href="/support" className="hover:underline">Support</a></li>
+          <li><a href="#/docs" className="hover:underline">Documentation</a></li>
+          <li><a href="#/api" className="hover:underline">API</a></li>
+          <li><a href="#/support" className="hover:underline">Support</a></li>
         </ul>
       </div>
       <div>
         <h3 className="mb-2 font-semibold">Company</h3>
         <ul className="space-y-1">
-          <li><a href="/about" className="hover:underline">About</a></li>
-          <li><a href="/contact" className="hover:underline">Contact</a></li>
-          <li><a href="/privacy" className="hover:underline">Privacy</a></li>
+          <li><a href="#/about" className="hover:underline">About</a></li>
+          <li><a href="#/contact" className="hover:underline">Contact</a></li>
+          <li><a href="#/privacy" className="hover:underline">Privacy</a></li>
         </ul>
       </div>
       <div>
         <h3 className="mb-2 font-semibold">Legal</h3>
         <ul className="space-y-1">
-          <li><a href="/terms" className="hover:underline">Terms</a></li>
-          <li><a href="/privacy-policy" className="hover:underline">Privacy Policy</a></li>
-          <li><a href="/cookie-policy" className="hover:underline">Cookie Policy</a></li>
+          <li><a href="#/terms" className="hover:underline">Terms</a></li>
+          <li><a href="#/privacy-policy" className="hover:underline">Privacy Policy</a></li>
+          <li><a href="#/cookie-policy" className="hover:underline">Cookie Policy</a></li>
         </ul>
       </div>
     </div>

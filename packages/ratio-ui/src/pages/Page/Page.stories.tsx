@@ -16,7 +16,7 @@ const PageDemo: React.FC<{ title: string }> = ({ title }) => (
   <div className="min-h-screen flex flex-col">
     <Navbar sticky>
       <Navbar.Brand>
-        <a href="/" className="text-lg tracking-tight whitespace-nowrap no-underline">
+        <a href="#/" className="text-lg tracking-tight whitespace-nowrap no-underline">
           {title}
         </a>
       </Navbar.Brand>
@@ -123,9 +123,9 @@ const PageDemo: React.FC<{ title: string }> = ({ title }) => (
 
     <Footer.Classic siteTitle={title}>
       <List>
-        <List.Item className="mb-2"><a href="/">Home</a></List.Item>
-        <List.Item className="mb-2"><a href="/docs">Documentation</a></List.Item>
-        <List.Item className="mb-2"><a href="/privacy">Privacy</a></List.Item>
+        <List.Item className="mb-2"><a href="#/">Home</a></List.Item>
+        <List.Item className="mb-2"><a href="#/docs">Documentation</a></List.Item>
+        <List.Item className="mb-2"><a href="#/privacy">Privacy</a></List.Item>
       </List>
     </Footer.Classic>
   </div>

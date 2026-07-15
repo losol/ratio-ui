@@ -67,14 +67,14 @@ export const Sizes: Story = {
 // The scholars of the Library of Alexandria — the full catalogue, and the
 // few consulted so often they stay pinned.
 const SCHOLARS: NavTreeItem[] = [
-  { title: 'Hypatia — astronomy, mathematics', href: '/hypatia' },
-  { title: 'Euclid — geometry', href: '/euclid' },
-  { title: 'Ptolemy — astronomy, geography', href: '/ptolemy' },
-  { title: 'Eratosthenes — geodesy, chief librarian', href: '/eratosthenes' },
-  { title: 'Aristarchus — heliocentrism', href: '/aristarchus' },
-  { title: 'Callimachus — the Pinakes catalogue', href: '/callimachus' },
-  { title: 'Herophilus — anatomy', href: '/herophilus' },
-  { title: 'Zenodotus — first librarian', href: '/zenodotus' },
+  { title: 'Hypatia — astronomy, mathematics', href: '#/hypatia' },
+  { title: 'Euclid — geometry', href: '#/euclid' },
+  { title: 'Ptolemy — astronomy, geography', href: '#/ptolemy' },
+  { title: 'Eratosthenes — geodesy, chief librarian', href: '#/eratosthenes' },
+  { title: 'Aristarchus — heliocentrism', href: '#/aristarchus' },
+  { title: 'Callimachus — the Pinakes catalogue', href: '#/callimachus' },
+  { title: 'Herophilus — anatomy', href: '#/herophilus' },
+  { title: 'Zenodotus — first librarian', href: '#/zenodotus' },
 ];
 const PINNED = SCHOLARS.slice(0, 3);
 
@@ -109,7 +109,7 @@ export const FilterNavigation: Story = {
         ) : (
           <NavTree
             aria-label="Scholars"
-            currentPath="/hypatia"
+            currentPath="#/hypatia"
             groups={[
               q
                 ? { label: 'Matches', items: matches }
