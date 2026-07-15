@@ -39,28 +39,28 @@ const ICON = 18;
 export const AdminSidebar: Story = {
   args: {
     'aria-label': 'Alexandria console',
-    currentPath: '/manuscripts',
+    currentPath: '#/manuscripts',
     groups: [
       {
         label: 'Collections',
         items: [
-          { title: 'Dashboard', href: '/', icon: <LayoutGrid size={ICON} /> },
+          { title: 'Dashboard', href: '#/', icon: <LayoutGrid size={ICON} /> },
           {
             title: 'Manuscripts',
-            href: '/manuscripts',
+            href: '#/manuscripts',
             icon: <ScrollText size={ICON} />,
             trailing: <Chip>400k</Chip>,
           },
-          { title: 'Instruments', href: '/instruments', icon: <Telescope size={ICON} /> },
+          { title: 'Instruments', href: '#/instruments', icon: <Telescope size={ICON} /> },
         ],
       },
       {
         label: 'Administration',
         items: [
-          { title: 'Catalogue', href: '/catalogue', icon: <Database size={ICON} /> },
+          { title: 'Catalogue', href: '#/catalogue', icon: <Database size={ICON} /> },
           {
             title: 'Imports',
-            href: '/imports',
+            href: '#/imports',
             icon: <Upload size={ICON} />,
             trailing: (
               <Chip>
@@ -68,7 +68,7 @@ export const AdminSidebar: Story = {
               </Chip>
             ),
           },
-          { title: 'Audit log', href: '/audit', icon: <ShieldCheck size={ICON} /> },
+          { title: 'Audit log', href: '#/audit', icon: <ShieldCheck size={ICON} /> },
         ],
       },
     ],
@@ -83,12 +83,15 @@ export const AdminSidebar: Story = {
 /**
  * Nested branches with active-path highlighting: fields of knowledge and the
  * heroes who shaped them. `currentPath` points at Emmy Noether, so her branch
- * auto-expands and her row is tinted.
+ * auto-expands and her row is tinted. `defaultExpandedDepth={1}` opens all
+ * top-level branches for the overview; a single branch can do the same with
+ * its own `defaultOpen` (Physics carries it here, belt-and-braces).
  */
 export const FieldsOfKnowledge: Story = {
   args: {
     'aria-label': 'Fields of knowledge',
-    currentPath: '/mathematics/noether',
+    currentPath: '#/mathematics/noether',
+    defaultExpandedDepth: 1,
     groups: [
       {
         label: 'Sciences',
@@ -96,28 +99,29 @@ export const FieldsOfKnowledge: Story = {
           {
             title: 'Physics',
             icon: <FlaskConical size={ICON} />,
+            defaultOpen: true,
             children: [
-              { title: 'Isaac Newton', href: '/physics/newton' },
-              { title: 'James Clerk Maxwell', href: '/physics/maxwell' },
-              { title: 'Marie Curie', href: '/physics/curie' },
+              { title: 'Isaac Newton', href: '#/physics/newton' },
+              { title: 'James Clerk Maxwell', href: '#/physics/maxwell' },
+              { title: 'Marie Curie', href: '#/physics/curie' },
             ],
           },
           {
             title: 'Mathematics',
             icon: <BookOpen size={ICON} />,
             children: [
-              { title: 'Leonhard Euler', href: '/mathematics/euler' },
-              { title: 'Carl Friedrich Gauss', href: '/mathematics/gauss' },
-              { title: 'Emmy Noether', href: '/mathematics/noether' },
+              { title: 'Leonhard Euler', href: '#/mathematics/euler' },
+              { title: 'Carl Friedrich Gauss', href: '#/mathematics/gauss' },
+              { title: 'Emmy Noether', href: '#/mathematics/noether' },
             ],
           },
           {
             title: 'Astronomy',
             icon: <Telescope size={ICON} />,
             children: [
-              { title: 'Hypatia', href: '/astronomy/hypatia' },
-              { title: 'Johannes Kepler', href: '/astronomy/kepler' },
-              { title: 'Galileo Galilei', href: '/astronomy/galileo' },
+              { title: 'Hypatia', href: '#/astronomy/hypatia' },
+              { title: 'Johannes Kepler', href: '#/astronomy/kepler' },
+              { title: 'Galileo Galilei', href: '#/astronomy/galileo' },
             ],
           },
         ],
@@ -139,16 +143,16 @@ export const FieldsOfKnowledge: Story = {
 export const BranchWithOverview: Story = {
   args: {
     'aria-label': "Kepler's works",
-    currentPath: '/kepler/harmonices-mundi',
+    currentPath: '#/kepler/harmonices-mundi',
     items: [
       {
         title: 'Johannes Kepler',
-        href: '/kepler',
+        href: '#/kepler',
         icon: <Telescope size={ICON} />,
         children: [
-          { title: 'Mysterium Cosmographicum (1596)', href: '/kepler/mysterium' },
-          { title: 'Astronomia Nova (1609)', href: '/kepler/astronomia-nova' },
-          { title: 'Harmonices Mundi (1619)', href: '/kepler/harmonices-mundi' },
+          { title: 'Mysterium Cosmographicum (1596)', href: '#/kepler/mysterium' },
+          { title: 'Astronomia Nova (1609)', href: '#/kepler/astronomia-nova' },
+          { title: 'Harmonices Mundi (1619)', href: '#/kepler/harmonices-mundi' },
         ],
       },
     ],
@@ -170,12 +174,12 @@ export const Horizontal: Story = {
   args: {
     'aria-label': 'Ages of knowledge',
     orientation: 'horizontal',
-    currentPath: '/renaissance',
+    currentPath: '#/renaissance',
     items: [
-      { title: 'Antiquity', href: '/antiquity' },
-      { title: 'Middle Ages', href: '/middle-ages', trailing: <Chip>scriptoria</Chip> },
-      { title: 'Renaissance', href: '/renaissance', trailing: <Chip>print</Chip> },
-      { title: 'Enlightenment', href: '/enlightenment' },
+      { title: 'Antiquity', href: '#/antiquity' },
+      { title: 'Middle Ages', href: '#/middle-ages', trailing: <Chip>scriptoria</Chip> },
+      { title: 'Renaissance', href: '#/renaissance', trailing: <Chip>print</Chip> },
+      { title: 'Enlightenment', href: '#/enlightenment' },
     ],
   },
   render: (args) => (
@@ -190,6 +194,11 @@ export const Horizontal: Story = {
  * sidebar pattern: a compact `SearchField` living inside the expanded
  * Manuscripts branch, live-filtering its siblings. Composition from the
  * call site; NavTree itself never imports `forms/`.
+ *
+ * Note `defaultOpen: true` on the branch: open-state is derived from the
+ * active path, so a branch whose children can be filtered away must declare
+ * it — otherwise zero matches would remove the active child and collapse
+ * the branch, filter field and all.
  */
 export const GroupFilter: Story = {
   args: { items: [] },
@@ -197,30 +206,30 @@ export const GroupFilter: Story = {
     const [query, setQuery] = useState('');
     const q = query.trim().toLowerCase();
     const works = [
-      { title: 'Almagest — Ptolemy', href: '/works/almagest' },
-      { title: 'Elements — Euclid', href: '/works/elements' },
-      { title: 'Conics — Apollonius', href: '/works/conics' },
-      { title: 'On Floating Bodies — Archimedes', href: '/works/floating-bodies' },
-      { title: 'Geographia — Eratosthenes', href: '/works/geographia' },
+      { title: 'Almagest — Ptolemy', href: '#/works/almagest' },
+      { title: 'Elements — Euclid', href: '#/works/elements' },
+      { title: 'Conics — Apollonius', href: '#/works/conics' },
+      { title: 'On Floating Bodies — Archimedes', href: '#/works/floating-bodies' },
+      { title: 'Geographia — Eratosthenes', href: '#/works/geographia' },
     ].filter((w) => !q || w.title.toLowerCase().includes(q));
 
     return (
       <div style={{ width: 300 }}>
         <NavTree
           aria-label="Collections"
-          currentPath="/works/almagest"
+          currentPath="#/works/almagest"
           groups={[
             {
               label: 'Collections',
               items: [
                 {
                   title: 'Manuscripts',
-                  href: '/works',
+                  href: '#/works',
+                  defaultOpen: true,
                   children: [
-                    { title: 'All manuscripts', href: '/works' },
+                    { title: 'All manuscripts', href: '#/works' },
                     {
                       id: 'filter',
-                      title: 'Filter',
                       content: (
                         <SearchField
                           size="sm"
