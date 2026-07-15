@@ -4,12 +4,14 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   SearchField as AriaSearchField,
   Input,
 } from 'react-aria-components';
 import { ActionButton } from '../../core/ActionButton';
+import { Kbd } from '../../core/Kbd';
+import { useKeyboardShortcut, shortcutLabel } from '../../hooks';
 import { Search, X } from '../../icons';
 import { cn } from '../../utils/cn';
 
@@ -28,6 +30,13 @@ export interface SearchFieldProps {
    * for sidebars and toolbars. @default 'md'
    */
   size?: SearchFieldSize;
+  /**
+   * Global keyboard shortcut that focuses the field, e.g. `'mod+k'` (⌘K on
+   * Apple platforms, Ctrl+K elsewhere). Shows a `Kbd` hint inside the field
+   * while it's empty and unfocused. Built on the generic
+   * `useKeyboardShortcut` hook.
+   */
+  shortcut?: string;
   /** Name for native form submission. Mirrors React Aria. */
   name?: string;
   autoFocus?: boolean;
@@ -101,6 +110,7 @@ export const SearchField = React.forwardRef<HTMLDivElement, SearchFieldProps>(
       onClear,
       placeholder = 'Search...',
       size = 'md',
+      shortcut,
       name,
       autoFocus,
       'aria-label': ariaLabel,
@@ -113,6 +123,20 @@ export const SearchField = React.forwardRef<HTMLDivElement, SearchFieldProps>(
   ) => {
     const [internalValue, setInternalValue] = useState(externalValue);
     const s = SIZES[size];
+
+    // Local ref (merged with the forwarded one) so the shortcut can focus
+    // the inner input.
+    const rootRef = useRef<HTMLDivElement | null>(null);
+    const setRootRef = (node: HTMLDivElement | null) => {
+      rootRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
+    };
+    useKeyboardShortcut(
+      shortcut ?? '',
+      () => rootRef.current?.querySelector('input')?.focus(),
+      { enabled: !!shortcut && !isDisabled },
+    );
 
     // Sync external value to internal
     useEffect(() => {
@@ -143,7 +167,7 @@ export const SearchField = React.forwardRef<HTMLDivElement, SearchFieldProps>(
         // `group` exposes React Aria's data-empty to the clear button below.
         className={cn('group', className)}
         data-testid={testId}
-        ref={ref}
+        ref={setRootRef}
       >
         <div className="relative">
           <div
@@ -163,6 +187,22 @@ export const SearchField = React.forwardRef<HTMLDivElement, SearchFieldProps>(
               '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none',
             )}
           />
+          {shortcut && !isDisabled && (
+            // Hint lives where the clear button appears: shown only while the
+            // field is empty and unfocused. The trailing `!` is Tailwind v4's
+            // important modifier — it lets focus-within's `hidden` win over
+            // `group-data-empty:inline-flex` at equal specificity.
+            <span
+              aria-hidden
+              className={cn(
+                'pointer-events-none absolute top-1/2 hidden -translate-y-1/2',
+                'group-data-empty:inline-flex group-focus-within:hidden!',
+                s.clearWrap,
+              )}
+            >
+              <Kbd>{shortcutLabel(shortcut)}</Kbd>
+            </span>
+          )}
           {/* React Aria wires this button to clear the field (ButtonContext).
               Hidden while the field is empty. */}
           <div
