@@ -8,33 +8,64 @@ import React, { useState, useCallback } from 'react';
 import { ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
 
-export interface NavTreeItem {
-  /**
-   * Visible label. Any node composes here — `<Chip.Dot />`, a logo, `<Kbd>` —
-   * but keep some text in it (or plain text) so the row has an accessible name.
-   */
-  title: React.ReactNode;
+interface NavTreeItemBase {
   /**
    * Stable key. Needed when `href` is absent and `title` isn't a plain string;
    * otherwise `href`/`title` serve as the key.
    */
   id?: string;
+}
+
+/** The regular item shape: a link row, optionally a collapsible branch. */
+export interface NavTreeLinkItem extends NavTreeItemBase {
+  /**
+   * Visible label. Any node composes here — `<Chip.Dot />`, a logo, `<Kbd>` —
+   * but keep some text in it (or plain text) so the row has an accessible
+   * name.
+   */
+  title: React.ReactNode;
   /** Destination. Omit on a branch to make the whole row a collapse toggle. */
   href?: string;
   /** Optional leading icon — pass a sized element, e.g. `<Database size={18} />`. */
   icon?: React.ReactNode;
   /** Right-aligned adornment — a count `<Chip>`, status dot, or badge. */
   trailing?: React.ReactNode;
-  /**
-   * Render arbitrary content as this item instead of a link row — e.g. a
-   * compact `SearchField` filtering the group it sits in (composed from the
-   * call site; NavTree stays in `core`). Ignored in `iconOnly` and
-   * `horizontal` modes. When set, `href`/`icon`/`children` are ignored.
-   */
-  content?: React.ReactNode;
   /** Nested items. The row gains a chevron and collapses. */
   children?: NavTreeItem[];
+  /**
+   * Start this branch expanded even when it doesn't contain the current
+   * page. The user's toggle wins until `currentPath` changes — then the
+   * default re-asserts, same as the active branch's auto-expand. Declare it
+   * on branches with dynamic children (e.g. a filter in a `content` row) —
+   * otherwise filtering away the active child collapses the branch.
+   */
+  defaultOpen?: boolean;
+  content?: never;
 }
+
+/**
+ * Arbitrary JSX in place of a link row — e.g. a compact `SearchField`
+ * filtering the group it sits in (composed from the call site; NavTree stays
+ * in `core`). Ignored in `iconOnly` and `horizontal` modes.
+ */
+export interface NavTreeContentItem extends NavTreeItemBase {
+  content: React.ReactNode;
+  /** Ignored — content items render no row chrome. (Key fallback only.) */
+  title?: React.ReactNode;
+  href?: never;
+  icon?: never;
+  trailing?: never;
+  children?: never;
+  defaultOpen?: never;
+}
+
+/**
+ * One node in the tree — either a link/branch row (required `title`, the
+ * row's accessible name) or a `content` item rendering arbitrary JSX.
+ * Modeled as a union so a plain row can't silently lack a label, and mixing
+ * `content` with row props is a type error instead of silently ignored.
+ */
+export type NavTreeItem = NavTreeLinkItem | NavTreeContentItem;
 
 export interface NavTreeGroup {
   /** Uppercase eyebrow above the group (e.g. "Workspace"). Omit for none. */
@@ -49,6 +80,13 @@ export interface NavTreeProps {
   items?: NavTreeItem[];
   /** Current path — highlights the active item and auto-expands its ancestors. */
   currentPath?: string;
+  /**
+   * Start every branch above this depth expanded — `1` opens the top-level
+   * branches, `Infinity` opens everything. Per-item `defaultOpen` and the
+   * active path's auto-expand still apply on top; the user's toggle wins
+   * until `currentPath` changes. @default 0
+   */
+  defaultExpandedDepth?: number;
   /**
    * `vertical` (default) is the stacked sidebar list; `horizontal` lays the
    * top-level items out as a row of tabs with an accent underline on the
@@ -65,11 +103,21 @@ export interface NavTreeProps {
    * name (falls back to `href`).
    */
   iconOnly?: boolean;
-  /** Routing link component (e.g. Next.js Link, React Router Link). */
+  /**
+   * Routing link component (e.g. Next.js Link, React Router Link). Beyond
+   * `className`, NavTree passes `style` (the depth indent), `aria-current`
+   * on the active row, and `aria-label`/`title` in the icon rail — the
+   * adapter must forward them all, so spread the rest:
+   * `({ href, ...rest }) => <Link to={href} {...rest} />`.
+   */
   LinkComponent?: React.ComponentType<{
     href: string;
     children: React.ReactNode;
     className?: string;
+    style?: React.CSSProperties;
+    'aria-current'?: 'page';
+    'aria-label'?: string;
+    title?: string;
   }>;
   /** Accessible label for the nav element. */
   'aria-label'?: string;
@@ -121,6 +169,7 @@ export function NavTree({
   items,
   currentPath,
   orientation = 'vertical',
+  defaultExpandedDepth = 0,
   iconOnly = false,
   LinkComponent,
   'aria-label': ariaLabel = 'Navigation',
@@ -178,6 +227,7 @@ export function NavTree({
                 node={node}
                 currentPath={currentPath}
                 iconOnly={iconOnly}
+                defaultExpandedDepth={defaultExpandedDepth}
                 LinkComponent={LinkComponent}
                 depth={0}
               />
@@ -211,11 +261,19 @@ interface NavTreeRowProps {
   node: NavTreeItem;
   currentPath?: string;
   iconOnly?: boolean;
+  defaultExpandedDepth?: number;
   LinkComponent?: NavTreeProps['LinkComponent'];
   depth: number;
 }
 
-function NavTreeRow({ node, currentPath, iconOnly, LinkComponent, depth }: Readonly<NavTreeRowProps>) {
+function NavTreeRow({
+  node,
+  currentPath,
+  iconOnly,
+  defaultExpandedDepth = 0,
+  LinkComponent,
+  depth,
+}: Readonly<NavTreeRowProps>) {
   const hasChildren = !!node.children?.length;
   const active = isActive(node.href, currentPath);
   const containsActive = hasActiveChild(node, currentPath);
@@ -230,9 +288,16 @@ function NavTreeRow({ node, currentPath, iconOnly, LinkComponent, depth }: Reado
     setPrevPath(currentPath);
     setManualOpen(null);
   }
-  const isOpen = manualOpen ?? (active || containsActive);
+  // One derived base shared by state and toggle — otherwise the first click
+  // on a branch that's only open via defaultOpen/depth would be a no-op.
+  const derivedOpen =
+    active || containsActive || !!node.defaultOpen || depth < defaultExpandedDepth;
+  const isOpen = manualOpen ?? derivedOpen;
 
-  const toggle = useCallback(() => setManualOpen((prev) => !(prev ?? (active || containsActive))), [active, containsActive]);
+  const toggle = useCallback(
+    () => setManualOpen((prev) => !(prev ?? derivedOpen)),
+    [derivedOpen],
+  );
 
   const LinkTag = (LinkComponent ?? 'a') as React.ElementType;
   const paddingLeft = `${0.75 + depth * 0.75}rem`;
@@ -394,6 +459,7 @@ function NavTreeRow({ node, currentPath, iconOnly, LinkComponent, depth }: Reado
               node={child}
               currentPath={currentPath}
               iconOnly={iconOnly}
+              defaultExpandedDepth={defaultExpandedDepth}
               LinkComponent={LinkComponent}
               depth={depth + 1}
             />

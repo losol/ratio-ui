@@ -54,10 +54,17 @@ const tocHeadings: TocHeading[] = [
   { id: 'open-access', text: 'The open era', level: 2 },
 ];
 
-const StoryLink = ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => (
-  <a href={href} className={className} onClick={(e) => { e.preventDefault(); console.log('navigate', href); }}>
-    {children}
-  </a>
+// Spread the rest — NavTree also passes style (depth indent), aria-current,
+// and rail aria-label/title through LinkComponent.
+const StoryLink = ({ href, ...rest }: React.ComponentPropsWithoutRef<'a'>) => (
+  <a
+    href={href}
+    {...rest}
+    onClick={(e) => {
+      e.preventDefault();
+      console.log('navigate', href);
+    }}
+  />
 );
 
 const CodeBlock = ({ children }: { children: string }) => (
