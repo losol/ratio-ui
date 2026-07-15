@@ -24,7 +24,7 @@ export const ServerError: Story = {
         Error code: 500 - Internal Server Error
       </ErrorBlock.Details>
       <ErrorBlock.Actions>
-        <a href="/" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+        <a href="#/" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
           Go Home
         </a>
         <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
@@ -65,7 +65,7 @@ export const Forbidden: Story = {
         If you believe this is an error, please contact your administrator.
       </ErrorBlock.Details>
       <ErrorBlock.Actions>
-        <a href="/" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+        <a href="#/" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
           Go Home
         </a>
       </ErrorBlock.Actions>
@@ -81,10 +81,10 @@ export const NotFound: Story = {
         The resource you're looking for doesn't exist or has been moved.
       </ErrorBlock.Description>
       <ErrorBlock.Actions>
-        <a href="/" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+        <a href="#/" className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
           Go Home
         </a>
-        <a href="/search" className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+        <a href="#/search" className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
           Search
         </a>
       </ErrorBlock.Actions>

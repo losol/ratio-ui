@@ -29,7 +29,7 @@ export const Basic: ProductCardStory = () => (
     title="Premium Widget"
     lead="A high-quality widget for your needs"
     price="kr 299,00"
-    href="/products/premium-widget"
+    href="#/products/premium-widget"
     onAddToCart={() => console.log('Added to cart')}
   />
 );
@@ -39,7 +39,7 @@ export const WithImage: ProductCardStory = () => (
     title="Professional Tool"
     lead="Essential tool for professionals"
     price="kr 499,00"
-    href="/products/pro-tool"
+    href="#/products/pro-tool"
     onAddToCart={() => console.log('Added to cart')}
     image={
       <img
@@ -56,7 +56,7 @@ export const WithoutButton: ProductCardStory = () => (
     title="Information Only"
     lead="This product card has no add to cart button"
     price="kr 199,00"
-    href="/products/info-only"
+    href="#/products/info-only"
   />
 );
 
@@ -65,7 +65,7 @@ export const CustomButtonText: ProductCardStory = () => (
     title="Special Product"
     lead="Product with custom button text"
     price="kr 399,00"
-    href="/products/special"
+    href="#/products/special"
     onAddToCart={() => console.log('Added to cart')}
     buttonText="Kjøp nå"
   />
@@ -76,7 +76,7 @@ export const LongDescription: ProductCardStory = () => (
     title="Product with Long Description"
     lead="This is a very long product description that demonstrates how the component handles text that exceeds the maximum number of lines. The text will be clamped to show only the first two lines with an ellipsis at the end."
     price="kr 599,00"
-    href="/products/long-desc"
+    href="#/products/long-desc"
     onAddToCart={() => console.log('Added to cart')}
   />
 );
@@ -87,7 +87,7 @@ export const Grid: ProductCardStory = () => (
       title="Product One"
       lead="Description for product one"
       price="kr 199,00"
-      href="/products/one"
+      href="#/products/one"
       onAddToCart={() => console.log('Added product one')}
       image={
         <img
@@ -101,7 +101,7 @@ export const Grid: ProductCardStory = () => (
       title="Product Two"
       lead="Description for product two"
       price="kr 299,00"
-      href="/products/two"
+      href="#/products/two"
       onAddToCart={() => console.log('Added product two')}
       image={
         <img
@@ -115,7 +115,7 @@ export const Grid: ProductCardStory = () => (
       title="Product Three"
       lead="Description for product three"
       price="kr 399,00"
-      href="/products/three"
+      href="#/products/three"
       onAddToCart={() => console.log('Added product three')}
       image={
         <img

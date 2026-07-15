@@ -39,15 +39,15 @@ const ICON = 18;
 const archiveNav = (iconOnly = false) => (
   <NavTree
     aria-label="Archive console"
-    currentPath="/manuscripts"
+    currentPath="#/manuscripts"
     iconOnly={iconOnly}
     groups={[
       {
         label: 'Collections',
         items: [
-          { title: 'Dashboard', href: '/', icon: <LayoutGrid size={ICON} /> },
-          { title: 'Manuscripts', href: '/manuscripts', icon: <ScrollText size={ICON} /> },
-          { title: 'Instruments', href: '/instruments', icon: <Telescope size={ICON} /> },
+          { title: 'Dashboard', href: '#/', icon: <LayoutGrid size={ICON} /> },
+          { title: 'Manuscripts', href: '#/manuscripts', icon: <ScrollText size={ICON} /> },
+          { title: 'Instruments', href: '#/instruments', icon: <Telescope size={ICON} /> },
         ],
       },
       {
@@ -57,17 +57,17 @@ const archiveNav = (iconOnly = false) => (
             title: 'Astronomy',
             icon: <Telescope size={ICON} />,
             children: [
-              { title: 'Hypatia', href: '/astronomy/hypatia' },
-              { title: 'Aristarchus', href: '/astronomy/aristarchus' },
-              { title: 'Eratosthenes', href: '/astronomy/eratosthenes' },
+              { title: 'Hypatia', href: '#/astronomy/hypatia' },
+              { title: 'Aristarchus', href: '#/astronomy/aristarchus' },
+              { title: 'Eratosthenes', href: '#/astronomy/eratosthenes' },
             ],
           },
           {
             title: 'Mathematics',
             icon: <FlaskConical size={ICON} />,
             children: [
-              { title: 'Euclid', href: '/mathematics/euclid' },
-              { title: 'Diophantus', href: '/mathematics/diophantus' },
+              { title: 'Euclid', href: '#/mathematics/euclid' },
+              { title: 'Diophantus', href: '#/mathematics/diophantus' },
             ],
           },
         ],
@@ -75,9 +75,9 @@ const archiveNav = (iconOnly = false) => (
       {
         label: 'Administration',
         items: [
-          { title: 'Catalogue', href: '/catalogue', icon: <Database size={ICON} /> },
-          { title: 'Imports', href: '/imports', icon: <Upload size={ICON} /> },
-          { title: 'Audit log', href: '/audit', icon: <ShieldCheck size={ICON} /> },
+          { title: 'Catalogue', href: '#/catalogue', icon: <Database size={ICON} /> },
+          { title: 'Imports', href: '#/imports', icon: <Upload size={ICON} /> },
+          { title: 'Audit log', href: '#/audit', icon: <ShieldCheck size={ICON} /> },
         ],
       },
     ]}

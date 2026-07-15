@@ -39,22 +39,22 @@ const ICON = 18;
 const nav = (
   <NavTree
     aria-label="Archive console"
-    currentPath="/"
+    currentPath="#/"
     groups={[
       {
         label: 'Collections',
         items: [
-          { title: 'Dashboard', href: '/', icon: <LayoutGrid size={ICON} /> },
-          { title: 'Manuscripts', href: '/manuscripts', icon: <ScrollText size={ICON} /> },
-          { title: 'Instruments', href: '/instruments', icon: <Telescope size={ICON} /> },
+          { title: 'Dashboard', href: '#/', icon: <LayoutGrid size={ICON} /> },
+          { title: 'Manuscripts', href: '#/manuscripts', icon: <ScrollText size={ICON} /> },
+          { title: 'Instruments', href: '#/instruments', icon: <Telescope size={ICON} /> },
         ],
       },
       {
         label: 'Administration',
         items: [
-          { title: 'Catalogue', href: '/catalogue', icon: <Database size={ICON} /> },
-          { title: 'Imports', href: '/imports', icon: <Upload size={ICON} /> },
-          { title: 'Audit log', href: '/audit', icon: <ShieldCheck size={ICON} /> },
+          { title: 'Catalogue', href: '#/catalogue', icon: <Database size={ICON} /> },
+          { title: 'Imports', href: '#/imports', icon: <Upload size={ICON} /> },
+          { title: 'Audit log', href: '#/audit', icon: <ShieldCheck size={ICON} /> },
         ],
       },
     ]}
