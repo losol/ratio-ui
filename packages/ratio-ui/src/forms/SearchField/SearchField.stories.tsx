@@ -38,6 +38,21 @@ export const Basic: Story = {
   ),
 };
 
+/**
+ * `shortcut` focuses the field from anywhere — press ⌘K (or Ctrl+K) and the
+ * `Kbd` hint shows the platform-correct label while the field is idle. Built
+ * on the generic `useKeyboardShortcut` hook from `hooks/`.
+ */
+export const WithShortcut: Story = {
+  render: () => (
+    <SearchField
+      shortcut="mod+k"
+      placeholder="Search the archive…"
+      aria-label="Search the archive"
+    />
+  ),
+};
+
 /** The three sizes: `sm` (sidebars/toolbars) · `md` (default) · `lg`. */
 export const Sizes: Story = {
   render: () => (

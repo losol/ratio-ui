@@ -4,3 +4,5 @@
 
 export { useCopyToClipboard } from './useCopyToClipboard';
 export type { UseCopyToClipboardOptions, CopyToClipboard } from './useCopyToClipboard';
+export { useKeyboardShortcut, shortcutLabel, isApplePlatform } from './useKeyboardShortcut';
+export type { UseKeyboardShortcutOptions } from './useKeyboardShortcut';
