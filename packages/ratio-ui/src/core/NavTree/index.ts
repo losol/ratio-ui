@@ -3,4 +3,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { NavTree } from './NavTree';
-export type { NavTreeProps, NavTreeItem, NavTreeGroup } from './NavTree';
+export type {
+  NavTreeProps,
+  NavTreeItem,
+  NavTreeLinkItem,
+  NavTreeContentItem,
+  NavTreeGroup,
+} from './NavTree';
