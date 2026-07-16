@@ -78,7 +78,7 @@ function renderHighlighted(
     nodes.push(
       <mark
         key={start}
-        className="rounded bg-primary-100 px-0.5 text-(--text) dark:bg-primary-900/50"
+        className="rounded-sm bg-primary-100 text-(--text) dark:bg-primary-900/50"
       >
         {text.slice(start, end)}
       </mark>,
