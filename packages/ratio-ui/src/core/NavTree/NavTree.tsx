@@ -50,7 +50,14 @@ export interface NavTreeLinkItem extends NavTreeItemBase {
  */
 export interface NavTreeContentItem extends NavTreeItemBase {
   content: React.ReactNode;
-  /** Ignored — content items render no row chrome. (Key fallback only.) */
+  /**
+   * Stable list key — required on content items. With no `href` or string
+   * `title` to fall back on, an index-based key would remount the (often
+   * stateful) content whenever siblings are filtered or reordered — e.g. a
+   * `SearchField` filtering its own group would lose focus as you type.
+   */
+  id: string;
+  /** Ignored — content items render no row chrome. */
   title?: React.ReactNode;
   href?: never;
   icon?: never;
@@ -179,7 +186,7 @@ export function NavTree({
 
   if (orientation === 'horizontal') {
     const LinkTag = (LinkComponent ?? 'a') as React.ElementType;
-    const flat = resolvedGroups.flatMap((g) => g.items).filter((n) => !n.content);
+    const flat = resolvedGroups.flatMap((g) => g.items).filter((n) => !('content' in n));
     return (
       <nav aria-label={ariaLabel} className={className}>
         <ul className="m-0 flex list-none items-center gap-6 border-b border-border-1 p-0">
@@ -305,7 +312,7 @@ function NavTreeRow({
   // Arbitrary content slot (e.g. a group filter) — plain node, no row chrome.
   // The rail hides it, matching the design (the filter lives in the wide
   // sidebar only).
-  if (node.content) {
+  if ('content' in node) {
     if (iconOnly) return null;
     return (
       <li className="py-1 pr-1" style={{ paddingLeft }}>
