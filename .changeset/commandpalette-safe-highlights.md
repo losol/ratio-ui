@@ -22,4 +22,6 @@ can hand over raw match offsets without pre-validating them.
   `description` is set, and will be removed in the next major. Migrate excerpt
   highlighting from an HTML string to `description` + `highlights`.
 
-This removes the only `dangerouslySetInnerHTML` in the library.
+This takes raw HTML off CommandPalette's default render path — the library's
+only remaining `dangerouslySetInnerHTML` is now the opt-in, deprecated
+`descriptionHtml` fallback.
