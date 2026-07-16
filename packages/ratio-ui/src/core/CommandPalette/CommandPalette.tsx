@@ -11,6 +11,21 @@ import { Kbd } from '../Kbd';
 export interface CommandPaletteItem {
   id: string;
   title: string;
+  /** Plain-text description / excerpt. Rendered as text — safe from injection. */
+  description?: string;
+  /**
+   * Highlight ranges into `description`, as `[start, end)` character offsets
+   * (e.g. search-term matches). The component renders `<mark>` around each range
+   * itself — no HTML is injected. Out-of-bounds or overlapping ranges are
+   * clamped/skipped.
+   */
+  highlights?: ReadonlyArray<readonly [start: number, end: number]>;
+  /**
+   * @deprecated Raw HTML string, injected via `dangerouslySetInnerHTML`. Only
+   * pass trusted or pre-sanitized HTML — untrusted values are an XSS vector.
+   * Prefer `description` + `highlights`, which are injection-safe. Ignored when
+   * `description` is set. Removed in the next major.
+   */
   descriptionHtml?: string;
 }
 
@@ -37,6 +52,42 @@ const SHORTCUT_KEYS: Record<string, string> = {
   'cmd+j': 'j',
   'cmd+p': 'p',
 };
+
+/**
+ * Render `text` with `<mark>` wrapped around each highlight range. Ranges are
+ * `[start, end)` character offsets; out-of-bounds ranges are clamped and
+ * overlapping ones are skipped. Only text slices are emitted — no HTML is
+ * injected, so this is safe for untrusted content.
+ */
+function renderHighlighted(
+  text: string,
+  ranges?: ReadonlyArray<readonly [number, number]>,
+): React.ReactNode {
+  if (!ranges?.length) return text;
+
+  const normalized = ranges
+    .map(([start, end]) => [Math.max(0, start), Math.min(text.length, end)] as const)
+    .filter(([start, end]) => end > start)
+    .sort((a, b) => a[0] - b[0]);
+
+  const nodes: React.ReactNode[] = [];
+  let cursor = 0;
+  normalized.forEach(([start, end]) => {
+    if (start < cursor) return; // overlaps a previous mark — skip
+    if (start > cursor) nodes.push(text.slice(cursor, start));
+    nodes.push(
+      <mark
+        key={start}
+        className="rounded bg-primary-100 px-0.5 text-(--text) dark:bg-primary-900/50"
+      >
+        {text.slice(start, end)}
+      </mark>,
+    );
+    cursor = end;
+  });
+  if (cursor < text.length) nodes.push(text.slice(cursor));
+  return nodes;
+}
 
 /**
  * Command palette with trigger button, search input, keyboard navigation,
@@ -232,11 +283,18 @@ export function CommandPalette({
                     <div className="text-sm font-medium text-(--text)">
                       {item.title}
                     </div>
-                    {item.descriptionHtml && (
-                      <div
-                        className="mt-1 line-clamp-2 text-xs text-(--text-subtle)"
-                        dangerouslySetInnerHTML={{ __html: item.descriptionHtml }}
-                      />
+                    {item.description ? (
+                      <div className="mt-1 line-clamp-2 text-xs text-(--text-subtle)">
+                        {renderHighlighted(item.description, item.highlights)}
+                      </div>
+                    ) : (
+                      // Deprecated fallback: trusted/pre-sanitized HTML only.
+                      item.descriptionHtml && (
+                        <div
+                          className="mt-1 line-clamp-2 text-xs text-(--text-subtle)"
+                          dangerouslySetInnerHTML={{ __html: item.descriptionHtml }}
+                        />
+                      )
                     )}
                   </li>
                 ))}
