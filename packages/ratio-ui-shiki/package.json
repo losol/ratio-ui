@@ -1,0 +1,62 @@
+{
+  "name": "@eventuras/ratio-ui-shiki",
+  "version": "0.1.0",
+  "description": "Alpha — Shiki syntax highlighting for Ratio UI's CodeBlock",
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/ratio-ui-shiki#readme",
+  "bugs": {
+    "url": "https://github.com/losol/ratio-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/losol/ratio-ui.git",
+    "directory": "packages/ratio-ui-shiki"
+  },
+  "keywords": [
+    "ratio-ui",
+    "shiki",
+    "syntax-highlighting",
+    "codeblock",
+    "alpha"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./CodeBlock": {
+      "types": "./dist/CodeBlock/index.d.ts",
+      "import": "./dist/CodeBlock/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "scripts": {
+    "build": "tsc && vite build",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eventuras/ratio-ui": "workspace:*",
+    "@ratio-ui/eslint-config": "workspace:*",
+    "@ratio-ui/typescript-config": "workspace:*",
+    "@ratio-ui/vite-config": "workspace:*",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "shiki": "^3.0.0",
+    "typescript": "6.0.3",
+    "vite": "8.1.3"
+  },
+  "peerDependencies": {
+    "@eventuras/ratio-ui": "^2.13.0",
+    "shiki": "^3.0.0"
+  }
+}
