@@ -23,7 +23,7 @@ versions.
 A drop-in for the core `CodeBlock` that highlights `code` client-side:
 
 ```tsx
-import { CodeBlock } from '@eventuras/ratio-ui-shiki';
+import { CodeBlock } from '@eventuras/ratio-ui-shiki/CodeBlock';
 
 <CodeBlock code={source} language="tsx" />;
 ```
@@ -60,6 +60,31 @@ Because `highlightedLines` is an array of React nodes (not an HTML string),
 this path never uses `dangerouslySetInnerHTML` — it is injection-safe by
 construction.
 
+### Advanced: `useShikiHighlighter`
+
+The hook the `<CodeBlock>` wrapper is built on. It loads (and shares, per theme
+pair) a highlighter for your own compositions — `null` while loading, then the
+ready `Highlighter`:
+
+```tsx
+import { useMemo } from 'react';
+import { CodeBlock } from '@eventuras/ratio-ui/core/CodeBlock';
+import { shikiToDualLines } from '@eventuras/ratio-ui-shiki';
+import { useShikiHighlighter } from '@eventuras/ratio-ui-shiki/useShikiHighlighter';
+
+function Code({ source }: { source: string }) {
+  const hl = useShikiHighlighter();
+  const lines = useMemo(
+    () => (hl ? shikiToDualLines(hl, source, 'tsx') : undefined),
+    [hl, source],
+  );
+  return <CodeBlock code={source} language="tsx" highlightedLines={lines} />;
+}
+```
+
+Pass your own `highlighter` (e.g. preloaded with extra languages) as the second
+argument to skip loading. Remember `DUAL_THEME_CSS` for mode-aware colors.
+
 ## Notes
 
 - Uses Shiki's WASM-free JavaScript regex engine (`shiki/engine/javascript`) to
@@ -68,8 +93,10 @@ construction.
   the `github-light` / `github-dark` pair. Pass `langs` / `themes` to customize.
 - The client `<CodeBlock>` injects `DUAL_THEME_CSS` itself (React style
   hoisting); include it manually only when you render dual-theme lines by hand.
+- Entrypoints are split for RSC: the root (`.`) is server-safe (highlighter
+  helpers + `DUAL_THEME_CSS` + types); the client component and hook live at
+  `@eventuras/ratio-ui-shiki/CodeBlock` and `.../useShikiHighlighter`.
 
 ## Roadmap
 
-- A `useShikiHighlighter` hook for advanced control.
 - Optional fine-grained core (`shiki/core`) build for minimal bundles.
