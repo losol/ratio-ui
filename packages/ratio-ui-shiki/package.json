@@ -28,6 +28,10 @@
     "./CodeBlock": {
       "types": "./dist/CodeBlock/index.d.ts",
       "import": "./dist/CodeBlock/index.js"
+    },
+    "./useShikiHighlighter": {
+      "types": "./dist/useShikiHighlighter/index.d.ts",
+      "import": "./dist/useShikiHighlighter/index.js"
     }
   },
   "main": "./dist/index.js",

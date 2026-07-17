@@ -4,19 +4,14 @@
 
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   CodeBlock as CoreCodeBlock,
   type CodeBlockProps as CoreCodeBlockProps,
 } from '@eventuras/ratio-ui/core/CodeBlock';
 import type { Highlighter } from 'shiki';
-import {
-  createRatioHighlighter,
-  shikiToDualLines,
-  DEFAULT_THEMES,
-  DUAL_THEME_CSS,
-  type DualThemes,
-} from '../highlighter';
+import { shikiToDualLines, DEFAULT_THEMES, DUAL_THEME_CSS, type DualThemes } from '../highlighter';
+import { useShikiHighlighter } from '../useShikiHighlighter';
 
 export interface CodeBlockProps extends Omit<CoreCodeBlockProps, 'highlightedLines'> {
   /**
@@ -34,29 +29,12 @@ export interface CodeBlockProps extends Omit<CoreCodeBlockProps, 'highlightedLin
   highlighter?: Highlighter;
 }
 
-// One shared highlighter per theme pair, so N CodeBlocks don't each boot Shiki.
-const cache = new Map<string, Promise<Highlighter>>();
-function sharedHighlighter(themes: DualThemes): Promise<Highlighter> {
-  const key = `${themes.light}|${themes.dark}`;
-  let pending = cache.get(key);
-  if (!pending) {
-    pending = createRatioHighlighter({ themes: [themes.light, themes.dark] });
-    // Don't cache a rejection forever — evict so a later mount can retry.
-    const created = pending;
-    created.catch(() => {
-      if (cache.get(key) === created) cache.delete(key);
-    });
-    cache.set(key, pending);
-  }
-  return pending;
-}
-
 /**
  * `CodeBlock`, wired to Shiki — a drop-in for `@eventuras/ratio-ui/core/CodeBlock`
  * that highlights `code` for the given `language`. It loads a highlighter
- * asynchronously and renders raw code until it is ready, so there is no flash of
- * missing content (graceful degradation). Token colors follow the app's
- * light/dark mode automatically.
+ * asynchronously (via `useShikiHighlighter`) and renders raw code until it is
+ * ready, so there is no flash of missing content (graceful degradation). Token
+ * colors follow the app's light/dark mode automatically.
  *
  * For static or server-rendered content, prefer the core `CodeBlock` with
  * pre-computed `highlightedLines` (build them with `shikiToDualLines` +
@@ -70,27 +48,7 @@ export function CodeBlock({
   ...rest
 }: Readonly<CodeBlockProps>) {
   const { light, dark } = themes;
-  const [activeHighlighter, setActiveHighlighter] = useState<Highlighter | null>(
-    highlighter ?? null,
-  );
-
-  useEffect(() => {
-    if (highlighter) {
-      setActiveHighlighter(highlighter);
-      return;
-    }
-    let active = true;
-    sharedHighlighter({ light, dark })
-      .then((h) => {
-        if (active) setActiveHighlighter(h);
-      })
-      .catch(() => {
-        // Highlighter failed to init — leave raw code (graceful degradation).
-      });
-    return () => {
-      active = false;
-    };
-  }, [highlighter, light, dark]);
+  const activeHighlighter = useShikiHighlighter(themes, highlighter);
 
   const highlightedLines = useMemo(() => {
     const hl = activeHighlighter;

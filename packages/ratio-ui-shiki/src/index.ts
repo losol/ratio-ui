@@ -2,7 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-export { CodeBlock, type CodeBlockProps } from './CodeBlock';
+// Root entrypoint — server/RSC-safe only. The client component and hook live at
+// `@eventuras/ratio-ui-shiki/CodeBlock` and `.../useShikiHighlighter` so a Server
+// Component can import the helpers below without a `'use client'` boundary.
 export {
   createRatioHighlighter,
   shikiToLines,
