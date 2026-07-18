@@ -7,9 +7,15 @@ const banner =
 
 export default defineReactLibConfig({
   entry: 'src/**/index.{ts,tsx}',
-  // Keep ratio-ui and shiki (incl. its subpaths, e.g. shiki/engine/javascript)
-  // as peer deps — the consumer owns those versions.
-  external: ['@eventuras/ratio-ui', /^@eventuras\/ratio-ui\//, /^shiki/],
+  // Keep ratio-ui, shiki (incl. subpaths like shiki/engine/javascript), and the
+  // fine-grained grammar/theme packages (@shikijs/langs, @shikijs/themes) as
+  // peer deps — the consumer owns those versions and dedupes them with shiki.
+  external: [
+    '@eventuras/ratio-ui',
+    /^@eventuras\/ratio-ui\//,
+    /^shiki/,
+    /^@shikijs\//,
+  ],
   viteConfig: {
     build: {
       rollupOptions: {

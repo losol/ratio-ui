@@ -9,14 +9,18 @@
 presentational and highlighter-agnostic; this companion package adds the Shiki
 layer so you don't wire it yourself.
 
+Built on `shiki/core` (fine-grained) with the WASM-free JavaScript regex engine,
+so consumers bundle only the curated grammars — not Shiki's full registry.
+
 ## Installation
 
 ```bash
-pnpm add @eventuras/ratio-ui @eventuras/ratio-ui-shiki shiki
+pnpm add @eventuras/ratio-ui @eventuras/ratio-ui-shiki shiki @shikijs/langs @shikijs/themes
 ```
 
-`@eventuras/ratio-ui` and `shiki` are peer dependencies — you control their
-versions.
+`@eventuras/ratio-ui`, `shiki`, and Shiki's `@shikijs/langs` / `@shikijs/themes`
+are peer dependencies — you control their versions. The `@shikijs/*` packages
+ship with, and version-match, `shiki`.
 
 ## Usage
 
@@ -28,10 +32,10 @@ import { CodeBlock } from '@eventuras/ratio-ui-shiki/CodeBlock';
 <CodeBlock code={source} language="tsx" />;
 ```
 
-It loads a highlighter asynchronously (shared per theme pair) and renders raw
-code until it is ready — no flash of missing content. Token colors **follow the
-app's light/dark mode** automatically (via `data-theme` / `data-color-scheme`,
-like the rest of ratio-ui); pass `themes={{ light, dark }}` to change the pair.
+It loads a shared highlighter asynchronously and renders raw code until it is
+ready — no flash of missing content. Token colors **follow the app's light/dark
+mode** automatically (via `data-theme` / `data-color-scheme`, like the rest of
+ratio-ui).
 
 ### Static / server-rendered highlighting
 
@@ -46,7 +50,7 @@ import { createRatioHighlighter, shikiToDualLines, DUAL_THEME_CSS } from '@event
 // app's light/dark mode (the client `<CodeBlock>` injects this for you):
 <style dangerouslySetInnerHTML={{ __html: DUAL_THEME_CSS }} />;
 
-const hl = await createRatioHighlighter({ langs: ['tsx'] });
+const hl = await createRatioHighlighter();
 <CodeBlock
   code={source}
   language="tsx"
@@ -55,16 +59,15 @@ const hl = await createRatioHighlighter({ langs: ['tsx'] });
 ```
 
 `shikiToLines` is the single-theme equivalent if you don't need light/dark (no
-`DUAL_THEME_CSS` needed — colors are inline).
-Because `highlightedLines` is an array of React nodes (not an HTML string),
-this path never uses `dangerouslySetInnerHTML` — it is injection-safe by
-construction.
+`DUAL_THEME_CSS` needed — colors are inline). Because `highlightedLines` is an
+array of React nodes (not an HTML string), this path never uses
+`dangerouslySetInnerHTML` — it is injection-safe by construction.
 
 ### Advanced: `useShikiHighlighter`
 
-The hook the `<CodeBlock>` wrapper is built on. It loads (and shares, per theme
-pair) a highlighter for your own compositions — `null` while loading, then the
-ready `Highlighter`:
+The hook the `<CodeBlock>` wrapper is built on. It loads (and shares) the
+default highlighter for your own compositions — `null` while loading, then the
+ready highlighter:
 
 ```tsx
 import { useMemo } from 'react';
@@ -82,21 +85,25 @@ function Code({ source }: { source: string }) {
 }
 ```
 
-Pass your own `highlighter` (e.g. preloaded with extra languages) as the second
-argument to skip loading. Remember `DUAL_THEME_CSS` for mode-aware colors.
+Need other languages or themes? Create a highlighter with your own imports and
+pass it in (`langs` / `themes` **replace** the defaults, so include everything
+you need):
+
+```tsx
+const hl = await createRatioHighlighter({
+  langs: [import('@shikijs/langs/rust'), import('@shikijs/langs/tsx')],
+});
+// useShikiHighlighter(hl)  — or  <CodeBlock highlighter={hl} … />
+```
 
 ## Notes
 
-- Uses Shiki's WASM-free JavaScript regex engine (`shiki/engine/javascript`) to
-  keep the runtime light. Most common grammars are supported.
-- `createRatioHighlighter` preloads a default language set (`DEFAULT_LANGS`) and
-  the `github-light` / `github-dark` pair. Pass `langs` / `themes` to customize.
+- `createRatioHighlighter` preloads a curated language set (`DEFAULT_LANGS`: tsx,
+  ts, jsx, js, json, bash, css, html, markdown, yaml, xml, python, csharp) and
+  the `github-light` / `github-dark` pair. Pass `langs` / `themes` as Shiki
+  inputs (e.g. `import('@shikijs/langs/go')`) to change the set.
 - The client `<CodeBlock>` injects `DUAL_THEME_CSS` itself (React style
   hoisting); include it manually only when you render dual-theme lines by hand.
 - Entrypoints are split for RSC: the root (`.`) is server-safe (highlighter
   helpers + `DUAL_THEME_CSS` + types); the client component and hook live at
   `@eventuras/ratio-ui-shiki/CodeBlock` and `.../useShikiHighlighter`.
-
-## Roadmap
-
-- Optional fine-grained core (`shiki/core`) build for minimal bundles.

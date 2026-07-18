@@ -5,45 +5,38 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { Highlighter } from 'shiki';
-import { createRatioHighlighter, DEFAULT_THEMES, type DualThemes } from '../highlighter';
+import type { HighlighterCore } from 'shiki/core';
+import { createRatioHighlighter } from '../highlighter';
 
-// One shared highlighter per theme pair, so N consumers don't each boot Shiki.
-const cache = new Map<string, Promise<Highlighter>>();
+// The default highlighter (curated langs + github light/dark), created once and
+// shared across every component that doesn't pass its own.
+let defaultHighlighter: Promise<HighlighterCore> | undefined;
 
-function sharedHighlighter(themes: DualThemes): Promise<Highlighter> {
-  const key = `${themes.light}|${themes.dark}`;
-  let pending = cache.get(key);
-  if (!pending) {
-    pending = createRatioHighlighter({ themes: [themes.light, themes.dark] });
+function getDefaultHighlighter(): Promise<HighlighterCore> {
+  if (!defaultHighlighter) {
+    const created = createRatioHighlighter();
     // Don't cache a rejection forever — evict so a later mount can retry.
-    const created = pending;
     created.catch(() => {
-      if (cache.get(key) === created) cache.delete(key);
+      if (defaultHighlighter === created) defaultHighlighter = undefined;
     });
-    cache.set(key, pending);
+    defaultHighlighter = created;
   }
-  return pending;
+  return defaultHighlighter;
 }
 
 /**
- * Load (and share) a Shiki highlighter for a light/dark theme pair. Returns
- * `null` while it loads — including immediately after `themes` changes, until
- * the new pair is ready, so callers never receive a highlighter missing the
- * requested themes. Highlighters are cached per theme pair, so many components
- * share one. Pass your own `highlighter` to skip loading — e.g. one preloaded
- * with extra languages via `createRatioHighlighter`.
+ * Load (and share) the ratio-ui Shiki highlighter — the curated default set
+ * from `createRatioHighlighter` (see its `DEFAULT_LANGS` + github light/dark).
+ * Returns `null` while it loads, then the ready highlighter. Pass your own
+ * `highlighter` — e.g. from `createRatioHighlighter` with extra language/theme
+ * imports — to skip loading.
  *
  * Pair the result with `shikiToDualLines` + `DUAL_THEME_CSS` to render code
  * whose colors follow the app's light/dark mode. This is the primitive the
  * `<CodeBlock>` wrapper is built on.
  */
-export function useShikiHighlighter(
-  themes: DualThemes = DEFAULT_THEMES,
-  highlighter?: Highlighter,
-): Highlighter | null {
-  const { light, dark } = themes;
-  const [active, setActive] = useState<Highlighter | null>(highlighter ?? null);
+export function useShikiHighlighter(highlighter?: HighlighterCore): HighlighterCore | null {
+  const [active, setActive] = useState<HighlighterCore | null>(highlighter ?? null);
 
   useEffect(() => {
     if (highlighter) {
@@ -51,10 +44,10 @@ export function useShikiHighlighter(
       return;
     }
     let alive = true;
-    // Drop any highlighter from a previous theme pair while the new one loads,
-    // so we never hand back one that lacks the current `light`/`dark` themes.
+    // Drop any previously-provided highlighter while the default loads, so we
+    // never return a stale one (matches the "null while loading" contract).
     setActive(null);
-    sharedHighlighter({ light, dark })
+    getDefaultHighlighter()
       .then((h) => {
         if (alive) setActive(h);
       })
@@ -64,7 +57,7 @@ export function useShikiHighlighter(
     return () => {
       alive = false;
     };
-  }, [highlighter, light, dark]);
+  }, [highlighter]);
 
   return active;
 }
