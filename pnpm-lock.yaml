@@ -263,6 +263,12 @@ importers:
       '@ratio-ui/vite-config':
         specifier: workspace:*
         version: link:../../config/vite-config
+      '@shikijs/langs':
+        specifier: ^3.0.0
+        version: 3.23.0
+      '@shikijs/themes':
+        specifier: ^3.0.0
+        version: 3.23.0
       '@types/react':
         specifier: ^19.2.17
         version: 19.2.17

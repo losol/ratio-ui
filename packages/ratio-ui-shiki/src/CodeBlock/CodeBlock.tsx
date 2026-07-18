@@ -9,14 +9,18 @@ import {
   CodeBlock as CoreCodeBlock,
   type CodeBlockProps as CoreCodeBlockProps,
 } from '@eventuras/ratio-ui/core/CodeBlock';
-import type { Highlighter } from 'shiki';
+import type { HighlighterCore } from 'shiki/core';
 import { shikiToDualLines, DEFAULT_THEMES, DUAL_THEME_CSS, type DualThemes } from '../highlighter';
 import { useShikiHighlighter } from '../useShikiHighlighter';
 
 export interface CodeBlockProps extends Omit<CoreCodeBlockProps, 'highlightedLines'> {
   /**
-   * Light + dark Shiki theme pair. The rendered colors follow the app's mode
-   * (`data-theme` / `data-color-scheme`), like the rest of ratio-ui.
+   * Light + dark Shiki theme pair to render with. The colors follow the app's
+   * mode (`data-theme` / `data-color-scheme`), like the rest of ratio-ui.
+   *
+   * The built-in highlighter only loads `github-light` / `github-dark`; to
+   * render a different pair, also pass a `highlighter` that has those themes
+   * loaded — otherwise the block falls back to un-highlighted code.
    * @default { light: 'github-light', dark: 'github-dark' }
    */
   themes?: DualThemes;
@@ -26,7 +30,7 @@ export interface CodeBlockProps extends Omit<CoreCodeBlockProps, 'highlightedLin
    * this component lazily create its own. Ensure it has `language` and both
    * themes loaded; otherwise the block falls back to un-highlighted code.
    */
-  highlighter?: Highlighter;
+  highlighter?: HighlighterCore;
 }
 
 /**
@@ -48,7 +52,7 @@ export function CodeBlock({
   ...rest
 }: Readonly<CodeBlockProps>) {
   const { light, dark } = themes;
-  const activeHighlighter = useShikiHighlighter(themes, highlighter);
+  const activeHighlighter = useShikiHighlighter(highlighter);
 
   const highlightedLines = useMemo(() => {
     const hl = activeHighlighter;

@@ -3,10 +3,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import React, { Fragment } from 'react';
-import { createHighlighter, type BundledLanguage, type BundledTheme, type Highlighter } from 'shiki';
+import { createHighlighterCore, type HighlighterCore } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+import type { BundledLanguage, BundledTheme, LanguageInput, ThemeInput } from 'shiki';
 
-/** Languages preloaded when you don't pass your own to {@link createRatioHighlighter}. */
+/**
+ * Languages preloaded when you don't pass your own to {@link createRatioHighlighter}.
+ * Kept in sync with the fine-grained `@shikijs/langs/*` imports below.
+ */
 export const DEFAULT_LANGS: BundledLanguage[] = [
   'tsx',
   'ts',
@@ -18,6 +22,9 @@ export const DEFAULT_LANGS: BundledLanguage[] = [
   'html',
   'markdown',
   'yaml',
+  'xml',
+  'python',
+  'csharp',
 ];
 
 /** A light + dark Shiki theme pair. */
@@ -45,23 +52,49 @@ export const DUAL_THEME_CSS = `.${SHIKI_TOKEN_CLASS}{color:var(--shiki-light)}
 :root[data-color-scheme="dark"] .${SHIKI_TOKEN_CLASS}{color:var(--shiki-dark)}`;
 
 export interface RatioHighlighterOptions {
-  /** Languages to preload. @default DEFAULT_LANGS */
-  langs?: BundledLanguage[];
-  /** Themes to preload. @default [DEFAULT_THEMES.light, DEFAULT_THEMES.dark] */
-  themes?: BundledTheme[];
+  /**
+   * Languages to preload, as Shiki language *inputs* (dynamic imports) — e.g.
+   * `import('@shikijs/langs/python')`, not the string names. Defaults to inputs
+   * for the {@link DEFAULT_LANGS} languages. Replaces the default set when set.
+   */
+  langs?: LanguageInput[];
+  /**
+   * Themes to preload, as Shiki theme inputs — e.g.
+   * `import('@shikijs/themes/nord')`. Defaults to the `github-light` /
+   * `github-dark` pair.
+   */
+  themes?: ThemeInput[];
 }
 
 /**
- * Create a Shiki highlighter preconfigured for ratio-ui: the WASM-free
- * JavaScript regex engine plus a sensible default language/theme set. The call
- * is async and relatively heavy — create one and share it across CodeBlocks
- * (the `<CodeBlock>` wrapper does this for you).
+ * Create a Shiki highlighter preconfigured for ratio-ui. Built on `shiki/core`
+ * (`createHighlighterCore`) with the WASM-free JavaScript regex engine and a
+ * curated, individually-imported language/theme set — so consumers bundle only
+ * these grammars, not Shiki's full bundled registry. The call is async and
+ * relatively heavy — create one and share it (the `<CodeBlock>` wrapper does).
  */
-export function createRatioHighlighter(options: RatioHighlighterOptions = {}): Promise<Highlighter> {
-  return createHighlighter({
+export function createRatioHighlighter(options: RatioHighlighterOptions = {}): Promise<HighlighterCore> {
+  return createHighlighterCore({
     engine: createJavaScriptRegexEngine(),
-    langs: options.langs ?? DEFAULT_LANGS,
-    themes: options.themes ?? [DEFAULT_THEMES.light, DEFAULT_THEMES.dark],
+    langs: options.langs ?? [
+      import('@shikijs/langs/tsx'),
+      import('@shikijs/langs/ts'),
+      import('@shikijs/langs/jsx'),
+      import('@shikijs/langs/js'),
+      import('@shikijs/langs/json'),
+      import('@shikijs/langs/bash'),
+      import('@shikijs/langs/css'),
+      import('@shikijs/langs/html'),
+      import('@shikijs/langs/markdown'),
+      import('@shikijs/langs/yaml'),
+      import('@shikijs/langs/xml'),
+      import('@shikijs/langs/python'),
+      import('@shikijs/langs/csharp'),
+    ],
+    themes: options.themes ?? [
+      import('@shikijs/themes/github-light'),
+      import('@shikijs/themes/github-dark'),
+    ],
   });
 }
 
@@ -71,7 +104,7 @@ export function createRatioHighlighter(options: RatioHighlighterOptions = {}): P
  * HTML string). `lang`/`theme` must already be loaded in `highlighter`.
  */
 export function shikiToLines(
-  highlighter: Highlighter,
+  highlighter: HighlighterCore,
   code: string,
   lang: BundledLanguage | string,
   theme: BundledTheme | string = DEFAULT_THEMES.dark,
@@ -111,7 +144,7 @@ export function shikiToLines(
  * `lang` and both themes must already be loaded in `highlighter`.
  */
 export function shikiToDualLines(
-  highlighter: Highlighter,
+  highlighter: HighlighterCore,
   code: string,
   lang: BundledLanguage | string,
   themes: DualThemes = DEFAULT_THEMES,
