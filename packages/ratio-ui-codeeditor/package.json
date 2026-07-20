@@ -1,0 +1,52 @@
+{
+  "name": "@eventuras/ratio-ui-codeeditor",
+  "version": "0.0.0",
+  "description": "Alpha spike \u2014 CodeMirror 6 code editor with ratio-ui styling",
+  "license": "MPL-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./CodeEditor": {
+      "types": "./dist/CodeEditor/index.d.ts",
+      "import": "./dist/CodeEditor/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@codemirror/lang-javascript": "^6",
+    "@codemirror/lang-json": "^6",
+    "@codemirror/lang-xml": "^6",
+    "@codemirror/language": "^6",
+    "@codemirror/lint": "^6",
+    "@codemirror/state": "^6",
+    "@codemirror/view": "^6",
+    "@lezer/highlight": "^1",
+    "codemirror": "^6"
+  },
+  "devDependencies": {
+    "@eventuras/eslint-config": "^1.0.6",
+    "@eventuras/typescript-config": "^1.1.1",
+    "@eventuras/vite-config": "^0.5.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.2"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
