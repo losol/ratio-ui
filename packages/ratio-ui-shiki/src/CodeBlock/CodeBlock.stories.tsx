@@ -16,7 +16,7 @@ import { CodeBlock } from './CodeBlock';
  * pre-computed `highlightedLines` (built via `shikiToDualLines` + `DUAL_THEME_CSS`).
  */
 const meta = {
-  title: 'Shiki/CodeBlock',
+  title: 'Code/CodeBlock',
   component: CodeBlock,
   parameters: { layout: 'padded' },
   tags: ['autodocs'],
