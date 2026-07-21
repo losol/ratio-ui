@@ -147,17 +147,21 @@ themes instead scope dark to their own selector, as in the block above. If you
 add your own dark-only override for a *shared* token, match the
 `data-color-scheme` arm so it triggers on the orthogonal axis too.
 
-## ⚠️ Set `data-theme` early (FOUC)
+## Avoiding a flash when you resolve the theme in JS
 
-`global.css` hides `<html>` (`opacity: 0`) until a theme is set, then reveals it
-for any `html[data-theme]`. Set `data-theme` **before first paint** — a blocking
-inline `<script>` in `<head>` — or the page renders blank/white until your
-attribute lands. See [css-exports.md](./css-exports.md).
+The light theme is defined on bare `:root`, so a page with no `data-theme` is
+styled and visible in light by default — nothing is required to see content.
+
+If you pick the theme dynamically (localStorage / system preference) and apply
+it *after* first paint, set `data-theme` **before first paint** with a blocking
+inline `<script>` in `<head>`; that alone gives a correct, flash-free first
+paint. If you can't, opt into the flash guard: add `data-theme-loading` to
+`<html>` and set `data-theme` once resolved. See [css-exports.md](./css-exports.md).
 
 ## Checklist
 
 - [ ] `:root[data-theme="<name>"]` block with `color-scheme: light` + brand/text/surface/border tokens
 - [ ] `[data-color-scheme="dark"]` variant overriding what changes
 - [ ] fonts embedded in your app (family tokens only)
-- [ ] `data-theme` set on `<html>` early (before paint)
+- [ ] if resolving the theme in JS: `data-theme` set on `<html>` early (before paint), or `data-theme-loading` opt-in
 - [ ] verified contrast on `--text-on-*` against their fills

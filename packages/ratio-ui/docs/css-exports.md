@@ -53,27 +53,30 @@ import '@eventuras/ratio-ui/global.css';
 ```
 
 **Includes:**
-- Theme initialization (prevents FOUC)
-- Global html/body styling
+- Global html/body styling (light theme by default)
 - Main layout styling
+- Opt-in flash guard for JS-resolved themes
 
 **Use when:**
 - You want the page structure but will use custom components
 - Building a custom design system on top of ratio-ui foundations
 
-## ⚠️ Required: set `data-theme` early (FOUC protection)
+## Theming and the flash guard
 
-`global.css` (and `ratio-ui.css`, which includes it) hides the page until a
-theme is chosen, to prevent a flash of unstyled/wrong-theme content:
+The light theme is defined on bare `:root`, so **importing the CSS is enough to
+get a fully styled, visible page** — the default palette is light and needs no
+`data-theme`. Set `data-theme` when you want a different palette (`dark`,
+`bureau`, …); it can even be set late without the page ever going blank.
 
-```css
-html { opacity: 0; }
-html[data-theme] { opacity: 1; }   /* revealed once a theme is set */
-```
+### Avoiding a flash of the default theme
 
-**Your app must set `data-theme` on `<html>` before first paint** — otherwise
-the page stays invisible and renders blank/white. Use a small blocking inline
-script in `<head>`, before the stylesheet-driven content shows:
+If you resolve the palette in JS (localStorage / system preference) and apply it
+*after* first paint, the page paints light first and then flips — a flash. Two
+ways to avoid it:
+
+**1. Set `data-theme` before first paint (recommended).** A blocking inline
+script in `<head>` makes the very first paint correct, with no flash and no
+hidden page:
 
 ```html
 <script>
@@ -85,10 +88,24 @@ script in `<head>`, before the stylesheet-driven content shows:
 </script>
 ```
 
-Any `data-theme` value reveals the page (matched by attribute presence), so
-named palettes like `bureau` work without extra wiring. If you import
-`components.css` only (no `global.css`), this rule is not included and the
-page is never hidden — you own theme init entirely.
+**2. Opt into the flash guard.** If you can't set the theme before paint, add
+`data-theme-loading` to `<html>` in your static markup and set the theme once
+resolved:
+
+```css
+/* shipped in global.css */
+html[data-theme-loading]:not([data-theme]):not([data-color-scheme]) { opacity: 0; }
+```
+
+The page is hidden only while the flag is present **and** neither theme axis is
+set — `data-theme` (palette / standard-theme mode) or `data-color-scheme`
+(named-theme mode) — so setting either reveals it even if the flag stays. Apps
+that never set the flag are never hidden — the blank-white-page footgun is gone.
+
+**Migration from ≤ 2.x:** the page used to be hidden by default
+(`html { opacity: 0 }`) until `data-theme` was set. If you relied on that to
+mask a JS-resolved theme, add `data-theme-loading` to keep the same behavior.
+If you already set `data-theme` in a blocking `<head>` script, nothing changes.
 
 > **Building your own palette?** See
 > [authoring-themes.md](./authoring-themes.md) for the token
