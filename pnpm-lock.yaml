@@ -160,9 +160,6 @@ importers:
 
   packages/datatable:
     dependencies:
-      '@eventuras/ratio-ui':
-        specifier: workspace:*
-        version: link:../ratio-ui
       react:
         specifier: ^19.0.0
         version: 19.2.7
@@ -170,6 +167,9 @@ importers:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
     devDependencies:
+      '@eventuras/ratio-ui':
+        specifier: workspace:*
+        version: link:../ratio-ui
       '@ratio-ui/typescript-config':
         specifier: workspace:*
         version: link:../../config/typescript-config
