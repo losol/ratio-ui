@@ -10,10 +10,17 @@ const isCI = process.env.CI === 'true';
 export default defineConfig({
   test: {
     passWithNoTests: true,
-    ...(isCI
-      ? {}
-      : {
-          projects: [
+    projects: [
+      // Package unit tests. Listing the package (rather than a glob of test
+      // files) makes vitest load its own config, so the environment, globals
+      // and setup files each package declares actually apply — a plain include
+      // pattern would run them in the default node environment and fail.
+      './packages/markdown',
+
+      // Browser-backed Storybook tests: local only, see note above.
+      ...(isCI
+        ? []
+        : [
             {
               plugins: [
                 storybookTest({
@@ -31,7 +38,7 @@ export default defineConfig({
                 },
               },
             },
-          ],
-        }),
+          ]),
+    ],
   },
 });

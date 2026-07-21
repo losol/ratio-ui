@@ -1,0 +1,12 @@
+{
+  "extends": "@ratio-ui/typescript-config/react-library.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "typeRoots": [
+      "./node_modules/@types",
+      "../../node_modules/@types"
+    ]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
