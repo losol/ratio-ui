@@ -1,6 +1,8 @@
 {
   "name": "@eventuras/datatable",
   "version": "0.5.29",
+  "description": "Data table for Ratio UI — sorting, filtering, pagination and expandable rows on TanStack Table",
+  "license": "MPL-2.0",
   "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/datatable#readme",
   "bugs": {
     "url": "https://github.com/losol/ratio-ui/issues"
@@ -10,6 +12,7 @@
     "url": "https://github.com/losol/ratio-ui.git",
     "directory": "packages/datatable"
   },
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -26,10 +29,8 @@
     "build": "vite build",
     "dev": "vite build --watch"
   },
-  "dependencies": {
-    "@eventuras/ratio-ui": "workspace:*"
-  },
   "devDependencies": {
+    "@eventuras/ratio-ui": "workspace:*",
     "@ratio-ui/typescript-config": "workspace:*",
     "@ratio-ui/vite-config": "workspace:*",
     "@tanstack/match-sorter-utils": "^8.19.4",
@@ -41,6 +42,7 @@
     "vite": "^8.1.0"
   },
   "peerDependencies": {
+    "@eventuras/ratio-ui": "^2.13.0",
     "@tanstack/match-sorter-utils": "^8.0.0",
     "@tanstack/react-table": "^8.0.0",
     "@tanstack/table-core": "^8.0.0",
