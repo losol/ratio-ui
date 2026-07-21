@@ -59,7 +59,7 @@
     "@types/react-dom": "^19.2.3",
     "shiki": "^3.0.0",
     "typescript": "6.0.3",
-    "vite": "8.1.3"
+    "vite": "8.1.4"
   },
   "peerDependencies": {
     "@eventuras/ratio-ui": "^2.13.0",
