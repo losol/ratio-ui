@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { CodeAnnotation } from '@eventuras/ratio-ui/core/CodeBlock';
 import { CodeBlock } from './CodeBlock';
 
 /**
@@ -52,5 +53,46 @@ export const Default: Story = {
     language: 'tsx',
     filename: 'Flashcard.tsx',
     showLineNumbers: true,
+  },
+};
+
+const REVIEW_NOTES: CodeAnnotation[] = [
+  {
+    line: 5,
+    severity: 'warning',
+    code: 'type/too-narrow',
+    path: 'Card.answer',
+    message:
+      'Answers often want formatting — code, a list, an image. Widening this to ReactNode lets a card render rich content without a second field.',
+  },
+  {
+    line: 8,
+    severity: 'info',
+    code: 'note',
+    message:
+      'Active recall is the whole point: the question has to stand alone first, so hidden is the correct default state.',
+  },
+  {
+    line: 13,
+    severity: 'error',
+    code: 'a11y/toggle-state',
+    path: 'Flashcard.button',
+    message:
+      'A toggle must announce its state. Add aria-pressed={revealed} so assistive technology can tell whether the answer is currently showing.',
+  },
+];
+
+/**
+ * Shiki highlighting *and* inline annotations together — the combination a
+ * review or validation report needs: coloured code you can read, with each note
+ * sitting under the line it refers to instead of behind a hover target.
+ */
+export const Review: Story = {
+  args: {
+    code: FLASHCARD_TSX,
+    language: 'tsx',
+    filename: 'Flashcard.tsx',
+    showLineNumbers: true,
+    annotations: REVIEW_NOTES,
   },
 };
