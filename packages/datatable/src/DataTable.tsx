@@ -15,10 +15,9 @@ import {
   TableState,
   useReactTable,
 } from '@tanstack/react-table';
-import { useEffect } from 'react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SearchField } from '@eventuras/ratio-ui/forms';
-;
+
 type DataTableProps = {
   columns: any[];
   data: any[];
@@ -146,7 +145,7 @@ const DataTable = (props: DataTableProps) => {
   });
   useEffect(() => {
     if (clientsidePagination) table.setPageSize(pageSize);
-  }, []);
+  }, [clientsidePagination, pageSize]);
 
   const searchInput = props.enableGlobalSearch ? (
     <SearchField
@@ -169,7 +168,7 @@ const DataTable = (props: DataTableProps) => {
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map(header => (
-                <th key={header.id} className="text-left">
+                <th key={header.id} scope="col" className="text-left">
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
