@@ -1,7 +1,7 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from 'react';
 import type { Key } from 'react-aria-components';
-import { CodeBlock } from './CodeBlock';
+import { CodeBlock, type CodeAnnotation } from './CodeBlock';
 import { ToggleButtonGroup } from '../ToggleButtonGroup';
 // Cross-layer import is fine here: this is a story (a composition demo), not
 // part of CodeBlock's shipped graph — CodeBlock itself never imports `forms`.
@@ -63,6 +63,46 @@ Json.args = { code: json, language: 'JSON', filename: 'event.json' };
 
 export const Xml = Template.bind({});
 Xml.args = { code: xml, language: 'XML', filename: 'event.xml' };
+
+const reviewNotes: CodeAnnotation[] = [
+  {
+    line: 5,
+    severity: 'warning',
+    code: 'soft-limit',
+    path: 'Event.capacity',
+    message:
+      'Capacity is above the default room size of 24. Anyone past that is waitlisted rather than enrolled.',
+  },
+  {
+    line: 7,
+    severity: 'info',
+    code: 'resolved',
+    path: 'Event.instructor.ref',
+    message: 'Resolved to Ada Lovelace — the reference points at an existing Practitioner.',
+  },
+  {
+    line: 8,
+    severity: 'error',
+    code: 'circular-ref',
+    path: 'Event.prerequisite.ref',
+    message:
+      'An event cannot be its own prerequisite: this reference points back at evt_019ea2ce, the resource being defined. Point it at the event learners should take first.',
+  },
+];
+
+/**
+ * Notes rendered inline, each beneath the line it refers to — validator output,
+ * review comments, explanations. They stay visible instead of hiding behind a
+ * hover target, so long messages get room to wrap and the whole set is scannable
+ * (and screenshot-able) at a glance.
+ */
+export const Annotations = Template.bind({});
+Annotations.args = {
+  code: json,
+  language: 'JSON',
+  filename: 'event.json',
+  annotations: reviewNotes,
+};
 
 export const Collapsed = Template.bind({});
 Collapsed.args = { code: ts, language: 'TypeScript', filename: 'create-event.ts', startCollapsed: true };
