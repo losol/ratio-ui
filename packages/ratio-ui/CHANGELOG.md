@@ -1,5 +1,78 @@
 # @eventuras/ratio-ui
 
+## 2.14.0
+
+### Minor Changes
+
+- 69c337d: **CodeBlock: inline annotations.**
+
+  `annotations` renders notes directly beneath the line they refer to — validation
+  output, review comments, explanations:
+
+  ```tsx
+  <CodeBlock
+    code={source}
+    annotations={[
+      {
+        line: 8,
+        severity: "error",
+        code: "circular-ref",
+        path: "Event.prerequisite.ref",
+        message: "An event cannot be its own prerequisite.",
+      },
+    ]}
+  />
+  ```
+
+  Each note takes a `severity` (`error | warning | info | success`, tinted with the
+  matching semantic tokens so it follows light/dark), an optional machine-readable
+  `code` shown as a pill, and an optional `path` for where it points. `message` is
+  a React node rather than an HTML string, so this stays injection-safe like the
+  rest of `CodeBlock`.
+
+  Unlike a hover tooltip the notes stay put: long messages get room to wrap, the
+  whole set is scannable at a glance, and the text lives in the document — so
+  keyboard and screen-reader users reach it, and a screenshot captures it.
+
+  Companion packages that wrap the core `CodeBlock` (e.g.
+  `@eventuras/ratio-ui-shiki`) pick this up without any change of their own.
+
+- c4a6a95: **CommandPalette: injection-safe result highlighting (`description` + `highlights`), `descriptionHtml` deprecated.**
+
+  `CommandPaletteItem` now takes a plain-text `description` plus optional
+  `highlights` — `[start, end)` character ranges the component wraps in `<mark>`
+  itself. No HTML is injected, so search-result excerpts from untrusted content
+  are safe by default:
+
+  ```ts
+  { id, title, description: 'Streaming logs and audit trails', highlights: [[0, 9]] }
+  ```
+
+  Out-of-bounds ranges are clamped and overlapping ones skipped, so a provider
+  can hand over raw match offsets without pre-validating them.
+
+  - `descriptionHtml` is **deprecated** — it injects raw HTML via
+    `dangerouslySetInnerHTML` and is an XSS vector for untrusted values. It still
+    renders (trusted/pre-sanitized content only) but is ignored when
+    `description` is set, and will be removed in the next major. Migrate excerpt
+    highlighting from an HTML string to `description` + `highlights`.
+
+  This takes raw HTML off CommandPalette's default render path — the library's
+  only remaining `dangerouslySetInnerHTML` is now the opt-in, deprecated
+  `descriptionHtml` fallback.
+
+### Patch Changes
+
+- ceaeb95: **NavTree: content items require a stable `id`, and content is detected by key presence.**
+
+  - `NavTreeContentItem` now requires `id: string`. With no `href` or string
+    `title` to key on, an index-based fallback would remount the (often stateful)
+    content — e.g. a `SearchField` filtering its own group loses focus — when
+    siblings are filtered or reordered.
+  - Content vs. link rows are distinguished by `'content' in node` rather than a
+    truthiness check, so a content value of `0`/`''`/`null` is no longer misread
+    as a link row.
+
 ## 2.13.0
 
 ### Minor Changes

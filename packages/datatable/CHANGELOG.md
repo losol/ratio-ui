@@ -1,5 +1,38 @@
 # @eventuras/datatable
 
+## 0.6.0
+
+### Minor Changes
+
+- fe53b07: **Publishable from this repository, and fixed for Node consumers.**
+
+  - Added `"type": "module"`. The build emits ESM, but without this Node read
+    `dist/index.js` as CommonJS and threw `Cannot use import statement outside a
+module` the moment anyone imported the package.
+  - **Breaking:** `@eventuras/ratio-ui` moved from `dependencies` to
+    `peerDependencies` (`^2.13.0`), matching the other Ratio UI companion
+    packages. As a regular dependency it resolved to a pinned copy at publish
+    time, so consumers ended up with a second ratio-ui beside their own —
+    duplicated styles and two module instances. **Install `@eventuras/ratio-ui`
+    alongside this package.**
+  - Ships a LICENSE (MPL-2.0), a README and a `description`; the published
+    package carried none of them.
+
+### Patch Changes
+
+- 5b5777c: Moved into `losol/ratio-ui`. The package consumes `@eventuras/ratio-ui` from the
+  workspace again rather than from npm — which supersedes the note on 0.5.29, where
+  that entry described the arrangement while datatable still lived in
+  `losol/eventuras`. It no longer depends on `@eventuras/ratio-ui-next` at all.
+
+  Alongside the move:
+
+  - Column headers declare `scope="col"`, so screen readers announce them as
+    column headers while navigating the grid.
+  - The client-side page-size effect now re-runs when `pageSize` or
+    `clientsidePagination` change, instead of only on mount — page size no longer
+    goes stale when those props change.
+
 ## 0.5.29
 
 ### Patch Changes
