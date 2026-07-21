@@ -1,6 +1,6 @@
 {
   "name": "@eventuras/datatable",
-  "version": "0.5.29",
+  "version": "0.6.0",
   "description": "Data table for Ratio UI — sorting, filtering, pagination and expandable rows on TanStack Table",
   "license": "MPL-2.0",
   "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/datatable#readme",
