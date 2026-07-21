@@ -95,6 +95,8 @@ jobs:
                 gh workflow run ratio-ui-publish.yml -f "tag=${TAG}" ;;
               @eventuras/ratio-ui-next)
                 gh workflow run ratio-ui-next-publish.yml -f "tag=${TAG}" ;;
+              @eventuras/datatable)
+                gh workflow run datatable-publish.yml -f "tag=${TAG}" ;;
               *)
                 echo "No publish workflow configured for ${NAME}" ;;
             esac
