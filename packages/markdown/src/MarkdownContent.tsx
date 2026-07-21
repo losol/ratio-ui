@@ -16,6 +16,19 @@ export type SanitizeSchemaExtension = {
   attributes?: Record<string, string[]>;
 };
 
+/**
+ * Component overrides for the renderer: typed overrides for standard HTML
+ * elements, plus custom element names emitted by remark plugins (e.g.
+ * `callout`).
+ *
+ * This is structurally react-markdown's `Components` type, aliased here so
+ * consumers import it from this package rather than reaching into
+ * react-markdown directly — and so the name stays stable if the renderer
+ * underneath ever changes.
+ */
+export type MarkdownComponents = Partial<Components> &
+  Record<string, React.ComponentType<any>>;
+
 export type MarkdownContentProps = {
   markdown?: string | null;
   heading?: string;
@@ -29,7 +42,7 @@ export type MarkdownContentProps = {
   stripHtmlTags?: boolean;
   /** Custom component overrides applied on top of defaults.
    *  Accepts standard HTML tag overrides and custom element names from remark plugins. */
-  customComponents?: Partial<Components> & Record<string, React.ComponentType<any>>;
+  customComponents?: MarkdownComponents;
   /** Additional remark plugins to run (after remark-gfm) */
   remarkPlugins?: any[];
   /** Extend the sanitize schema to allow custom elements/attributes from plugins */
