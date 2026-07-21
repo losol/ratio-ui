@@ -11,6 +11,31 @@ import { cn } from '../../utils/cn';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import './CodeBlock.css';
 
+/** A note attached to a line — validator output, a review comment, an explanation. */
+export interface CodeAnnotation {
+  /**
+   * 1-based line the note belongs to; it renders directly beneath that line.
+   * Ignored when it isn't a positive integer, points past the end of `code`, or
+   * falls on a line hidden by `showMore`.
+   */
+  line: number;
+  /** Tone of the note. @default 'info' */
+  severity?: 'error' | 'warning' | 'info' | 'success';
+  /** The note itself. Nodes, not an HTML string — safe from injection. */
+  message: React.ReactNode;
+  /** Short machine-readable code shown as a pill, e.g. a validator rule id. */
+  code?: string;
+  /** Where the note points — a path or expression, shown muted beside the code. */
+  path?: string;
+}
+
+const SEVERITY_LABEL: Record<NonNullable<CodeAnnotation['severity']>, string> = {
+  error: 'Error',
+  warning: 'Warning',
+  info: 'Info',
+  success: 'Success',
+};
+
 export interface CodeBlockProps {
   /** The code to display. Shown raw, whitespace preserved. Source of truth for copy/download/line count. */
   code: string;
@@ -36,6 +61,14 @@ export interface CodeBlockProps {
    * Copy/download still use the raw `code`.
    */
   highlightedLines?: React.ReactNode[];
+  /**
+   * Notes rendered inline, each directly beneath the line it refers to —
+   * validation issues, review comments, explanations. Unlike a tooltip they
+   * stay put: long messages wrap, every note is scannable at a glance, and the
+   * text lives in the document (so keyboard and screen-reader users reach it,
+   * and a screenshot captures it).
+   */
+  annotations?: CodeAnnotation[];
   showHeader?: boolean;
   showLineNumbers?: boolean;
   showCopy?: boolean;
@@ -98,6 +131,7 @@ export function CodeBlock({
   filename,
   languageSelector,
   highlightedLines,
+  annotations,
   showHeader = true,
   showLineNumbers = true,
   showCopy = true,
@@ -120,6 +154,21 @@ export function CodeBlock({
 
   const clipped = showMore && !expanded && lineCount > maxLines;
   const visibleCount = clipped ? maxLines : lineCount;
+
+  // Grouped by line so each row can render its own notes without rescanning.
+  // A `line` that isn't a positive integer is dropped here rather than landing
+  // in a bucket no row ever looks up — the effect is the same, but the intent
+  // is visible instead of looking like an accident.
+  const annotationsByLine = useMemo(() => {
+    const byLine = new Map<number, CodeAnnotation[]>();
+    for (const note of annotations ?? []) {
+      if (!Number.isInteger(note.line) || note.line < 1) continue;
+      const existing = byLine.get(note.line);
+      if (existing) existing.push(note);
+      else byLine.set(note.line, [note]);
+    }
+    return byLine;
+  }, [annotations]);
 
   const download = useCallback(() => {
     const key = language.toLowerCase();
@@ -235,16 +284,43 @@ export function CodeBlock({
       {!collapsed && (
         <div className="codeblock__body">
           <pre className="codeblock__pre">
-            {lines.slice(0, visibleCount).map((line, i) => (
-              <div className="codeblock__line" key={i}>
-                {showLineNumbers && (
-                  <span className="codeblock__ln" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                )}
-                <span className="codeblock__cell">{highlightedLines?.[i] ?? line}</span>
-              </div>
-            ))}
+            {lines.slice(0, visibleCount).map((line, i) => {
+              const notes = annotationsByLine.get(i + 1);
+              return (
+                <React.Fragment key={i}>
+                  <div className="codeblock__line">
+                    {showLineNumbers && (
+                      <span className="codeblock__ln" aria-hidden="true">
+                        {i + 1}
+                      </span>
+                    )}
+                    <span className="codeblock__cell">{highlightedLines?.[i] ?? line}</span>
+                  </div>
+                  {notes?.map((note, n) => {
+                    const severity = note.severity ?? 'info';
+                    return (
+                      <div
+                        key={n}
+                        className={cn('codeblock__annotation', `codeblock__annotation--${severity}`)}
+                      >
+                        <div className="codeblock__annotation-meta">
+                          <span className="codeblock__annotation-severity">
+                            {SEVERITY_LABEL[severity]}
+                          </span>
+                          {note.code && (
+                            <span className="codeblock__annotation-code">{note.code}</span>
+                          )}
+                          {note.path && (
+                            <span className="codeblock__annotation-path">{note.path}</span>
+                          )}
+                        </div>
+                        <div className="codeblock__annotation-message">{note.message}</div>
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              );
+            })}
           </pre>
           {clipped && <div className="codeblock__fade" aria-hidden="true" />}
         </div>

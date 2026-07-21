@@ -186,6 +186,89 @@
   overflow-wrap: anywhere;
 }
 
+/* ---- inline annotations ---- */
+.codeblock__annotation {
+  box-sizing: border-box;
+  /* Indented to the code column. The width cap matters: the <pre> is sized to
+     max-content, so an uncapped note would widen the block and force horizontal
+     scrolling on every line. The cap only holds if long unbroken tokens — paths,
+     ids, URLs — can break, hence overflow-wrap. */
+  max-width: 76ch;
+  overflow-wrap: anywhere;
+  margin: 4px 18px 5px 44px;
+  padding: 8px 13px 9px;
+  border-left: 3px solid var(--info-solid);
+  border-radius: 0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0;
+  background: var(--info-bg);
+  font-family: var(--font-sans);
+  white-space: normal; /* the ancestor <pre> is pre-formatted */
+}
+.codeblock--no-ln .codeblock__annotation {
+  margin-left: 16px;
+}
+.codeblock__annotation--error {
+  border-left-color: var(--error-solid);
+  background: var(--error-bg);
+}
+.codeblock__annotation--warning {
+  border-left-color: var(--warning-solid);
+  background: var(--warning-bg);
+}
+.codeblock__annotation--info {
+  border-left-color: var(--info-solid);
+  background: var(--info-bg);
+}
+.codeblock__annotation--success {
+  border-left-color: var(--success-solid);
+  background: var(--success-bg);
+}
+
+.codeblock__annotation-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 3px;
+}
+.codeblock__annotation-severity {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.codeblock__annotation--error .codeblock__annotation-severity {
+  color: var(--error-text);
+}
+.codeblock__annotation--warning .codeblock__annotation-severity {
+  color: var(--warning-text);
+}
+.codeblock__annotation--info .codeblock__annotation-severity {
+  color: var(--info-text);
+}
+.codeblock__annotation--success .codeblock__annotation-severity {
+  color: var(--success-text);
+}
+
+.codeblock__annotation-code {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm, 5px);
+  background: color-mix(in srgb, var(--code-text) 8%, transparent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--code-muted);
+}
+.codeblock__annotation-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--code-muted);
+}
+.codeblock__annotation-message {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--code-text);
+}
+
 /* ---- show more ---- */
 .codeblock__fade {
   position: absolute;
