@@ -77,18 +77,28 @@
 
 /* Base styles */
 @layer base {
-  /* Prevent FOUC during theme initialization */
   html {
-    opacity: 0;
     font-size: var(--font-size-base);
   }
 
-  /* Any resolved theme (dark, light, bureau, …) reveals the page.
-     Matched by attribute presence so new named palettes don't have to
-     be added here — previously this listed only dark/light, which left
-     bureau (and any future theme) stuck at opacity:0 → blank white. */
-  html[data-theme] {
-    opacity: 1;
+  /* Flash guard — opt-in.
+
+     The light theme is fully defined on bare `:root` (see tokens/theme.css),
+     so a page with no `data-theme` is fully styled and visible by default.
+     We therefore DON'T hide the page just because a theme attribute is
+     absent — previously `html { opacity: 0 }` did, which left any consumer
+     who never set `data-theme` staring at a permanently blank white page.
+
+     Apps that resolve the theme in JS *after* first paint can still avoid a
+     flash of the default theme: add `data-theme-loading` to <html> (in the
+     static markup or a blocking <head> script) and set the theme once
+     resolved. The page is hidden only while loading AND neither theme axis
+     is set — `data-theme` (palette / standard-theme mode) or
+     `data-color-scheme` (named-theme mode) — so setting either reveals it
+     even if the flag is left in place. Apps that never set the flag are
+     never hidden. */
+  html[data-theme-loading]:not([data-theme]):not([data-color-scheme]) {
+    opacity: 0;
   }
 
   main {
