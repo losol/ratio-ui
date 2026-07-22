@@ -4,3 +4,5 @@
 
 export { cn } from './cn';
 export { buildCoverImageStyle } from './buildCoverImageStyle';
+export { slugify } from './slugify';
+export { getTextContent } from './getTextContent';
