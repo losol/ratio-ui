@@ -3,10 +3,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { SpacingProps } from '../../tokens/spacing';
-import { buildSpacingClasses } from '../../tokens/spacing';
+import { buildSpacingClasses, extractSpacingProps } from '../../tokens/spacing';
 import { cn } from '../../utils/cn';
 
-export interface HeadingProps extends SpacingProps {
+export interface HeadingProps
+  extends SpacingProps,
+    React.HTMLAttributes<HTMLHeadingElement> {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   children: React.ReactNode;
   className?: string;
@@ -26,15 +28,23 @@ const HeadingRoot = ({
   children,
   className,
   testId,
-  ...spacingProps
-}: HeadingProps) => (
-  <HeadingComponent
-    className={cn('text-(--text)', buildSpacingClasses(spacingProps), className)}
-    data-testid={testId}
-  >
-    {children}
-  </HeadingComponent>
-);
+  ...rest
+}: HeadingProps) => {
+  // Split the spacing props (which become utility classes) from standard
+  // DOM/aria attributes, which forward to the element — so `id` (anchor
+  // targets), `style`, `aria-*` and event handlers reach the heading without
+  // leaking `padding`/`gap` onto the DOM.
+  const [spacing, domProps] = extractSpacingProps(rest);
+  return (
+    <HeadingComponent
+      {...domProps}
+      className={cn('text-(--text)', buildSpacingClasses(spacing), className)}
+      data-testid={testId}
+    >
+      {children}
+    </HeadingComponent>
+  );
+};
 
 export interface HeadingGroupProps {
   children: React.ReactNode;
