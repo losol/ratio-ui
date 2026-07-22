@@ -1,0 +1,209 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/**
+ * Composable footer building blocks. Everything is driven by semantic tokens so
+ * a footer tracks the active theme; a `dark` footer additionally re-scopes the
+ * text/border tokens (see `.ratio-footer--dark`) so blocks stay legible on the
+ * deep surface without any hardcoded rgba().
+ */
+
+/* ── Dark footer: a local dark token context ───────────────────────────────
+   `surface-dark` flips only `--text`; a footer's blocks also read
+   `--text-muted`, `--text-subtle` and `--border-*`, so re-scope the set here.
+   Text tokens reference the same palette steps as tokens/theme.css's dark
+   theme (so they match app dark exactly); borders derive from the light ink so
+   there is nothing to keep in sync. */
+.ratio-footer--dark {
+  --text: var(--color-secondary-200);
+  --text-muted: var(--color-secondary-500);
+  --text-subtle: var(--color-secondary-600);
+  --text-light: var(--color-secondary-100);
+  --border-1: color-mix(in oklch, var(--color-secondary-100) 10%, transparent);
+  --border-2: color-mix(in oklch, var(--color-secondary-100) 16%, transparent);
+  color: var(--text);
+}
+
+/* ── Brand ─────────────────────────────────────────────────────────────── */
+.ratio-footer__brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ratio-footer__wordmark {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--text);
+}
+.ratio-footer__mission {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 16px 0 0;
+  max-width: 32ch;
+}
+
+/* ── LinkColumn + Link ─────────────────────────────────────────────────── */
+.ratio-footer__col {
+  display: flex;
+  flex-direction: column;
+}
+.ratio-footer__col-title {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  margin: 0 0 14px;
+}
+.ratio-footer__link {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 6px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  transition: color 0.16s;
+}
+.ratio-footer__link:hover {
+  color: var(--text);
+}
+.ratio-footer__tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: color-mix(in oklch, var(--accent) 16%, transparent);
+  color: var(--accent);
+}
+.ratio-footer__link-external {
+  width: 12px;
+  height: 12px;
+  opacity: 0.5;
+}
+
+/* ── Publisher ─────────────────────────────────────────────────────────── */
+.ratio-footer__publisher {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+.ratio-footer__publisher-name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.ratio-footer__publisher a {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--primary) 30%, transparent);
+}
+.ratio-footer__publisher a:hover {
+  border-bottom-color: var(--primary);
+}
+.ratio-footer__publisher-org {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-subtle);
+  margin-top: 8px;
+}
+
+/* ── Newsletter ────────────────────────────────────────────────────────── */
+.ratio-footer__newsletter {
+  max-width: 340px;
+}
+.ratio-footer__newsletter-label {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.ratio-footer__newsletter-hint {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 6px 0 14px;
+}
+
+/* ── Social ────────────────────────────────────────────────────────────── */
+.ratio-footer__social {
+  display: flex;
+  gap: 9px;
+}
+.ratio-footer__social-item {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  background: var(--card);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background-color 0.18s, transform 0.18s;
+}
+.ratio-footer__social-item:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+.ratio-footer__social-item svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── BottomBar ─────────────────────────────────────────────────────────── */
+.ratio-footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-1);
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-subtle);
+}
+.ratio-footer__bottom--flush {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+.ratio-footer__bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  /* Keep the links to the right even when there is no copyright node. */
+  margin-left: auto;
+}
+.ratio-footer__bottom a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.ratio-footer__bottom a:hover {
+  color: var(--text);
+}
