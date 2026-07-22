@@ -185,7 +185,11 @@ export const MarkdownContent = ({
       <List as="ol" variant="markdown" {...props} />
     ),
     li: ({ node, ...props }) => <List.Item {...props} />,
-    blockquote: ({ node, children }) => <Blockquote>{children}</Blockquote>,
+    blockquote: ({ node, children, className, cite }) => (
+      <Blockquote className={className} cite={cite}>
+        {children}
+      </Blockquote>
+    ),
     code: ({ node, className, children, ...props }) => {
       // Inline code (no `language-` class) becomes a token-styled pill. Fenced
       // blocks (`language-*`) are rendered by the `pre` override below as a
@@ -199,7 +203,7 @@ export const MarkdownContent = ({
           </code>
         );
       }
-      return <InlineCode>{children}</InlineCode>;
+      return <InlineCode className={className}>{children}</InlineCode>;
     },
     pre: ({ children }) => {
       // react-markdown wraps a fence as `<pre><code class="language-…">…</code></pre>`.
@@ -214,10 +218,13 @@ export const MarkdownContent = ({
       const raw = codeProps?.children;
       const text =
         typeof raw === 'string' ? raw : Array.isArray(raw) ? raw.join('') : String(raw ?? '');
-      const language = /language-(\w+)/.exec(codeProps?.className ?? '')?.[1];
+      // `\S+` (not `\w+`) so info strings with dashes/symbols survive, e.g.
+      // `objective-c`, `c++`. The class holds a single token, so there is no
+      // trailing metadata to guard against.
+      const language = /language-(\S+)/.exec(codeProps?.className ?? '')?.[1];
       return (
         <CodeBlock
-          code={text.replace(/\n$/, '')}
+          code={text.replace(/\r?\n$/, '')}
           language={language ?? 'Text'}
           showLineNumbers={false}
           showDownload={false}
@@ -225,7 +232,7 @@ export const MarkdownContent = ({
         />
       );
     },
-    hr: () => <Divider />,
+    hr: ({ node, className }) => <Divider className={className} />,
     strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
     em: ({ node, ...props }) => <em className="italic" {...props} />,
   };
