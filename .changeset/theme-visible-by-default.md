@@ -2,7 +2,7 @@
 '@eventuras/ratio-ui': minor
 ---
 
-**Breaking: `global.css` no longer hides the page until `data-theme` is set.**
+**Behavior change: `global.css` no longer hides the page until a theme is set.**
 
 The light theme is fully defined on bare `:root`, so a page with no `data-theme`
 is already correctly styled. The previous `html { opacity: 0 }` guard hid it

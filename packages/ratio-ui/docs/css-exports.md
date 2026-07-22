@@ -74,17 +74,21 @@ If you resolve the palette in JS (localStorage / system preference) and apply it
 *after* first paint, the page paints light first and then flips — a flash. Two
 ways to avoid it:
 
-**1. Set `data-theme` before first paint (recommended).** A blocking inline
-script in `<head>` makes the very first paint correct, with no flash and no
-hidden page:
+**1. Set the theme before first paint (recommended).** A blocking inline script
+in `<head>` makes the very first paint correct, with no flash and no hidden
+page. Set both attributes when you use the light/dark axis, otherwise the page
+can still paint light and then flip when `data-color-scheme` lands:
 
 ```html
 <script>
-  // Resolve from storage / system preference, then set the attributes.
-  // data-theme = palette (e.g. "light", "dark", "bureau")
-  // data-color-scheme = light|dark (named themes; optional for the
-  //                     standard theme where dark is a data-theme value)
-  document.documentElement.setAttribute('data-theme', resolvedTheme);
+  // Resolve from storage / system preference, then set the attributes before
+  // the page paints.
+  //   data-theme        = palette (e.g. "light", "dark", "bureau")
+  //   data-color-scheme = light | dark (the mode; the standard theme also
+  //                       accepts "dark" as a data-theme value)
+  const el = document.documentElement;
+  el.setAttribute('data-theme', resolvedTheme);
+  if (resolvedScheme) el.setAttribute('data-color-scheme', resolvedScheme);
 </script>
 ```
 
@@ -98,9 +102,10 @@ html[data-theme-loading]:not([data-theme]):not([data-color-scheme]) { opacity: 0
 ```
 
 The page is hidden only while the flag is present **and** neither theme axis is
-set — `data-theme` (palette / standard-theme mode) or `data-color-scheme`
-(named-theme mode) — so setting either reveals it even if the flag stays. Apps
-that never set the flag are never hidden — the blank-white-page footgun is gone.
+set — `data-theme` (palette, and the standard theme's mode) or
+`data-color-scheme` (the orthogonal light/dark axis) — so setting either reveals
+it even if the flag stays. Apps that never set the flag are never hidden — the
+blank-white-page footgun is gone.
 
 **Migration from ≤ 2.x:** the page used to be hidden by default
 (`html { opacity: 0 }`) until `data-theme` was set. If you relied on that to
