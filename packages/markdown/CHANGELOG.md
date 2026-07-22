@@ -1,5 +1,41 @@
 # @eventuras/markdown
 
+## 0.13.0
+
+### Minor Changes
+
+- 71c0a89: Fix dark mode. Code blocks, inline code, blockquotes and rules were rendered
+  with hardcoded light Tailwind greys and turned near-invisible under
+  `data-theme="dark"`. Rendering now delegates to ratio-ui's theme-aware
+  components, so no hardcoded colours remain in the component map:
+
+  - fenced code blocks → `CodeBlock`
+  - inline code → `InlineCode`
+  - blockquotes → `Blockquote`
+  - thematic breaks → `Divider`
+
+  Requires `@eventuras/ratio-ui` `^2.15.0` (peer range raised from `^2.13.0`) for
+  the new `InlineCode` and `Divider` primitives.
+
+- 80cbd81: Add `extractHeadings(markdown)`, which pulls the h2/h3 headings out of raw
+  markdown as a `TocHeading[]` for an "on this page" table of contents. Ids are
+  produced with ratio-ui's `slugify`, so they match the anchors a heading
+  renderer puts on the page; fenced code blocks are skipped and link/emphasis
+  syntax is stripped from the visible text. Pairs with
+  `@eventuras/ratio-ui/core/TableOfContents`.
+- f8207a1: Move the markdown engine into runtime dependencies, and name its component type.
+
+  - `react-markdown`, `rehype-raw`, `rehype-sanitize` and `remark-gfm` move from
+    peer to regular dependencies. They are internal implementation — the component
+    builds its own render pipeline and shares no instance across the package
+    boundary — so consumers no longer have to install them by hand. Only `react`,
+    `react-dom` and `@eventuras/ratio-ui`, which genuinely need one shared copy,
+    remain peers.
+  - New exported type `MarkdownComponents` for `customComponents`. It is
+    react-markdown's `Components` (plus custom element names from remark plugins),
+    aliased so consumers import it from this package instead of reaching into
+    react-markdown, and so the name survives a future change of renderer.
+
 ## 0.12.0
 
 ### Minor Changes

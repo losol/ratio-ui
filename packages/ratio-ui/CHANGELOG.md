@@ -1,5 +1,70 @@
 # @eventuras/ratio-ui
 
+## 2.15.0
+
+### Minor Changes
+
+- 68a188a: `Heading` now forwards standard DOM and ARIA attributes to the rendered
+  element.
+
+  `id`, `style`, `role`, `aria-*`, event handlers and the other HTML heading
+  attributes now reach the element, so anchor targets like
+  `<Heading as="h2" id={slug}>` work without wrapping the heading in an
+  id-bearing element. Spacing props are still compiled to utility classes, and
+  `className`/`testId` keep their explicit meaning — spacing keys never leak onto
+  the DOM (they are split out with `extractSpacingProps`).
+
+- 71c0a89: Add `InlineCode` and `Divider` core components.
+
+  - `InlineCode` renders a `<code>` pill styled with the shared `--code-*` tokens,
+    so inline snippets match `CodeBlock` and stay legible in every theme.
+  - `Divider` renders a token-driven thematic break (`--border-2`) rather than a
+    fixed grey rule.
+
+  Both ship their own theme-aware CSS that travels with the component import, so
+  they work regardless of which CSS entrypoint the app uses.
+
+- 937f5c4: **Behavior change: `global.css` no longer hides the page until a theme is set.**
+
+  The light theme is fully defined on bare `:root`, so a page with no `data-theme`
+  is already correctly styled. The previous `html { opacity: 0 }` guard hid it
+  anyway until a theme attribute appeared — which meant any consumer who never set
+  `data-theme` got a permanently blank white page, with no error. For a design
+  system that is the worst possible first-run experience.
+
+  The visibility guard is now **opt-in** and forgiving:
+
+  ```css
+  html[data-theme-loading]:not([data-theme]):not([data-color-scheme]) {
+    opacity: 0;
+  }
+  ```
+
+  - Import the CSS and render — the page is visible in the light theme. No
+    attribute required.
+  - Set `data-theme` for another palette; it can be set late without the page
+    ever going blank.
+  - Resolving the theme in JS after first paint and want no flash? Set
+    `data-theme` in a blocking `<head>` script (correct first paint), or add
+    `data-theme-loading` to `<html>` and set `data-theme` once resolved.
+
+  **Migration.** If you already set `data-theme` in a blocking `<head>` script,
+  nothing changes. If you relied on the default `opacity: 0` to mask a
+  JS-resolved theme applied after paint, add `data-theme-loading` to `<html>` to
+  keep the same hide-until-resolved behavior.
+
+- 80cbd81: Add `slugify` and `getTextContent` utilities (`@eventuras/ratio-ui/utils`).
+
+  - `slugify` is the single source of truth for heading anchor ids — the same
+    GitHub-flavoured slug used both to id a heading and to build the table of
+    contents that links to it, so the two never drift.
+  - `getTextContent` flattens a React node tree to plain text, e.g. for slugging
+    a heading whose children mix strings and inline elements.
+
+  Together with the existing `TableOfContents` component and `TocHeading` type,
+  these let a consumer render an anchored, scroll-spied TOC without re-inventing
+  the slug convention.
+
 ## 2.14.0
 
 ### Minor Changes
