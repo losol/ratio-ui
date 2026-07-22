@@ -1,0 +1,22 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/**
+ * Inline code pill. Text stays in CodeBlock's --code-text ink, but the fill is
+ * a low-alpha tint of that same ink rather than the code *surface* colour: the
+ * surface is white/near-black and barely separates from the page, whereas the
+ * ink tint darkens a light page and lightens a dark one, so the pill always
+ * reads against running text. Same technique as Blockquote's subtle fill.
+ */
+.inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+  color: var(--code-text);
+  background: color-mix(in srgb, var(--code-text) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--code-text) 20%, transparent);
+}
