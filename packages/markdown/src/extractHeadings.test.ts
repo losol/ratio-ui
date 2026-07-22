@@ -28,4 +28,17 @@ describe('extractHeadings', () => {
     const md = '# Title\n\n## Section\n\n#### Too deep';
     expect(extractHeadings(md).map((h) => h.text)).toEqual(['Section']);
   });
+
+  it('tolerates indentation and trailing ATX hashes', () => {
+    const md = '   ## Indented ##\n\n##   Spaced';
+    expect(extractHeadings(md)).toEqual([
+      { id: 'indented', text: 'Indented', level: 2 },
+      { id: 'spaced', text: 'Spaced', level: 2 },
+    ]);
+  });
+
+  it('drops headings that slugify to nothing', () => {
+    const md = '## !!!\n\n## Real';
+    expect(extractHeadings(md).map((h) => h.text)).toEqual(['Real']);
+  });
 });
