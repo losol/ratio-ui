@@ -8,6 +8,10 @@ import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Text } from '@eventuras/ratio-ui/core/Text';
 import { Link } from '@eventuras/ratio-ui/core/Link';
 import { List } from '@eventuras/ratio-ui/core/List';
+import { CodeBlock } from '@eventuras/ratio-ui/core/CodeBlock';
+import { Blockquote } from '@eventuras/ratio-ui/core/Blockquote';
+import { InlineCode } from '@eventuras/ratio-ui/core/InlineCode';
+import { Divider } from '@eventuras/ratio-ui/core/Divider';
 import { normalizeMarkdown } from './normalizeMarkdown';
 import { mergeAttributes } from './mergeSanitizeSchemas';
 
@@ -181,32 +185,47 @@ export const MarkdownContent = ({
       <List as="ol" variant="markdown" {...props} />
     ),
     li: ({ node, ...props }) => <List.Item {...props} />,
-    blockquote: ({ node, ...props }) => (
-      <blockquote
-        className="border-l-4 border-gray-300 pl-4 italic my-4 text-gray-700"
-        {...props}
-      />
-    ),
+    blockquote: ({ node, children }) => <Blockquote>{children}</Blockquote>,
     code: ({ node, className, children, ...props }) => {
-      // Check if it's inline code (no className with "language-" prefix)
-      const isInline = !className?.startsWith('language-');
-      return isInline ? (
-        <code
-          className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono"
-          {...props}
-        >
-          {children}
-        </code>
-      ) : (
-        <code className={className} {...props}>
-          {children}
-        </code>
+      // Inline code (no `language-` class) becomes a token-styled pill. Fenced
+      // blocks (`language-*`) are rendered by the `pre` override below as a
+      // CodeBlock — here the element is passed through so `pre` can read its
+      // language class and text.
+      const isBlock = className?.startsWith('language-');
+      if (isBlock) {
+        return (
+          <code className={className} {...props}>
+            {children}
+          </code>
+        );
+      }
+      return <InlineCode>{children}</InlineCode>;
+    },
+    pre: ({ children }) => {
+      // react-markdown wraps a fence as `<pre><code class="language-…">…</code></pre>`.
+      // Pull the text + language out of that single <code> child and render a
+      // theme-aware CodeBlock instead of a bare, hardcoded-grey <pre>.
+      const codeEl = Array.isArray(children) ? children[0] : children;
+      const codeProps =
+        codeEl && typeof codeEl === 'object' && 'props' in codeEl
+          ? (codeEl as React.ReactElement<{ className?: string; children?: React.ReactNode }>)
+              .props
+          : undefined;
+      const raw = codeProps?.children;
+      const text =
+        typeof raw === 'string' ? raw : Array.isArray(raw) ? raw.join('') : String(raw ?? '');
+      const language = /language-(\w+)/.exec(codeProps?.className ?? '')?.[1];
+      return (
+        <CodeBlock
+          code={text.replace(/\n$/, '')}
+          language={language ?? 'Text'}
+          showLineNumbers={false}
+          showDownload={false}
+          showCollapse={false}
+        />
       );
     },
-    pre: ({ node, ...props }) => (
-      <pre className="bg-gray-100 p-4 rounded overflow-x-auto my-4" {...props} />
-    ),
-    hr: ({ node, ...props }) => <hr className="my-8 border-gray-300" {...props} />,
+    hr: () => <Divider />,
     strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
     em: ({ node, ...props }) => <em className="italic" {...props} />,
   };

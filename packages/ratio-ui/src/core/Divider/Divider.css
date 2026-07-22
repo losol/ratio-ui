@@ -1,0 +1,15 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/**
+ * Thematic break. Token-driven so the rule tracks the active theme instead of
+ * a fixed grey.
+ */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border-2);
+  margin: var(--space-l) 0;
+}
