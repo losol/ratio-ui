@@ -51,7 +51,7 @@
   "devDependencies": {
     "@eventuras/ratio-ui": "workspace:*",
     "@shikijs/langs": "^3.0.0",
-    "@shikijs/themes": "^3.0.0",
+    "@shikijs/themes": "^4.3.1",
     "@ratio-ui/eslint-config": "workspace:*",
     "@ratio-ui/typescript-config": "workspace:*",
     "@ratio-ui/vite-config": "workspace:*",
@@ -64,7 +64,7 @@
   "peerDependencies": {
     "@eventuras/ratio-ui": "^2.13.0",
     "@shikijs/langs": "^3.0.0",
-    "@shikijs/themes": "^3.0.0",
+    "@shikijs/themes": "^4.3.1",
     "shiki": "^3.0.0"
   }
 }
