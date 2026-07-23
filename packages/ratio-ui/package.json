@@ -118,7 +118,7 @@
     "eslint-plugin-storybook": "^10.5.0",
     "tailwindcss": "^4.3.2",
     "tailwindcss-react-aria-components": "^2.2.0",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vite": "8.1.4"
   },
   "peerDependencies": {
