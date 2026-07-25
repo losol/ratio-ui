@@ -10,7 +10,8 @@ import {
   type CodeBlockProps as CoreCodeBlockProps,
 } from '@eventuras/ratio-ui/core/CodeBlock';
 import type { HighlighterCore } from 'shiki/core';
-import { shikiToDualLines, DEFAULT_THEMES, DUAL_THEME_CSS, type DualThemes } from '../highlighter';
+import { shikiToDualLines, DEFAULT_THEMES, type DualThemes } from '../highlighter';
+import { DualThemeStyles } from '../tokens';
 import { useShikiHighlighter } from '../useShikiHighlighter';
 
 export interface CodeBlockProps extends Omit<CoreCodeBlockProps, 'highlightedLines'> {
@@ -75,9 +76,7 @@ export function CodeBlock({
   return (
     <>
       {/* Injection-safe theme switch; React hoists + dedupes by href. */}
-      <style href="ratio-ui-shiki-dual" precedence="medium">
-        {DUAL_THEME_CSS}
-      </style>
+      <DualThemeStyles />
       <CoreCodeBlock code={code} language={language} highlightedLines={highlightedLines} {...rest} />
     </>
   );

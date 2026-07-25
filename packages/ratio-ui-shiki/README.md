@@ -63,6 +63,40 @@ const hl = await createRatioHighlighter();
 array of React nodes (not an HTML string), this path never uses
 `dangerouslySetInnerHTML` — it is injection-safe by construction.
 
+### Precomputed tokens: highlight at build time, render without Shiki
+
+When the page re-renders on the client (SPA, or React Router's `ssr: false` +
+prerender), `shikiToDualLines` isn't enough — whatever produces the lines must
+also run in the browser. Split it in two instead: tokenize in a **build
+script** with `codeToDualTokens`, ship the result as JSON, and render it with
+`tokensToLines` from the Shiki-free `tokens` entrypoint. The client then
+bundles ~1 kB — no grammars, no engine — and code is highlighted from the very
+first paint.
+
+```ts
+// build script (Node) — runs once per build
+import { createRatioHighlighter, codeToDualTokens } from '@eventuras/ratio-ui-shiki';
+
+const hl = await createRatioHighlighter();
+const tokens = codeToDualTokens(hl, source, 'tsx');
+await fs.writeFile('tokens.json', JSON.stringify(tokens));
+```
+
+```tsx
+// client — imports only the tiny tokens module, never Shiki
+import { CodeBlock } from '@eventuras/ratio-ui/core/CodeBlock';
+import { tokensToLines, DualThemeStyles } from '@eventuras/ratio-ui-shiki/tokens';
+import tokens from './tokens.json';
+
+<DualThemeStyles />
+<CodeBlock code={source} language="tsx" highlightedLines={tokensToLines(tokens)} />;
+```
+
+`shikiToDualLines(hl, code, lang)` is exactly
+`tokensToLines(codeToDualTokens(hl, code, lang))` — the two paths render
+byte-identical markup (unit-tested), so you can start client-side and move to
+precomputed tokens later without visual change.
+
 ### Advanced: `useShikiHighlighter`
 
 The hook the `<CodeBlock>` wrapper is built on. It loads (and shares) the
@@ -106,4 +140,7 @@ const hl = await createRatioHighlighter({
   hoisting); include it manually only when you render dual-theme lines by hand.
 - Entrypoints are split for RSC: the root (`.`) is server-safe (highlighter
   helpers + `DUAL_THEME_CSS` + types); the client component and hook live at
-  `@eventuras/ratio-ui-shiki/CodeBlock` and `.../useShikiHighlighter`.
+  `@eventuras/ratio-ui-shiki/CodeBlock` and `.../useShikiHighlighter`; the
+  Shiki-free precomputed-token renderer lives at
+  `@eventuras/ratio-ui-shiki/tokens` (`tokensToLines`, `DualThemeStyles`,
+  `DUAL_THEME_CSS`, types — imports nothing from Shiki).
