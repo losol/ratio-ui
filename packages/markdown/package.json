@@ -51,6 +51,7 @@
   },
   "devDependencies": {
     "@eventuras/ratio-ui": "workspace:*",
+    "@eventuras/ratio-ui-shiki": "workspace:*",
     "@ratio-ui/eslint-config": "workspace:*",
     "@ratio-ui/typescript-config": "workspace:*",
     "@ratio-ui/vite-config": "workspace:*",

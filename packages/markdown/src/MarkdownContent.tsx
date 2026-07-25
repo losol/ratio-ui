@@ -21,6 +21,25 @@ export type SanitizeSchemaExtension = {
 };
 
 /**
+ * Props a `codeBlock` override receives — the exact call the built-in
+ * CodeBlock rendering gets, so any CodeBlock-compatible component (e.g.
+ * `@eventuras/ratio-ui-shiki`'s) is a drop-in that matches the default
+ * appearance. Components that only need the content can ignore the chrome
+ * flags; they are required here (not optional) because `MarkdownContent`
+ * always passes them — marking them optional would reject override
+ * components whose own props require the flags.
+ */
+export type MarkdownCodeBlockProps = {
+  /** Code inside the fence, trailing newline stripped. */
+  code: string;
+  /** Fence language (`ts` for ```ts). `'Text'` when the fence has none. */
+  language: string;
+  showLineNumbers: boolean;
+  showDownload: boolean;
+  showCollapse: boolean;
+};
+
+/**
  * Component overrides for the renderer: typed overrides for standard HTML
  * elements, plus custom element names emitted by remark plugins (e.g.
  * `callout`).
@@ -51,6 +70,20 @@ export type MarkdownContentProps = {
   remarkPlugins?: any[];
   /** Extend the sanitize schema to allow custom elements/attributes from plugins */
   sanitizeSchemaExtension?: SanitizeSchemaExtension;
+  /**
+   * Component that renders fenced code blocks instead of the default
+   * (un-highlighted) `@eventuras/ratio-ui` CodeBlock. This is the opt-in seam
+   * for syntax highlighting — pass `@eventuras/ratio-ui-shiki`'s CodeBlock and
+   * fences highlight, with everything else unchanged:
+   *
+   * ```tsx
+   * import { CodeBlock as ShikiCodeBlock } from '@eventuras/ratio-ui-shiki/CodeBlock';
+   * <MarkdownContent markdown={md} codeBlock={ShikiCodeBlock} />
+   * ```
+   *
+   * Inline code is unaffected (stays `InlineCode`).
+   */
+  codeBlock?: React.ComponentType<MarkdownCodeBlockProps>;
 };
 
 export const MarkdownContent = ({
@@ -63,6 +96,7 @@ export const MarkdownContent = ({
   customComponents,
   remarkPlugins: extraRemarkPlugins,
   sanitizeSchemaExtension,
+  codeBlock,
 }: MarkdownContentProps) => {
   if (!markdown) return null;
 
@@ -235,8 +269,9 @@ export const MarkdownContent = ({
       // `objective-c`, `c++`. The class holds a single token, so there is no
       // trailing metadata to guard against.
       const language = /language-(\S+)/.exec(codeProps?.className ?? '')?.[1];
+      const FenceBlock = codeBlock ?? CodeBlock;
       return (
-        <CodeBlock
+        <FenceBlock
           code={text.replace(/\r?\n$/, '')}
           language={language ?? 'Text'}
           showLineNumbers={false}
