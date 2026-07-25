@@ -12,7 +12,7 @@ vi.mock('@eventuras/ratio-ui/core/Text', () => ({
 }));
 
 // import the component under test
-import { MarkdownContent } from './MarkdownContent';
+import { MarkdownContent, type MarkdownCodeBlockProps } from './MarkdownContent';
 import { mergeSanitizeSchemas } from './mergeSanitizeSchemas';
 
 describe('MarkdownContent', () => {
@@ -240,6 +240,57 @@ describe('MarkdownContent', () => {
         />
       );
       expect(container.querySelector('a')).toHaveAttribute('href', '/home');
+    });
+  });
+
+  describe('codeBlock override', () => {
+    const fence = '```ts\nconst x = 1;\n```';
+
+    it('renders fences with the override, passing code and language', () => {
+      let seen: MarkdownCodeBlockProps | undefined;
+      const Custom = (props: MarkdownCodeBlockProps) => {
+        seen = props;
+        return <div data-testid="custom-fence">{props.code}</div>;
+      };
+      render(<MarkdownContent markdown={fence} codeBlock={Custom} />);
+      expect(screen.getByTestId('custom-fence')).toHaveTextContent('const x = 1;');
+      expect(seen?.code).toBe('const x = 1;'); // trailing newline stripped
+      expect(seen?.language).toBe('ts');
+    });
+
+    it("passes language 'Text' for fences without a language", () => {
+      let seen: MarkdownCodeBlockProps | undefined;
+      const Custom = (props: MarkdownCodeBlockProps) => {
+        seen = props;
+        return null;
+      };
+      render(<MarkdownContent markdown={'```\nplain\n```'} codeBlock={Custom} />);
+      expect(seen?.language).toBe('Text');
+    });
+
+    it('forwards the chrome flags the default rendering uses', () => {
+      // A CodeBlock-compatible override must look like the built-in one —
+      // dropping these flags would silently add line numbers etc. to fences.
+      let seen: MarkdownCodeBlockProps | undefined;
+      const Custom = (props: MarkdownCodeBlockProps) => {
+        seen = props;
+        return null;
+      };
+      render(<MarkdownContent markdown={fence} codeBlock={Custom} />);
+      expect(seen).toMatchObject({
+        showLineNumbers: false,
+        showDownload: false,
+        showCollapse: false,
+      });
+    });
+
+    it('leaves inline code as InlineCode when an override is set', () => {
+      const Custom = () => <div data-testid="custom-fence" />;
+      const { container } = render(
+        <MarkdownContent markdown={'Inline `code` here'} codeBlock={Custom} />
+      );
+      expect(screen.queryByTestId('custom-fence')).not.toBeInTheDocument();
+      expect(container.querySelector('code')).toHaveTextContent('code');
     });
   });
 })

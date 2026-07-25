@@ -225,6 +225,9 @@ importers:
       '@eventuras/ratio-ui':
         specifier: workspace:*
         version: link:../ratio-ui
+      '@eventuras/ratio-ui-shiki':
+        specifier: workspace:*
+        version: link:../ratio-ui-shiki
       '@ratio-ui/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint-config

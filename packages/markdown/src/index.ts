@@ -1,7 +1,7 @@
 export {MarkdownContent} from './MarkdownContent'
 export {normalizeMarkdown} from './normalizeMarkdown'
 export {extractHeadings} from './extractHeadings'
-export type {MarkdownContentProps, SanitizeSchemaExtension, MarkdownComponents} from './MarkdownContent'
+export type {MarkdownContentProps, SanitizeSchemaExtension, MarkdownComponents, MarkdownCodeBlockProps} from './MarkdownContent'
 export { mergeSanitizeSchemas } from './mergeSanitizeSchemas'
 
 export { remarkCallout } from './remarkCallout'
