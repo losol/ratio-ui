@@ -32,6 +32,10 @@
     "./useShikiHighlighter": {
       "types": "./dist/useShikiHighlighter/index.d.ts",
       "import": "./dist/useShikiHighlighter/index.js"
+    },
+    "./tokens": {
+      "types": "./dist/tokens/index.d.ts",
+      "import": "./dist/tokens/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -46,7 +50,8 @@
   },
   "scripts": {
     "build": "tsc && vite build",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@eventuras/ratio-ui": "workspace:*",
@@ -55,11 +60,15 @@
     "@ratio-ui/eslint-config": "workspace:*",
     "@ratio-ui/typescript-config": "workspace:*",
     "@ratio-ui/vite-config": "workspace:*",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "jsdom": "29.1.1",
     "shiki": "^3.0.0",
     "typescript": "6.0.3",
-    "vite": "8.1.4"
+    "vite": "8.1.4",
+    "vitest": "4.1.10"
   },
   "peerDependencies": {
     "@eventuras/ratio-ui": "^2.13.0",

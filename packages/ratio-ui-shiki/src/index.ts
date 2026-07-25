@@ -9,10 +9,20 @@ export {
   createRatioHighlighter,
   shikiToLines,
   shikiToDualLines,
+  codeToDualTokens,
   DEFAULT_LANGS,
   DEFAULT_THEMES,
-  SHIKI_TOKEN_CLASS,
-  DUAL_THEME_CSS,
   type RatioHighlighterOptions,
   type DualThemes,
 } from './highlighter';
+
+// The Shiki-free half — also available standalone (without pulling in any
+// shiki imports) as `@eventuras/ratio-ui-shiki/tokens`.
+export {
+  tokensToLines,
+  DualThemeStyles,
+  SHIKI_TOKEN_CLASS,
+  DUAL_THEME_CSS,
+  type DualToken,
+  type DualTokenLine,
+} from './tokens';
