@@ -56,21 +56,26 @@ const config: StorybookConfig = {
     disableTelemetry: true,
     disableWhatsNewNotifications: true,
   },
-  // Resolve the workspace `@eventuras/ratio-ui` to its source, so stories in
-  // companion packages (e.g. ratio-ui-shiki) pick up its components and their
+  // Resolve workspace `@eventuras/*` packages to their source, so stories that
+  // import across packages (e.g. ratio-ui-shiki stories using ratio-ui, or
+  // markdown stories using ratio-ui-shiki) pick up components and their
   // per-component CSS without a prior `dist` build — CI installs with
   // `--ignore-scripts`, and the built dist JS no longer imports its own CSS.
   viteFinal: (viteConfig) => {
     const resolve = (viteConfig.resolve ??= {});
-    const ratioUiSrc = join(packagesDir, 'ratio-ui', 'src');
     const existing = Array.isArray(resolve.alias)
       ? resolve.alias
       : Object.entries(resolve.alias ?? {}).map(([find, replacement]) => ({ find, replacement }));
-    resolve.alias = [
-      ...existing,
-      { find: /^@eventuras\/ratio-ui$/, replacement: join(ratioUiSrc, 'index.ts') },
-      { find: /^@eventuras\/ratio-ui\/(.*)$/, replacement: join(ratioUiSrc, '$1') },
-    ];
+    // `$` and the `/` in the subpath variant keep e.g. `@eventuras/ratio-ui`
+    // from swallowing `@eventuras/ratio-ui-shiki/...`.
+    const srcAliases = ['ratio-ui', 'ratio-ui-shiki'].flatMap((pkg) => {
+      const src = join(packagesDir, pkg, 'src');
+      return [
+        { find: new RegExp(`^@eventuras/${pkg}$`), replacement: join(src, 'index.ts') },
+        { find: new RegExp(`^@eventuras/${pkg}/(.*)$`), replacement: join(src, '$1') },
+      ];
+    });
+    resolve.alias = [...existing, ...srcAliases];
     return viteConfig;
   },
 };
