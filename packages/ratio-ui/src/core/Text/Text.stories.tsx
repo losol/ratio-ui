@@ -25,6 +25,14 @@ const meta: Meta<typeof Text> = {
       control: { type: 'select' },
       options: [undefined, 'primary', 'secondary', 'accent', 'error', 'success', 'warning', 'info'],
     },
+    family: {
+      control: { type: 'select' },
+      options: [undefined, 'sans', 'serif', 'mono'],
+    },
+    transform: {
+      control: { type: 'select' },
+      options: [undefined, 'none', 'uppercase'],
+    },
     className: { control: 'text' },
   },
 };
@@ -143,3 +151,25 @@ WithPadding.args = {
   padding: 'md',
   className: 'bg-gray-100',
 };
+
+export const MonoFamily = Template.bind({});
+MonoFamily.args = {
+  children: 'a1b2-c3d4-e5f6 — identifiers and code-adjacent text',
+  family: 'mono',
+  size: 'sm',
+};
+
+/**
+ * The small meta/caption voice: `family="mono"` + `transform="uppercase"`
+ * (which bundles a modest letter-spacing) + `size="xs"` + `variant="subtle"`.
+ * Use it for type labels, counts, and other quiet metadata beneath or beside
+ * primary content — the same voice as `Heading.Eyebrow`, one size quieter.
+ */
+export const MetaCaption = () => (
+  <div>
+    <Text size="lg">What is the patient's date of birth?</Text>
+    <Text as="span" size="xs" variant="subtle" family="mono" transform="uppercase">
+      date · required
+    </Text>
+  </div>
+);

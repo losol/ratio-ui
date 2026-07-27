@@ -12,6 +12,8 @@ export type TextSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl';
 export type TextWeight = 'light' | 'normal' | 'medium' | 'semibold' | 'bold';
 export type TextVariant = 'default' | 'muted' | 'subtle';
 export type TextColor = Exclude<Color, 'neutral'>;
+export type TextFamily = 'sans' | 'serif' | 'mono';
+export type TextTransform = 'none' | 'uppercase';
 
 interface TextBaseProps extends SpacingProps {
   as?: 'p' | 'span';
@@ -19,6 +21,18 @@ interface TextBaseProps extends SpacingProps {
   weight?: TextWeight;
   variant?: TextVariant;
   color?: TextColor;
+  /**
+   * Typeface, from the theme's font tokens (`--font-sans` / `--font-serif` /
+   * `--font-mono`). Unset inherits from the surrounding text (normally sans).
+   */
+  family?: TextFamily;
+  /**
+   * `'uppercase'` also applies a modest letter-spacing — uppercase without
+   * tracking reads as broken, and every uppercase treatment in ratio-ui
+   * (Heading.Eyebrow, Badge) pairs the two. Combine with `family="mono"`,
+   * `size="xs"` and `variant="subtle"` for the small meta/caption voice.
+   */
+  transform?: TextTransform;
   className?: string;
   icon?: React.ReactNode;
   testId?: string;
@@ -51,6 +65,17 @@ const variantClasses: Record<TextVariant, string> = {
   subtle: 'text-text-subtle',
 };
 
+const familyClasses: Record<TextFamily, string> = {
+  sans: 'font-sans',
+  serif: 'font-serif',
+  mono: 'font-mono',
+};
+
+const transformClasses: Record<TextTransform, string> = {
+  none: '',
+  uppercase: 'uppercase tracking-wider',
+};
+
 const colorClasses: Record<TextColor, string> = {
   primary: 'text-primary',
   secondary: 'text-secondary',
@@ -69,6 +94,8 @@ export const Text: React.FC<TextProps> = ({
   weight,
   variant = 'default',
   color,
+  family,
+  transform,
   className = '',
   icon,
   padding, paddingX, paddingY, paddingTop, paddingBottom,
@@ -84,6 +111,8 @@ export const Text: React.FC<TextProps> = ({
     color ? colorClasses[color] : variantClasses[variant],
     size && sizeClasses[size],
     weight && weightClasses[weight],
+    family && familyClasses[family],
+    transform && transformClasses[transform],
     buildSpacingClasses({ padding, paddingX, paddingY, paddingTop, paddingBottom, margin, marginX, marginY, marginTop, marginBottom, gap }),
     className,
   );

@@ -3,3 +3,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Text } from './Text';
+export type {
+  TextProps,
+  TextSize,
+  TextWeight,
+  TextVariant,
+  TextColor,
+  TextFamily,
+  TextTransform,
+} from './Text';

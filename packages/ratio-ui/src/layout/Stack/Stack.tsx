@@ -35,6 +35,14 @@ export interface StackProps {
    */
   dividers?: boolean;
   /**
+   * Draw a nesting rail — a `--border-1` hairline down the left edge with a
+   * matching inset — marking the children as one level deeper in a hierarchy
+   * (outlines, threads, tree levels). Vertical stacks only; ignored when
+   * `direction="horizontal"`.
+   * @default false
+   */
+  rail?: boolean;
+  /**
    * Custom className
    */
   className?: string;
@@ -107,6 +115,7 @@ export const Stack: React.FC<StackProps> = ({
   justify,
   wrap = false,
   dividers = false,
+  rail = false,
   className = '',
   as: Component = 'div',
   children,
@@ -116,6 +125,7 @@ export const Stack: React.FC<StackProps> = ({
   const alignClass = align ? alignClasses[align] : '';
   const justifyClass = justify ? justifyClasses[justify] : '';
   const wrapClass = wrap ? 'flex-wrap' : '';
+  const railClass = rail && direction === 'vertical' ? 'border-l border-border-1 pl-5' : '';
   let dividerClass = '';
   if (dividers) {
     dividerClass = direction === 'vertical'
@@ -131,6 +141,7 @@ export const Stack: React.FC<StackProps> = ({
     justifyClass,
     wrapClass,
     dividerClass,
+    railClass,
     className,
   ]
     .filter(Boolean)
