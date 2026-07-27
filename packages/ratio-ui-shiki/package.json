@@ -65,7 +65,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "jsdom": "29.1.1",
-    "shiki": "^3.0.0",
+    "shiki": "^4.3.1",
     "typescript": "6.0.3",
     "vite": "8.1.4",
     "vitest": "4.1.10"
@@ -74,6 +74,6 @@
     "@eventuras/ratio-ui": "^2.13.0",
     "@shikijs/langs": "^3.0.0",
     "@shikijs/themes": "^4.3.1",
-    "shiki": "^3.0.0"
+    "shiki": "^4.3.1"
   }
 }
