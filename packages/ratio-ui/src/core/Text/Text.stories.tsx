@@ -149,7 +149,9 @@ export const WithPadding = Template.bind({});
 WithPadding.args = {
   children: 'Text with padding',
   padding: 'md',
-  className: 'bg-gray-100',
+  // Token background (not a hardcoded gray) so the demo surface follows the
+  // theme — hardcoded light gray made the text invisible in dark mode.
+  className: 'bg-card-hover rounded-lg',
 };
 
 export const MonoFamily = Template.bind({});

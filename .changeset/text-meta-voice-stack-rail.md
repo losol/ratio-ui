@@ -12,3 +12,6 @@ Two small primitives for editorial outlines (className-free consumers):
 - `Stack` gains `rail` — a `--border-1` hairline down the left edge with a
   matching inset, marking children as one level deeper in a hierarchy
   (outlines, threads, tree levels). Vertical stacks only.
+- `Stack` `align` accepts `'baseline'` — for horizontal stacks pairing text at
+  different sizes (a title and its caption), so baselines line up instead of
+  boxes.

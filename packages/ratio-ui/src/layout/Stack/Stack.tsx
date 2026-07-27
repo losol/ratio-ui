@@ -17,9 +17,11 @@ export interface StackProps {
    */
   gap?: Space;
   /**
-   * Alignment of items along the cross axis
+   * Alignment of items along the cross axis. `baseline` is the right choice
+   * when a horizontal stack pairs text at different sizes (a title and its
+   * caption) — their baselines line up instead of their boxes.
    */
-  align?: 'start' | 'center' | 'end' | 'stretch';
+  align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline';
   /**
    * Justify content along the main axis
    */
@@ -71,6 +73,7 @@ const alignClasses = {
   center: 'items-center',
   end: 'items-end',
   stretch: 'items-stretch',
+  baseline: 'items-baseline',
 };
 
 const justifyClasses = {

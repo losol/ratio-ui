@@ -31,6 +31,7 @@ interface TextBaseProps extends SpacingProps {
    * tracking reads as broken, and every uppercase treatment in ratio-ui
    * (Heading.Eyebrow, Badge) pairs the two. Combine with `family="mono"`,
    * `size="xs"` and `variant="subtle"` for the small meta/caption voice.
+   * `'none'` explicitly resets an inherited transform; unset inherits.
    */
   transform?: TextTransform;
   className?: string;
@@ -72,7 +73,9 @@ const familyClasses: Record<TextFamily, string> = {
 };
 
 const transformClasses: Record<TextTransform, string> = {
-  none: '',
+  // Explicit reset, not a no-op: text-transform inherits, so `'none'` must
+  // override a transform set higher up. Unset (undefined) inherits.
+  none: 'normal-case tracking-normal',
   uppercase: 'uppercase tracking-wider',
 };
 
