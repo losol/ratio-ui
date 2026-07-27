@@ -102,7 +102,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "lucide-react": "^1.24.0",
+    "lucide-react": "^1.25.0",
     "react-aria-components": "^1.19.0",
     "react-stately": "^3.48.0",
     "tailwind-merge": "^3.5.0"
@@ -112,14 +112,14 @@
     "@ratio-ui/typescript-config": "workspace:*",
     "@ratio-ui/vite-config": "workspace:*",
     "@swc/helpers": "^0.5.21",
-    "@tailwindcss/vite": "^4.3.2",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "eslint-plugin-storybook": "^10.5.0",
-    "tailwindcss": "^4.3.2",
+    "eslint-plugin-storybook": "^10.5.2",
+    "tailwindcss": "^4.3.3",
     "tailwindcss-react-aria-components": "^2.2.0",
     "typescript": "6.0.3",
-    "vite": "8.1.4"
+    "vite": "8.1.5"
   },
   "peerDependencies": {
     "react": "^19.0.0",
