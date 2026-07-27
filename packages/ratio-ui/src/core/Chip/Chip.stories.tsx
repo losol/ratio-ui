@@ -207,3 +207,52 @@ export const SquareCorners: Story = {
     </div>
   ),
 };
+
+export const TwoTone: Story = {
+  name: 'Two-tone (split) — key/value',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`split` renders a segmented key/value pill: a darker `Chip.Key` (meta voice built in) and a lighter `Chip.Value` sharing one border and radius. Values are family-neutral — wrap ids and counts in mono, leave prose plain. Like every chip, split chips re-skin per scope: `--chip-key-bg: var(--accent)` on a container gives colored keys, `--chip-radius` squares the corners.',
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-wrap items-center gap-3">
+        <Chip split>
+          <Chip.Key>topic</Chip.Key>
+          <Chip.Value>Anatomy</Chip.Value>
+        </Chip>
+        <Chip split>
+          <Chip.Key>cards</Chip.Key>
+          <Chip.Value className="font-mono">128</Chip.Value>
+        </Chip>
+        <Chip split>
+          <Chip.Key>level</Chip.Key>
+          <Chip.Value>beginner</Chip.Value>
+        </Chip>
+      </div>
+      {/* The intended habitat: quiet metadata beside primary content. */}
+      <div className="flex flex-col gap-4">
+        {[
+          { lesson: 'The heart and circulation', cards: '42', quiz: '8' },
+          { lesson: 'Bones of the hand', cards: '27', quiz: '5' },
+        ].map(({ lesson, cards, quiz }) => (
+          <div key={lesson} className="flex flex-wrap items-center gap-3">
+            <span className="text-lg">{lesson}</span>
+            <Chip split>
+              <Chip.Key>cards</Chip.Key>
+              <Chip.Value className="font-mono">{cards}</Chip.Value>
+            </Chip>
+            <Chip split>
+              <Chip.Key>quiz</Chip.Key>
+              <Chip.Value className="font-mono">{quiz}</Chip.Value>
+            </Chip>
+          </div>
+        ))}
+      </div>
+    </div>
+  ),
+};

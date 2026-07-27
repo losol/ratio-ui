@@ -43,12 +43,30 @@ import './Chip.css';
  *
  * ## Composition
  *
- * Chip is a flex row with `gap-1.5`, so any children render side-by-side.
- * Use `<Chip.Dot/>` for the conventional `currentColor` dot, or compose any
- * icon, text, or other element before/after the label.
+ * By default Chip is a padded flex row with `gap-1.5`, so any children
+ * render side-by-side. Use `<Chip.Dot/>` for the conventional
+ * `currentColor` dot, or compose any icon, text, or other element
+ * before/after the label. (In `split` mode the row instead becomes flush,
+ * equal-height segments — see below.)
  *
- * Typography (mono, uppercase, etc.) is intentionally not on Chip — apply
- * it via `className` or wrap the text in a typography primitive.
+ * Typography (mono, uppercase, etc.) is intentionally not on the chip label —
+ * apply it via `className` or wrap the text in a typography primitive (e.g.
+ * `<Text as="span" family="mono">`). The one exception is `<Chip.Key>`,
+ * whose meta voice is intrinsic to the two-tone pattern.
+ *
+ * ## Two-tone (split) chips
+ *
+ * `split` turns the chip into a segmented key/value pill — a darker label
+ * segment and a lighter value segment sharing one border and radius:
+ *
+ * ```tsx
+ * <Chip split><Chip.Key>id</Chip.Key><Chip.Value>3445</Chip.Value></Chip>
+ * ```
+ *
+ * Segment colors read from `--chip-key-bg/-fg` and `--chip-value-bg/-fg`,
+ * so scopes re-skin them like any chip: a colored key is
+ * `--chip-key-bg: var(--accent)` on a wrapper, and square corners are the
+ * usual `--chip-radius` override — no extra variants needed.
  *
  * ```tsx
  * <Chip>v2.4</Chip>                              // default
@@ -77,28 +95,49 @@ export interface ChipProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, '
    * Visual treatment.
    * - `'subtle'` (default) — `--chip-bg` background + border + text
    * - `'outline'` — transparent background, `--chip-border` outline + `--chip-fg` text
+   *
+   * Ignored when `split` is set — the segments paint their own backgrounds
+   * from the `--chip-key-*` / `--chip-value-*` tokens.
    */
   variant?: ChipVariant;
+  /**
+   * Two-tone key/value mode: the chip becomes a segmented pill and its
+   * padding moves into the segments — compose exactly `<Chip.Key>` +
+   * `<Chip.Value>` as children. Segment colors come from the
+   * `--chip-key-*` / `--chip-value-*` tokens, so a scope can re-skin them
+   * (colored keys, square corners) without a component variant.
+   *
+   * ```tsx
+   * <Chip split><Chip.Key>id</Chip.Key><Chip.Value>3445</Chip.Value></Chip>
+   * ```
+   */
+  split?: boolean;
 }
 
 const ChipRoot: React.FC<ChipProps> = ({
   children,
   variant = 'subtle',
+  split = false,
   className,
   ...rest
 }) => (
   <span
     {...rest}
     className={cn(
-      // Layout + typography baseline
-      'inline-flex items-center gap-1.5 px-2.5 py-1 whitespace-nowrap',
+      // Layout + typography baseline. In split mode the segments own the
+      // padding and stretch to equal height; the root just clips them to
+      // the pill radius.
+      split
+        ? 'inline-flex items-stretch overflow-hidden whitespace-nowrap'
+        : 'inline-flex items-center gap-1.5 px-2.5 py-1 whitespace-nowrap',
       'text-xs font-medium leading-none',
       // Themable surface (overridable by any ancestor scope)
       'rounded-[var(--chip-radius,9999px)]',
       'text-(--chip-fg) border border-(--chip-border)',
-      // Subtle has a filled background; outline is transparent
-      variant === 'subtle' && 'bg-(--chip-bg)',
-      variant === 'outline' && 'bg-transparent',
+      // Subtle has a filled background; outline is transparent. Split
+      // segments paint their own backgrounds.
+      !split && variant === 'subtle' && 'bg-(--chip-bg)',
+      (split || variant === 'outline') && 'bg-transparent',
       className,
     )}
   >
@@ -134,4 +173,48 @@ const Dot: React.FC<DotProps> = ({ pulse, className }) => (
 );
 Dot.displayName = 'Chip.Dot';
 
-export const Chip = Object.assign(ChipRoot, { Dot });
+interface SegmentProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+/**
+ * The label segment of a split chip — the "key" in `id: 3445`. Carries the
+ * meta voice (mono, uppercase, tracked) intrinsically: the key is always a
+ * label, so its typography belongs to the pattern. Colors come from
+ * `--chip-key-bg` / `--chip-key-fg`.
+ */
+const Key: React.FC<SegmentProps> = ({ children, className }) => (
+  <span
+    className={cn(
+      'inline-flex items-center px-2.5 py-1.5',
+      'bg-(--chip-key-bg) text-(--chip-key-fg)',
+      'font-mono text-[10.5px] uppercase tracking-widest',
+      className,
+    )}
+  >
+    {children}
+  </span>
+);
+Key.displayName = 'Chip.Key';
+
+/**
+ * The value segment of a split chip. Semibold, but family-neutral — the
+ * value is content, so its typography belongs to the consumer: wrap in
+ * `<Text as="span" family="mono">` for ids and code-ish values, leave
+ * plain for prose. Colors come from `--chip-value-bg` / `--chip-value-fg`.
+ */
+const Value: React.FC<SegmentProps> = ({ children, className }) => (
+  <span
+    className={cn(
+      'inline-flex items-center px-3 py-1.5',
+      'bg-(--chip-value-bg) text-(--chip-value-fg) font-semibold',
+      className,
+    )}
+  >
+    {children}
+  </span>
+);
+Value.displayName = 'Chip.Value';
+
+export const Chip = Object.assign(ChipRoot, { Dot, Key, Value });
