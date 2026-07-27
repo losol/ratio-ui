@@ -1,5 +1,46 @@
 # @eventuras/ratio-ui
 
+## 2.16.0
+
+### Minor Changes
+
+- 1fbf082: Two-tone (split) chips: `<Chip split>` renders a segmented key/value pill —
+  `<Chip.Key>` (darker, meta voice built in) + `<Chip.Value>` (lighter,
+  semibold, family-neutral) sharing one border and radius. Segment colors read
+  from new `--chip-key-bg/-fg` and `--chip-value-bg/-fg` tokens, so scopes
+  re-skin them like any chip (colored keys, square corners) without extra
+  variants.
+- 477960f: Make `Footer` composable with a set of building blocks.
+
+  New compound subcomponents let you assemble editorial or compact footers from
+  parts instead of hand-writing markup:
+
+  - `Footer.Brand` — logo + wordmark + a serif mission line
+  - `Footer.LinkColumn` + `Footer.Link` — titled link stacks; a link can carry a
+    `tag` badge or an `external` arrow, and takes an `as` prop for router links
+  - `Footer.Publisher` — the imprint block (reuses the `Publisher` shape)
+  - `Footer.Newsletter` — frames a label/hint around your own signup form
+  - `Footer.Social` + `Footer.Social.Item` — a row of round icon links
+  - `Footer.BottomBar` — the thin copyright/legal row, with an optional top rule
+
+  Everything is token-driven; a `dark` footer now re-scopes the text and border
+  tokens so blocks stay legible on the deep surface without hardcoded colours.
+  `Footer` and `Footer.Classic` are unchanged, so existing footers keep working.
+
+- 442bbc7: Two small primitives for editorial outlines (className-free consumers):
+
+  - `Text` gains `family` (`'sans' | 'serif' | 'mono'`, from the theme's font
+    tokens) and `transform` (`'none' | 'uppercase'` — uppercase bundles a modest
+    letter-spacing). Together with `size="xs"` + `variant="subtle"` this is the
+    small meta/caption voice (type labels, counts) previously only reachable via
+    className. Text prop types are now exported from `core/Text`.
+  - `Stack` gains `rail` — a `--border-1` hairline down the left edge with a
+    matching inset, marking children as one level deeper in a hierarchy
+    (outlines, threads, tree levels). Vertical stacks only.
+  - `Stack` `align` accepts `'baseline'` — for horizontal stacks pairing text at
+    different sizes (a title and its caption), so baselines line up instead of
+    boxes.
+
 ## 2.15.0
 
 ### Minor Changes
