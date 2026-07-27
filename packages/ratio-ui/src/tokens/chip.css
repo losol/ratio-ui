@@ -20,6 +20,14 @@
   --chip-border: var(--border-1);
   --chip-on-solid: var(--color-neutral-50);
   --chip-radius: 9999px;
+
+  /* Two-tone (split) chips — the key segment sits a step darker than the
+     value segment, so the value reads as the payload. Override per-scope
+     for colored keys (e.g. `--chip-key-bg: var(--accent)`). */
+  --chip-key-bg: var(--color-secondary-300);
+  --chip-key-fg: var(--text-muted);
+  --chip-value-bg: var(--color-secondary-50);
+  --chip-value-fg: var(--text);
 }
 
 :root[data-theme="dark"],
@@ -27,4 +35,11 @@
   --chip-bg: rgba(255, 255, 255, 0.06);
   --chip-fg: var(--text-muted);
   --chip-border: var(--border-1);
+
+  /* Linseed-ramp steps between --card and --border-2 (from the two-tone
+     chip sketch): key recedes toward the card, value lifts toward text. */
+  --chip-key-bg: oklch(0.265 0.04 230);
+  --chip-key-fg: var(--text-muted);
+  --chip-value-bg: oklch(0.355 0.055 224);
+  --chip-value-fg: var(--text);
 }
