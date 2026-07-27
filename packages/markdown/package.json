@@ -63,7 +63,7 @@
     "jsdom": "29.1.1",
     "tslib": "2.8.1",
     "typescript": "6.0.3",
-    "vite": "8.1.4",
+    "vite": "8.1.5",
     "vitest": "4.1.10"
   },
   "peerDependencies": {
