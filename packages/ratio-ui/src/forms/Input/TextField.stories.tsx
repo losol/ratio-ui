@@ -45,7 +45,7 @@ export const WithError: Story = {
     name: 'email',
     label: 'Email Address',
     placeholder: 'Enter your email',
-    errors: { email: 'Invalid email address' },
+    errors: { email: { message: 'Invalid email address' } },
   },
 };
 

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import React, {
-  forwardRef,
   InputHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
@@ -26,13 +25,17 @@ interface ExtendedInputProps extends InputFieldProps {
    * @beta Experimental — renders the beta `CopyButton`; behaviour may change.
    */
   showCopyToClipboard?: boolean;
+  /**
+   * Ref to the underlying `<input>`/`<textarea>`. Must stay a plain prop:
+   * `forwardRef`'s `PropsWithoutRef` collapses named props into the index
+   * signature `InputProps` still carries, degrading every prop to `any`.
+   */
+  ref?: React.Ref<HTMLElement>;
 }
 
 type CommonProps = InputHTMLAttributes<HTMLInputElement> &
   TextareaHTMLAttributes<HTMLTextAreaElement> & {
-    'aria-invalid'?: boolean;
     'data-testid'?: string;
-    [key: string]: any;
   };
 
 /**
@@ -58,114 +61,110 @@ type CommonProps = InputHTMLAttributes<HTMLInputElement> &
  * />
  * ```
  */
-export const TextField = forwardRef<HTMLElement, ExtendedInputProps>(
-  (
-    {
-      name,
-      type = 'text',
-      placeholder,
-      label,
-      description,
-      className,
-      errors,
-      disabled,
-      multiline = false,
-      rows,
-      cols,
-      noMargin = false,
-      noWrapper = false,
-      showCopyToClipboard = false,
-      testId,
-      ...rest
-    },
-    forwardedRef
-  ) => {
-    const hasError = errors?.[name];
+export function TextField({
+  name,
+  type = 'text',
+  placeholder,
+  label,
+  description,
+  className,
+  errors,
+  disabled,
+  multiline = false,
+  rows,
+  cols,
+  noMargin = false,
+  noWrapper = false,
+  showCopyToClipboard = false,
+  testId,
+  ref: forwardedRef,
+  ...rest
+}: ExtendedInputProps) {
+  const hasError = errors?.[name];
 
-    let inputClassName = `${className ?? formStyles.defaultInputStyle} ${
-      hasError ? formStyles.inputErrorGlow : ''
-    } ${disabled ? 'cursor-not-allowed' : ''} ${
-      showCopyToClipboard ? 'pr-10' : ''
-    }`;
+  let inputClassName = `${className ?? formStyles.defaultInputStyle} ${
+    hasError ? formStyles.inputErrorGlow : ''
+  } ${disabled ? 'cursor-not-allowed' : ''} ${
+    showCopyToClipboard ? 'pr-10' : ''
+  }`;
 
-    if (multiline) {
-      inputClassName = `${inputClassName} ${formStyles.textarea}`;
-    }
-
-    const id = rest.id ?? name;
-
-    const assignRef = (
-      element: HTMLInputElement | HTMLTextAreaElement | null
-    ) => {
-      if (typeof forwardedRef === 'function') {
-        forwardedRef(element);
-      } else if (forwardedRef && 'current' in forwardedRef) {
-        (forwardedRef as React.MutableRefObject<
-          HTMLInputElement | HTMLTextAreaElement | null
-        >).current = element;
-      }
-    };
-
-    const commonProps: CommonProps = {
-      id,
-      className: inputClassName,
-      placeholder,
-      disabled,
-      'aria-invalid': hasError ? true : undefined,
-      'data-testid': testId,
-      name,
-      ...rest,
-    };
-
-    const inputElement = multiline ? (
-      <textarea
-        ref={assignRef as React.Ref<HTMLTextAreaElement>}
-        rows={rows ?? 3}
-        {...commonProps}
-      />
-    ) : (
-      <input
-        ref={assignRef as React.Ref<HTMLInputElement>}
-        type={type}
-        {...commonProps}
-      />
-    );
-
-    const copyValue = rest.value ?? rest.defaultValue ?? '';
-    const fieldControl = showCopyToClipboard ? (
-      <div className="relative">
-        {inputElement}
-        <span
-          className={`absolute right-1 ${
-            multiline ? 'top-1' : 'inset-y-0 flex items-center'
-          }`}
-        >
-          <CopyButton
-            value={String(copyValue)}
-            size="sm"
-            ariaLabel={label ? `Copy ${label}` : 'Copy to clipboard'}
-          />
-        </span>
-      </div>
-    ) : (
-      inputElement
-    );
-
-    const content = (
-      <>
-        {label && <Label htmlFor={id}>{label}</Label>}
-        {description && <InputDescription>{description}</InputDescription>}
-        {fieldControl}
-        {hasError && <InputError errors={errors} name={name} />}
-      </>
-    );
-
-    if (noWrapper) {
-      return content;
-    }
-
-    return <div className={formStyles.inputWrapper}>{content}</div>;
+  if (multiline) {
+    inputClassName = `${inputClassName} ${formStyles.textarea}`;
   }
-);
+
+  const id = rest.id ?? name;
+
+  const assignRef = (
+    element: HTMLInputElement | HTMLTextAreaElement | null
+  ) => {
+    if (typeof forwardedRef === 'function') {
+      forwardedRef(element);
+    } else if (forwardedRef && 'current' in forwardedRef) {
+      (forwardedRef as React.RefObject<
+        HTMLInputElement | HTMLTextAreaElement | null
+      >).current = element;
+    }
+  };
+
+  const commonProps: CommonProps = {
+    id,
+    className: inputClassName,
+    placeholder,
+    disabled,
+    'aria-invalid': hasError ? true : undefined,
+    'data-testid': testId,
+    name,
+    ...rest,
+  };
+
+  const inputElement = multiline ? (
+    <textarea
+      ref={assignRef as React.Ref<HTMLTextAreaElement>}
+      rows={rows ?? 3}
+      {...commonProps}
+    />
+  ) : (
+    <input
+      ref={assignRef as React.Ref<HTMLInputElement>}
+      type={type}
+      {...commonProps}
+    />
+  );
+
+  const copyValue = rest.value ?? rest.defaultValue ?? '';
+  const fieldControl = showCopyToClipboard ? (
+    <div className="relative">
+      {inputElement}
+      <span
+        className={`absolute right-1 ${
+          multiline ? 'top-1' : 'inset-y-0 flex items-center'
+        }`}
+      >
+        <CopyButton
+          value={String(copyValue)}
+          size="sm"
+          ariaLabel={label ? `Copy ${label}` : 'Copy to clipboard'}
+        />
+      </span>
+    </div>
+  ) : (
+    inputElement
+  );
+
+  const content = (
+    <>
+      {label && <Label htmlFor={id}>{label}</Label>}
+      {description && <InputDescription>{description}</InputDescription>}
+      {fieldControl}
+      {hasError && <InputError errors={errors} name={name} />}
+    </>
+  );
+
+  if (noWrapper) {
+    return content;
+  }
+
+  return <div className={formStyles.inputWrapper}>{content}</div>;
+}
 
 TextField.displayName = 'TextField';
