@@ -1,5 +1,5 @@
 {
-  "extends": "@ratio-ui/typescript-config/react-library.json",
+  "extends": "@eventuras/typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",

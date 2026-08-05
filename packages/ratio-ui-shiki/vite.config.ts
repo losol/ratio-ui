@@ -1,4 +1,4 @@
-import { defineReactLibConfig } from '@ratio-ui/vite-config/react-lib';
+import { defineReactLibConfig } from '@eventuras/vite-config/react-lib';
 
 // Prepended to every emitted bundle (see packages/ratio-ui/vite.config.ts).
 const banner =

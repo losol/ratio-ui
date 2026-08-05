@@ -55,5 +55,5 @@ pnpm --filter @eventuras/ratio-ui-next build
 pnpm --filter @eventuras/ratio-ui-next lint
 ```
 
-The package build is handled by the shared `@ratio-ui/vite-config` library
+The package build is handled by the shared `@eventuras/vite-config` library
 preset.
