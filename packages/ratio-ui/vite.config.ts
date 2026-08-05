@@ -1,4 +1,4 @@
-import { defineReactLibConfig } from '@ratio-ui/vite-config/react-lib';
+import { defineReactLibConfig } from '@eventuras/vite-config/react-lib';
 
 // Prepended to every emitted bundle. The slogan + repo URL live here (in the
 // published output where consumers see them), so source files stay minimal.

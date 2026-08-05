@@ -1,6 +1,5 @@
 packages:
   - packages/*
-  - config/*
   - '!**/dist'
   - '!**/node_modules'
 
@@ -19,6 +18,8 @@ minimumReleaseAge: 14400
 minimumReleaseAgeExclude:
   - 'storybook'
   - '@storybook/*'
+  - '@eventuras/vite-config@0.3.1'
+  - '@eventuras/eslint-config@1.0.4'
 minimumReleaseAgeStrict: false
 
 peerDependencyRules:

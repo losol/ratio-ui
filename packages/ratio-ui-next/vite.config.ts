@@ -1,4 +1,4 @@
-import { defineNextLibConfig } from '@ratio-ui/vite-config/next-lib';
+import { defineNextLibConfig } from '@eventuras/vite-config/next-lib';
 import { resolve } from 'node:path';
 
 // Prepended to every emitted bundle (see packages/ratio-ui/vite.config.ts).

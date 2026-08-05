@@ -1,8 +1,9 @@
 # ratio-ui
 
 Ratio UI is a React component library and design system for knowledge sharing.
-It contains reusable UI components, design tokens, Storybook documentation, and
-the small build/config packages used to ship them.
+It contains reusable UI components, design tokens, and Storybook documentation.
+Build and lint configs come from the shared `@eventuras/*` config packages
+maintained in [origo](https://github.com/losol/origo).
 
 ## Packages
 
@@ -10,9 +11,6 @@ the small build/config packages used to ship them.
 | ----------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------- |
 | `@eventuras/ratio-ui`         | [`packages/ratio-ui`](packages/ratio-ui)               | Core React components, layout primitives, forms, design tokens, CSS, and Storybook. |
 | `@eventuras/ratio-ui-next`    | [`packages/ratio-ui-next`](packages/ratio-ui-next)     | Next.js wrappers for Ratio UI `Image` and `Link`.                                   |
-| `@ratio-ui/eslint-config`     | [`config/eslint-config`](config/eslint-config)         | Shared ESLint presets and local rules.                                              |
-| `@ratio-ui/typescript-config` | [`config/typescript-config`](config/typescript-config) | Shared TypeScript config presets.                                                   |
-| `@ratio-ui/vite-config`       | [`config/vite-config`](config/vite-config)             | Shared Vite library build presets.                                                  |
 
 ## Requirements
 

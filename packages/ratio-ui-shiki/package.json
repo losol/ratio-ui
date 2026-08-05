@@ -54,12 +54,12 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@eventuras/eslint-config": "^1.0.4",
     "@eventuras/ratio-ui": "workspace:*",
+    "@eventuras/typescript-config": "^1.0.0",
+    "@eventuras/vite-config": "^0.3.1",
     "@shikijs/langs": "^4.3.1",
     "@shikijs/themes": "^4.3.1",
-    "@ratio-ui/eslint-config": "workspace:*",
-    "@ratio-ui/typescript-config": "workspace:*",
-    "@ratio-ui/vite-config": "workspace:*",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.17",
