@@ -12,8 +12,11 @@ pnpm add @eventuras/markdown @eventuras/ratio-ui
 Install the peer dependencies it expects:
 
 ```bash
-pnpm add react react-dom react-markdown remark-gfm rehype-raw rehype-sanitize
+pnpm add react react-dom react-markdown remark-gfm rehype-sanitize
 ```
+
+Raw HTML is opt-in and needs one more package — see
+[Raw HTML](#raw-html-opt-in).
 
 ## Usage
 
@@ -52,12 +55,34 @@ The `codeBlock` component receives `{ code, language }` plus the chrome flags
 the built-in rendering uses (see `MarkdownCodeBlockProps`), so any
 CodeBlock-compatible component slots in and matches the default appearance.
 
+## Raw HTML (opt-in)
+
+Raw HTML in markdown is inert by default. Parsing it needs `rehype-raw`, which
+is ~50 kB gzipped — more than half the parser's total weight — so it is not a
+dependency of this package. Content that needs it installs it and passes it in:
+
+```bash
+pnpm add rehype-raw
+```
+
+```tsx
+import rehypeRaw from 'rehype-raw';
+
+<MarkdownContent markdown={legacyHtml} rehypePlugins={[rehypeRaw]} />
+```
+
+`rehypePlugins` is a general seam, not a raw-HTML flag — any rehype plugin
+works. Plugins run *before* sanitization, which always runs last and cannot be
+replaced, so markup a plugin introduces is still filtered by the schema. If a
+plugin needs tags or attributes the default schema drops, widen it with
+`sanitizeSchemaExtension`.
+
 ## Security Features
 
 By default, the component:
 
 - Strips invisible characters and control characters
-- Blocks raw HTML (unless `enableRawHtml={true}`)
+- Blocks raw HTML (unless you opt in — see [Raw HTML](#raw-html-opt-in))
 - **Blocks external URLs** in links and images (only relative URLs like `/events` are allowed)
 - Blocks `javascript:` URLs
 - Blocks `data:` URLs in links, but allows them for images — matching GitHub's
@@ -81,6 +106,8 @@ Without this prop, external links will be rendered as plain text.
 - `markdown?: string | null` - The markdown content to render
 - `heading?: string` - Optional heading to display above the content
 - `keepInvisibleCharacters?: boolean` - Keep invisible/control characters (default: `false`)
-- `enableRawHtml?: boolean` - Allow raw HTML in markdown (unsafe, default: `false`)
 - `allowExternalLinks?: boolean` - Allow external/absolute URLs in links and images (default: `false`)
+- `remarkPlugins?: any[]` - Additional remark plugins, run after `remark-gfm`
+- `rehypePlugins?: any[]` - Additional rehype plugins, run before sanitization; pass `rehype-raw` here to allow raw HTML
+- `sanitizeSchemaExtension?: SanitizeSchemaExtension` - Extra tags/attributes to allow through sanitization
 - `codeBlock?: ComponentType<MarkdownCodeBlockProps>` - Component rendering fenced code blocks, e.g. `@eventuras/ratio-ui-shiki`'s CodeBlock for syntax highlighting (default: un-highlighted Ratio UI `CodeBlock`)

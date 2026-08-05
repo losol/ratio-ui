@@ -6,7 +6,6 @@ export default defineReactLibConfig({
   external: [
     'react-markdown',
     'remark-gfm',
-    'rehype-raw',
     'rehype-sanitize',
     '@eventuras/ratio-ui',
     // for deep imports..:
