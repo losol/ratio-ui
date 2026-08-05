@@ -3,6 +3,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import rehypeRaw from 'rehype-raw';
 // mock ratio-ui primitives to avoid style deps
 vi.mock('@eventuras/ratio-ui/core/Heading', () => ({
   Heading: (p: any) => <h2 {...p} />,
@@ -54,16 +55,29 @@ describe('MarkdownContent', () => {
     expect(screen.getByText('Start')).toBeInTheDocument()
   })
 
-  // blocks raw HTML by default
-  it('blocks raw HTML when enableRawHtml = false (default)', () => {
+  // blocks raw HTML by default — rehype-raw is not installed unless asked for
+  it('blocks raw HTML by default', () => {
     render(<MarkdownContent markdown={'<div data-x="1">XSS</div>'} />)
     expect(screen.queryByText('XSS')).not.toBeInTheDocument()
   })
 
-  // permits raw HTML only when explicitly enabled
-  it('can allow raw HTML when enableRawHtml = true', () => {
-    render(<MarkdownContent markdown={'<div>X</div>'} enableRawHtml={true}/>)
+  // permits raw HTML only when the consumer supplies rehype-raw
+  it('renders raw HTML when rehype-raw is passed via rehypePlugins', () => {
+    render(<MarkdownContent markdown={'<div>X</div>'} rehypePlugins={[rehypeRaw]} />)
     expect(screen.getByText('X')).toBeInTheDocument()
+  })
+
+  // sanitization runs after consumer plugins, so raw HTML is still filtered
+  it('sanitizes markup introduced by rehypePlugins', () => {
+    const { container } = render(
+      <MarkdownContent
+        markdown={'<div onclick="alert(1)">X</div><script>alert(2)</script>'}
+        rehypePlugins={[rehypeRaw]}
+      />
+    )
+    expect(screen.getByText('X')).toBeInTheDocument()
+    expect(container.querySelector('[onclick]')).toBeNull()
+    expect(container.querySelector('script')).toBeNull()
   })
 
   // blocks external links by default

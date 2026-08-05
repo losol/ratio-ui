@@ -1,9 +1,8 @@
 import type React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
-import type { Components } from 'react-markdown';
+import type { Components, Options } from 'react-markdown';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { Text } from '@eventuras/ratio-ui/core/Text';
 import { Link } from '@eventuras/ratio-ui/core/Link';
@@ -52,13 +51,20 @@ export type MarkdownCodeBlockProps = {
 export type MarkdownComponents = Partial<Components> &
   Record<string, React.ComponentType<any>>;
 
+/**
+ * Plugin list accepted by `remarkPlugins` and `rehypePlugins` — structurally
+ * unified's `PluggableList`, derived from react-markdown's own `Options` so it
+ * cannot drift from what the renderer accepts. Aliased here for the same
+ * reason as `MarkdownComponents`: consumers import it from this package rather
+ * than reaching into react-markdown or unified directly.
+ */
+export type MarkdownPluginList = NonNullable<Options['remarkPlugins']>;
+
 export type MarkdownContentProps = {
   markdown?: string | null;
   heading?: string;
   /** Keep invisible/control characters instead of stripping them. Default: false */
   keepInvisibleCharacters?: boolean;
-  /** Allow raw HTML in markdown (unsafe). Default: false */
-  enableRawHtml?: boolean;
   /** Allow external/absolute URLs in links and images. Default: false (only relative URLs allowed) */
   allowExternalLinks?: boolean;
   /** Strip HTML tags from input before processing. Useful for legacy content with HTML-wrapped markdown. Default: false */
@@ -67,7 +73,24 @@ export type MarkdownContentProps = {
    *  Accepts standard HTML tag overrides and custom element names from remark plugins. */
   customComponents?: MarkdownComponents;
   /** Additional remark plugins to run (after remark-gfm) */
-  remarkPlugins?: any[];
+  remarkPlugins?: MarkdownPluginList;
+  /**
+   * Additional rehype plugins. They run *before* sanitization — which always
+   * runs last and cannot be replaced — so markup a plugin introduces is still
+   * filtered by the sanitize schema (extend it via `sanitizeSchemaExtension`
+   * if a plugin needs tags the default schema drops).
+   *
+   * This is the seam for raw HTML. `rehype-raw` is not a dependency of this
+   * package — it is ~50 kB gzipped, more than half the parser's total weight,
+   * for a feature most content doesn't use — so install it yourself and pass
+   * it in:
+   *
+   * ```tsx
+   * import rehypeRaw from 'rehype-raw';
+   * <MarkdownContent markdown={md} rehypePlugins={[rehypeRaw]} />
+   * ```
+   */
+  rehypePlugins?: MarkdownPluginList;
   /** Extend the sanitize schema to allow custom elements/attributes from plugins */
   sanitizeSchemaExtension?: SanitizeSchemaExtension;
   /**
@@ -90,11 +113,11 @@ export const MarkdownContent = ({
   markdown,
   heading,
   keepInvisibleCharacters = false,
-  enableRawHtml = false,
   allowExternalLinks = false,
   stripHtmlTags = false,
   customComponents,
   remarkPlugins: extraRemarkPlugins,
+  rehypePlugins: extraRehypePlugins,
   sanitizeSchemaExtension,
   codeBlock,
 }: MarkdownContentProps) => {
@@ -145,9 +168,11 @@ export const MarkdownContent = ({
       }
     : defaultSchema;
 
-  // Create rehype plugins list
-  const rehypePlugins: any[] = [
-    ...(enableRawHtml ? [rehypeRaw] : []),
+  // Sanitization runs last, always. Consumer plugins go first so anything they
+  // introduce — raw HTML via rehype-raw, custom elements — still has to pass
+  // the schema on the way out.
+  const rehypePlugins: MarkdownPluginList = [
+    ...(extraRehypePlugins ?? []),
     [rehypeSanitize, sanitizeSchema],
   ];
 
