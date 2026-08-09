@@ -4,8 +4,10 @@
 
 import React from 'react';
 
+import type { FieldErrorMap } from '../Input/InputProps';
+
 type ErrorProps = {
-  errors?: { [key: string]: { message: string } | undefined };
+  errors?: FieldErrorMap;
   name: string;
   className?: string;
 };

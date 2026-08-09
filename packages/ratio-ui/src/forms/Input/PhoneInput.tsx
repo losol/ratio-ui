@@ -18,6 +18,7 @@ import { formStyles, textStyles, componentStyles } from '../styles/formStyles';
 import { Label } from '../common/Label';
 import { InputDescription } from '../common/InputDescription';
 import { InputError } from '../common/InputError';
+import type { FieldErrorMap } from './InputProps';
 import { COUNTRY_CODES } from './PhoneInputCountryCodes';
 
 /** See PhoneInputProps.countries */
@@ -55,7 +56,7 @@ export interface PhoneInputProps {
   /** Full international phone number (controlled) */
   value?: string;
   /** Field errors map */
-  errors?: Record<string, { message: string } | undefined>;
+  errors?: FieldErrorMap;
   /** Disable inputs */
   disabled?: boolean;
   /** Change callback with parsed parts */

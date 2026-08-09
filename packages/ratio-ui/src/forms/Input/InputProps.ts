@@ -36,6 +36,21 @@ export type ValidInputTypes =
 export type InputLikeElement = HTMLInputElement | HTMLTextAreaElement;
 
 /**
+ * Field errors keyed by input name.
+ *
+ * Structural on purpose rather than importing react-hook-form's `FieldErrors`
+ * — a design system must not depend on a form library. It is also loose on
+ * purpose: in RHF a `FieldError.message` is *optional*, fields without an
+ * error are absent or `undefined`, and nested or array fields produce objects
+ * carrying no `message` at all. Anything narrower rejects `formState.errors`
+ * straight out of `useForm()`, which is how consumers actually write it.
+ *
+ * `InputProps.types.test.ts` asserts that against the real RHF types, so this
+ * compatibility cannot silently drift again.
+ */
+export type FieldErrorMap = Record<string, { message?: string } | undefined>;
+
+/**
  * Base props for primitive inputs. Instantiated with `InputLikeElement` so
  * event handlers accept events from either element `TextField` may render.
  */
@@ -54,8 +69,8 @@ export interface InputProps extends InputHTMLAttributes<InputLikeElement> {
 export interface InputFieldProps extends InputProps {
   label?: string;
   description?: string;
-  /** Keyed by input name (react-hook-form compatible). */
-  errors?: { [key: string]: { message: string } };
+  /** Keyed by input name. Takes `formState.errors` from react-hook-form as-is. */
+  errors?: FieldErrorMap;
   noMargin?: boolean;
   noWrapper?: boolean;
 }
