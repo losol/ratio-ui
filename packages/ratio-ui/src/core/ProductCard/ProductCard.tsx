@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Card, CardProps } from '../Card/Card';
-import { Button } from '../Button/Button';
+import { Button } from '../Button';
 import { Link } from '../Link/Link';
 
 export interface ProductCardProps extends Omit<CardProps, 'children'> {

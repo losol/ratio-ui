@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Navbar } from './Navbar';
+import { Navbar } from '.';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { Menu } from '../Menu';

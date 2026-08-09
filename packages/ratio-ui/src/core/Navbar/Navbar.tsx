@@ -143,7 +143,7 @@ export interface NavbarActionsProps {
   className?: string;
 }
 
-function NavbarBrand({ children, className }: Readonly<NavbarBrandProps>) {
+export function NavbarBrand({ children, className }: Readonly<NavbarBrandProps>) {
   return (
     <div className={cn('flex shrink-0 items-center text-(--text)', className)}>
       {children}
@@ -151,7 +151,7 @@ function NavbarBrand({ children, className }: Readonly<NavbarBrandProps>) {
   );
 }
 
-function NavbarContent({ children, className }: Readonly<NavbarContentProps>) {
+export function NavbarContent({ children, className }: Readonly<NavbarContentProps>) {
   return (
     <div className={cn('flex grow items-center gap-3 text-(--text)', className)}>
       {children}
@@ -164,7 +164,7 @@ function NavbarContent({ children, className }: Readonly<NavbarContentProps>) {
  * comfortable width. A slot on purpose: `SearchField` lives in `forms/`,
  * which `core/` can't depend on, so you drop it in from the call site.
  */
-function NavbarSearch({ children, className }: Readonly<NavbarSearchProps>) {
+export function NavbarSearch({ children, className }: Readonly<NavbarSearchProps>) {
   return (
     <div className={cn('flex min-w-0 grow items-center', className)}>
       <div className="w-full max-w-100">{children}</div>
@@ -173,7 +173,7 @@ function NavbarSearch({ children, className }: Readonly<NavbarSearchProps>) {
 }
 
 /** Horizontal pill links — pair with {@link NavbarLink}. */
-function NavbarLinks({ children, className }: Readonly<NavbarLinksProps>) {
+export function NavbarLinks({ children, className }: Readonly<NavbarLinksProps>) {
   return (
     <ul className={cn('flex list-none items-center gap-1 p-0 m-0', className)}>
       {children}
@@ -181,7 +181,7 @@ function NavbarLinks({ children, className }: Readonly<NavbarLinksProps>) {
   );
 }
 
-function NavbarLink({
+export function NavbarLink({
   href,
   icon,
   isCurrent,
@@ -216,14 +216,14 @@ function NavbarLink({
 }
 
 /** Right-hand cluster — bell, theme toggle, user menu. */
-function NavbarActions({ children, className }: Readonly<NavbarActionsProps>) {
+export function NavbarActions({ children, className }: Readonly<NavbarActionsProps>) {
   return (
     <div className={cn('flex shrink-0 items-center gap-2', className)}>{children}</div>
   );
 }
 
 /** Flexible gap — pushes whatever follows to the right edge. */
-function NavbarSpacer({ className }: Readonly<{ className?: string }>) {
+export function NavbarSpacer({ className }: Readonly<{ className?: string }>) {
   return <div aria-hidden className={cn('grow', className)} />;
 }
 
@@ -234,7 +234,7 @@ function NavbarSpacer({ className }: Readonly<{ className?: string }>) {
  * `md:hidden`. Several pairs can coexist (`controls="search"` etc.) — one
  * panel open at a time.
  */
-function NavbarToggle({
+export function NavbarToggle({
   controls = 'menu',
   ariaLabel = 'Menu',
   children,
@@ -267,7 +267,7 @@ function NavbarToggle({
  * The disclosure panel that folds out under the bar — search, vertical nav,
  * actions. Paired with {@link NavbarToggle} via `id`; typically `md:hidden`.
  */
-function NavbarCollapse({ id = 'menu', children, className }: Readonly<NavbarCollapseProps>) {
+export function NavbarCollapse({ id = 'menu', children, className }: Readonly<NavbarCollapseProps>) {
   const ctx = useContext(NavbarDisclosureContext);
   if (ctx?.openPanel !== id) return null;
   return (
@@ -290,7 +290,7 @@ const ROW_VARIANT_CLASSES: Record<NavbarRowVariant, string> = {
  * separated by background tone, never borders. Without `variant` you get a
  * plain flex row.
  */
-function NavbarRow({ children, variant, className }: Readonly<NavbarRowProps>) {
+export function NavbarRow({ children, variant, className }: Readonly<NavbarRowProps>) {
   return (
     <div
       className={cn(
@@ -303,7 +303,7 @@ function NavbarRow({ children, variant, className }: Readonly<NavbarRowProps>) {
   );
 }
 
-const NavbarRoot = ({
+export const NavbarRoot = ({
   children,
   bgColor,
   sticky = false,
@@ -385,32 +385,3 @@ const NavbarRoot = ({
     </nav>
   );
 };
-
-/**
- * Navbar — the app/site header, composed from parts:
- *
- * ```tsx
- * <Navbar sticky elevated fluid>
- *   <Navbar.Brand>…logo…</Navbar.Brand>
- *   <Navbar.Search><SearchField size="sm" … /></Navbar.Search>
- *   <Navbar.Links>
- *     <Navbar.Link href="/" isCurrent>Dashboard</Navbar.Link>
- *     <Navbar.Link href="/resources">Resources</Navbar.Link>
- *   </Navbar.Links>
- *   <Navbar.Spacer />
- *   <Navbar.Actions>…bell, user menu…</Navbar.Actions>
- * </Navbar>
- * ```
- */
-export const Navbar = Object.assign(NavbarRoot, {
-  Row: NavbarRow,
-  Toggle: NavbarToggle,
-  Collapse: NavbarCollapse,
-  Brand: NavbarBrand,
-  Content: NavbarContent,
-  Search: NavbarSearch,
-  Links: NavbarLinks,
-  Link: NavbarLink,
-  Actions: NavbarActions,
-  Spacer: NavbarSpacer,
-});

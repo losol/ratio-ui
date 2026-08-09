@@ -112,7 +112,7 @@ export interface ButtonAvatarProps extends Omit<AvatarProps, 'size'> {
  * eats the button's left padding), so the button keeps its token-driven chrome
  * instead of a hand-copied class string.
  */
-function ButtonAvatar({ size, className, ...rest }: ButtonAvatarProps) {
+export function ButtonAvatar({ size, className, ...rest }: ButtonAvatarProps) {
   const btnSize = useContext(ButtonSizeContext);
   const preset = AVATAR_PILL[btnSize];
   return (
@@ -138,7 +138,7 @@ export interface ButtonLabelProps extends React.HTMLAttributes<HTMLSpanElement> 
  * the flex `min-w-0` footgun so a long name ellipsizes instead of blowing the
  * pill out: `<Button><Button.Avatar …/><Button.Label maxWidth="20ch">{name}</Button.Label></Button>`.
  */
-function ButtonLabel({ maxWidth, className, style, children, ...rest }: ButtonLabelProps) {
+export function ButtonLabel({ maxWidth, className, style, children, ...rest }: ButtonLabelProps) {
   return (
     <span
       className={cn('min-w-0 truncate', className)}
@@ -162,7 +162,7 @@ ButtonLabel.displayName = 'Button.Label';
  *
  * Compound: `Button.Avatar` renders a flush leading avatar for trigger pills.
  */
-const ButtonRoot = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+export const ButtonRoot = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     variant = 'primary',
     size = 'md',
@@ -263,4 +263,3 @@ const ButtonRoot = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 
 ButtonRoot.displayName = 'Button';
 
-export const Button = Object.assign(ButtonRoot, { Avatar: ButtonAvatar, Label: ButtonLabel });

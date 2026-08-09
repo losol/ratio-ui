@@ -8,7 +8,7 @@ import { Footer } from '../../core/Footer/Footer';
 import { Heading } from '../../core/Heading';
 import { ValueTile } from '../../core/ValueTile';
 import { List } from '../../core/List/List';
-import { Navbar } from '../../core/Navbar/Navbar';
+import { Navbar } from '../../core/Navbar';
 import { Container } from '../../layout/Container';
 import { Section } from '../../layout/Section/Section';
 
