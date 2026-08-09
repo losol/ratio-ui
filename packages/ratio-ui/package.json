@@ -97,8 +97,9 @@
     "src/fonts.css"
   ],
   "scripts": {
-    "build": "tsc && vite build",
-    "lint": "eslint ."
+    "build": "tsc && vite build && node scripts/check-client-statics.mjs",
+    "lint": "eslint .",
+    "check:client-statics": "node scripts/check-client-statics.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

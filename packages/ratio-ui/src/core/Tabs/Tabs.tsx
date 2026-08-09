@@ -66,7 +66,7 @@ function collectItems(children: React.ReactNode): ReactElement<TabItemProps>[] {
  * fine); selection is controllable via `selectedKey` / `onSelectionChange` or
  * uncontrolled via `defaultSelectedKey`.
  */
-export const Tabs: TabsComponent = ({
+export const TabsRoot: React.FC<TabsProps> = ({
   children,
   defaultSelectedKey,
   selectedKey,
@@ -125,5 +125,4 @@ export const Tabs: TabsComponent = ({
   );
 };
 
-const TabItem: React.FC<TabItemProps> = ({ children }) => <>{children}</>;
-Tabs.Item = TabItem;
+export const TabItem: React.FC<TabItemProps> = ({ children }) => <>{children}</>;

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button } from '../core/Button/Button';
+import { Button } from '../core/Button';
 import { Stack } from '../layout/Stack/Stack';
 
 import { ToastRenderer } from './ToastRenderer';
