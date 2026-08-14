@@ -53,6 +53,7 @@ export {
   Database,
   ShieldCheck,
   ScrollText,
+  Settings,
   LogOut,
 
   // Knowledge domains
