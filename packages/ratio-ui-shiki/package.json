@@ -64,7 +64,7 @@
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "jsdom": "29.1.1",
+    "jsdom": "30.0.1",
     "shiki": "^4.4.1",
     "typescript": "6.0.3",
     "vite": "8.2.0",
