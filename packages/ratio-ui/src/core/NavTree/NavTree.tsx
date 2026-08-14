@@ -24,7 +24,11 @@ export interface NavTreeLinkItem extends NavTreeItemBase {
    * name.
    */
   title: React.ReactNode;
-  /** Destination. Omit on a branch to make the whole row a collapse toggle. */
+  /**
+   * Destination. Omit on a branch to make the whole row a collapse toggle, and
+   * on a leaf for a plain row with nothing to click — an empty state, or a
+   * grouping that exists only to hold its children.
+   */
   href?: string;
   /** Optional leading icon — pass a sized element, e.g. `<Database size={18} />`. */
   icon?: React.ReactNode;
@@ -192,21 +196,34 @@ export function NavTree({
         <ul className="m-0 flex list-none items-center gap-6 border-b border-border-1 p-0">
           {flat.map((node, i) => {
             const active = isActive(node.href, currentPath) || hasActiveChild(node, currentPath);
+            const tabClass = cn(HTAB, active ? HTAB_ACTIVE : HTAB_IDLE);
+            const inner = (
+              <>
+                {node.icon && (
+                  <span aria-hidden className="shrink-0">
+                    {node.icon}
+                  </span>
+                )}
+                {node.title}
+                {node.trailing && <span className="shrink-0">{node.trailing}</span>}
+              </>
+            );
             return (
               <li key={nodeKey(node, i)} className="list-none">
-                <LinkTag
-                  href={node.href ?? '#'}
-                  aria-current={active ? 'page' : undefined}
-                  className={cn(HTAB, active ? HTAB_ACTIVE : HTAB_IDLE)}
-                >
-                  {node.icon && (
-                    <span aria-hidden className="shrink-0">
-                      {node.icon}
-                    </span>
-                  )}
-                  {node.title}
-                  {node.trailing && <span className="shrink-0">{node.trailing}</span>}
-                </LinkTag>
+                {node.href ? (
+                  <LinkTag
+                    href={node.href}
+                    aria-current={active ? 'page' : undefined}
+                    className={tabClass}
+                  >
+                    {inner}
+                  </LinkTag>
+                ) : (
+                  // No destination, and horizontal renders no children to
+                  // toggle — a label, not a link. An `href="#"` would look
+                  // like one and jump to the top of the page.
+                  <span className={cn(tabClass, 'cursor-default')}>{inner}</span>
+                )}
               </li>
             );
           })}
@@ -382,18 +399,33 @@ function NavTreeRow({
   }
 
   if (!hasChildren) {
+    const rowClass = cn(ROW, active ? ROW_ACTIVE : ROW_IDLE);
+    const inner = (
+      <>
+        {iconNode}
+        <span className="min-w-0 flex-1 truncate">{node.title}</span>
+        {trailingNode}
+      </>
+    );
     return (
       <li>
-        <LinkTag
-          href={node.href ?? '#'}
-          aria-current={active ? 'page' : undefined}
-          className={cn(ROW, active ? ROW_ACTIVE : ROW_IDLE)}
-          style={{ paddingLeft }}
-        >
-          {iconNode}
-          <span className="min-w-0 flex-1 truncate">{node.title}</span>
-          {trailingNode}
-        </LinkTag>
+        {node.href ? (
+          <LinkTag
+            href={node.href}
+            aria-current={active ? 'page' : undefined}
+            className={rowClass}
+            style={{ paddingLeft }}
+          >
+            {inner}
+          </LinkTag>
+        ) : (
+          // Nothing to go to and nothing to toggle — a plain row (an empty
+          // state, a heading among the items). `href="#"` would offer a link
+          // that jumps to the top of the page and pushes a history entry.
+          <span className={cn(rowClass, 'cursor-default')} style={{ paddingLeft }}>
+            {inner}
+          </span>
+        )}
       </li>
     );
   }

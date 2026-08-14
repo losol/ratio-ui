@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { SearchField } from '../../forms/SearchField';
 import {
   BookOpen,
@@ -162,6 +163,53 @@ export const BranchWithOverview: Story = {
       <NavTree {...args} />
     </div>
   ),
+};
+
+/**
+ * Rows without an `href` have nothing to navigate to, so they are not links:
+ * a branch is a collapse toggle, and a leaf is plain text — a grouping that
+ * only holds its children, a section heading, an empty state. Documentation
+ * trees produce these on their own, wherever a folder groups pages without
+ * being a page itself.
+ */
+export const RowsWithoutDestination: Story = {
+  args: {
+    'aria-label': 'Alexandria catalogue',
+    currentPath: '#/catalogue',
+    items: [
+      { title: 'Catalogue', href: '#/catalogue', icon: <Database size={ICON} /> },
+      {
+        // No href: the row toggles rather than navigating.
+        title: 'Scrolls',
+        icon: <ScrollText size={ICON} />,
+        children: [
+          { title: 'Almagest', href: '#/scrolls/almagest' },
+          { title: 'Elements', href: '#/scrolls/elements' },
+        ],
+      },
+      { id: 'lost', title: 'Lost works — nothing catalogued yet' },
+    ],
+  },
+  render: (args) => (
+    <div style={{ width: 300 }}>
+      <NavTree {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+
+    // Neither row is a link: no `href="#"` to click into, and the toggle keeps
+    // its own affordance.
+    const links = canvas.getAllByRole('link');
+    expect(links.every((link) => link.getAttribute('href') !== '#')).toBe(true);
+    expect(canvas.queryByRole('link', { name: /Lost works/ })).toBeNull();
+
+    const toggle = canvas.getByRole('button', { name: /Scrolls/ });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(canvas.getByRole('link', { name: 'Almagest' })).toBeVisible();
+  },
 };
 
 /**
