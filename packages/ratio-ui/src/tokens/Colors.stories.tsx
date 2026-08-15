@@ -95,8 +95,8 @@ const scales: Record<string, ScaleConfig> = {
 const Swatch = ({ name, step, bgClass }: { name: string; step: number; bgClass: string }) => (
   <div className="flex flex-col items-center gap-1">
     <div className={`h-12 w-full rounded border border-neutral-300 dark:border-neutral-700 ${bgClass}`} />
-    <span className="text-xs font-mono text-text-muted">{step}</span>
-    <span className="text-[10px] font-mono text-text-subtle">{name}-{step}</span>
+    <span className="text-xs font-mono text-(--text-muted)">{step}</span>
+    <span className="text-[10px] font-mono text-(--text-subtle)">{name}-{step}</span>
   </div>
 );
 
@@ -115,30 +115,30 @@ const ColorScale = ({ name, config }: { name: string; config: ScaleConfig }) => 
 const OpacityDemo = () => (
   <div className="mb-8">
     <h3 className="text-sm font-semibold mb-2">Opacity Modifiers</h3>
-    <p className="text-xs text-text-muted mb-3">
+    <p className="text-xs text-(--text-muted) mb-3">
       With oklch in <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">@theme</code>,
       opacity modifiers like <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">bg-primary-500/50</code> work at build time.
     </p>
     <div className="flex gap-2 items-end">
       <div className="flex flex-col items-center gap-1">
         <div className="h-12 w-16 rounded bg-primary-500" />
-        <span className="text-xs font-mono text-text-muted">100%</span>
+        <span className="text-xs font-mono text-(--text-muted)">100%</span>
       </div>
       <div className="flex flex-col items-center gap-1">
         <div className="h-12 w-16 rounded bg-primary-500/75" />
-        <span className="text-xs font-mono text-text-muted">75%</span>
+        <span className="text-xs font-mono text-(--text-muted)">75%</span>
       </div>
       <div className="flex flex-col items-center gap-1">
         <div className="h-12 w-16 rounded bg-primary-500/50" />
-        <span className="text-xs font-mono text-text-muted">50%</span>
+        <span className="text-xs font-mono text-(--text-muted)">50%</span>
       </div>
       <div className="flex flex-col items-center gap-1">
         <div className="h-12 w-16 rounded bg-primary-500/25" />
-        <span className="text-xs font-mono text-text-muted">25%</span>
+        <span className="text-xs font-mono text-(--text-muted)">25%</span>
       </div>
       <div className="flex flex-col items-center gap-1">
         <div className="h-12 w-16 rounded bg-primary-500/10" />
-        <span className="text-xs font-mono text-text-muted">10%</span>
+        <span className="text-xs font-mono text-(--text-muted)">10%</span>
       </div>
     </div>
   </div>
@@ -147,7 +147,7 @@ const OpacityDemo = () => (
 const AllColors = () => (
   <div className="p-6 max-w-5xl">
     <h2 className="text-lg font-bold mb-1">Color Tokens</h2>
-    <p className="text-sm text-text-muted mb-6">
+    <p className="text-sm text-(--text-muted) mb-6">
       Color scales defined in oklch. Supports Tailwind v4 opacity modifiers.
     </p>
     <OpacityDemo />

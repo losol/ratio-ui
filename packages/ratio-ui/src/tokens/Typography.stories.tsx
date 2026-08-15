@@ -22,7 +22,7 @@ const fonts = [
 const AllTypography = () => (
   <div className="p-6 max-w-5xl">
     <h2 className="text-lg font-bold mb-1">Typography Tokens</h2>
-    <p className="text-sm text-text-muted mb-6">
+    <p className="text-sm text-(--text-muted) mb-6">
       Fluid type scale powered by <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">clamp()</code> — scales smoothly between viewport sizes.
     </p>
 
@@ -30,11 +30,11 @@ const AllTypography = () => (
     <div className="space-y-4 mb-8">
       {fonts.map(({ name, css, role }) => (
         <div key={name} className="flex items-baseline gap-4">
-          <span className="text-xs font-mono text-text-subtle w-16 shrink-0">--font-{name}</span>
+          <span className="text-xs font-mono text-(--text-subtle) w-16 shrink-0">--font-{name}</span>
           <span className="text-xl" style={{ fontFamily: css }}>
             The quick brown fox jumps over the lazy dog
           </span>
-          <span className="text-xs text-text-subtle shrink-0">{role}</span>
+          <span className="text-xs text-(--text-subtle) shrink-0">{role}</span>
         </div>
       ))}
     </div>
@@ -43,7 +43,7 @@ const AllTypography = () => (
     <div className="space-y-3">
       {fontSizes.map(({ name, label }) => (
         <div key={name} className="flex items-baseline gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-2">
-          <span className="text-xs font-mono text-text-subtle w-24 shrink-0">--font-size-{name}</span>
+          <span className="text-xs font-mono text-(--text-subtle) w-24 shrink-0">--font-size-{name}</span>
           <span style={{ fontSize: `var(--font-size-${name})` }}>
             {label} — Aa Bb Cc 123
           </span>

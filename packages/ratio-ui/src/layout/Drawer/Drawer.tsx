@@ -77,7 +77,7 @@ const Drawer: DrawerComponent = ({
     >
       <Modal
         className={cn(
-          'fixed bg-(--surface) overflow-auto',
+          'fixed bg-surface overflow-auto',
           // Horizontal drawers: full height, responsive width.
           (side === 'left' || side === 'right') &&
             'top-0 h-full w-11/12 md:w-10/12 lg:w-7/12 2xl:w-8/12',

@@ -63,7 +63,7 @@ export const Horizontal: Story = {
 /** A grid of stat blocks — Hero side-panel pattern. */
 export const Grid: Story = {
   render: () => (
-    <div className="grid gap-7 max-w-sm border-l border-(--border-2) pl-10">
+    <div className="grid gap-7 max-w-sm border-l border-border-2 pl-10">
       <ValueTile>
         <ValueTile.Value>
           <em className="text-(--accent)">240+</em> articles

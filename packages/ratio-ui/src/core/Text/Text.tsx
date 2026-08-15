@@ -62,8 +62,8 @@ const weightClasses: Record<TextWeight, string> = {
 
 const variantClasses: Record<TextVariant, string> = {
   default: '',
-  muted: 'text-text-muted',
-  subtle: 'text-text-subtle',
+  muted: 'text-(--text-muted)',
+  subtle: 'text-(--text-subtle)',
 };
 
 const familyClasses: Record<TextFamily, string> = {
@@ -80,9 +80,9 @@ const transformClasses: Record<TextTransform, string> = {
 };
 
 const colorClasses: Record<TextColor, string> = {
-  primary: 'text-primary',
-  secondary: 'text-secondary',
-  accent: 'text-accent',
+  primary: 'text-(--primary)',
+  secondary: 'text-(--secondary)',
+  accent: 'text-(--accent)',
   error: 'text-error-text',
   success: 'text-success-text',
   warning: 'text-warning-text',

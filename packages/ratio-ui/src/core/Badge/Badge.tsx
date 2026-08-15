@@ -37,10 +37,10 @@ const filledStatusClasses: Record<Status, string> = {
 
 const subtleStatusClasses: Record<Status, string> = {
   neutral: 'bg-card border border-border-1 text-(--text-muted)',
-  info: 'bg-(--info-bg) border border-(--info-border) text-(--info-text)',
-  success: 'bg-(--success-bg) border border-(--success-border) text-(--success-text)',
-  warning: 'bg-(--warning-bg) border border-(--warning-border) text-(--warning-text)',
-  error: 'bg-(--error-bg) border border-(--error-border) text-(--error-text)',
+  info: 'bg-info-bg border border-info-border text-info-text',
+  success: 'bg-success-bg border border-success-border text-success-text',
+  warning: 'bg-warning-bg border border-warning-border text-warning-text',
+  error: 'bg-error-bg border border-error-border text-error-text',
 };
 
 export const Badge: React.FC<BadgeProps> = ({

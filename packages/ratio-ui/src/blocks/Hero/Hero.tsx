@@ -95,7 +95,7 @@ const HeroRoot: HeroComponent = (({
   return (
     <section
       className={cn(
-        'py-(--space-2xl) border-b border-(--border-1) relative overflow-hidden',
+        'py-(--space-2xl) border-b border-border-1 relative overflow-hidden',
         dark && 'surface-dark',
         className,
       )}
@@ -122,7 +122,7 @@ const HeroMain: React.FC<HeroSlotProps> = ({ children, className }) => (
 const HeroSide: React.FC<HeroSlotProps> = ({ children, className }) => (
   <div
     className={cn(
-      'hidden lg:grid lg:border-l lg:border-(--border-2) lg:pl-10 gap-7',
+      'hidden lg:grid lg:border-l lg:border-border-2 lg:pl-10 gap-7',
       className,
     )}
   >

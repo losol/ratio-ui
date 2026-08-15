@@ -97,9 +97,10 @@
     "src/fonts.css"
   ],
   "scripts": {
-    "build": "tsc && vite build && node scripts/check-client-statics.mjs",
+    "build": "tsc && vite build && node scripts/check-client-statics.mjs && node scripts/check-token-syntax.mjs",
     "lint": "eslint .",
-    "check:client-statics": "node scripts/check-client-statics.mjs"
+    "check:client-statics": "node scripts/check-client-statics.mjs",
+    "check:token-syntax": "node scripts/check-token-syntax.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -61,15 +61,15 @@ const styles = {
     'data-[current]:before:rounded-[3px] data-[current]:before:bg-(--accent)',
   ),
   menuItemDanger: cn(
-    'text-(--error-solid)',
-    'hover:bg-[color-mix(in_oklch,var(--error-solid)_14%,transparent)] hover:text-(--error-solid)',
+    'text-error',
+    'hover:bg-[color-mix(in_oklch,var(--error-solid)_14%,transparent)] hover:text-error',
   ),
   itemIcon: cn(
     'shrink-0 text-(--text-subtle) transition-colors group-hover:text-(--text)',
     'group-data-[current]:text-(--primary)',
     '[&>svg]:h-[17px] [&>svg]:w-[17px]',
   ),
-  itemIconDanger: 'text-(--error-solid) group-hover:text-(--error-solid)',
+  itemIconDanger: 'text-error group-hover:text-error',
   // T2 trigger: outline pill that fills with primary and glows when open;
   // the chevron cap rotates via `in-aria-expanded` (see MenuChevron).
   triggerDefault: cn(

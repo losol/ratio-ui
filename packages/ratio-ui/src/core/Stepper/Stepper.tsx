@@ -33,7 +33,7 @@ const getStepStatusClasses = (status: StepStatus, variant: StepperVariant) => {
     const statusClasses = {
       complete: 'bg-success-500',
       current: 'bg-(--primary) ring-4 ring-primary-200 dark:ring-primary-800',
-      upcoming: 'bg-(--border-2)',
+      upcoming: 'bg-border-2',
       error: 'bg-error-500 ring-4 ring-error-200 dark:ring-error-800',
     };
     return `${baseClasses} ${sizeClasses} ${statusClasses[status]}`;
@@ -54,7 +54,7 @@ const getConnectorClasses = (isComplete: boolean) => {
   return `flex-1 h-0.5 transition-all duration-300 ${
     isComplete
       ? 'bg-success-500'
-      : 'bg-(--border-2)'
+      : 'bg-border-2'
   }`;
 };
 
@@ -137,7 +137,7 @@ const VerticalStepper: React.FC<{ steps: Step[]; variant: StepperVariant }> = ({
               <div className={`w-0.5 flex-1 min-h-8 transition-all duration-300 ${
                 step.status === 'complete'
                   ? 'bg-success-500'
-                  : 'bg-(--border-2)'
+                  : 'bg-border-2'
               }`} />
             )}
           </div>
