@@ -123,7 +123,7 @@ export const CopyLabel: React.FC<CopyLabelProps> = ({
           'bg-card border-2 border-solid rounded',
           'cursor-pointer font-[inherit] text-left',
           'transition-[border-color,background] duration-200',
-          copied ? 'border-primary bg-primary-50' : 'border-border-1',
+          copied ? 'border-(--primary) bg-primary-50' : 'border-border-1',
           !copied && 'hover:border-border-2 hover:bg-card-hover',
           FOCUS_RING
         )}

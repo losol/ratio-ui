@@ -178,7 +178,7 @@ export const Select: React.FC<SelectProps> = ({
           styles.trigger,
           SIZE[size].trigger,
           isInvalid
-            ? 'border-(--error-solid) hover:border-(--error-solid)'
+            ? 'border-error hover:border-error'
             : 'border-border-1',
         )}
       >

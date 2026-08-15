@@ -78,7 +78,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
     >
       <CopyStateIcon copied={copied} size={iconSize} />
       {withLabel && (
-        <span className={cn('text-xs font-semibold', copied && 'text-primary')}>
+        <span className={cn('text-xs font-semibold', copied && 'text-(--primary)')}>
           {copied ? 'Copied' : 'Copy'}
         </span>
       )}

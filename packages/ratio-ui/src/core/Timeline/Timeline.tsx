@@ -7,7 +7,7 @@ import type { Status } from '../../tokens/colors';
 import { cn } from '../../utils/cn';
 
 const dotStatusClasses: Record<Status, string> = {
-  neutral: 'bg-(--border-2)',
+  neutral: 'bg-border-2',
   info: 'bg-info',
   success: 'bg-success',
   warning: 'bg-warning',
@@ -15,7 +15,7 @@ const dotStatusClasses: Record<Status, string> = {
 };
 
 const ringStatusClasses: Record<Status, string> = {
-  neutral: 'border-(--border-2)',
+  neutral: 'border-border-2',
   info: 'border-info',
   success: 'border-success',
   warning: 'border-warning',
@@ -94,10 +94,10 @@ const Item: React.FC<TimelineItemProps> = ({
     >
       <span
         className={cn(
-          'absolute left-0 top-1 flex h-3 w-3 -translate-x-1/2 items-center justify-center rounded-full ring-4 ring-(--surface)',
+          'absolute left-0 top-1 flex h-3 w-3 -translate-x-1/2 items-center justify-center rounded-full ring-4 ring-surface',
           !icon &&
             (marker === 'ring'
-              ? cn('border-2 bg-(--surface)', ringStatusClasses[status])
+              ? cn('border-2 bg-surface', ringStatusClasses[status])
               : dotStatusClasses[status]),
         )}
         aria-hidden="true"

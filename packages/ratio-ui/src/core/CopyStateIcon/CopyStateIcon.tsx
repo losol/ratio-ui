@@ -24,10 +24,10 @@ export const CopyStateIcon: React.FC<CopyStateIconProps> = ({ copied, size = 18 
     <Check
       size={size}
       strokeWidth={2.4}
-      className="text-primary animate-pop"
+      className="text-(--primary) animate-pop"
     />
   ) : (
-    <Copy size={size} strokeWidth={2} className="text-text-muted" />
+    <Copy size={size} strokeWidth={2} className="text-(--text-muted)" />
   );
 
 CopyStateIcon.displayName = 'CopyStateIcon';

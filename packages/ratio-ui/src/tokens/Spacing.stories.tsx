@@ -17,15 +17,15 @@ const spacingSteps = [
 const AllSpacing = () => (
   <div className="p-6 max-w-5xl">
     <h2 className="text-lg font-bold mb-1">Spacing Tokens</h2>
-    <p className="text-sm text-text-muted mb-6">
+    <p className="text-sm text-(--text-muted) mb-6">
       Fluid spacing scale powered by <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">clamp()</code> — adapts to viewport width.
     </p>
 
     <div className="space-y-3">
       {spacingSteps.map(({ name, label }) => (
         <div key={name} className="flex items-center gap-4">
-          <span className="text-xs font-mono text-text-subtle w-20 shrink-0">--space-{name}</span>
-          <span className="text-xs text-text-muted w-8 shrink-0 text-right">{label}</span>
+          <span className="text-xs font-mono text-(--text-subtle) w-20 shrink-0">--space-{name}</span>
+          <span className="text-xs text-(--text-muted) w-8 shrink-0 text-right">{label}</span>
           <div
             className="h-6 rounded bg-primary-400"
             style={{ width: `var(--space-${name})` }}
@@ -35,13 +35,13 @@ const AllSpacing = () => (
     </div>
 
     <h3 className="text-sm font-semibold mt-8 mb-3">Spacing Demo</h3>
-    <p className="text-xs text-text-muted mb-3">
+    <p className="text-xs text-(--text-muted) mb-3">
       Boxes with increasing gap using each spacing token.
     </p>
     <div className="space-y-4">
       {spacingSteps.map(({ name, label }) => (
         <div key={name} className="flex items-center">
-          <span className="text-xs font-mono text-text-subtle w-20 shrink-0">gap: {label}</span>
+          <span className="text-xs font-mono text-(--text-subtle) w-20 shrink-0">gap: {label}</span>
           <div className="flex" style={{ gap: `var(--space-${name})` }}>
             <div className="h-8 w-8 rounded bg-primary-300" />
             <div className="h-8 w-8 rounded bg-primary-400" />
@@ -80,7 +80,7 @@ const semanticSteps: { value: Space; css: string; tailwind: string }[] = [
 const SemanticScale = () => (
   <div className="p-6 max-w-5xl">
     <h2 className="text-lg font-bold mb-1">Semantic Spacing Scale</h2>
-    <p className="text-sm text-text-muted mb-6">
+    <p className="text-sm text-(--text-muted) mb-6">
       The 6-step <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">Space</code> type
       used by <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">SpacingProps</code> (padding, margin, gap).
       Backed by fluid CSS tokens.
@@ -90,26 +90,26 @@ const SemanticScale = () => (
     <div className="space-y-3 mb-8">
       {semanticSteps.map(({ value, css, tailwind }) => (
         <div key={value} className="flex items-center gap-4">
-          <span className="text-xs font-mono text-text-subtle w-10 shrink-0">{value}</span>
-          <span className="text-xs font-mono text-text-subtle w-24 shrink-0">{css}</span>
+          <span className="text-xs font-mono text-(--text-subtle) w-10 shrink-0">{value}</span>
+          <span className="text-xs font-mono text-(--text-subtle) w-24 shrink-0">{css}</span>
           <div
             className="h-6 rounded bg-primary-400"
             style={{ width: value === 'none' ? '2px' : `var(${css})` }}
           />
-          <span className="text-[10px] font-mono text-text-subtle">{tailwind}</span>
+          <span className="text-[10px] font-mono text-(--text-subtle)">{tailwind}</span>
         </div>
       ))}
     </div>
 
     {/* Gap demo */}
     <h3 className="text-sm font-semibold mb-3">Gap demo</h3>
-    <p className="text-xs text-text-muted mb-3">
+    <p className="text-xs text-(--text-muted) mb-3">
       Each row uses <code className="bg-neutral-100 dark:bg-neutral-800 px-1 rounded">buildSpacingClasses({'{ gap: value }'})</code>.
     </p>
     <div className="space-y-4">
       {semanticSteps.map(({ value }) => (
         <div key={value} className="flex items-center">
-          <span className="text-xs font-mono text-text-subtle w-10 shrink-0">{value}</span>
+          <span className="text-xs font-mono text-(--text-subtle) w-10 shrink-0">{value}</span>
           <div className={`flex ${buildSpacingClasses({ gap: value })}`}>
             <div className="h-8 w-8 rounded bg-primary-300" />
             <div className="h-8 w-8 rounded bg-primary-400" />
@@ -124,7 +124,7 @@ const SemanticScale = () => (
     <div className="space-y-3">
       {semanticSteps.filter(s => s.value !== 'none').map(({ value }) => (
         <div key={value} className="flex items-center gap-4">
-          <span className="text-xs font-mono text-text-subtle w-10 shrink-0">{value}</span>
+          <span className="text-xs font-mono text-(--text-subtle) w-10 shrink-0">{value}</span>
           <div className={`inline-block bg-primary-100 dark:bg-primary-900 rounded border border-primary-300 ${buildSpacingClasses({ padding: value })}`}>
             <div className="h-6 w-20 rounded bg-primary-400 text-[10px] font-mono text-white flex items-center justify-center">
               content

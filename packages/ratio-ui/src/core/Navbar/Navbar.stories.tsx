@@ -200,7 +200,7 @@ export const MarketingHeader: Story = {
  */
 export const EditorialSplit: Story = {
   render: () => (
-    <div className="bg-(--surface) py-6 md:p-6">
+    <div className="bg-surface py-6 md:p-6">
       <Navbar elevated>
         <Navbar.Row variant="utility">
           <span className="min-w-0 truncate font-serif italic">
