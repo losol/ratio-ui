@@ -206,6 +206,11 @@
    Semantic tokens (light)
    -------------------------------------------- */
 :root {
+  /* Native color-scheme so browser chrome (scrollbars, form controls,
+     light-dark()) follows the theme — same contract the bureau theme and
+     theme-template.css already declare. */
+  color-scheme: light;
+
   /* Linseed-600 picks up AAA contrast on Linen for links/CTAs.
      Page surface is Linen-200 — never pure white — so the warm
      naturmaling temperature carries through everywhere. */
@@ -286,6 +291,8 @@
    step (see docs/bureau-theme-spec.md). */
 :root[data-theme='dark'],
 :root[data-color-scheme='dark'] {
+  color-scheme: dark;
+
   --primary: var(--color-primary-400);
   --secondary: var(--color-primary-900);
   --accent: var(--color-accent-300);

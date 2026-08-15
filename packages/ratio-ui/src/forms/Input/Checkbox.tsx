@@ -6,8 +6,10 @@ import React, { FC, InputHTMLAttributes, ReactNode } from 'react';
 
 export const checkboxStyles = {
   container: 'my-2',
+  // `accent-primary` is what actually tints a native checkbox — `text-*` never
+  // reached it. The box itself follows the theme's `color-scheme`.
   checkbox:
-    'align-text-bottom w-5 h-5 text-(--primary) bg-card border-border-1 focus:ring-(--focus-ring) focus:ring-2',
+    'align-text-bottom w-5 h-5 accent-primary bg-card border-border-1 focus:ring-(--focus-ring) focus:ring-2',
   label: 'font-bold ml-2 text-(--text)',
   description: 'ml-7 mt-2 text-sm',
 };
