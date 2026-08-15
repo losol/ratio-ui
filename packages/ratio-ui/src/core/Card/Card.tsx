@@ -5,7 +5,7 @@
 import React, { ReactNode } from 'react';
 import type { SpacingProps } from '../../tokens/spacing';
 import type { BorderProps } from '../../tokens/borders';
-import type { Color } from '../../tokens/colors';
+import type { Color, Status } from '../../tokens/colors';
 import { surfaceBgClasses } from '../../tokens/colors';
 import { buildSpacingClasses } from '../../tokens/spacing';
 import { buildBorderClasses } from '../../tokens/borders';
@@ -37,6 +37,13 @@ export interface CardProps extends SpacingProps, BorderProps {
    */
   shadow?: CardShadow;
   /**
+   * Left edge stripe in a status color — colour-codes a card's category or
+   * severity in a stack. Only the left border changes, so it composes with
+   * `color`, `border`, `borderColor` and `hoverEffect` (the stripe stays put
+   * while the other three sides take the hover border).
+   */
+  accent?: Status;
+  /**
    * Add the canonical interactive hover — surface lifts to `--card-hover`,
    * border picks up `--primary`, and a soft Linseed-tinted glow appears.
    * Tuned to hint, not shout; the card stays put so cursor pass-by
@@ -57,12 +64,14 @@ const SHADOW_CLASSES: Record<CardShadow, string> = {
   md: 'card-shadow-md',
 };
 
+
 export const Card: React.FC<CardProps> = ({
   transparent = false,
   shadow,
   hoverEffect = false,
   gap = 'sm',
   color,
+  accent,
   children,
   as: Component = 'div',
   backgroundImageUrl,
@@ -121,12 +130,14 @@ export const Card: React.FC<CardProps> = ({
         bgClasses,
         borderClasses,
         SHADOW_CLASSES[effectiveShadow],
+        accent && 'border-l-4',
         transitionClasses,
         hoverClasses,
         spacingClasses,
         className,
       )}
       style={combinedStyle}
+      data-accent={accent}
       data-testid={testId}
       {...rest}
     >

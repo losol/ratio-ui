@@ -23,6 +23,10 @@ const meta: Meta<typeof Card> = {
       control: 'select',
       options: [undefined, 'neutral', 'primary', 'secondary', 'accent', 'success', 'warning', 'error', 'info'],
     },
+    accent: {
+      control: 'select',
+      options: [undefined, 'neutral', 'info', 'success', 'warning', 'error'],
+    },
     backgroundImageUrl: { control: 'text' },
     margin: { control: 'select', options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'] },
   },
@@ -76,6 +80,51 @@ export const Tile: Story = {
         <p className="text-sm text-(--text-muted)">
           Color scales, typography, spacing, borders — all theme-aware via CSS variables.
         </p>
+      </Box>
+    ),
+  },
+};
+
+/**
+ * `accent` stripes the left edge in a status color. Use it to colour-code a
+ * stack of cards by category or severity — the eye groups the stripes before
+ * it reads a word. Only the left border changes, so the card's own fill and
+ * border stay put.
+ */
+export const Accent: Story = {
+  render: () => (
+    <div className="flex max-w-xl flex-col gap-3">
+      {([
+        ['warning', 'Migration', 'Runs automatically on next startup.'],
+        ['info', 'Configuration', 'New optional setting; existing installs keep the old default.'],
+        ['error', 'Breaking change', 'The v1 endpoint is removed. Move to /v2 before upgrading.'],
+        ['success', 'Resolved', 'The duplicate-import bug from 2.3.1 is fixed.'],
+        ['neutral', 'Housekeeping', 'Dependency bumps and internal cleanup.'],
+      ] as const).map(([accent, title, body]) => (
+        <Card key={accent} accent={accent} padding="md" radius="lg" shadow="none">
+          <Heading as="h4" marginBottom="xs">{title}</Heading>
+          <p className="text-sm text-(--text-muted)">{body}</p>
+        </Card>
+      ))}
+    </div>
+  ),
+};
+
+/**
+ * `accent` + `hoverEffect` — the stripe holds its color while the other three
+ * sides pick up the hover border.
+ */
+export const AccentWithHover: Story = {
+  args: {
+    accent: 'warning',
+    hoverEffect: true,
+    padding: 'md',
+    radius: 'lg',
+    shadow: 'none',
+    children: (
+      <Box>
+        <Heading as="h4" marginBottom="xs">Hover me</Heading>
+        <p className="text-sm text-(--text-muted)">The left stripe stays warning-colored.</p>
       </Box>
     ),
   },
