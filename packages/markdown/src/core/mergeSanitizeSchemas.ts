@@ -1,4 +1,7 @@
-import type { SanitizeSchemaExtension } from './MarkdownContent';
+export type SanitizeSchemaExtension = {
+  tagNames?: string[];
+  attributes?: Record<string, string[]>;
+};
 
 /**
  * Merges attribute allowlists, concatenating per tag rather than replacing.
