@@ -35,7 +35,7 @@
     "@eventuras/vite-config": "^0.3.1",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-table": "^8.21.3",
-    "@tanstack/table-core": "^8.21.3",
+    "@tanstack/table-core": "^9.1.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "lucide-react": "^1.28.0",
