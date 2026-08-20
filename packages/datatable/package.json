@@ -34,7 +34,7 @@
     "@eventuras/typescript-config": "^1.0.0",
     "@eventuras/vite-config": "^0.3.1",
     "@tanstack/match-sorter-utils": "^8.19.4",
-    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-table": "^9.1.2",
     "@tanstack/table-core": "^8.21.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
