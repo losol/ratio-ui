@@ -7,4 +7,5 @@ export type {
   ToggleButtonGroupProps,
   ToggleButtonOption,
   ToggleButtonGroupSize,
+  ToggleButtonGroupVariant,
 } from './ToggleButtonGroup';
