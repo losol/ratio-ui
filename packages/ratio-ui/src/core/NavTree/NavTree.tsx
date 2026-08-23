@@ -4,8 +4,9 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { ChevronRight } from '../../icons';
+import React, { useState, useMemo } from 'react';
+import { ChevronRight, X } from '../../icons';
+import { ActionButton } from '../ActionButton';
 import { cn } from '../../utils/cn';
 
 interface NavTreeItemBase {
@@ -45,6 +46,7 @@ export interface NavTreeLinkItem extends NavTreeItemBase {
    */
   defaultOpen?: boolean;
   content?: never;
+  context?: never;
 }
 
 /**
@@ -68,15 +70,40 @@ export interface NavTreeContentItem extends NavTreeItemBase {
   trailing?: never;
   children?: never;
   defaultOpen?: never;
+  context?: never;
 }
 
 /**
- * One node in the tree — either a link/branch row (required `title`, the
- * row's accessible name) or a `content` item rendering arbitrary JSX.
- * Modeled as a union so a plain row can't silently lack a label, and mixing
- * `content` with row props is a type error instead of silently ignored.
+ * Names the record a branch is scoped to (the expanding rail) — place it
+ * first among the branch's children. Mono eyebrow style, optional close
+ * button; ignored in `iconOnly` and `horizontal` modes, like `content`.
  */
-export type NavTreeItem = NavTreeLinkItem | NavTreeContentItem;
+export interface NavTreeContextItem extends NavTreeItemBase {
+  /** The record's name — truncates to one line. */
+  context: React.ReactNode;
+  /** Stable list key — required, as for `content` items. */
+  id: string;
+  /** Renders a close button; leave the record here (e.g. navigate to the list). */
+  onClose?: () => void;
+  /** Accessible name for the close button. @default 'Close' */
+  closeLabel?: string;
+  title?: never;
+  href?: never;
+  icon?: never;
+  trailing?: never;
+  children?: never;
+  defaultOpen?: never;
+  content?: never;
+}
+
+/**
+ * One node in the tree — a link/branch row (required `title`, the row's
+ * accessible name), a `content` item rendering arbitrary JSX, or a `context`
+ * row naming the record a branch is scoped to. Modeled as a union so a plain
+ * row can't silently lack a label, and mixing the kinds' props is a type
+ * error instead of silently ignored.
+ */
+export type NavTreeItem = NavTreeLinkItem | NavTreeContentItem | NavTreeContextItem;
 
 export interface NavTreeGroup {
   /** Uppercase eyebrow above the group (e.g. "Workspace"). Omit for none. */
@@ -98,6 +125,16 @@ export interface NavTreeProps {
    * until `currentPath` changes. @default 0
    */
   defaultExpandedDepth?: number;
+  /** Branches to start expanded, by key — same semantics as `defaultOpen`. Mirrors React Aria. */
+  defaultExpandedKeys?: Iterable<string>;
+  /**
+   * Controlled expansion: open-state follows this set exactly, nothing
+   * auto-expands — derive it from the route and the rail matches the URL.
+   * Keys: `id`, else `href`, else a string `title`. Mirrors React Aria.
+   */
+  expandedKeys?: Iterable<string>;
+  /** Fires with the full set of open keys after a toggle, controlled or not. */
+  onExpandedChange?: (keys: Set<string>) => void;
   /**
    * `vertical` (default) is the stacked sidebar list; `horizontal` lays the
    * top-level items out as a row of tabs with an accent underline on the
@@ -181,6 +218,9 @@ export function NavTree({
   currentPath,
   orientation = 'vertical',
   defaultExpandedDepth = 0,
+  defaultExpandedKeys,
+  expandedKeys,
+  onExpandedChange,
   iconOnly = false,
   LinkComponent,
   'aria-label': ariaLabel = 'Navigation',
@@ -188,9 +228,56 @@ export function NavTree({
 }: Readonly<NavTreeProps>) {
   const resolvedGroups = groups ?? (items ? [{ items }] : []);
 
+  // Expansion state lives here so a toggle can report the whole open set.
+  // Uncontrolled: derived from the active path + `default*` unless toggled
+  // manually; a `currentPath` change clears the overrides (state adjusted
+  // during render). Controlled: `expandedKeys` is the whole truth.
+  const controlled = expandedKeys !== undefined;
+  const controlledSet = useMemo(() => new Set(expandedKeys ?? []), [expandedKeys]);
+  const defaultSet = useMemo(() => new Set(defaultExpandedKeys ?? []), [defaultExpandedKeys]);
+  const [manual, setManual] = useState<Record<string, boolean>>({});
+  const [prevPath, setPrevPath] = useState(currentPath);
+  if (prevPath !== currentPath) {
+    setPrevPath(currentPath);
+    setManual({});
+  }
+
+  const isOpenWith = (overrides: Record<string, boolean>) =>
+    (node: NavTreeLinkItem, key: string, depth: number): boolean => {
+      if (controlled) return controlledSet.has(key);
+      const derived =
+        isActive(node.href, currentPath) ||
+        hasActiveChild(node, currentPath) ||
+        !!node.defaultOpen ||
+        depth < defaultExpandedDepth ||
+        defaultSet.has(key);
+      return overrides[key] ?? derived;
+    };
+
+  const expansion: Expansion = {
+    isOpen: isOpenWith(manual),
+    toggle: (node, key, depth) => {
+      const open = expansion.isOpen(node, key, depth);
+      if (controlled) {
+        const next = new Set(controlledSet);
+        if (open) next.delete(key);
+        else next.add(key);
+        onExpandedChange?.(next);
+        return;
+      }
+      const nextManual = { ...manual, [key]: !open };
+      setManual(nextManual);
+      if (onExpandedChange) {
+        onExpandedChange(collectOpenKeys(resolvedGroups, isOpenWith(nextManual)));
+      }
+    },
+  };
+
   if (orientation === 'horizontal') {
     const LinkTag = (LinkComponent ?? 'a') as React.ElementType;
-    const flat = resolvedGroups.flatMap((g) => g.items).filter((n) => !('content' in n));
+    const flat = resolvedGroups
+      .flatMap((g) => g.items)
+      .filter((n): n is NavTreeLinkItem => !isContentItem(n) && !isContextItem(n));
     return (
       <nav aria-label={ariaLabel} className={className}>
         <ul className="m-0 flex list-none items-center gap-6 border-b border-border-1 p-0">
@@ -249,9 +336,10 @@ export function NavTree({
               <NavTreeRow
                 key={nodeKey(node, i)}
                 node={node}
+                branchKey={branchKey(node, `g${index}`, i)}
                 currentPath={currentPath}
                 iconOnly={iconOnly}
-                defaultExpandedDepth={defaultExpandedDepth}
+                expansion={expansion}
                 LinkComponent={LinkComponent}
                 depth={0}
               />
@@ -266,6 +354,43 @@ export function NavTree({
 /** Stable list key: explicit `id`, else `href`, else a string title, else index. */
 function nodeKey(node: NavTreeItem, index: number): string {
   return node.id ?? node.href ?? (typeof node.title === 'string' ? node.title : `item-${index}`);
+}
+
+/**
+ * Expansion key: `id`, else `href`, else a string `title` — these are what
+ * `expandedKeys` addresses, so a title shared across groups needs an `id`.
+ * Unnamed branches fall back to their path from the root, which can't collide.
+ */
+function branchKey(node: NavTreeItem, parentKey: string, index: number): string {
+  return (
+    node.id ??
+    node.href ??
+    (typeof node.title === 'string' ? node.title : `${parentKey}/${index}`)
+  );
+}
+
+/** `in` doesn't narrow past the `?: never` guards on the other kinds — explicit predicates do. */
+const isContentItem = (node: NavTreeItem): node is NavTreeContentItem => 'content' in node;
+const isContextItem = (node: NavTreeItem): node is NavTreeContextItem => 'context' in node;
+
+interface Expansion {
+  isOpen: (node: NavTreeLinkItem, key: string, depth: number) => boolean;
+  toggle: (node: NavTreeLinkItem, key: string, depth: number) => void;
+}
+
+/** The full set of open branch keys under the given rule — for `onExpandedChange`. */
+function collectOpenKeys(groups: NavTreeGroup[], isOpen: Expansion['isOpen']): Set<string> {
+  const open = new Set<string>();
+  const walk = (nodes: NavTreeItem[], parentKey: string, depth: number) => {
+    nodes.forEach((node, i) => {
+      if (isContentItem(node) || isContextItem(node) || !node.children?.length) return;
+      const key = branchKey(node, parentKey, i);
+      if (isOpen(node, key, depth)) open.add(key);
+      walk(node.children, key, depth + 1);
+    });
+  };
+  groups.forEach((group, i) => walk(group.items, `g${i}`, 0));
+  return open;
 }
 
 function isActive(href: string | undefined, currentPath: string | undefined): boolean {
@@ -283,53 +408,30 @@ function hasActiveChild(node: NavTreeItem, currentPath: string | undefined): boo
 
 interface NavTreeRowProps {
   node: NavTreeItem;
+  /** Expansion key of this row (see `branchKey`). */
+  branchKey: string;
   currentPath?: string;
   iconOnly?: boolean;
-  defaultExpandedDepth?: number;
+  expansion: Expansion;
   LinkComponent?: NavTreeProps['LinkComponent'];
   depth: number;
 }
 
 function NavTreeRow({
   node,
+  branchKey: key,
   currentPath,
   iconOnly,
-  defaultExpandedDepth = 0,
+  expansion,
   LinkComponent,
   depth,
 }: Readonly<NavTreeRowProps>) {
-  const hasChildren = !!node.children?.length;
-  const active = isActive(node.href, currentPath);
-  const containsActive = hasActiveChild(node, currentPath);
-
-  // Open-state is derived from the active path unless the user has toggled the
-  // branch manually. A `currentPath` change clears the manual override (state
-  // adjusted during render — React's sanctioned "derive from props" pattern),
-  // so navigating auto-expands the new active branch again.
-  const [manualOpen, setManualOpen] = useState<boolean | null>(null);
-  const [prevPath, setPrevPath] = useState(currentPath);
-  if (prevPath !== currentPath) {
-    setPrevPath(currentPath);
-    setManualOpen(null);
-  }
-  // One derived base shared by state and toggle — otherwise the first click
-  // on a branch that's only open via defaultOpen/depth would be a no-op.
-  const derivedOpen =
-    active || containsActive || !!node.defaultOpen || depth < defaultExpandedDepth;
-  const isOpen = manualOpen ?? derivedOpen;
-
-  const toggle = useCallback(
-    () => setManualOpen((prev) => !(prev ?? derivedOpen)),
-    [derivedOpen],
-  );
-
-  const LinkTag = (LinkComponent ?? 'a') as React.ElementType;
   const paddingLeft = `${0.75 + depth * 0.75}rem`;
 
   // Arbitrary content slot (e.g. a group filter) — plain node, no row chrome.
   // The rail hides it, matching the design (the filter lives in the wide
   // sidebar only).
-  if ('content' in node) {
+  if (isContentItem(node)) {
     if (iconOnly) return null;
     return (
       <li className="py-1 pr-1" style={{ paddingLeft }}>
@@ -337,6 +439,38 @@ function NavTreeRow({
       </li>
     );
   }
+
+  // Context row: the record's name in the mono eyebrow style, optional
+  // close button. Hidden in the rail, like `content`.
+  if (isContextItem(node)) {
+    if (iconOnly) return null;
+    return (
+      <li className="flex items-start gap-2 py-1.5 pr-1" style={{ paddingLeft }}>
+        <span className="min-w-0 flex-1 truncate pt-0.5 font-mono text-xs leading-snug text-(--text-subtle)">
+          {node.context}
+        </span>
+        {node.onClose && (
+          <ActionButton
+            variant="ghost"
+            size="sm"
+            round
+            ariaLabel={node.closeLabel ?? 'Close'}
+            onPress={node.onClose}
+          >
+            <X size={14} />
+          </ActionButton>
+        )}
+      </li>
+    );
+  }
+
+  const hasChildren = !!node.children?.length;
+  const active = isActive(node.href, currentPath);
+  const containsActive = hasActiveChild(node, currentPath);
+  const isOpen = hasChildren && expansion.isOpen(node, key, depth);
+  const toggle = () => expansion.toggle(node, key, depth);
+
+  const LinkTag = (LinkComponent ?? 'a') as React.ElementType;
 
   // Text for the chevron's accessible name. A ReactNode title can't be
   // interpolated (it would stringify to "[object Object]"), so fall back to
@@ -496,9 +630,10 @@ function NavTreeRow({
             <NavTreeRow
               key={nodeKey(child, i)}
               node={child}
+              branchKey={branchKey(child, key, i)}
               currentPath={currentPath}
               iconOnly={iconOnly}
-              defaultExpandedDepth={defaultExpandedDepth}
+              expansion={expansion}
               LinkComponent={LinkComponent}
               depth={depth + 1}
             />

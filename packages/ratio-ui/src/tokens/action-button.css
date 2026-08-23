@@ -14,7 +14,11 @@
  * to round or square all action buttons inside that scope.
  */
 
-:root {
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-dark,
+.surface-light {
   --action-button-bg:        var(--card);
   --action-button-fg:        var(--text-muted);
   --action-button-border:    var(--border-1);

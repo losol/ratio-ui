@@ -71,6 +71,7 @@ export {
 
   // User
   User,
+  Users,
 
   // Status & Alerts
   AlertCircle,

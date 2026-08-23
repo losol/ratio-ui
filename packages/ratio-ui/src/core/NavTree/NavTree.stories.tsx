@@ -2,10 +2,12 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import { useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, within } from 'storybook/test';
 import { SearchField } from '../../forms/SearchField';
+import { Heading } from '../Heading';
+import { Link } from '../Link';
 import {
   BookOpen,
   Database,
@@ -15,6 +17,7 @@ import {
   ShieldCheck,
   Telescope,
   Upload,
+  Users,
 } from '../../icons';
 import { Chip } from '../Chip';
 import { NavTree } from './NavTree';
@@ -300,5 +303,165 @@ export const GroupFilter: Story = {
         />
       </div>
     );
+  },
+};
+
+const RouteContext = createContext<(path: string) => void>(() => {});
+
+function RouterLink({
+  href,
+  children,
+  ...rest
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  'aria-current'?: 'page';
+}) {
+  const navigate = useContext(RouteContext);
+  return (
+    <a
+      href={href}
+      onClick={(e) => {
+        e.preventDefault();
+        navigate(href);
+      }}
+      {...rest}
+    >
+      {children}
+    </a>
+  );
+}
+
+const MANUSCRIPTS = [
+  { slug: 'almagest', title: 'Almagest — Ptolemy', readers: 14 },
+  { slug: 'elements', title: 'Elements — Euclid', readers: 31 },
+  { slug: 'conics', title: 'Conics — Apollonius', readers: 6 },
+];
+
+const SECTIONS = ['Overview', 'Readers', 'Loans', 'Annotations', 'Edit'];
+
+/**
+ * The expanding rail: a record's sections unfold under the list's branch,
+ * headed by a `context` row naming it. Three rules keep it honest, and the
+ * API carries them — expansion follows the route (`expandedKeys` derived
+ * from the path, so deep links land open), one record unfolded at a time,
+ * and the record's name lives in the rail so the H1 is the section.
+ * Collapsing the branch (`onExpandedChange`) means the same as the close
+ * button: leave the record.
+ */
+export const ExpandingRail: Story = {
+  args: { items: [] },
+  render: function ExpandingRailStory() {
+    const [path, setPath] = useState('#/manuscripts');
+    const slug = /^#\/manuscripts\/([^/]+)/.exec(path)?.[1];
+    const record = MANUSCRIPTS.find((m) => m.slug === slug);
+    const base = `#/manuscripts/${slug}`;
+    const section =
+      SECTIONS.find((name) => path === `${base}/${name.toLowerCase()}`) ??
+      (record ? 'Overview' : undefined);
+
+    return (
+      <RouteContext.Provider value={setPath}>
+        <div className="flex h-[420px] items-start gap-8">
+          <div className="w-[236px] shrink-0">
+            <NavTree
+              aria-label="Alexandria console"
+              currentPath={path}
+              LinkComponent={RouterLink}
+              expandedKeys={record ? ['#/manuscripts'] : []}
+              onExpandedChange={(keys) => {
+                if (!keys.has('#/manuscripts')) setPath('#/manuscripts');
+              }}
+              groups={[
+                {
+                  label: 'Library',
+                  items: [
+                    { title: 'Dashboard', href: '#/', icon: <LayoutGrid size={ICON} /> },
+                    {
+                      title: 'Manuscripts',
+                      href: '#/manuscripts',
+                      icon: <ScrollText size={ICON} />,
+                      children: record && [
+                        {
+                          id: 'record',
+                          context: record.title,
+                          onClose: () => setPath('#/manuscripts'),
+                          closeLabel: 'Close manuscript',
+                        },
+                        { title: 'Overview', href: base },
+                        {
+                          title: 'Readers',
+                          href: `${base}/readers`,
+                          trailing: <Chip>{record.readers}</Chip>,
+                        },
+                        { title: 'Loans', href: `${base}/loans` },
+                        { title: 'Annotations', href: `${base}/annotations` },
+                        { title: 'Edit', href: `${base}/edit` },
+                      ],
+                    },
+                    { title: 'Readers', href: '#/readers', icon: <Users size={ICON} /> },
+                    { title: 'Instruments', href: '#/instruments', icon: <Telescope size={ICON} /> },
+                  ],
+                },
+              ]}
+            />
+          </div>
+          <main className="min-w-0 flex-1">
+            {record ? (
+              <Heading.Group>
+                <Heading.Eyebrow>{record.title}</Heading.Eyebrow>
+                <Heading as="h1">{section}</Heading>
+              </Heading.Group>
+            ) : (
+              <>
+                <Heading as="h1">Manuscripts</Heading>
+                <ul className="mt-4 space-y-2">
+                  {MANUSCRIPTS.map((m) => (
+                    <li key={m.slug}>
+                      <Link href={`#/manuscripts/${m.slug}`} component={RouterLink}>
+                        {m.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </main>
+        </div>
+      </RouteContext.Provider>
+    );
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const nav = within(canvas.getByRole('navigation', { name: 'Alexandria console' }));
+
+    // On the list: nothing is unfolded.
+    expect(nav.queryByText('Almagest — Ptolemy')).toBeNull();
+    expect(nav.queryByRole('link', { name: /Readers/ })).toHaveAttribute('href', '#/readers');
+
+    // Open a record from the page: the rail unfolds under Manuscripts with
+    // the record named above its sections.
+    await userEvent.click(canvas.getByRole('link', { name: 'Almagest — Ptolemy' }));
+    expect(nav.getByText('Almagest — Ptolemy')).toBeVisible();
+    expect(nav.getByRole('link', { name: 'Loans' })).toHaveAttribute(
+      'href',
+      '#/manuscripts/almagest/loans',
+    );
+    expect(nav.getByRole('button', { name: 'Collapse Manuscripts' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+
+    // Deep-navigating inside the record keeps it open; the H1 is the section.
+    await userEvent.click(nav.getByRole('link', { name: 'Loans' }));
+    expect(canvas.getByRole('heading', { level: 1 })).toHaveTextContent('Loans');
+    expect(nav.getByText('Almagest — Ptolemy')).toBeVisible();
+
+    // Close it: back to the list, branch folded.
+    await userEvent.click(nav.getByRole('button', { name: 'Close manuscript' }));
+    expect(nav.queryByText('Almagest — Ptolemy')).toBeNull();
+    expect(canvas.getByRole('heading', { level: 1 })).toHaveTextContent('Manuscripts');
   },
 };

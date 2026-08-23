@@ -46,9 +46,9 @@ export interface NavbarProps {
    */
   glass?: boolean;
   /**
-   * Marks the navbar as a dark surface so the brand and content text
-   * use the light `var(--text)` color. Use for primary-toned navbars
-   * or glass overlays on dark heroes.
+   * Marks the navbar as a dark surface — a local dark token context, so
+   * brand, content text, muted tones and borders take the dark theme's
+   * values. Use for primary-toned navbars or glass overlays on dark heroes.
    */
   dark?: boolean;
   /**

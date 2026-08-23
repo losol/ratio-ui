@@ -56,22 +56,12 @@
 
 /* (Design tokens are imported at the top, with the other @import rules.) */
 
-/* Surface tone overrides. Composes with the theme-aware default `--text`
-   from tokens/theme.css: in unmarked containers `--text` follows the
-   page theme; inside `.surface-dark`/`.surface-light` it's pinned via
-   the semantic `--text-light`/`--text-dark` tokens (so palette changes
-   propagate automatically).
-
-   We set `color: var(--text)` on the utility itself so plain HTML
-   descendants (`<p>`, `<span>`, etc.) inherit the right tone via CSS
-   cascade — components reading `text-(--text)` keep working unchanged. */
-.surface-dark {
-  --text: var(--text-light);
-  color: var(--text);
-}
-
+/* Surface tone overrides. tokens/theme.css declares the full semantic set
+   on these classes, so a marked container is a complete local theme context.
+   `color: var(--text)` here lets plain HTML descendants inherit the tone.
+   (The `dark:` variant stays keyed to the page attributes — use tokens.) */
+.surface-dark,
 .surface-light {
-  --text: var(--text-dark);
   color: var(--text);
 }
 

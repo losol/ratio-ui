@@ -10,7 +10,9 @@
  * neutral contrast. Consumed by core/CodeBlock. Dark values respond to
  * both data-theme="dark" and the orthogonal data-color-scheme="dark".
  */
-:root {
+/* Also on the surface scopes, so a surface inside the other mode matches. */
+:root,
+.surface-light {
   --code-surface: #ffffff;
   --code-body: #ffffff;
   --code-text: #2a313b;
@@ -27,7 +29,8 @@
 }
 
 :root[data-theme="dark"],
-:root[data-color-scheme="dark"] {
+:root[data-color-scheme="dark"],
+.surface-dark {
   --code-surface: #11161c;
   --code-body: #11161c;
   --code-text: #c7d2de;

@@ -41,9 +41,9 @@ export interface ContainerProps extends SpacingProps, BorderProps {
    */
   color?: Color;
   /**
-   * Marks the container as a dark surface so descendants pick up the
-   * light `var(--text)` color. Useful when the Container sits on a
-   * colored or photographic background.
+   * Marks the container as a dark surface — a local dark token context,
+   * so descendants take the dark theme's text, border and card values.
+   * Useful when the Container sits on a colored or photographic background.
    */
   dark?: boolean;
   testId?: string;
