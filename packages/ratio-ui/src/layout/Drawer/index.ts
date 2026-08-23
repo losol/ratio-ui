@@ -3,3 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Drawer } from './Drawer';
+export type { DrawerProps, DrawerSize } from './Drawer';
