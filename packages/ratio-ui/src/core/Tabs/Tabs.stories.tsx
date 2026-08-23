@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
+import { expect, userEvent, within } from 'storybook/test';
+import { Chip } from '../Chip';
 import { Tabs } from '../Tabs';
 
 const meta = {
@@ -163,4 +165,69 @@ export const DisabledTab: Story = {
       <Tabs {...args} />
     </div>
   ),
+};
+
+/**
+ * `title` takes any node, so a tab can carry a marker beside its label — a
+ * count of what is inside, or a dot flagging a section that needs attention.
+ * Two rules come with it: give the item an `id` (the title is otherwise what
+ * keys it), and keep the meaning out of the colour — the dot is `aria-hidden`
+ * and the tab spells it out in `aria-label`.
+ */
+export const TitleWithMarker: Story = {
+  args: {
+    children: (
+      <>
+        <Tabs.Item
+          id="transcription"
+          title={
+            <>
+              Transcription
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-error" />
+            </>
+          }
+          aria-label="Transcription — needs attention"
+        >
+          <p>
+            Three lines of the papyrus are unread. The scribe&apos;s hand changes
+            halfway down the column.
+          </p>
+        </Tabs.Item>
+        <Tabs.Item
+          id="provenance"
+          title={
+            <>
+              Provenance <Chip>4</Chip>
+            </>
+          }
+        >
+          <p>
+            Four recorded owners between the Fayum and the reading room, the
+            earliest a village archive.
+          </p>
+        </Tabs.Item>
+        <Tabs.Item id="notes" title="Notes">
+          <p>Nothing outstanding.</p>
+        </Tabs.Item>
+      </>
+    ),
+  },
+  render: (args) => (
+    <div className="w-[720px] max-w-full">
+      <Tabs {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+
+    // The dot carries no accessible name of its own; the tab spells it out.
+    const flagged = canvas.getByRole('tab', { name: 'Transcription — needs attention' });
+    expect(flagged).toBeVisible();
+
+    // A node title still selects and keys correctly.
+    const counted = canvas.getByRole('tab', { name: /Provenance/ });
+    await userEvent.click(counted);
+    expect(counted).toHaveAttribute('aria-selected', 'true');
+    expect(canvas.getByText(/Four recorded owners/)).toBeVisible();
+  },
 };
