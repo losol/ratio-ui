@@ -1,6 +1,7 @@
 'use client';
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import { Pagination } from '@eventuras/ratio-ui/core/Pagination';
+import { Table } from '@eventuras/ratio-ui/core/Table';
 import {
   ColumnFilter,
   ColumnFiltersState,
@@ -11,6 +12,7 @@ import {
   getExpandedRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  OnChangeFn,
   Row,
   TableState,
   useReactTable,
@@ -18,18 +20,56 @@ import {
 import React, { useEffect } from 'react';
 import { SearchField } from '@eventuras/ratio-ui/forms';
 
-type DataTableProps = {
+/** How many rows may be open at once while the table owns expansion. */
+export type DataTableExpansionMode = 'single' | 'multiple';
+
+export type DataTableProps<TData = any> = {
+  /** TanStack column definitions — build them with `createColumnHelper`. */
   columns: any[];
-  data: any[];
+  data: TData[];
   pageSize?: number;
   clientsidePagination?: boolean;
   state?: Partial<TableState>;
   enableGlobalSearch?: boolean;
   columnFilters?: ColumnFilter[];
-  renderToolbar?: (searchInput: React.ReactNode) => React.ReactNode;
-  renderSubComponent?: (props: { row: Row<any> }) => React.ReactElement;
-  getRowCanExpand?: (row: Row<any>) => boolean;
-  getRowId?: (originalRow: any, index: number) => string;
+  /**
+   * Wrap the search input in your own toolbar. `meta` carries the row counts,
+   * so a filter summary can sit next to the field.
+   */
+  renderToolbar?: (
+    searchInput: React.ReactNode,
+    meta: { shown: number; total: number },
+  ) => React.ReactNode;
+  renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
+  /** Which rows can expand. Required for `renderSubComponent` to reach them. */
+  getRowCanExpand?: (row: Row<TData>) => boolean;
+  getRowId?: (originalRow: TData, index: number) => string;
+  /**
+   * Controlled expansion. Mirrors TanStack: a record of row ids, or `true`
+   * for every row — the "expand all" toolbar switch. While set, the table
+   * applies no policy of its own (`expansionMode` and the search auto-expand
+   * step aside) and reports changes through `onExpandedChange`.
+   */
+  expanded?: ExpandedState;
+  /** Fires when a row is toggled, controlled or not. */
+  onExpandedChange?: OnChangeFn<ExpandedState>;
+  /**
+   * Uncontrolled policy: `'single'` (default) closes the open row when
+   * another opens; `'multiple'` leaves them open. A global search expands
+   * everything either way, so matches inside a row are visible.
+   */
+  expansionMode?: DataTableExpansionMode;
+  /**
+   * Called when a row is clicked, unless the click landed on a control inside
+   * it (a link, the expander, a checkbox) — that click belongs to the control.
+   * A convenience for pointer users: it does not make the row focusable, so
+   * keep the real destination in a cell for keyboard and screen-reader users.
+   */
+  onRowClick?: (row: Row<TData>) => void;
+  /** Shown in place of the rows when nothing matches. */
+  emptyState?: React.ReactNode;
+  /** Renders a count under the table, e.g. `(shown, total) => \`${shown} of ${total} rows\``. */
+  rowCountLabel?: (shown: number, total: number) => React.ReactNode;
 };
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -49,11 +89,40 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Return if the item should be filtered in/out
   return itemRank.passed;
 };
-const DataTable = (props: DataTableProps) => {
-  const { columns, data, clientsidePagination, pageSize = 25, state } = props;
+
+/** Controls whose click is theirs, not the row's (see `onRowClick`). */
+const INTERACTIVE = 'a,button,input,select,textarea,label,[role="button"],[role="link"]';
+
+/** Only one row stays open — the id that just turned on wins. */
+function keepOne(previous: ExpandedState, next: ExpandedState): ExpandedState {
+  if (typeof next === 'boolean') return next;
+  const wasOpen = typeof previous === 'boolean' ? [] : Object.keys(previous).filter(id => previous[id]);
+  const isOpen = Object.keys(next).filter(id => next[id]);
+  if (isOpen.length <= wasOpen.length) return next; // a row closed
+  const opened = isOpen.find(id => !wasOpen.includes(id));
+  return opened ? { [opened]: true } : next;
+}
+
+const DataTable = <TData,>(props: DataTableProps<TData>) => {
+  const {
+    columns,
+    data,
+    clientsidePagination,
+    pageSize = 25,
+    state,
+    expansionMode = 'single',
+    onRowClick,
+    emptyState,
+    rowCountLabel,
+  } = props;
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = React.useState('');
-  const [expanded, setExpanded] = React.useState<ExpandedState>({});
+  const [internalExpanded, setInternalExpanded] = React.useState<ExpandedState>({});
+
+  // Controlled expansion hands the whole policy to the caller.
+  const isControlled = props.expanded !== undefined;
+  const expanded = isControlled ? props.expanded! : internalExpanded;
+  const { onExpandedChange } = props;
 
   const handleClientPageChange = (newPage: number) => {
     table.setPageIndex(newPage);
@@ -65,54 +134,29 @@ const DataTable = (props: DataTableProps) => {
     }
   }, [props.columnFilters]);
 
-  // Auto-expand all rows when searching
+  // A search matches text inside expanded content too, so open every row
+  // while filtering and collapse again when the field is cleared.
   useEffect(() => {
-    if (globalFilter) {
-      // Expand all rows when there's a search filter
-      setExpanded(true);
-    } else {
-      // Collapse all when search is cleared
-      setExpanded({});
-    }
-  }, [globalFilter]);
+    if (isControlled) return;
+    setInternalExpanded(globalFilter ? true : {});
+  }, [globalFilter, isControlled]);
 
-  // Custom handler to only allow one row expanded at a time (when not searching)
-  const handleExpandedChange = React.useCallback(
-    (updater: ExpandedState | ((old: ExpandedState) => ExpandedState)) => {
-      // If searching, allow all rows to be expanded
-      if (globalFilter) {
-        setExpanded(updater);
+  const handleExpandedChange = React.useCallback<OnChangeFn<ExpandedState>>(
+    updater => {
+      if (isControlled) {
+        onExpandedChange?.(updater);
         return;
       }
-
-      // Otherwise, ensure only one row is expanded at a time
-      setExpanded(old => {
-        const newExpanded = typeof updater === 'function' ? updater(old) : updater;
-
-        // If it's a boolean (expand all/collapse all), just use it
-        if (typeof newExpanded === 'boolean') {
-          return newExpanded;
-        }
-
-        // Find which row was toggled by comparing old and new state
-        const oldIds = Object.keys(old).filter(key => (old as Record<string, boolean>)[key]);
-        const newIds = Object.keys(newExpanded).filter(key => (newExpanded as Record<string, boolean>)[key]);
-
-        // If a row was just expanded (newIds has more items than oldIds)
-        if (newIds.length > oldIds.length) {
-          // Find the newly expanded row
-          const newlyExpandedId = newIds.find(id => !oldIds.includes(id));
-          if (newlyExpandedId) {
-            // Only keep the newly expanded row
-            return { [newlyExpandedId]: true };
-          }
-        }
-
-        // If a row was collapsed, just return the new state
-        return newExpanded;
+      setInternalExpanded(old => {
+        const next = typeof updater === 'function' ? updater(old) : updater;
+        // While searching every row is open, so the single-row policy would
+        // collapse the very matches the search opened.
+        const settled = expansionMode === 'single' && !globalFilter ? keepOne(old, next) : next;
+        onExpandedChange?.(settled);
+        return settled;
       });
     },
-    [globalFilter]
+    [isControlled, onExpandedChange, expansionMode, globalFilter],
   );
 
   const table = useReactTable({
@@ -156,50 +200,74 @@ const DataTable = (props: DataTableProps) => {
     />
   ) : null;
 
+  const rows = table.getRowModel().rows;
+  const shown = table.getFilteredRowModel().rows.length;
+  const columnCount = table.getVisibleLeafColumns().length;
+
   return (
     <>
-      {props.renderToolbar ? (
-        props.renderToolbar(searchInput)
-      ) : (
-        searchInput
-      )}
-      <table className="table-auto w-full">
-        <thead>
+      {props.renderToolbar
+        ? props.renderToolbar(searchInput, { shown, total: data.length })
+        : searchInput}
+      <Table>
+        <Table.Header>
           {table.getHeaderGroups().map(headerGroup => (
-            <tr key={headerGroup.id}>
+            <Table.Row key={headerGroup.id}>
               {headerGroup.headers.map(header => (
-                <th key={header.id} scope="col" className="text-left">
+                <Table.HeadCell key={header.id} scope="col">
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
+                </Table.HeadCell>
               ))}
-            </tr>
+            </Table.Row>
           ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map(row => (
-            <React.Fragment key={row.id ?? row.index}>
-              <tr
-                className="group even:bg-gray-50 odd:bg-white dark:even:bg-gray-950 dark:odd:bg-gray-900 text-black dark:text-white"
+        </Table.Header>
+        <Table.Body>
+          {rows.map(row => (
+            <React.Fragment key={row.id}>
+              <Table.Row
+                className={onRowClick ? 'cursor-pointer hover:bg-card-hover' : ''}
+                onClick={
+                  onRowClick
+                    ? event => {
+                        // Let a control inside the row keep its own click.
+                        const target = event.target;
+                        if (target instanceof Element && target.closest(INTERACTIVE)) return;
+                        onRowClick(row);
+                      }
+                    : undefined
+                }
               >
                 {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="p-2">
+                  <Table.Cell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+                  </Table.Cell>
                 ))}
-              </tr>
+              </Table.Row>
               {row.getIsExpanded() && props.renderSubComponent && (
-                <tr className="bg-gray-100 dark:bg-gray-800">
-                  <td colSpan={row.getVisibleCells().length} className="p-4">
+                <Table.Row className="bg-card">
+                  <Table.Cell colSpan={columnCount}>
                     {props.renderSubComponent({ row })}
-                  </td>
-                </tr>
+                  </Table.Cell>
+                </Table.Row>
               )}
             </React.Fragment>
           ))}
-        </tbody>
-      </table>
+          {/* Keyed to the filtered count, not the page: an out-of-range page
+              is empty while matches still exist on another one. */}
+          {shown === 0 && emptyState && (
+            <Table.Row>
+              <Table.Cell colSpan={columnCount} className="py-8 text-center text-(--text-subtle)">
+                {emptyState}
+              </Table.Cell>
+            </Table.Row>
+          )}
+        </Table.Body>
+      </Table>
+      {rowCountLabel && (
+        <div className="pt-3 text-sm text-(--text-subtle)">{rowCountLabel(shown, data.length)}</div>
+      )}
       {clientsidePagination && table.getPageCount() > 1 ? (
         <Pagination
           currentPage={table.getState().pagination.pageIndex + 1}
