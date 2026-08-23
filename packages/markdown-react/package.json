@@ -1,6 +1,6 @@
 {
   "name": "@eventuras/markdown-react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "React markdown engine — react-markdown (remark/rehype) behind a semantic renderer contract; design-system bindings supply the components.",
   "keywords": [
     "markdown",
