@@ -2,11 +2,10 @@ import { defineReactLibConfig } from '@eventuras/vite-config/react-lib';
 
 export default defineReactLibConfig({
   entry: 'src/index.ts',
-  tailwind: true,
   external: [
-    '@eventuras/markdown-react',
-    '@eventuras/ratio-ui',
-    // for deep imports..:
-    /^@eventuras\/ratio-ui\//
+    'react-markdown',
+    'remark-gfm',
+    'rehype-sanitize',
+    '@eventuras/markdown-core',
   ],
 });

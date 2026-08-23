@@ -3,8 +3,11 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import type { Components, Options } from 'react-markdown';
-import { normalizeMarkdown } from './normalizeMarkdown';
-import { mergeAttributes, type SanitizeSchemaExtension } from './mergeSanitizeSchemas';
+import {
+  normalizeMarkdown,
+  mergeAttributes,
+  type SanitizeSchemaExtension,
+} from '@eventuras/markdown-core';
 import type { MarkdownCodeBlockProps, MarkdownRenderers } from './renderers';
 
 /**
@@ -116,8 +119,8 @@ const DefaultEm: NonNullable<MarkdownRenderers['em']> = (props) => <em {...props
 /**
  * The design-system-agnostic markdown renderer: parsing, GFM, sanitization,
  * URL policy, and fence extraction — with every visible element delegated to
- * a `MarkdownRenderers` set. Nothing in this module may import a design
- * system; bindings like `ratio/MarkdownContent` supply the renderers.
+ * a `MarkdownRenderers` set. Nothing in this package may import a design
+ * system; binding packages like `@eventuras/markdown` supply the renderers.
  */
 export const MarkdownEngine = ({
   markdown,

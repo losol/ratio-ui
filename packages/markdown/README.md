@@ -1,7 +1,11 @@
 # @eventuras/markdown
 
-Markdown rendering for [Ratio UI](https://github.com/losol/ratio-ui) — React
-components built on `react-markdown` (remark/rehype), sanitised by default.
+Markdown rendering for [Ratio UI](https://github.com/losol/ratio-ui) —
+sanitised by default. This package is the Ratio UI *binding* of
+[`@eventuras/markdown-react`](../markdown-react), which owns the
+engine (parsing, GFM, sanitization, URL policy); this package maps each
+rendered element to a ratio-ui component. See
+[ADR-0001](docs/adr/0001-engine-renderer-split.md) for the split.
 
 ## Installation
 
@@ -12,8 +16,12 @@ pnpm add @eventuras/markdown @eventuras/ratio-ui
 Install the peer dependencies it expects:
 
 ```bash
-pnpm add react react-dom react-markdown remark-gfm rehype-sanitize
+pnpm add react react-dom
 ```
+
+The engine (`react-markdown`, `remark-gfm`, `rehype-sanitize`) comes with
+`@eventuras/markdown-react`, a regular dependency — nothing extra to
+install.
 
 Raw HTML is opt-in and needs one more package — see
 [Raw HTML](#raw-html-opt-in).

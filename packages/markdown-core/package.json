@@ -1,21 +1,22 @@
 {
-  "name": "@eventuras/markdown",
-  "version": "0.15.0",
-  "description": "Markdown renderer for React using react-markdown (remark/rehype) and Ratio UI components.",
+  "name": "@eventuras/markdown-core",
+  "version": "0.0.0",
+  "description": "Framework-agnostic markdown utilities and remark plugins — input normalization, sanitize-schema merging, heading extraction, GitHub-style callouts.",
   "keywords": [
     "markdown",
-    "react",
-    "ratio-ui"
+    "remark",
+    "rehype",
+    "unified"
   ],
   "license": "MPL-2.0",
-  "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/markdown#readme",
+  "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/markdown-core#readme",
   "bugs": {
     "url": "https://github.com/losol/ratio-ui/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/losol/ratio-ui.git",
-    "directory": "packages/markdown"
+    "directory": "packages/markdown-core"
   },
   "sideEffects": false,
   "type": "module",
@@ -34,38 +35,26 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "pnpm run clean && vite build",
+    "build": "pnpm run clean && vite build && node scripts/check-imports.mjs",
+    "check:imports": "node scripts/check-imports.mjs",
     "clean": "rm -rf dist",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@eventuras/markdown-react": "workspace:^"
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
     "@eventuras/eslint-config": "^1.0.4",
-    "@eventuras/ratio-ui": "workspace:*",
-    "@eventuras/ratio-ui-shiki": "workspace:*",
     "@eventuras/typescript-config": "^1.0.0",
     "@eventuras/vite-config": "^0.3.1",
-    "@testing-library/jest-dom": "7.0.1",
-    "@testing-library/react": "^16.3.2",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
-    "jsdom": "30.0.1",
-    "rehype-raw": "^7.0.0",
+    "@types/mdast": "^4.0.4",
     "tslib": "2.8.1",
     "typescript": "6.0.3",
     "vite": "8.2.1",
     "vitest": "4.1.10"
-  },
-  "peerDependencies": {
-    "@eventuras/ratio-ui": "^2.15.0",
-    "react": ">=18 <20",
-    "react-dom": ">=18 <20"
   },
   "engines": {
     "node": ">=22.0.0 <25.0.0"

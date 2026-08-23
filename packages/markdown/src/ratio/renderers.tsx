@@ -6,7 +6,7 @@ import { CodeBlock } from '@eventuras/ratio-ui/core/CodeBlock';
 import { Blockquote } from '@eventuras/ratio-ui/core/Blockquote';
 import { InlineCode } from '@eventuras/ratio-ui/core/InlineCode';
 import { Divider } from '@eventuras/ratio-ui/core/Divider';
-import type { MarkdownRenderers } from '../core/renderers';
+import type { MarkdownRenderers } from '@eventuras/markdown-react';
 
 /**
  * The Ratio UI renderer set — maps each engine slot to a ratio-ui component.
