@@ -3,33 +3,91 @@ import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import { Pagination } from '@eventuras/ratio-ui/core/Pagination';
 import { Table } from '@eventuras/ratio-ui/core/Table';
 import {
-  ColumnFilter,
-  ColumnFiltersState,
-  ExpandedState,
-  FilterFn,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  constructFilterFn,
+  createColumnHelper as createTanStackColumnHelper,
+  createExpandedRowModel,
+  createFilteredRowModel,
+  createPaginatedRowModel,
   flexRender,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  OnChangeFn,
-  Row,
-  TableState,
-  useReactTable,
+  globalFilteringFeature,
+  rowExpandingFeature,
+  rowPaginationFeature,
+  tableFeatures,
+  useTable,
+  type ColumnFilter,
+  type ColumnFiltersState,
+  type ExpandedState,
+  type OnChangeFn,
+  type Row,
+  type RowData,
+  type TableState,
 } from '@tanstack/react-table';
 import React, { useEffect } from 'react';
 import { SearchField } from '@eventuras/ratio-ui/forms';
 
+/**
+ * Rank-based fuzzy match, built with v9's `constructFilterFn` so the
+ * comparator is typed and the rank lands in the row's filter meta. Its
+ * generics default to `any` on purpose: naming this table's features here
+ * would be circular, since the feature set is what registers this function.
+ */
+const fuzzyFilter = constructFilterFn({
+  filter: (dataValue, filterValue, _row, _columnId, addMeta) => {
+    const itemRank = rankItem(dataValue, filterValue);
+    addMeta?.({ itemRank });
+    return itemRank.passed;
+  },
+});
+
+/**
+ * The feature set this table registers. v9 bundles nothing automatically, so
+ * every capability below is opted into explicitly: column + global filtering,
+ * client pagination, expandable rows, and column visibility — the last one
+ * because v8 bundled it, so a caller could always hide columns through the
+ * `state` escape hatch. Prerequisite features come before the row-model slot
+ * that depends on them.
+ */
+export const dataTableFeatures = tableFeatures({
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  globalFilteringFeature,
+  rowPaginationFeature,
+  rowExpandingFeature,
+  filteredRowModel: createFilteredRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+  expandedRowModel: createExpandedRowModel(),
+  filterFns: { fuzzy: fuzzyFilter },
+  // A value slot that carries a type: v9 infers the shape of a row's
+  // `columnFiltersMeta` from it, and `RankingInfo` has no meaningful runtime
+  // value to construct here.
+  filterMeta: {} as { itemRank: RankingInfo },
+});
+
+export type DataTableFeatures = typeof dataTableFeatures;
+/** The row type handed to `renderSubComponent`, `onRowClick` and friends. */
+export type DataTableRow<TData extends RowData> = Row<DataTableFeatures, TData>;
+
+/**
+ * `createColumnHelper` bound to this table's features — v9's helper takes the
+ * feature set as its first type argument, and consumers shouldn't have to
+ * know ours. Same call shape as before: `createColumnHelper<Row>()`.
+ */
+export function createColumnHelper<TData extends RowData>() {
+  return createTanStackColumnHelper<DataTableFeatures, TData>();
+}
+
 /** How many rows may be open at once while the table owns expansion. */
 export type DataTableExpansionMode = 'single' | 'multiple';
 
-export type DataTableProps<TData = any> = {
+export type DataTableProps<TData extends RowData = any> = {
   /** TanStack column definitions — build them with `createColumnHelper`. */
   columns: any[];
   data: TData[];
   pageSize?: number;
   clientsidePagination?: boolean;
-  state?: Partial<TableState>;
+  state?: Partial<TableState<DataTableFeatures>>;
   enableGlobalSearch?: boolean;
   columnFilters?: ColumnFilter[];
   /**
@@ -40,9 +98,9 @@ export type DataTableProps<TData = any> = {
     searchInput: React.ReactNode,
     meta: { shown: number; total: number },
   ) => React.ReactNode;
-  renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
+  renderSubComponent?: (props: { row: DataTableRow<TData> }) => React.ReactElement;
   /** Which rows can expand. Required for `renderSubComponent` to reach them. */
-  getRowCanExpand?: (row: Row<TData>) => boolean;
+  getRowCanExpand?: (row: DataTableRow<TData>) => boolean;
   getRowId?: (originalRow: TData, index: number) => string;
   /**
    * Controlled expansion. Mirrors TanStack: a record of row ids, or `true`
@@ -65,31 +123,12 @@ export type DataTableProps<TData = any> = {
    * A convenience for pointer users: it does not make the row focusable, so
    * keep the real destination in a cell for keyboard and screen-reader users.
    */
-  onRowClick?: (row: Row<TData>) => void;
+  onRowClick?: (row: DataTableRow<TData>) => void;
   /** Shown in place of the rows when nothing matches. */
   emptyState?: React.ReactNode;
   /** Renders a count under the table, e.g. `(shown, total) => \`${shown} of ${total} rows\``. */
   rowCountLabel?: (shown: number, total: number) => React.ReactNode;
 };
-declare module '@tanstack/table-core' {
-  interface FilterFns {
-    fuzzy: FilterFn<unknown>;
-  }
-  interface FilterMeta {
-    itemRank: RankingInfo;
-  }
-}
-const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  // Rank the item
-  const itemRank = rankItem(row.getValue(columnId), value);
-  // Store the itemRank info
-  addMeta({
-    itemRank,
-  });
-  // Return if the item should be filtered in/out
-  return itemRank.passed;
-};
-
 /** Controls whose click is theirs, not the row's (see `onRowClick`). */
 const INTERACTIVE = 'a,button,input,select,textarea,label,[role="button"],[role="link"]';
 
@@ -103,7 +142,7 @@ function keepOne(previous: ExpandedState, next: ExpandedState): ExpandedState {
   return opened ? { [opened]: true } : next;
 }
 
-const DataTable = <TData,>(props: DataTableProps<TData>) => {
+const DataTable = <TData extends RowData>(props: DataTableProps<TData>) => {
   const {
     columns,
     data,
@@ -159,24 +198,19 @@ const DataTable = <TData,>(props: DataTableProps<TData>) => {
     [isControlled, onExpandedChange, expansionMode, globalFilter],
   );
 
-  const table = useReactTable({
+  const table = useTable({
+    features: dataTableFeatures,
     columns,
     data: data,
     getRowId: props.getRowId,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
     onExpandedChange: handleExpandedChange,
-    getFilteredRowModel: getFilteredRowModel(),
     getRowCanExpand: props.getRowCanExpand,
-    filterFns: {
-      fuzzy: fuzzyFilter,
-    },
-    globalFilterFn: fuzzyFilter,
+    globalFilterFn: 'fuzzy',
     initialState: {
       pagination: {
+        pageIndex: 0,
         pageSize: pageSize,
       },
     },
@@ -270,17 +304,16 @@ const DataTable = <TData,>(props: DataTableProps<TData>) => {
       )}
       {clientsidePagination && table.getPageCount() > 1 ? (
         <Pagination
-          currentPage={table.getState().pagination.pageIndex + 1}
+          currentPage={table.state.pagination.pageIndex + 1}
           totalPages={table.getPageCount()}
           onPreviousPageClick={() =>
-            handleClientPageChange(table.getState().pagination.pageIndex - 1)
+            handleClientPageChange(table.state.pagination.pageIndex - 1)
           }
-          onNextPageClick={() => handleClientPageChange(table.getState().pagination.pageIndex + 1)}
+          onNextPageClick={() => handleClientPageChange(table.state.pagination.pageIndex + 1)}
         />
       ) : null}
     </>
   );
 };
 export default DataTable;
-export type { ColumnFilter, ColumnSort, TableState } from '@tanstack/react-table';
-export { createColumnHelper } from '@tanstack/react-table';
+export type { ColumnFilter, ColumnSort } from '@tanstack/react-table';

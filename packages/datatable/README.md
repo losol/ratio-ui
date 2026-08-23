@@ -50,7 +50,7 @@ const columns = [
 | `clientsidePagination` | `boolean` | Paginate in the browser and render Ratio UI's `Pagination`. |
 | `enableGlobalSearch` | `boolean` | Adds a `SearchField` that fuzzy-matches across every column. |
 | `columnFilters` | `ColumnFilter[]` | Per-column filters, controlled from the outside. |
-| `state` | `Partial<TableState>` | Escape hatch for any other TanStack table state. |
+| `state` | `Partial<TableState<DataTableFeatures>>` | Escape hatch for any other TanStack table state. |
 | `renderToolbar` | `(searchInput, { shown, total }) => ReactNode` | Wrap the search input in your own toolbar; `meta` carries the row counts. |
 | `renderSubComponent` | `({ row }) => ReactElement` | Content for an expanded row. |
 | `getRowCanExpand` | `(row) => boolean` | Which rows can expand. |
@@ -61,6 +61,19 @@ const columns = [
 | `onRowClick` | `(row) => void` | Row click for pointer users; clicks on a control inside the row are that control's. |
 | `emptyState` | `ReactNode` | Shown in place of the rows when nothing matches. |
 | `rowCountLabel` | `(shown, total) => ReactNode` | Renders a count under the table. |
+
+## TanStack Table v9
+
+Built on TanStack Table v9, which registers no features automatically. This
+package registers the ones it needs — column and global filtering, client
+pagination, expandable rows and column visibility — and exports the set as
+`dataTableFeatures` (with `DataTableFeatures` and `DataTableRow<T>` types) for
+callers that need to name a row or state type.
+
+`createColumnHelper` is re-exported bound to that feature set, so the call
+shape is unchanged from v8: `createColumnHelper<Manuscript>()`. If you build
+columns with TanStack's own helper instead, it needs the features first:
+`createColumnHelper<DataTableFeatures, Manuscript>()`.
 
 ## Expanding rows
 
