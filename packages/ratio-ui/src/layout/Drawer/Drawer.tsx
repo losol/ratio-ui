@@ -14,6 +14,17 @@ import { ActionButton } from '../../core/ActionButton';
 import { X } from '../../icons';
 import { cn } from '../../utils/cn';
 
+export type DrawerSize = 'responsive' | 'sm' | 'md' | 'lg' | 'xl';
+
+// Same width scale as Dialog (28 / 32 / 42 / 56 rem), so a panel is the same
+// size whichever way it arrives on screen.
+const sizeClasses: Record<Exclude<DrawerSize, 'responsive'>, string> = {
+  sm: 'max-w-md',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+};
+
 export interface DrawerProps {
   isOpen: boolean;
   onClose?: () => void;
@@ -24,6 +35,20 @@ export interface DrawerProps {
    * from the bottom, and notification trays from the top. @default 'right'
    */
   side?: 'left' | 'right' | 'top' | 'bottom';
+  /**
+   * Width of a left/right drawer, on the same `sm | md | lg | xl` scale as
+   * `Dialog`. `'responsive'` (the default) keeps the original behaviour — a
+   * viewport fraction that fills most of a phone and about half a desktop.
+   * Prefer a named size for an inspector or activity panel, which wants a
+   * column, not half the page.
+   *
+   * Ignored on `top` / `bottom` sheets: those are full-width by definition
+   * and sized by their content up to 85vh.
+   * @default 'responsive'
+   */
+  size?: DrawerSize;
+  /** Merged onto the drawer panel — the escape hatch when `size` isn't enough. */
+  className?: string;
   /** Whether clicking the backdrop closes the drawer. Defaults to true. */
   isDismissable?: boolean;
   /** When true, Escape no longer closes the drawer. Defaults to false. */
@@ -62,9 +87,12 @@ const Drawer: DrawerComponent = ({
   onClose,
   children,
   side = 'right',
+  size = 'responsive',
+  className,
   isDismissable = true,
   isKeyboardDismissDisabled = false,
 }: DrawerProps) => {
+  const isHorizontal = side === 'left' || side === 'right';
   return (
     <ModalOverlay
       isOpen={isOpen}
@@ -78,15 +106,20 @@ const Drawer: DrawerComponent = ({
       <Modal
         className={cn(
           'fixed bg-surface overflow-auto',
-          // Horizontal drawers: full height, responsive width.
-          (side === 'left' || side === 'right') &&
-            'top-0 h-full w-11/12 md:w-10/12 lg:w-7/12 2xl:w-8/12',
+          // Horizontal drawers: full height. Width is either the original
+          // viewport fraction or a capped column.
+          isHorizontal && 'top-0 h-full',
+          isHorizontal &&
+            (size === 'responsive'
+              ? 'w-11/12 md:w-10/12 lg:w-7/12 2xl:w-8/12'
+              : cn('w-11/12', sizeClasses[size])),
           side === 'left' && 'left-0',
           side === 'right' && 'right-0',
           // Vertical drawers (sheets): full width, content-sized up to 85vh.
-          (side === 'top' || side === 'bottom') && 'left-0 right-0 w-full max-h-[85vh]',
+          !isHorizontal && 'left-0 right-0 w-full max-h-[85vh]',
           side === 'top' && 'top-0 rounded-b-xl',
           side === 'bottom' && 'bottom-0 rounded-t-xl',
+          className,
         )}
       >
         <AriaDialog className="relative flex flex-col p-6 outline-hidden h-full">
