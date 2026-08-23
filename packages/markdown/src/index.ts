@@ -1,10 +1,14 @@
 export { MarkdownContent } from './ratio/MarkdownContent'
-export { normalizeMarkdown } from './core/normalizeMarkdown'
 export { extractHeadings } from './ratio/extractHeadings'
 export type {MarkdownContentProps, SanitizeSchemaExtension, MarkdownComponents, MarkdownPluginList, MarkdownCodeBlockProps} from './ratio/MarkdownContent'
-export { mergeSanitizeSchemas } from './core/mergeSanitizeSchemas'
-
-export { remarkCallout } from './core/remarkCallout'
-export type { CalloutType } from './core/remarkCallout'
 export { calloutComponents } from './ratio/calloutComponents'
-export { calloutSanitizeSchema } from './core/calloutSanitizeSchema'
+
+// Engine helpers, re-exported so consumers keep a single import source. They
+// originate in @eventuras/markdown-core and reach us through the engine tier.
+export {
+  normalizeMarkdown,
+  mergeSanitizeSchemas,
+  remarkCallout,
+  calloutSanitizeSchema,
+} from '@eventuras/markdown-react'
+export type { CalloutType } from '@eventuras/markdown-react'

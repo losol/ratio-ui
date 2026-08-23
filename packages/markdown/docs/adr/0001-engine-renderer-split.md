@@ -2,7 +2,12 @@
 
 ## Status
 
-Accepted 2026-08-16
+Accepted 2026-08-16.
+Extracted 2026-08-20 into two tiers: the React engine + renderer contract to
+`@eventuras/markdown-react`, and the framework-agnostic utilities
+(normalize, sanitize-schema merging, heading extraction, callout plugin) to
+`@eventuras/markdown-core`. "src/core" below refers to what is now those
+packages; the boundary and contract are unchanged.
 
 ## Context
 

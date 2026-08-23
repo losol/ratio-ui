@@ -14,7 +14,7 @@ vi.mock('@eventuras/ratio-ui/core/Text', () => ({
 
 // import the component under test
 import { MarkdownContent, type MarkdownCodeBlockProps } from './MarkdownContent';
-import { mergeSanitizeSchemas } from '../core/mergeSanitizeSchemas';
+import { mergeSanitizeSchemas } from '@eventuras/markdown-react';
 
 describe('MarkdownContent', () => {
   // renders heading when provided
@@ -177,9 +177,9 @@ describe('MarkdownContent', () => {
   describe('remarkCallout', () => {
     // Lazy import to avoid hoisting issues with vi.mock
     const setup = async () => {
-      const { remarkCallout } = await import('../core/remarkCallout');
+      const { remarkCallout } = await import('@eventuras/markdown-react');
       const { calloutComponents } = await import('./calloutComponents');
-      const { calloutSanitizeSchema } = await import('../core/calloutSanitizeSchema');
+      const { calloutSanitizeSchema } = await import('@eventuras/markdown-react');
       return { remarkCallout, calloutComponents, calloutSanitizeSchema };
     };
 

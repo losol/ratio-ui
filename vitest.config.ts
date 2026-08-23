@@ -16,6 +16,8 @@ export default defineConfig({
       // and setup files each package declares actually apply — a plain include
       // pattern would run them in the default node environment and fail.
       './packages/markdown',
+      './packages/markdown-react',
+      './packages/markdown-core',
 
       // Browser-backed Storybook tests: local only, see note above.
       ...(isCI

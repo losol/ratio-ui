@@ -68,7 +68,15 @@ const config: StorybookConfig = {
       : Object.entries(resolve.alias ?? {}).map(([find, replacement]) => ({ find, replacement }));
     // `$` and the `/` in the subpath variant keep e.g. `@eventuras/ratio-ui`
     // from swallowing `@eventuras/ratio-ui-shiki/...`.
-    const srcAliases = ['ratio-ui', 'ratio-ui-shiki'].flatMap((pkg) => {
+    // Every workspace package a story reaches through its package name has to
+    // be listed: nothing here is built before Storybook runs, so an unaliased
+    // one resolves to a `dist/` that doesn't exist yet.
+    const srcAliases = [
+      'ratio-ui',
+      'ratio-ui-shiki',
+      'markdown-core',
+      'markdown-react',
+    ].flatMap((pkg) => {
       const src = join(packagesDir, pkg, 'src');
       return [
         { find: new RegExp(`^@eventuras/${pkg}$`), replacement: join(src, 'index.ts') },
