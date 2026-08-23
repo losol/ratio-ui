@@ -1,5 +1,141 @@
 # @eventuras/ratio-ui
 
+## 2.18.0
+
+### Minor Changes
+
+- 1ccb5ef: `Drawer` gains `size` and `className`. A left/right drawer was always a
+  viewport fraction — around half the page on a desktop — with no way to ask for
+  less, so an inspector or activity panel had no shape to fit into.
+
+  `size` takes the same `sm | md | lg | xl` scale as `Dialog` (28 / 32 / 42 /
+  56 rem), so a panel is the same width whichever way it arrives on screen. The
+  default is `'responsive'`, the original behaviour, so existing drawers are
+  untouched. It applies to `left` / `right` drawers; `top` / `bottom` sheets are
+  full-width by definition and stay content-sized up to 85vh.
+
+  `className` merges onto the drawer panel, the escape hatch for the cases the
+  scale doesn't cover — `Drawer` previously accepted none at all.
+
+  Note that the widths are rem-based and this design system scales rem with the
+  viewport (`--font-size-base` is a clamp), so `sm` is 28rem, not a fixed 448px.
+
+- 52e06d4: New `EmptyState` in `core/` — what a list, table or panel shows when it holds
+  nothing. Covers the two cases that look alike and read differently: nothing
+  created yet (offer the action that fills it), or a filter that matched nothing
+  (say so, or the reader concludes the list is broken). `title` is required;
+  `icon`, `description` and `action` are optional.
+
+  `size="sm"` is the row inside a list or table, `md` (default) the panel filling
+  a card. DOM attributes reach the root, so a filter-driven empty state can carry
+  `role="status"`; nothing is announced by default.
+
+- 39a29f6: New `Switch` in `forms/` — the on/off control that takes effect immediately:
+  showing detail in a list, turning a notification on. Built on React Aria
+  Components, so the selection API is theirs (`isSelected`, `defaultSelected`,
+  `onChange`, `isDisabled`, `isReadOnly`) and it is a real `role="switch"`,
+  focusable and operable with Space.
+
+  The design system had no such control: `Checkbox` is for values submitted with
+  a form, and `ToggleButton` is a button that reads as pressed, not a setting
+  that reads as on. Toolbar switches were being built out of `ToggleButton` or
+  hand-rolled spans.
+
+  - `size` — the same `sm | md | lg` scale as `Button`. Default `md`.
+  - `labelPosition` — `'end'` (default) puts the label after the track, the
+    toolbar form; `'start'` puts it first for a settings row, where
+    `className="w-full justify-between"` pushes the track to the edge.
+  - `description` — a supporting line under the label.
+
+- 69fe499: `NavTree` gains controlled expansion — `expandedKeys`, `defaultExpandedKeys`,
+  `onExpandedChange` (after React Aria's Tree) — and a `context` item that names
+  the record a branch is scoped to, with an optional close button. Together they
+  make the expanding rail: derive `expandedKeys` from the route and a record's
+  sections unfold under the list's branch, one at a time, matching the URL. See
+  the _Expanding rail_ story. Uncontrolled trees behave as before.
+
+  `.surface-dark` / `.surface-light` are now complete theme contexts (text,
+  muted/subtle, borders, cards, brand, status), not just a `--text` flip. For
+  that to work the semantic `--color-*` aliases moved to `@theme inline`, so
+  `bg-card` compiles to `var(--card)` — a custom property resolves its `var()`
+  where it is declared, and the old `:root` alias ignored scoped overrides.
+  Palette scales are unchanged. If your own CSS read an alias directly
+  (`var(--color-card)`), switch to the token (`var(--card)`). `Footer`'s private
+  `.ratio-footer--dark` scope is gone; it uses `surface-dark`.
+
+  Dark-theme `--text-muted` / `--text-subtle` are retuned from Linen steps (tan
+  and olive on the cool surface) to low-chroma warm greys — `oklch(0.81 0.012 85)`
+  and `oklch(0.69 0.012 85)` — ≥ 5:1 on every dark surface.
+
+  `Users` joins the icon barrel.
+
+- ccf363c: New `SaveStatus` in `core/` — the pill on a surface that saves by itself:
+  `idle`, `saving`, `saved` (with the time it landed) or `error`. `error` is in
+  the vocabulary because this replaces a Save button, and silence after a failed
+  save loses the reader's work.
+
+  The state is the caller's — an app knows when its request resolves, a timer in
+  a component doesn't. `labels` replaces the English copy. `role="status"` by
+  default. Built on `Chip`, so a scope that re-skins its chips re-skins this too.
+
+- 7948ca5: `Tabs.Item`'s `title` accepts any node, not just a string — so a tab can carry
+  a marker beside its label: a count chip, or a dot flagging the section that
+  needs attention. Existing string titles are unchanged.
+
+  Two things come with it. `id` is now required when the title isn't a plain
+  string, since the title is otherwise what keys the tab and its panel (a node
+  would stringify to `[object Object]`); node titles without an `id` fall back
+  to their position. And `Tabs.Item` takes `aria-label`, for a title whose
+  meaning isn't carried by its text — the dot stays `aria-hidden` and the tab
+  spells it out.
+
+- 331cf72: Three additions that let Timeline carry release-notes-style content, plus the
+  `Settings` icon in the barrel.
+
+  `Timeline.Item` gains `layout` and `marker`, and `timestamp` becomes optional.
+  `layout="inline"` puts the title first with timestamp and actor trailing as
+  muted meta — the release-notes voice, where audit logs want the default
+  `"stacked"` (when, then what). `marker="ring"` draws a hollow circle instead of
+  a filled dot, for items that mark a point in a series rather than report an
+  outcome. `icon` still overrides both. Existing items are unchanged.
+
+  `Card` gains `accent`, a left edge stripe in a status color for colour-coding a
+  stack of cards by category or severity. It touches only the left border, so it
+  composes with `color`, `border`, `borderColor` and `hoverEffect` — on hover the
+  stripe holds its color while the other three sides take the hover border.
+
+- 71b3f76: `ToggleButtonGroup` gains `variant="chips"`: the shared track drops away, each
+  option becomes its own outlined pill, and the row wraps. That is the
+  filter-chip form — a set with no fixed length where any number may be on at
+  once — as against the segmented track, which suits a few mutually exclusive
+  views seen together. The design sketches use both, and only the segmented one
+  existed. The selection API is unchanged; `variant` defaults to `'segmented'`,
+  so existing groups are untouched.
+
+  Underneath, the pill chrome moved into `ToggleButton` as two new variants,
+  `'segmented'` and `'chip'`, with the `sm | md | lg` size scale the group
+  already used. The group rendered React Aria's raw `ToggleButton` and styled it
+  inline, which left ratio-ui's own `ToggleButton` unused and diverging; now a
+  lone toggle and one inside a group are the same component and cannot drift
+  apart. Verified the segmented rendering is pixel-identical before and after.
+
+  `ToggleButton` also gains `size`. It applies to the pill variants; the older
+  `default` / `primary` / `outline` keep their own padding and are unchanged.
+
+### Patch Changes
+
+- d63d67e: The standard theme now declares `color-scheme` — `light` on `:root`, `dark` on
+  `:root[data-theme='dark'], :root[data-color-scheme='dark']`. It was the one
+  theme missing it; `bureau.css` and `theme-template.css` already declare it, and
+  the template documents it as part of the theme contract. Without it the browser
+  renders native chrome in light mode under the dark theme, which is why
+  checkboxes showed up as white boxes on dark surfaces. Scrollbars, date pickers
+  and other native controls follow too.
+
+  `Checkbox` swaps `text-(--primary)` for `accent-primary` — `text-*` never
+  reached a native checkbox, so the checked state now actually picks up the brand
+  color.
+
 ## 2.17.3
 
 ### Patch Changes

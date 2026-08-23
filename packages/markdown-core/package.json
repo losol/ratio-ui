@@ -1,6 +1,6 @@
 {
   "name": "@eventuras/markdown-core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Framework-agnostic markdown utilities and remark plugins — input normalization, sanitize-schema merging, heading extraction, GitHub-style callouts.",
   "keywords": [
     "markdown",

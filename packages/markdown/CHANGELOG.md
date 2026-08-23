@@ -1,5 +1,38 @@
 # @eventuras/markdown
 
+## 0.15.1
+
+### Patch Changes
+
+- a875a24: Internal engine/renderer split — no API change. `MarkdownContent` is now a
+  thin binding of a design-system-agnostic engine (`src/core/`) to a Ratio UI
+  renderer set (`src/ratio/`), along the semantic `MarkdownRenderers` contract
+  described in `docs/adr/0001-engine-renderer-split.md`. Parsing, sanitization,
+  URL policy, and fence extraction live in the engine; renderer sets are plain
+  prop-to-component mappings. A build guard (`check-core-imports`) keeps
+  `src/core/` free of design-system imports so it stays extractable to a
+  standalone package.
+- e6adb33: The `@eventuras/markdown*` family splits into tiers (ADR-0001, PR 2 of the
+  package split):
+
+  - **`@eventuras/markdown-core`** (new) — framework-agnostic utilities and
+    remark plugins: `normalizeMarkdown`, `mergeSanitizeSchemas`,
+    `extractHeadings` (with injectable `slugify`), `remarkCallout` +
+    `calloutSanitizeSchema`. No React; `unist-util-visit` is the only
+    dependency.
+  - **`@eventuras/markdown-react`** (new) — the React engine extracted from
+    `@eventuras/markdown`: `MarkdownEngine` + the `MarkdownRenderers` slot
+    contract are now public API, so a design-system binding is a plain
+    prop-to-component mapping. Parsing, GFM, the sanitize-last pipeline, URL
+    policy, and fence extraction are owned by the engine. Re-exports the core
+    tier.
+  - **`@eventuras/markdown`** — unchanged for consumers: same exports, same
+    behavior. It now binds the engine to Ratio UI renderers and re-exports the
+    shared helpers.
+
+- Updated dependencies [e6adb33]
+  - @eventuras/markdown-react@0.1.0
+
 ## 0.15.0
 
 ### Minor Changes
