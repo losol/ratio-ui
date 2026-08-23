@@ -23,10 +23,10 @@ export interface FooterProps {
   className?: string;
   /**
    * Render the footer as a dark surface — a deep `--color-primary-950`
-   * background, and a local dark token scope so every block's semantic tokens
-   * (`--text`, `--text-muted`, `--text-subtle`, `--border-*`) resolve to the
-   * light-on-dark values from the dark theme. Use to anchor the bottom of the
-   * page with a deep block regardless of the page theme.
+   * background inside a `surface-dark` scope, so every block's semantic
+   * tokens (`--text`, `--text-muted`, `--text-subtle`, `--border-*`) resolve
+   * to the dark theme's values. Use to anchor the bottom of the page with a
+   * deep block regardless of the page theme.
    */
   dark?: boolean;
 }
@@ -255,7 +255,7 @@ const FooterRoot: FooterComponent = (({ children, className, dark }: FooterProps
   <footer
     className={cn(
       'p-3 pt-10',
-      dark ? 'ratio-footer--dark bg-primary-950' : 'bg-overlay-press',
+      dark ? 'surface-dark bg-primary-950' : 'bg-overlay-press',
       className,
     )}
   >

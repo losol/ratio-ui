@@ -14,9 +14,10 @@ export interface HeroProps {
   className?: string;
   style?: CSSProperties;
   /**
-   * Marks the hero as a dark surface (applies `surface-dark` className) so
-   * descendants reading `var(--text)` pick up the light tone. Useful for
-   * heroes with photo backgrounds or strongly colored fills.
+   * Marks the hero as a dark surface (applies `surface-dark`): a local dark
+   * token context, so text, muted tones, borders and buttons all take the
+   * dark theme's values. Useful for heroes with photo backgrounds or
+   * strongly colored fills.
    */
   dark?: boolean;
   /**

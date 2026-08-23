@@ -7,6 +7,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Sidebar } from './Sidebar';
 import { Drawer } from '../Drawer';
 import { ActionButton } from '../../core/ActionButton';
+import { Chip } from '../../core/Chip';
+import { Heading } from '../../core/Heading';
 import { LiveIndicator } from '../../core/LiveIndicator';
 import { NavTree } from '../../core/NavTree';
 import {
@@ -212,4 +214,85 @@ export const MobileDrawer: Story = {
       </div>
     );
   },
+};
+
+/**
+ * A dark rail on a light page, with a record unfolded (see NavTree's
+ * *Expanding rail* story for the route wiring). `surface-dark` is a complete
+ * local theme context — muted text, hairlines, chip, close button and live
+ * dot all take the dark set. Toggle the page theme: the rail stays dark.
+ */
+export const DarkRail: Story = {
+  args: { children: null },
+  render: () => (
+    <div className="flex h-[520px] items-start overflow-hidden">
+      <Sidebar
+        aria-label="Archive console"
+        top={0}
+        className="surface-dark border-r-0 bg-surface"
+        style={{ height: '100%' }}
+      >
+        <Sidebar.Header>{wordmark()}</Sidebar.Header>
+        <Sidebar.Body>
+          <NavTree
+            aria-label="Archive console"
+            currentPath="#/manuscripts/almagest/readers"
+            expandedKeys={['#/manuscripts']}
+            groups={[
+              {
+                label: 'Library',
+                items: [
+                  { title: 'Dashboard', href: '#/', icon: <LayoutGrid size={ICON} /> },
+                  {
+                    title: 'Manuscripts',
+                    href: '#/manuscripts',
+                    icon: <ScrollText size={ICON} />,
+                    children: [
+                      {
+                        id: 'record',
+                        context: 'Almagest — Ptolemy',
+                        onClose: () => {},
+                        closeLabel: 'Close manuscript',
+                      },
+                      { title: 'Overview', href: '#/manuscripts/almagest' },
+                      {
+                        title: 'Readers',
+                        href: '#/manuscripts/almagest/readers',
+                        trailing: <Chip>14</Chip>,
+                      },
+                      { title: 'Loans', href: '#/manuscripts/almagest/loans' },
+                      { title: 'Edit', href: '#/manuscripts/almagest/edit' },
+                    ],
+                  },
+                  { title: 'Instruments', href: '#/instruments', icon: <Telescope size={ICON} /> },
+                ],
+              },
+              {
+                label: 'Administration',
+                items: [
+                  { title: 'Catalogue', href: '#/catalogue', icon: <Database size={ICON} /> },
+                  { title: 'Audit log', href: '#/audit', icon: <ShieldCheck size={ICON} /> },
+                ],
+              },
+            ]}
+          />
+        </Sidebar.Body>
+        <Sidebar.Footer>
+          <div className="flex items-center px-3 py-1">
+            <LiveIndicator status="live">Catalogue in sync</LiveIndicator>
+          </div>
+        </Sidebar.Footer>
+      </Sidebar>
+      <main className="flex-1 p-8">
+        <Heading.Group>
+          <Heading.Eyebrow>Almagest — Ptolemy</Heading.Eyebrow>
+          <Heading as="h1">Readers</Heading>
+        </Heading.Group>
+        <p className="mt-2 max-w-[52ch] text-sm text-(--text-muted)">
+          The rail is pinned to the dark set while the page keeps the theme.
+          The record's name lives in the rail, so the H1 is the section.
+        </p>
+      </main>
+    </div>
+  ),
 };

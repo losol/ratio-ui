@@ -26,9 +26,10 @@
  */
 
 /* --------------------------------------------
-   bureau — light (K4 .kmr)
+   bureau — light (K4 .kmr) — also the `.surface-light` context
    -------------------------------------------- */
-:root[data-theme="bureau"] {
+:root[data-theme="bureau"],
+:root[data-theme="bureau"] .surface-light {
   color-scheme: light;
 
   /* Brand */
@@ -106,9 +107,10 @@
 }
 
 /* --------------------------------------------
-   bureau — dark (K4 .neo--dark)
+   bureau — dark (K4 .neo--dark) — also the `.surface-dark` context
    -------------------------------------------- */
-:root[data-theme="bureau"][data-color-scheme="dark"] {
+:root[data-theme="bureau"][data-color-scheme="dark"],
+:root[data-theme="bureau"] .surface-dark {
   color-scheme: dark;
 
   /* Brand */

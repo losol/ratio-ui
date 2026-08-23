@@ -8,5 +8,6 @@ export type {
   NavTreeItem,
   NavTreeLinkItem,
   NavTreeContentItem,
+  NavTreeContextItem,
   NavTreeGroup,
 } from './NavTree';

@@ -14,7 +14,10 @@
  * container to round or square all chips inside that scope.
  */
 
-:root {
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-light {
   --chip-bg: var(--card);
   --chip-fg: var(--text-muted);
   --chip-border: var(--border-1);
@@ -31,7 +34,8 @@
 }
 
 :root[data-theme="dark"],
-:root[data-color-scheme="dark"] {
+:root[data-color-scheme="dark"],
+.surface-dark {
   --chip-bg: rgba(255, 255, 255, 0.06);
   --chip-fg: var(--text-muted);
   --chip-border: var(--border-1);

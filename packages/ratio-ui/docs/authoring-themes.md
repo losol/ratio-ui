@@ -147,6 +147,16 @@ themes instead scope dark to their own selector, as in the block above. If you
 add your own dark-only override for a *shared* token, match the
 `data-color-scheme` arm so it triggers on the orthogonal axis too.
 
+### Dark surfaces inside a light page
+
+`.surface-dark` / `.surface-light` (the `dark` prop on Hero, Section,
+Container, Navbar, Footer) are complete local token contexts: the standard
+theme declares its whole light/dark set on them, so a dark rail on a light
+page gets dark muted text, borders, cards and status colors. A named theme
+adds its own arm — `[data-theme="acme"] .surface-dark { … }` — with the same
+tokens as its dark variant. (The `dark:` Tailwind variant stays keyed to the
+page attributes; inside a surface, rely on tokens.)
+
 ## Avoiding a flash when you resolve the theme in JS
 
 The light theme is defined on bare `:root`, so a page with no `data-theme` is

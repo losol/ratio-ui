@@ -16,10 +16,11 @@ export interface SectionProps
     Omit<React.ComponentPropsWithoutRef<'section'>, keyof SpacingProps | 'color'> {
   color?: Color;
   /**
-   * Marks the section as a dark surface so descendants (Heading, Button,
-   * Link) pick up light `var(--text)` color. Use for hero sections with
-   * dark or strongly colored backgrounds. For the rare case of forcing a
-   * light surface inside a dark page, apply `className="surface-light"`.
+   * Marks the section as a dark surface — a local dark token context, so
+   * descendants (Heading, Button, Link, muted text, borders) take the dark
+   * theme's values. Use for hero sections with dark or strongly colored
+   * backgrounds. For the rare case of forcing a light surface inside a
+   * dark page, apply `className="surface-light"`.
    */
   dark?: boolean;
   testId?: string;

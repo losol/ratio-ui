@@ -17,7 +17,9 @@
  * later, these belong in `theme.css` next to info/success/warning/error.
  */
 
-:root {
+/* Also on the surface scopes, so a surface inside the other mode matches. */
+:root,
+.surface-light {
   /* Retro palette */
   --retro-bg:           #0a0d09;
   --retro-bg-strip:     #11160f;
@@ -51,7 +53,8 @@
 }
 
 :root[data-theme="dark"],
-:root[data-color-scheme="dark"] {
+:root[data-color-scheme="dark"],
+.surface-dark {
   --debug-bg:     rgba(100, 100, 100, 0.16);
   --debug-border: rgba(100, 100, 100, 0.28);
   --debug-text:   var(--color-neutral-300);
