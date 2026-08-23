@@ -59,7 +59,7 @@ const columns = [
 | `onExpandedChange` | `OnChangeFn<ExpandedState>` | Fires when a row is toggled, controlled or not. |
 | `expansionMode` | `'single' \| 'multiple'` | Uncontrolled policy. `'single'` (default) closes the open row when another opens. |
 | `onRowClick` | `(row) => void` | Row click for pointer users; clicks on a control inside the row are that control's. |
-| `emptyState` | `ReactNode` | Shown in place of the rows when nothing matches. |
+| `emptyState` | `ReactNode` | Shown in place of the rows when nothing matches — pass Ratio UI's `EmptyState` (2.18+). |
 | `rowCountLabel` | `(shown, total) => ReactNode` | Renders a count under the table. |
 
 ## TanStack Table v9

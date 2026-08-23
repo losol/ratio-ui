@@ -11,10 +11,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, within } from 'storybook/test';
 import { ActionButton } from '@eventuras/ratio-ui/core/ActionButton';
 import { Badge } from '@eventuras/ratio-ui/core/Badge';
+import { EmptyState } from '@eventuras/ratio-ui/core/EmptyState';
 import { Chip } from '@eventuras/ratio-ui/core/Chip';
 import { Heading } from '@eventuras/ratio-ui/core/Heading';
 import { ToggleButton } from '@eventuras/ratio-ui/core/ToggleButton';
-import { ChevronRight } from '@eventuras/ratio-ui/icons';
+import { Button } from '@eventuras/ratio-ui/core/Button';
+import { ChevronRight, ScrollText } from '@eventuras/ratio-ui/icons';
 import DataTable, { createColumnHelper } from './DataTable';
 import type { DataTableProps } from './DataTable';
 
@@ -187,7 +189,9 @@ export const SearchAndCounts: Story = {
     getRowCanExpand: () => true,
     renderSubComponent: ({ row }) => copyList(row),
     rowCountLabel: (shown, total) => `${shown} of ${total} works`,
-    emptyState: 'No work matches the search.',
+    // The slot takes any node — Ratio UI's EmptyState is what it's for.
+    // `role="status"` announces the message when it replaces the rows.
+    emptyState: <EmptyState size="sm" role="status" title="No work matches the search." />,
   },
 };
 
@@ -286,7 +290,16 @@ export const Empty: Story = {
   args: {
     columns,
     data: [],
-    emptyState: 'No works catalogued yet.',
+    // Nothing catalogued yet reads differently from a filter that matched
+    // nothing: it names what would appear, and offers the way to add it.
+    emptyState: (
+      <EmptyState
+        icon={<ScrollText size={24} />}
+        title="No works catalogued yet"
+        description="Registered works appear here, newest first."
+        action={<Button variant="primary">Register a work</Button>}
+      />
+    ),
     rowCountLabel: (shown, total) => `${shown} of ${total} works`,
   },
 };
