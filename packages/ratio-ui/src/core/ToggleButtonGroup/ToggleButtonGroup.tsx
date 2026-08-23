@@ -5,14 +5,12 @@
 'use client';
 
 import React from 'react';
-import {
-  ToggleButton,
-  ToggleButtonGroup as AriaToggleButtonGroup,
-  type Key,
-} from 'react-aria-components';
+import { ToggleButtonGroup as AriaToggleButtonGroup, type Key } from 'react-aria-components';
+import { ToggleButton } from '../ToggleButton';
 import { cn } from '../../utils/cn';
 
 export type ToggleButtonGroupSize = 'sm' | 'md' | 'lg';
+export type ToggleButtonGroupVariant = 'segmented' | 'chips';
 
 export interface ToggleButtonOption {
   /** Stable identity of the segment; the key reported in the selection. */
@@ -30,9 +28,18 @@ export interface ToggleButtonOption {
 export interface ToggleButtonGroupProps {
   /** The segments, in display order. */
   options: ToggleButtonOption[];
+  /**
+   * `'segmented'` (default) sits the options in one recessed pill track —
+   * a few mutually exclusive views of the same thing, always visible
+   * together. `'chips'` drops the track and lets each option stand as its
+   * own outlined pill, wrapping onto further lines: the filter-chip row,
+   * where the set can be long and any number may be on at once.
+   * @default 'segmented'
+   */
+  variant?: ToggleButtonGroupVariant;
   /** Segment size — same `sm | md | lg` scale as Button. @default 'md' */
   size?: ToggleButtonGroupSize;
-  /** Stretch to fill the container; segments then share the width equally. */
+  /** Stretch to fill the container; segments then share the width equally. Segmented only. */
   fullWidth?: boolean;
 
   // — React Aria selection model —
@@ -74,13 +81,6 @@ export interface ToggleButtonGroupProps {
   testId?: string;
 }
 
-/** Per-size padding + type scale for a segment. */
-const SIZE: Record<ToggleButtonGroupSize, string> = {
-  sm: 'px-2 py-0.5 text-xs',
-  md: 'px-3 py-1.25 text-[13px]',
-  lg: 'px-4 py-2 text-sm',
-};
-
 /**
  * ToggleButtonGroup — a pill-shaped row of options with a filled active segment
  * (iOS-style). A thin, token-driven skin over React Aria's `ToggleButtonGroup`,
@@ -114,6 +114,7 @@ const SIZE: Record<ToggleButtonGroupSize, string> = {
  * />
  */
 export function ToggleButtonGroup({
+  variant = 'segmented',
   options,
   size = 'md',
   fullWidth = false,
@@ -166,37 +167,31 @@ export function ToggleButtonGroup({
       aria-label={ariaLabel}
       data-testid={testId}
       className={cn(
-        // Recessed pill track: a low-opacity tint of the text color reads on
-        // both light and dark surfaces without a dedicated token.
-        'inline-flex gap-1 p-0.75 rounded-full border border-border-1 bg-[color-mix(in_srgb,var(--text)_7%,transparent)]',
-        fullWidth && 'flex w-full',
+        variant === 'segmented'
+          ? // Recessed pill track: a low-opacity tint of the text color reads on
+            // both light and dark surfaces without a dedicated token.
+            'inline-flex gap-1 p-0.75 rounded-full border border-border-1 bg-[color-mix(in_srgb,var(--text)_7%,transparent)]'
+          : // Chips carry their own outline, so the row is just layout — and it
+            // wraps, since a filter set has no fixed length.
+            'flex flex-wrap items-center gap-2',
+        variant === 'segmented' && fullWidth && 'flex w-full',
         className,
       )}
     >
       {options.map((option) => (
+        // The pill chrome lives in ToggleButton's variants, so a lone toggle
+        // and one inside a group are the same component.
         <ToggleButton
           key={option.value}
           id={option.value}
+          variant={variant === 'chips' ? 'chip' : 'segmented'}
+          size={size}
           isDisabled={option.isDisabled}
           // When `label` isn't plain text (e.g. an icon), the button would have
           // no accessible name — fall back to `title` so it isn't announced
           // empty. Text labels name themselves, so leave those undefined.
           aria-label={typeof option.label === 'string' ? undefined : option.title}
-          className={({ isSelected, isHovered, isFocusVisible, isDisabled: segDisabled }) =>
-            cn(
-              'inline-flex items-center justify-center rounded-full border-0 font-semibold cursor-pointer whitespace-nowrap outline-none transition-colors duration-150',
-              SIZE[size],
-              fullWidth && 'flex-1',
-              isSelected
-                ? 'text-(--text-on-primary) bg-(--primary)'
-                : 'text-(--text-muted)',
-              !isSelected &&
-                isHovered &&
-                'text-(--text) bg-[color-mix(in_srgb,var(--text)_5%,transparent)]',
-              isFocusVisible && 'ring-2 ring-(--focus-ring)',
-              segDisabled && 'opacity-50 cursor-not-allowed',
-            )
-          }
+          className={variant === 'segmented' && fullWidth ? 'flex-1' : undefined}
         >
           {/* `title` lives on the content span: React Aria's ToggleButton only
               forwards its curated DOM-attribute set, which omits `title`. */}

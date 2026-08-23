@@ -207,3 +207,43 @@ export const DisabledSegment: ToggleButtonGroupStory = () => (
     ]}
   />
 );
+
+/**
+ * `variant="chips"` drops the shared track: each option becomes its own
+ * outlined pill and the row wraps. That is the filter-chip form — a set with
+ * no fixed length, where any number may be on at once — as against the
+ * segmented track, which suits a few mutually exclusive views seen together.
+ *
+ * The selection API is the same either way; only the chrome changes. Both
+ * forms render `ToggleButton`'s pill variants, so a lone toggle matches a row
+ * of them.
+ */
+export const Chips: ToggleButtonGroupStory = () => {
+  const [selected, setSelected] = useState<Set<Key>>(() => new Set(['astronomy', 'mathematics']));
+  const fields = [
+    { value: 'astronomy', label: 'Astronomy', count: 41 },
+    { value: 'mathematics', label: 'Mathematics', count: 63 },
+    { value: 'medicine', label: 'Medicine', count: 18 },
+    { value: 'geography', label: 'Geography', count: 12 },
+    { value: 'poetry', label: 'Poetry', count: 87 },
+    { value: 'rhetoric', label: 'Rhetoric', count: 24 },
+    { value: 'law', label: 'Law', count: 9 },
+  ];
+  return (
+    <div style={{ maxWidth: 460, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <ToggleButtonGroup
+        variant="chips"
+        aria-label="Filter by field of study"
+        selectionMode="multiple"
+        options={fields}
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+      />
+      <p style={{ fontSize: 13, color: 'var(--text-subtle)' }}>
+        {selected.size === 0
+          ? 'No field selected — the shelves stay closed.'
+          : `${selected.size} of ${fields.length} fields`}
+      </p>
+    </div>
+  );
+};
