@@ -28,16 +28,16 @@ import '@eventuras/ratio-ui/ratio-ui.css';
 ```tsx
 import { DataTable, createColumnHelper } from '@eventuras/datatable';
 
-type Course = { id: string; title: string; seats: number };
+type Manuscript = { id: string; title: string; author: string };
 
-const column = createColumnHelper<Course>();
+const column = createColumnHelper<Manuscript>();
 
 const columns = [
-  column.accessor('title', { header: 'Course' }),
-  column.accessor('seats', { header: 'Seats' }),
+  column.accessor('title', { header: 'Work' }),
+  column.accessor('author', { header: 'Author' }),
 ];
 
-<DataTable columns={columns} data={courses} enableGlobalSearch clientsidePagination pageSize={20} />;
+<DataTable columns={columns} data={works} enableGlobalSearch clientsidePagination pageSize={20} />;
 ```
 
 ## Props
@@ -51,10 +51,51 @@ const columns = [
 | `enableGlobalSearch` | `boolean` | Adds a `SearchField` that fuzzy-matches across every column. |
 | `columnFilters` | `ColumnFilter[]` | Per-column filters, controlled from the outside. |
 | `state` | `Partial<TableState>` | Escape hatch for any other TanStack table state. |
-| `renderToolbar` | `(searchInput) => ReactNode` | Wrap the search input in your own toolbar. |
+| `renderToolbar` | `(searchInput, { shown, total }) => ReactNode` | Wrap the search input in your own toolbar; `meta` carries the row counts. |
 | `renderSubComponent` | `({ row }) => ReactElement` | Content for an expanded row. |
 | `getRowCanExpand` | `(row) => boolean` | Which rows can expand. |
 | `getRowId` | `(originalRow, index) => string` | Stable row identity; useful when rows reorder. |
+| `expanded` | `ExpandedState` | Controlled expansion — a record of row ids, or `true` for every row. |
+| `onExpandedChange` | `OnChangeFn<ExpandedState>` | Fires when a row is toggled, controlled or not. |
+| `expansionMode` | `'single' \| 'multiple'` | Uncontrolled policy. `'single'` (default) closes the open row when another opens. |
+| `onRowClick` | `(row) => void` | Row click for pointer users; clicks on a control inside the row are that control's. |
+| `emptyState` | `ReactNode` | Shown in place of the rows when nothing matches. |
+| `rowCountLabel` | `(shown, total) => ReactNode` | Renders a count under the table. |
+
+## Expanding rows
+
+The table renders the open row's content but never invents the control that
+opens it — add an expander column, TanStack-style:
+
+```tsx
+const expander = column.display({
+  id: 'expander',
+  header: () => null,
+  cell: ({ row }) =>
+    row.getCanExpand() ? (
+      <button onClick={row.getToggleExpandedHandler()}>…</button>
+    ) : null,
+});
+
+<DataTable
+  columns={[expander, ...columns]}
+  data={works}
+  getRowCanExpand={() => true}
+  renderSubComponent={({ row }) => <Copies work={row.original} />}
+/>;
+```
+
+Left alone, one row stays open at a time. Pass `expanded` to own it — a
+toolbar switch that sets `expanded={showDetail ? true : {}}` unfolds every
+row, the density control a long admin list needs. A global search opens every
+row while it's active, so a match inside expanded content is visible.
+
+## Accessibility
+
+`onRowClick` is a pointer convenience: it does not make the row focusable.
+Keep the real destination in a cell — a link or a button — so keyboard and
+screen-reader users have a path. Clicks that land on a control inside the row
+don't trigger `onRowClick`.
 
 ## History
 
