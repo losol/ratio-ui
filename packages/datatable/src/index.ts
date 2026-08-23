@@ -1,2 +1,8 @@
-export { default as DataTable, createColumnHelper } from './DataTable';
-export type { ColumnFilter, DataTableProps, DataTableExpansionMode } from './DataTable';
+export { default as DataTable, createColumnHelper, dataTableFeatures } from './DataTable';
+export type {
+  ColumnFilter,
+  DataTableProps,
+  DataTableExpansionMode,
+  DataTableFeatures,
+  DataTableRow,
+} from './DataTable';
