@@ -9,11 +9,22 @@ import { Tab, TabList, TabPanel, Tabs as AriaTabs } from 'react-aria-components'
 import { cn } from '../../utils/cn';
 
 export type TabItemProps = {
+  /**
+   * Stable key, and what `selectedKey` addresses. Required when `title` isn't
+   * a plain string — otherwise the title serves as the key.
+   */
   id?: string;
-  title: string;
+  /**
+   * Visible label. Any node composes here — a status dot beside the text, a
+   * count `<Chip>` — but keep some text in it (or pass `aria-label`) so the
+   * tab has an accessible name.
+   */
+  title: React.ReactNode;
   children: React.ReactNode | null;
   /** Disable just this tab (not focusable, not selectable). */
   isDisabled?: boolean;
+  /** Accessible name, for a `title` that carries no text of its own. */
+  'aria-label'?: string;
   testId?: string;
 };
 
@@ -35,7 +46,7 @@ export interface TabsComponent extends React.FC<TabsProps> {
 const styles = {
   tabList: 'flex gap-1 list-none overflow-x-auto border-b border-border-1',
   tab: {
-    base: 'font-semibold py-2.5 px-4 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring) transition-colors whitespace-nowrap -mb-px border-b-2',
+    base: 'flex items-center gap-2 font-semibold py-2.5 px-4 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring) transition-colors whitespace-nowrap -mb-px border-b-2',
     selected: 'border-(--primary) text-(--text)',
     notSelected: 'border-transparent text-(--text-muted) hover:text-(--text)',
   },
@@ -48,6 +59,18 @@ const styles = {
  * single opaque child — so items wrapped in one produced a lone tab with
  * `title`/`id` of `undefined` (an empty, unlabeled pill) instead of the tabs.
  */
+/**
+ * Key for a tab and its panel: explicit `id`, else a string `title`. A
+ * ReactNode title can't be a key (it would stringify to "[object Object]"),
+ * so those fall back to the position — stable while the tabs are, which is
+ * why `id` is documented as required there.
+ */
+function itemKey(item: ReactElement<TabItemProps>, index: number): string {
+  const { id, title } = item.props;
+  if (id) return id;
+  return typeof title === 'string' ? title : `tab-${index}`;
+}
+
 function collectItems(children: React.ReactNode): ReactElement<TabItemProps>[] {
   return React.Children.toArray(children).flatMap((child) => {
     if (!React.isValidElement(child)) return [];
@@ -65,6 +88,9 @@ function collectItems(children: React.ReactNode): ReactElement<TabItemProps>[] {
  * `<Tabs.Item title="…">…</Tabs.Item>` children (a fragment around them is
  * fine); selection is controllable via `selectedKey` / `onSelectionChange` or
  * uncontrolled via `defaultSelectedKey`.
+ *
+ * A `title` may be any node — text plus a status dot, a count chip — in which
+ * case give the item an `id`, since the title is otherwise what keys it.
  */
 export const TabsRoot: React.FC<TabsProps> = ({
   children,
@@ -83,13 +109,14 @@ export const TabsRoot: React.FC<TabsProps> = ({
       onSelectionChange={(key) => onSelectionChange?.(String(key))}
     >
       <TabList className={styles.tabList}>
-        {validChildren.map((child) => {
-          const id = child.props.id ?? child.props.title;
+        {validChildren.map((child, index) => {
+          const id = itemKey(child, index);
           return (
             <Tab
               key={id}
               id={id}
               isDisabled={child.props.isDisabled}
+              aria-label={child.props['aria-label']}
               data-testid={child.props.testId}
               className={({ isSelected, isDisabled }) =>
                 cn(
@@ -106,8 +133,8 @@ export const TabsRoot: React.FC<TabsProps> = ({
         })}
       </TabList>
 
-      {validChildren.map((child) => {
-        const id = child.props.id ?? child.props.title;
+      {validChildren.map((child, index) => {
+        const id = itemKey(child, index);
         return (
           <TabPanel
             key={id}
