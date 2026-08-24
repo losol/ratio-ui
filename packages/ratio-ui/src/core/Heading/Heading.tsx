@@ -37,11 +37,9 @@ const HeadingRoot = ({
   const [spacing, domProps] = extractSpacingProps(rest);
   return (
     <HeadingComponent
+      data-testid={testId}
       {...domProps}
       className={cn('text-(--text)', buildSpacingClasses(spacing), className)}
-      // Only override when `testId` is set, so a `data-testid` forwarded
-      // through `domProps` survives instead of being clobbered with undefined.
-      {...(testId !== undefined && { 'data-testid': testId })}
     >
       {children}
     </HeadingComponent>

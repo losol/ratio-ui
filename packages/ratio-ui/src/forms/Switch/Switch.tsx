@@ -112,8 +112,8 @@ export function Switch({
 
   return (
     <AriaSwitch
-      {...props}
       data-testid={testId}
+      {...props}
       className={cn(
         'group flex cursor-pointer items-center gap-3 outline-none',
         'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',

@@ -45,9 +45,9 @@ const ConsoleRoot: React.FC<ConsoleProps> = ({
   ...rest
 }) => (
   <section
+    data-testid={testId}
     {...rest}
     className={cn('console', `--theme-${theme}`, className)}
-    data-testid={testId}
   >
     {children}
   </section>

@@ -133,9 +133,9 @@ export function NumberField({
 
   return (
     <AriaNumberField
+      data-testid={testId}
       {...props}
       className={clsx(styles.wrapper, className)}
-      data-testid={testId}
     >
       {label && <Label className={styles.label}>{label}</Label>}
 
