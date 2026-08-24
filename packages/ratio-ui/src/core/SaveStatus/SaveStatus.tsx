@@ -99,10 +99,8 @@ export function SaveStatus({
   return (
     <Chip
       role="status"
+      data-testid={testId}
       {...rest}
-      // Only override when `testId` is set: `data-testid={undefined}` after
-      // the spread would drop a forwarded one (same guard as `Heading`).
-      {...(testId !== undefined && { 'data-testid': testId })}
       data-state={status}
       className={cn('font-mono transition-colors', SIZE[size], STATE_STYLE[status], className)}
     >

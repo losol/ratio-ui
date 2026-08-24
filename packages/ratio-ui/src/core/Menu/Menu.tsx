@@ -132,10 +132,10 @@ export type MenuLinkProps = {
 
 const MenuLink = ({ icon, isCurrent, variant, children, testId, ...rest }: MenuLinkProps & MenuItemProps) => (
   <MenuItem
+    data-testid={testId}
     {...rest}
     aria-current={isCurrent ? 'page' : undefined}
     data-current={isCurrent || undefined}
-    data-testid={testId}
     className={cn(styles.menuItem, variant === 'danger' && styles.menuItemDanger)}
   >
     {icon && (
@@ -263,9 +263,9 @@ const MenuButton = (props: MenuButtonProps & MenuItemProps) => {
   void onClick;
   return (
     <MenuItem
+      data-testid={testId}
       {...rest}
       className={cn(styles.menuItem, variant === 'danger' && styles.menuItemDanger)}
-      data-testid={testId}
     >
       {icon && (
         <span aria-hidden className={cn(styles.itemIcon, variant === 'danger' && styles.itemIconDanger)}>

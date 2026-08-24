@@ -82,10 +82,8 @@ export function EmptyState({
 
   return (
     <div
+      data-testid={testId}
       {...rest}
-      // Only override when `testId` is set: `data-testid={undefined}` after
-      // the spread would drop a forwarded one (same guard as `Heading`).
-      {...(testId !== undefined && { 'data-testid': testId })}
       className={cn('flex flex-col items-center text-center', styles.root, className)}
     >
       {icon && (
