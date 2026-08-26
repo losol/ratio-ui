@@ -224,7 +224,7 @@ export function CommandPalette({
       {/* Dialog */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/50"
+          className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-scrim"
           onClick={(e) => {
             if (e.target === e.currentTarget) close();
           }}

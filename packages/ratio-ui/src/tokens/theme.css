@@ -170,6 +170,7 @@
   --color-overlay-hover: var(--overlay-hover);
   --color-overlay-press: var(--overlay-press);
   --color-overlay-drag: var(--overlay-drag);
+  --color-scrim: var(--scrim);
 
   /* Status (semantic) */
   --color-success: var(--success-solid);
@@ -198,6 +199,9 @@
 
   /* Shadow */
   --shadow-focus: 0 0 0 4px var(--focus-ring);
+  /* Floating-layer family (Drawer, Dialog) — soft, large and warm-tinted,
+     the lift that separates a panel from the scrimmed page. */
+  --shadow-overlay: 0 24px 60px rgb(20 14 8 / 0.38);
   /* Card hover glow — Linseed-tinted, theme-aware via --primary.
      Kept low-alpha so the lift hints rather than shouts. */
   --shadow-card-hover-tile: 0 2px 6px
@@ -244,6 +248,10 @@
   --overlay-hover: rgba(var(--overlay-ink), var(--alpha-1));
   --overlay-press: rgba(var(--overlay-ink), var(--alpha-2));
   --overlay-drag: rgba(var(--overlay-ink), var(--alpha-3));
+
+  /* Scrim behind drawers/sheets — warm ink, dims the page without
+     going pitch black. */
+  --scrim: rgb(20 14 8 / 0.55);
 
   /* Page surface — warm Linen, slightly muted. */
   --surface: oklch(0.945 0.012 88);
@@ -323,6 +331,10 @@
   --overlay-hover: rgba(var(--overlay-ink), var(--alpha-1));
   --overlay-press: rgba(var(--overlay-ink), var(--alpha-2));
   --overlay-drag: rgba(var(--overlay-ink), var(--alpha-3));
+
+  /* Scrim — deeper than light mode so the sheet still separates from
+     an already-dark page. */
+  --scrim: rgb(0 0 0 / 0.62);
 
   /* Page surface — Linseed-950, the deep cool floor of the palette. */
   --surface: var(--color-primary-950);
