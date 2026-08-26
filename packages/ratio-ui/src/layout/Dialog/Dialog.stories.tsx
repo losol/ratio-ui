@@ -46,6 +46,45 @@ export const WithTriggerButton: Story = {
   render: args => <StatefulDialog {...args} />,
 };
 
+const FamilyHeaderDemo = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Edit participant</Button>
+      <Dialog isOpen={open} onClose={() => setOpen(false)}>
+        <Dialog.Header>
+          <Dialog.Eyebrow>Participant</Dialog.Eyebrow>
+          <Dialog.Heading>Edit registration</Dialog.Heading>
+        </Dialog.Header>
+        <Dialog.Content>
+          <p>
+            Changes are saved on the registration and confirmed by email. The header above —
+            eyebrow, heading, close button — is the same chrome a Drawer renders, because the two
+            are one family: a dialog is the centered placement, a drawer the edge placement.
+          </p>
+        </Dialog.Content>
+        <Dialog.Footer>
+          <Button variant="secondary" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={() => setOpen(false)}>Save changes</Button>
+        </Dialog.Footer>
+      </Dialog>
+    </>
+  );
+};
+
+/**
+ * The family anatomy: `Header` wraps an `Eyebrow` and `Heading` and renders
+ * the close button for you — identical chrome to `Drawer.Header`, so a panel
+ * reads the same whether it interrupts in the center or slides in from an
+ * edge. Actions sit right-aligned with the primary last; a drawer would
+ * stretch them full width instead.
+ */
+export const FamilyHeader: Story = {
+  render: () => <FamilyHeaderDemo />,
+};
+
 const FooterDemo = () => {
   const [open, setOpen] = useState(false);
   return (

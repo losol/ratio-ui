@@ -12,6 +12,10 @@
  * This is the home for animations used across more than one component.
  */
 @theme {
+  /* Floating-layer easing (Drawer, Dialog): fast launch, soft settle. Use via
+     the `ease-overlay` utility so every panel arrives with the same motion. */
+  --ease-overlay: cubic-bezier(0.32, 0.72, 0, 1);
+
   /* Quick scale + fade "pop" — a success affordance appearing after an action
      completes (copy ✓, save ✓, …). Use via the `animate-pop` utility. */
   --animate-pop: pop 0.32s ease-out;

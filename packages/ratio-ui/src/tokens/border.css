@@ -10,4 +10,6 @@
   --radius: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+  /* Floating-layer family (Drawer, Dialog): the corner of a detached panel. */
+  --radius-overlay: 1.25rem;
 }
