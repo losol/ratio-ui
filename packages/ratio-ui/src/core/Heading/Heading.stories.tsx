@@ -49,6 +49,50 @@ export const Level6 = () =>
   });
 
 /**
+ * `size` decouples the visual scale from the semantic level. Without it,
+ * headings follow the document prose scale from `global.css`; with it they
+ * use a compact serif scale with margins zeroed, for composed UI where the
+ * layout owns spacing — cards, panels, detail-page headers.
+ */
+export const Sizes = () => (
+  <div className="space-y-8 max-w-2xl">
+    <div>
+      <Heading as="h1" size="lg">
+        Readers scan before they read
+      </Heading>
+      <p className="mt-2">
+        Eye-tracking studies consistently show readers skimming headings,
+        first lines, and highlighted facts before committing to a text. An h1
+        at <code>size="lg"</code> is quieter than the 6xl prose default —
+        suited to detail pages where a facts strip or aside competes for that
+        first scan.
+      </p>
+    </div>
+    <div>
+      <Heading as="h2" size="md">
+        Hierarchy is wayfinding
+      </Heading>
+      <p className="mt-2">
+        Clear visual steps between heading levels act like signposts in a
+        long text: they let a reader predict where an answer lives without
+        reading everything. An h2 at <code>size="md"</code> steps down
+        visually without giving up its semantic level.
+      </p>
+    </div>
+    <div>
+      <Heading as="h2" size="sm">
+        Semantics outrank size
+      </Heading>
+      <p className="mt-2">
+        Screen readers navigate by heading level, not font size — so a card
+        heading can shrink to <code>size="sm"</code> and remain an h2 in the
+        document outline. Scale is presentation; structure is meaning.
+      </p>
+    </div>
+  </div>
+);
+
+/**
  * `Heading.Group` renders an `<hgroup>` — semantic HTML for a heading
  * paired with a kicker/eyebrow. Assistive technology may present this
  * grouping differently, but it conveys that the texts belong together.
