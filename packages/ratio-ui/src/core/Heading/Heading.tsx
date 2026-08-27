@@ -6,10 +6,28 @@ import type { SpacingProps } from '../../tokens/spacing';
 import { buildSpacingClasses, extractSpacingProps } from '../../tokens/spacing';
 import { cn } from '../../utils/cn';
 
+export type HeadingSize = 'sm' | 'md' | 'lg';
+
+// Compact editorial scale: serif at medium weight, tight tracking, margins
+// zeroed so the surrounding layout owns spacing (unlike the prose scale in
+// global.css, where headings carry their own margins).
+const sizeClasses: Record<HeadingSize, string> = {
+  sm: 'text-xl',
+  md: 'text-2xl',
+  lg: 'text-4xl',
+};
+
 export interface HeadingProps
   extends SpacingProps,
     React.HTMLAttributes<HTMLHeadingElement> {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  /**
+   * Visual scale, decoupled from the semantic level. Unset (default) keeps
+   * the document prose scale from `global.css` (h1 6xl … h3 2xl). Set it in
+   * composed UI — cards, panels, detail-page shells — for a compact serif
+   * heading with no margins: `sm` xl, `md` 2xl, `lg` 4xl.
+   */
+  size?: HeadingSize;
   children: React.ReactNode;
   className?: string;
   testId?: string;
@@ -25,6 +43,7 @@ export interface HeadingProps
  */
 const HeadingRoot = ({
   as: HeadingComponent = 'h1',
+  size,
   children,
   className,
   testId,
@@ -39,7 +58,13 @@ const HeadingRoot = ({
     <HeadingComponent
       data-testid={testId}
       {...domProps}
-      className={cn('text-(--text)', buildSpacingClasses(spacing), className)}
+      className={cn(
+        'text-(--text)',
+        size && 'font-serif font-medium tracking-tight leading-tight m-0',
+        size && sizeClasses[size],
+        buildSpacingClasses(spacing),
+        className,
+      )}
     >
       {children}
     </HeadingComponent>
