@@ -172,13 +172,9 @@ export interface FooterSocialItemProps extends React.AnchorHTMLAttributes<HTMLAn
   children?: React.ReactNode;
 }
 
-interface FooterSocialComponent extends React.FC<FooterSocialProps> {
-  Item: React.FC<FooterSocialItemProps>;
-}
-
-const FooterSocial = ((({ children, className }: FooterSocialProps) => (
+const FooterSocialRoot: React.FC<FooterSocialProps> = ({ children, className }) => (
   <div className={cn('ratio-footer__social', className)}>{children}</div>
-)) as FooterSocialComponent);
+);
 
 const FooterSocialItem: React.FC<FooterSocialItemProps> = ({
   label,
@@ -197,7 +193,7 @@ const FooterSocialItem: React.FC<FooterSocialItemProps> = ({
   </Component>
 );
 
-FooterSocial.Item = FooterSocialItem;
+const FooterSocial = Object.assign(FooterSocialRoot, { Item: FooterSocialItem });
 
 // ── BottomBar ────────────────────────────────────────────────────────────────
 
@@ -232,17 +228,6 @@ const FooterBottomBar: React.FC<FooterBottomBarProps> = ({
 
 // ── Shell + compound assembly ────────────────────────────────────────────────
 
-interface FooterComponent extends React.FC<FooterProps> {
-  Classic: React.FC<FooterClassicProps>;
-  Brand: React.FC<FooterBrandProps>;
-  LinkColumn: React.FC<FooterLinkColumnProps>;
-  Link: React.FC<FooterLinkProps>;
-  Publisher: React.FC<FooterPublisherProps>;
-  Newsletter: React.FC<FooterNewsletterProps>;
-  Social: FooterSocialComponent;
-  BottomBar: React.FC<FooterBottomBarProps>;
-}
-
 /**
  * Thin `<footer>` shell with the standard background, padding, and `Container`
  * wrapper. Compose your own layout from the building blocks — `Footer.Brand`,
@@ -251,7 +236,7 @@ interface FooterComponent extends React.FC<FooterProps> {
  * `Footer.BottomBar` — or use `Footer.Classic` for the legacy fixed layout.
  * Everything is token-driven; set `dark` to anchor the page with a deep block.
  */
-const FooterRoot: FooterComponent = (({ children, className, dark }: FooterProps) => (
+const FooterRoot: React.FC<FooterProps> = ({ children, className, dark }) => (
   <footer
     className={cn(
       'p-3 pt-10',
@@ -261,7 +246,7 @@ const FooterRoot: FooterComponent = (({ children, className, dark }: FooterProps
   >
     <Container>{children}</Container>
   </footer>
-)) as FooterComponent;
+);
 
 /**
  * Pre-2.0 Footer layout — siteTitle and an optional publisher block on the
@@ -303,13 +288,13 @@ const FooterClassic: React.FC<FooterClassicProps> = ({
   </FooterRoot>
 );
 
-FooterRoot.Classic = FooterClassic;
-FooterRoot.Brand = FooterBrand;
-FooterRoot.LinkColumn = FooterLinkColumn;
-FooterRoot.Link = FooterLink;
-FooterRoot.Publisher = FooterPublisher;
-FooterRoot.Newsletter = FooterNewsletter;
-FooterRoot.Social = FooterSocial;
-FooterRoot.BottomBar = FooterBottomBar;
-
-export const Footer = FooterRoot;
+export const Footer = Object.assign(FooterRoot, {
+  Classic: FooterClassic,
+  Brand: FooterBrand,
+  LinkColumn: FooterLinkColumn,
+  Link: FooterLink,
+  Publisher: FooterPublisher,
+  Newsletter: FooterNewsletter,
+  Social: FooterSocial,
+  BottomBar: FooterBottomBar,
+});

@@ -29,23 +29,14 @@ export interface HeroProps {
   backgroundImageUrl?: string;
 }
 
-interface HeroSlotProps {
+export interface HeroSlotProps {
   children?: ReactNode;
   className?: string;
 }
 
-interface HeroTitleProps extends HeroSlotProps {
+export interface HeroTitleProps extends HeroSlotProps {
   /** Heading level. Defaults to 1 — heroes are usually the page's primary heading. */
   as?: 'h1' | 'h2';
-}
-
-interface HeroComponent extends React.FC<HeroProps> {
-  Main: React.FC<HeroSlotProps>;
-  Side: React.FC<HeroSlotProps>;
-  Eyebrow: React.FC<HeroSlotProps>;
-  Title: React.FC<HeroTitleProps>;
-  Lead: React.FC<HeroSlotProps>;
-  Actions: React.FC<HeroSlotProps>;
 }
 
 /**
@@ -76,13 +67,13 @@ interface HeroComponent extends React.FC<HeroProps> {
  * </Hero>
  * ```
  */
-const HeroRoot: HeroComponent = (({
+const HeroRoot: React.FC<HeroProps> = ({
   children,
   className,
   style,
   dark,
   backgroundImageUrl,
-}: HeroProps) => {
+}) => {
   // Detect whether the consumer included a Hero.Side so we can drop the
   // second grid column when there's nothing to put in it. Without this
   // the main content would float in the left half on lg+ with empty
@@ -114,7 +105,7 @@ const HeroRoot: HeroComponent = (({
       </Container>
     </section>
   );
-}) as HeroComponent;
+};
 
 const HeroMain: React.FC<HeroSlotProps> = ({ children, className }) => (
   <div className={className}>{children}</div>
@@ -167,11 +158,11 @@ const HeroActions: React.FC<HeroSlotProps> = ({ children, className }) => (
   <div className={cn('flex gap-3 flex-wrap mt-8', className)}>{children}</div>
 );
 
-HeroRoot.Main = HeroMain;
-HeroRoot.Side = HeroSide;
-HeroRoot.Eyebrow = HeroEyebrow;
-HeroRoot.Title = HeroTitle;
-HeroRoot.Lead = HeroLead;
-HeroRoot.Actions = HeroActions;
-
-export const Hero = HeroRoot;
+export const Hero = Object.assign(HeroRoot, {
+  Main: HeroMain,
+  Side: HeroSide,
+  Eyebrow: HeroEyebrow,
+  Title: HeroTitle,
+  Lead: HeroLead,
+  Actions: HeroActions,
+});
