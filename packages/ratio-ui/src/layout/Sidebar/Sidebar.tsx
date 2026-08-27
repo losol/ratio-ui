@@ -36,15 +36,9 @@ export interface SidebarProps {
   testId?: string;
 }
 
-interface SidebarSlotProps {
+export interface SidebarSlotProps {
   children: ReactNode;
   className?: string;
-}
-
-export interface SidebarComponent extends React.FC<SidebarProps> {
-  Header: React.FC<SidebarSlotProps>;
-  Body: React.FC<SidebarSlotProps>;
-  Footer: React.FC<SidebarSlotProps>;
 }
 
 /**
@@ -70,7 +64,7 @@ export interface SidebarComponent extends React.FC<SidebarProps> {
  *   <Sidebar.Footer>…theme toggle…</Sidebar.Footer>
  * </Sidebar>
  */
-const Sidebar: SidebarComponent = ({
+const SidebarRoot: React.FC<SidebarProps> = ({
   children,
   width = 236,
   collapsed = false,
@@ -111,8 +105,8 @@ const SidebarFooter: React.FC<SidebarSlotProps> = ({ children, className }) => (
 );
 SidebarFooter.displayName = 'Sidebar.Footer';
 
-Sidebar.Header = SidebarHeader;
-Sidebar.Body = SidebarBody;
-Sidebar.Footer = SidebarFooter;
-
-export { Sidebar };
+export const Sidebar = Object.assign(SidebarRoot, {
+  Header: SidebarHeader,
+  Body: SidebarBody,
+  Footer: SidebarFooter,
+});

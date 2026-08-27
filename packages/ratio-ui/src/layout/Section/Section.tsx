@@ -26,23 +26,23 @@ export interface SectionProps
   testId?: string;
 }
 
-interface SectionHeaderProps {
+export interface SectionHeaderProps {
   children?: ReactNode;
   className?: string;
 }
 
-interface SectionEyebrowProps {
+export interface SectionEyebrowProps {
   children?: ReactNode;
   className?: string;
 }
 
-interface SectionTitleProps {
+export interface SectionTitleProps {
   children?: ReactNode;
   className?: string;
   as?: 'h1' | 'h2' | 'h3';
 }
 
-interface SectionLinkProps extends React.ComponentPropsWithoutRef<'a'> {
+export interface SectionLinkProps extends React.ComponentPropsWithoutRef<'a'> {
   children?: ReactNode;
   className?: string;
   /**
@@ -55,14 +55,7 @@ interface SectionLinkProps extends React.ComponentPropsWithoutRef<'a'> {
   as?: React.ElementType;
 }
 
-interface SectionComponent extends React.FC<SectionProps> {
-  Header: React.FC<SectionHeaderProps>;
-  Eyebrow: React.FC<SectionEyebrowProps>;
-  Title: React.FC<SectionTitleProps>;
-  Link: React.FC<SectionLinkProps>;
-}
-
-const SectionRoot: SectionComponent = (props => {
+const SectionRoot: React.FC<SectionProps> = props => {
   const [spacing, {
     color,
     dark,
@@ -86,7 +79,7 @@ const SectionRoot: SectionComponent = (props => {
       {children}
     </section>
   );
-}) as SectionComponent;
+};
 
 /**
  * Header row for a section — eyebrow + title on the left, optional
@@ -194,11 +187,11 @@ const SectionLink: React.FC<SectionLinkProps> = ({
   </Component>
 );
 
-SectionRoot.Header = SectionHeader;
-SectionRoot.Eyebrow = SectionEyebrow;
-SectionRoot.Title = SectionTitle;
-SectionRoot.Link = SectionLink;
-
 SectionRoot.displayName = 'Section';
 
-export const Section = SectionRoot;
+export const Section = Object.assign(SectionRoot, {
+  Header: SectionHeader,
+  Eyebrow: SectionEyebrow,
+  Title: SectionTitle,
+  Link: SectionLink,
+});

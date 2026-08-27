@@ -31,19 +31,14 @@ export interface ValueTileProps {
   testId?: string;
 }
 
-interface ValueProps {
+export interface ValueTileValueProps {
   children?: ReactNode;
   className?: string;
 }
 
-interface CaptionProps {
+export interface ValueTileCaptionProps {
   children?: ReactNode;
   className?: string;
-}
-
-interface ValueTileComponent extends React.FC<ValueTileProps> {
-  Value: React.FC<ValueProps>;
-  Caption: React.FC<CaptionProps>;
 }
 
 // Orientation propagates from root to Caption via a `data-orientation`
@@ -77,14 +72,14 @@ interface ValueTileComponent extends React.FC<ValueTileProps> {
  * </ValueTile>
  * ```
  */
-const ValueTileRoot: ValueTileComponent = (({
+const ValueTileRoot: React.FC<ValueTileProps> = ({
   number,
   label,
   orientation = 'vertical',
   children,
   className,
   testId,
-}: ValueTileProps) => {
+}) => {
   const layoutClass =
     orientation === 'horizontal' ? 'flex items-baseline gap-3' : 'flex flex-col';
 
@@ -107,7 +102,7 @@ const ValueTileRoot: ValueTileComponent = (({
       {inner}
     </div>
   );
-}) as ValueTileComponent;
+};
 
 /**
  * Display value slot. Serif, large, follows the semantic `--primary`
@@ -116,7 +111,7 @@ const ValueTileRoot: ValueTileComponent = (({
  * italic-numeral look (HTML `<em>` is italic by default; add a color
  * class for emphasis).
  */
-const ValueTileValue: React.FC<ValueProps> = ({ children, className }) => (
+const ValueTileValue: React.FC<ValueTileValueProps> = ({ children, className }) => (
   <div
     className={cn(
       'font-serif text-4xl leading-none tracking-tight text-(--primary)',
@@ -132,7 +127,7 @@ const ValueTileValue: React.FC<ValueProps> = ({ children, className }) => (
  * (horizontal). The vertical layout adds a small top margin; horizontal
  * relies on the parent's gap.
  */
-const ValueTileCaption: React.FC<CaptionProps> = ({ children, className }) => (
+const ValueTileCaption: React.FC<ValueTileCaptionProps> = ({ children, className }) => (
   <p
     className={cn(
       'text-sm text-(--text-muted)',
@@ -146,9 +141,9 @@ const ValueTileCaption: React.FC<CaptionProps> = ({ children, className }) => (
   </p>
 );
 
-ValueTileRoot.Value = ValueTileValue;
-ValueTileRoot.Caption = ValueTileCaption;
-
 ValueTileRoot.displayName = 'ValueTile';
 
-export const ValueTile = ValueTileRoot;
+export const ValueTile = Object.assign(ValueTileRoot, {
+  Value: ValueTileValue,
+  Caption: ValueTileCaption,
+});
