@@ -1,5 +1,58 @@
 # @eventuras/ratio-ui
 
+## 2.19.0
+
+### Minor Changes
+
+- 8474931: New `AsideLayout` layout primitive: content with a sticky companion rail.
+  Compose `AsideLayout.Main` with `AsideLayout.Aside` — the aside (a
+  registration card, summary, or table of contents) sticks beside the
+  content from `lg`, offset for an app header via `top` and sized via
+  `width`, and stacks below the content on small screens.
+- 3e6a023: DescriptionList gains `variant="facts"` — an editorial key-facts strip with
+  mono overline terms above serif values in a bordered grid — and
+  `variant="meta"` — compact label/value rows for card asides and summaries.
+  The root now also accepts `className` and `testId`. The default look is
+  unchanged.
+- fd0df5b: Drawer is now a floating sheet: inset from the screen edges with radius,
+  border and shadow, a real scrim behind it (new themable `--scrim` token),
+  slide transitions, a draggable dismiss handle on top/bottom sheets, and new
+  `Drawer.Eyebrow` plus `scrim`/`stackOffset` props for stacked drawers.
+  The close button moved into `Drawer.Header`'s row, and slot padding moved
+  from the panel into the slots so the body scrolls alone and the footer
+  divider runs full-bleed. Breaking detail: a drawer composed without the
+  slots gets no default padding anymore — use the slots, or pad the content
+  yourself. Full anatomy is documented in the Drawer stories.
+
+  Dialog joins the same family: one shell (surface, hairline border, shared
+  `--radius-overlay`/`--shadow-overlay`/`--ease-overlay`/`--scrim` tokens,
+  slot padding with a full-bleed footer divider) where a dialog is the
+  centered placement — fade + scale entry — and a drawer the edge placement.
+  New `Dialog.Header` and `Dialog.Eyebrow` mirror Drawer's; AlertDialog and
+  CommandPalette inherit the look.
+
+- ea3cc16: Heading gains a `size` prop (`sm` | `md` | `lg`) that decouples the visual
+  scale from the semantic level. Unset keeps the document prose scale from
+  `global.css`; set, the heading renders on a compact editorial scale — serif
+  at medium weight, tight tracking, margins zeroed — for composed UI such as
+  cards, panels, and detail-page headers where the layout owns spacing.
+
+### Patch Changes
+
+- 3c08b91: Internal: Hero, ValueTile, Sidebar, Footer, and Section now build their
+  compound exports with `Object.assign` inference instead of a hand-rolled
+  `*Component` interface plus cast — matching Heading and DescriptionList.
+  No runtime API change; the slot prop interfaces these components use are
+  now exported (`HeroSlotProps`, `SectionTitleProps`, `SidebarSlotProps`,
+  `ValueTileValueProps`, `ValueTileCaptionProps`, …), and the never
+  re-exported `*Component` interfaces are gone.
+- 951e5cb: A `data-testid` passed to `Switch`, `NumberField`, `Menu.Link`, `Menu.Button`
+  or `Console` was silently dropped: the component set its own `data-testid`
+  after spreading caller props, and React removes an attribute set to
+  `undefined`. It now comes before the spread, as in most of the library, so
+  both routes work. `Heading`, `EmptyState` and `SaveStatus` solved this with a
+  conditional spread; they use the same ordering now, so there is one rule.
+
 ## 2.18.0
 
 ### Minor Changes
