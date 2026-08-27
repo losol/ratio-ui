@@ -1,4 +1,6 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
+import { Badge } from '../Badge';
+import { Card } from '../Card';
 import { DescriptionList } from './DescriptionList';
 
 const meta: Meta<typeof DescriptionList> = {
@@ -54,6 +56,46 @@ export const UserProfile: DescriptionListStory = () => (
       <DescriptionList.Definition>January 2023</DescriptionList.Definition>
     </DescriptionList.Item>
   </DescriptionList>
+);
+
+/**
+ * `variant="facts"` renders an editorial key-facts strip — mono overline
+ * terms above serif values in a bordered grid. Use it under a page title
+ * to surface the handful of facts a reader scans for first. Here: the 1927
+ * Solvay Conference, where 17 of the 29 attendees were or became Nobel
+ * laureates — the fact-strip shape an event page needs.
+ */
+export const FactsStrip: DescriptionListStory = () => (
+  <DescriptionList variant="facts">
+    <DescriptionList.Description term="Date">24–29 October 1927</DescriptionList.Description>
+    <DescriptionList.Description term="Location">Brussels, Belgium</DescriptionList.Description>
+    <DescriptionList.Description term="Attendees">29 physicists</DescriptionList.Description>
+    <DescriptionList.Description term="Nobel laureates">17</DescriptionList.Description>
+  </DescriptionList>
+);
+
+/**
+ * `variant="meta"` renders compact label/value rows — the same mono
+ * overline voice as `facts`, laid out for narrow surfaces like card
+ * asides and order summaries. Here: Faraday's 1860 Christmas Lectures,
+ * "The Chemical History of a Candle" — public science lectures that
+ * became one of the most reprinted science books ever.
+ */
+export const MetaRows: DescriptionListStory = () => (
+  <Card padding="md" className="max-w-sm">
+    <div className="flex items-baseline justify-between gap-4 mb-4">
+      <span className="font-medium">Christmas Lectures</span>
+      <Badge variant="subtle" status="success">
+        Open
+      </Badge>
+    </div>
+    <DescriptionList variant="meta">
+      <DescriptionList.Description term="Lecturer">Michael Faraday</DescriptionList.Description>
+      <DescriptionList.Description term="Location">Royal Institution, London</DescriptionList.Description>
+      <DescriptionList.Description term="Held">December 1860</DescriptionList.Description>
+      <DescriptionList.Description term="Audience">Young people</DescriptionList.Description>
+    </DescriptionList>
+  </Card>
 );
 
 export const ProductDetails: DescriptionListStory = () => (
