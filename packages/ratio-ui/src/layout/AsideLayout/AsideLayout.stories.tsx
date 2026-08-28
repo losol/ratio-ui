@@ -70,8 +70,11 @@ export const Playground: AsideLayoutStory = () => (
 
 /**
  * `top` on the aside offsets the sticky position for an app header rendered
- * above the layout — same convention as `Sidebar`. `width` picks the rail
- * width from `lg`.
+ * above the layout — same convention as `Sidebar`. It takes a px number or
+ * any CSS length: the header here is `h-16`, so `calc(var(--spacing) * 20)`
+ * (header plus one row of breathing room) stays exact while the root font
+ * size — and with it `--spacing` — scales with the viewport. `width` picks
+ * the rail width from `lg`.
  */
 export const UnderAppHeader: AsideLayoutStory = () => (
   <div>
@@ -81,11 +84,11 @@ export const UnderAppHeader: AsideLayoutStory = () => (
     <div className="p-4">
       <AsideLayout>
         <AsideLayout.Main>{article}</AsideLayout.Main>
-        <AsideLayout.Aside top={80} width="lg" aria-label="Key facts">
+        <AsideLayout.Aside top="calc(var(--spacing) * 20)" width="lg" aria-label="Key facts">
           <Card padding="md">
             <p className="text-sm">
-              Sticks 80px down: header height plus breathing room, so the rail never slides
-              under the chrome.
+              Sticks 20 spacing units down: header height plus breathing room, so the rail
+              never slides under the chrome — at every viewport width.
             </p>
           </Card>
         </AsideLayout.Aside>

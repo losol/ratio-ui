@@ -18,13 +18,15 @@ export interface SidebarProps {
   /** Width in px when `collapsed`. @default 64 */
   collapsedWidth?: number;
   /**
-   * Offset in px for a full-width app topbar rendered ABOVE the sidebar
-   * (outside it): the sidebar sticks below it and fills the remaining
-   * viewport height — one value drives both `top` and `height`. Unrelated
-   * to `Sidebar.Header`, which lives inside the sidebar. Leave at 0 for a
-   * full-height sidebar with the logo in `Sidebar.Header`. @default 0
+   * Offset for a full-width app topbar rendered ABOVE the sidebar (outside
+   * it): the sidebar sticks below it and fills the remaining viewport
+   * height — one value drives both `top` and `height`. Px, or any CSS
+   * length (`"calc(var(--spacing) * 16)"` for a rem-sized topbar on the
+   * fluid root font size). Unrelated to `Sidebar.Header`, which lives
+   * inside the sidebar. Leave at 0 for a full-height sidebar with the logo
+   * in `Sidebar.Header`. @default 0
    */
-  top?: number;
+  top?: number | string;
   /** Accessible label for the aside landmark. */
   'aria-label'?: string;
   className?: string;
@@ -74,21 +76,29 @@ const SidebarRoot: React.FC<SidebarProps> = ({
   className,
   style,
   testId,
-}) => (
-  <aside
-    aria-label={ariaLabel}
-    data-collapsed={collapsed || undefined}
-    data-testid={testId}
-    className={cn(
-      'sticky flex shrink-0 flex-col overflow-x-hidden border-r border-border-1',
-      'transition-[width] duration-200 ease-out',
-      className,
-    )}
-    style={{ width: collapsed ? collapsedWidth : width, top, height: `calc(100vh - ${top}px)`, ...style }}
-  >
-    {children}
-  </aside>
-);
+}) => {
+  const topLength = typeof top === 'number' ? `${top}px` : top;
+  return (
+    <aside
+      aria-label={ariaLabel}
+      data-collapsed={collapsed || undefined}
+      data-testid={testId}
+      className={cn(
+        'sticky flex shrink-0 flex-col overflow-x-hidden border-r border-border-1',
+        'transition-[width] duration-200 ease-out',
+        className,
+      )}
+      style={{
+        width: collapsed ? collapsedWidth : width,
+        top,
+        height: `calc(100vh - ${topLength})`,
+        ...style,
+      }}
+    >
+      {children}
+    </aside>
+  );
+};
 
 const SidebarHeader: React.FC<SidebarSlotProps> = ({ children, className }) => (
   <div className={cn('shrink-0 px-3 pb-3 pt-5', className)}>{children}</div>

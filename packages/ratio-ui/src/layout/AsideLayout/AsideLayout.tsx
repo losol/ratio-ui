@@ -29,11 +29,13 @@ export interface AsideLayoutAsideProps {
   /** Rail width from `lg`: `sm` 16rem, `md` 20rem (default), `lg` 24rem. */
   width?: AsideLayoutWidth;
   /**
-   * Offset in px for a sticky app header above the layout — the aside
-   * sticks below it while the content scrolls. Same convention as
-   * `Sidebar`'s `top`. @default 0
+   * Sticky offset for chrome above the layout (an app header): px, or any
+   * CSS length — `"calc(var(--spacing) * 16)"` tracks a rem-sized header
+   * exactly on the fluid root font size, where a px constant is off by a
+   * few px at some viewport widths. Same convention as `Sidebar`'s `top`.
+   * @default 0
    */
-  top?: number;
+  top?: number | string;
   /** Accessible label for the aside landmark. */
   'aria-label'?: string;
   className?: string;
@@ -48,7 +50,7 @@ export interface AsideLayoutAsideProps {
  * @example
  * <AsideLayout>
  *   <AsideLayout.Main>…article content…</AsideLayout.Main>
- *   <AsideLayout.Aside top={64}>
+ *   <AsideLayout.Aside top="calc(var(--spacing) * 16)">
  *     <Card>…</Card>
  *   </AsideLayout.Aside>
  * </AsideLayout>

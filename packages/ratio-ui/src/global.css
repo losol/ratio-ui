@@ -95,6 +95,16 @@
     @apply grow;
   }
 
+  /* Anchor targets clear sticky chrome. Every element with an id is a
+     potential `#id` scroll target; set `--scroll-margin-top` once on the
+     page (the height of the sticky header, in `--spacing` units so it
+     tracks the fluid root font size) and each jump lands below it — no
+     per-target `scroll-mt-*`, which ratio-ui.css does not ship. Zero
+     specificity: an explicit `scroll-mt-*` on an element still wins. */
+  :where([id]) {
+    scroll-margin-top: var(--scroll-margin-top, 0px);
+  }
+
   /* Typography - base styles for semantic HTML */
   html {
     font-family: var(--font-body);
