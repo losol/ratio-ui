@@ -52,6 +52,7 @@
 
   /* Surfaces */
   --surface: #e6e0d1;            /* paper */
+  --surface-glass: color-mix(in oklch, var(--surface) 88%, transparent);
   --card: #fffdf7;
   --card-hover: #fbf6ea;         /* derived: slightly warmer than card */
 
@@ -131,6 +132,7 @@
 
   /* Surfaces */
   --surface: #14140f;            /* paper/bg */
+  --surface-glass: color-mix(in oklch, var(--surface) 88%, transparent);
   --card: #20231b;
   --card-hover: #272b20;         /* derived: a step lighter than card */
 

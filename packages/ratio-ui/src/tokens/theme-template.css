@@ -52,6 +52,7 @@
 
   /* Surfaces */
   --surface:    #f8fafc;  /* page background */
+  --surface-glass: color-mix(in oklch, var(--surface) 88%, transparent); /* Navbar `glass` */
   --card:       #ffffff;  /* raised cards/panels */
   --card-hover: #f1f5f9;  /* card hover state */
 
@@ -107,6 +108,7 @@
   --text-subtle: #6b7280;
 
   --surface:    #0b0f19;
+  --surface-glass: color-mix(in oklch, var(--surface) 88%, transparent);
   --card:       #111827;
   --card-hover: #1f2937;
 
