@@ -1,5 +1,81 @@
 # @eventuras/ratio-ui
 
+## 2.20.0
+
+### Minor Changes
+
+- 25f0e15: New `Announcement` in `core/` — the band for everything a site needs to _say_
+  about an event: a deadline, planned maintenance, a flag at half mast, a death.
+  Two forms of one component: `variant="row"` is the one-line notice below the
+  navbar, `variant="banner"` the taller announcement above it with a serif
+  `Title`. Composed from parts — `Body`, `Title`, an inline `Link` or a pill
+  `Action` (one way in, never two), and a `Rule` or `Image` graphic — with
+  `onDismiss` rendering the close button while the caller owns the state and
+  whatever remembers it, keyed by message. Content-named rather than
+  placement-named: with `fluid` it sits just as well at the top of a `Card` or a
+  `Drawer`.
+
+  `tone` is `info` / `warning` / `success` / `error` on the Panel and Badge status
+  tokens, `neutral` for the quiet linen marking, and `ink` for the mourning band.
+  It is a labelled region landmark; nothing is announced unless you pass
+  `role="status"`.
+
+- e2639ee: `Navbar` as the first of two sticky rows. Any `<nav>` prop now passes through
+  to the root — `aria-label` above all, so a page with a site navbar _and_ a
+  section nav has two named landmarks. `Navbar.Link` takes an explicit
+  `aria-current` (`"location"` for in-page anchors, where `isCurrent`'s `"page"`
+  is wrong) with the same current styling.
+
+  `glass` is now frosted _surface_: a new `--surface-glass` token (the page
+  surface at 88%, declared per theme arm) with the backdrop blur, so a sticky
+  glass bar is light on a light page and dark inside `dark` / `surface-dark`.
+  Previously it was a 12% ink tint meant for dark hero overlays; `overlay glass
+dark` keeps that look, a bare `glass` on a light page turns from a dark tint
+  to a light frost.
+
+  The utilities the bundled CSS guarantees are now whole scales rather than a
+  list of holes: spacing families (`p`/`m`/`gap` × `0`–`16`, `20`–`40`),
+  `z-0`–`z-50`, and `sm`/`md`/`lg` display. Documented in `docs/css-exports.md`
+  — anything beyond needs the consumer's own Tailwind build.
+
+- b7fc73c: New `SectionNav` in `core/` — the second row of a detail page's navigation: a
+  sticky strip of section anchors under the site navbar, mono-uppercase links in
+  `--text-subtle` with the section being read lifted to `--text` and marked
+  `aria-current="location"`. `top` takes px or any CSS length
+  (`"calc(var(--spacing) * 16)"` under an `h-16` navbar) and the row measures
+  its own bottom edge for the scroll-spy (`useActiveSection`), re-measured on
+  resize. Items are `{ id, title }`; `track: false` keeps a link — say, to a
+  registration card in the sticky aside — out of the spy. Lines up with
+  `Navbar`'s centered `container`; `fluid` for app shells. Name the landmark.
+
+  `NavList` is deprecated in its favour (forced `LinkComponent`, `top-0` under
+  a `z-50` navbar, no current state, no label) and will be removed in 3.0.
+
+- 8009888: Sticky offsets on a fluid rem scale. `AsideLayout.Aside` and `Sidebar` take
+  `top` as a px number _or_ a CSS length, so `top="calc(var(--spacing) * 16)"`
+  sits exactly under an `h-16` navbar at every viewport width — the root font
+  size is a `clamp()`, so any px constant for "the navbar's height" is off by a
+  few px somewhere. `Sidebar` keeps its `height: calc(100vh - top)` contract for
+  both forms.
+
+  Anchor targets clear sticky chrome the same way: `global.css` now declares
+  `:where([id]) { scroll-margin-top: var(--scroll-margin-top, 0px) }`, so setting
+  `--scroll-margin-top` once on the page makes every `#id` jump land below the
+  header — no per-target `scroll-mt-*` (which `ratio-ui.css` does not ship).
+  Zero specificity, so an explicit `scroll-mt-*` still wins.
+
+- 634df99: New `useActiveSection(ids, { offset })` in `hooks/` — scroll-spy that returns
+  the id of the section being read: the last one whose element has scrolled up
+  to the `offset` line (sticky chrome), the topmost before any has, and the last
+  at the bottom of the page so a short final section still gets its turn.
+  Positions are read on scroll and resize rather than through an
+  IntersectionObserver, which only reports crossings and goes stale after an
+  anchor jump or a fast scroll.
+
+  `TableOfContents` now uses it — fixing exactly that stale highlight — and takes
+  an `offset` prop for a navbar above the content. Its current link is marked
+  `aria-current="location"` (was `true`), the value for in-page anchors.
+
 ## 2.19.0
 
 ### Minor Changes
