@@ -9,9 +9,15 @@ const sampleItems: NavListItem[] = [
   { href: '#faq', title: 'FAQ' },
 ];
 
+/**
+ * **Deprecated** — use `SectionNav` (`Core/SectionNav`): sticky under the
+ * navbar with a `top` offset, scroll-spy with `aria-current`, a named
+ * landmark, plain anchors. `NavList` is removed in 3.0.
+ */
 const meta: Meta<NavListProps> = {
   title: 'Core/NavList',
   component: NavList,
+  tags: ['deprecated'],
   argTypes: {
     sticky: { control: 'boolean' },
   },
