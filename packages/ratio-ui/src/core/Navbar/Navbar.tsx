@@ -26,7 +26,7 @@ type NavbarDisclosureApi = {
 };
 const NavbarDisclosureContext = createContext<NavbarDisclosureApi | null>(null);
 
-export interface NavbarProps {
+export interface NavbarProps extends React.ComponentPropsWithoutRef<'nav'> {
   children?: ReactNode;
   /** Tailwind background class (default `bg-transparent`). */
   bgColor?: string;
@@ -40,9 +40,10 @@ export interface NavbarProps {
    */
   overlay?: boolean;
   /**
-   * Translucent dark background with backdrop-blur. Composes with `overlay`
-   * for a glass hero-overlay look. Pair with `dark` when the resulting
-   * background is dark enough that you need light text.
+   * Frosted glass: the page surface at 88% (`--surface-glass`) with a
+   * backdrop blur, so content shows through as the bar pins or floats.
+   * Follows the token context — light on a light page, dark inside `dark`
+   * (the hero-overlay look, with `overlay`).
    */
   glass?: boolean;
   /**
@@ -109,6 +110,12 @@ export interface NavbarLinkProps {
   icon?: ReactNode;
   /** Mark as the current page — tinted pill + `aria-current="page"`. */
   isCurrent?: boolean;
+  /**
+   * Explicit `aria-current` — `"location"` for an in-page anchor, where
+   * `"page"` would be wrong. Every value except `false` / `"false"` (the
+   * ARIA spellings of "not current") gets the current styling.
+   */
+  'aria-current'?: React.AriaAttributes['aria-current'];
   /** Routing link component (e.g. Next.js Link). Defaults to `<a>`. */
   LinkComponent?: React.ComponentType<{
     href: string;
@@ -185,20 +192,23 @@ export function NavbarLink({
   href,
   icon,
   isCurrent,
+  'aria-current': ariaCurrentProp,
   LinkComponent,
   className,
   children,
 }: Readonly<NavbarLinkProps>) {
   const Tag = (LinkComponent ?? 'a') as React.ElementType;
+  const ariaCurrent = ariaCurrentProp ?? (isCurrent ? 'page' : undefined);
+  const current = ariaCurrent !== undefined && ariaCurrent !== false && ariaCurrent !== 'false';
   return (
     <li className="list-none">
       <Tag
         href={href}
-        aria-current={isCurrent ? 'page' : undefined}
+        aria-current={ariaCurrent}
         className={cn(
           'inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium',
           'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring)',
-          isCurrent
+          current
             ? 'bg-primary-100 font-semibold text-(--text) dark:bg-primary-900'
             : 'text-(--text-muted) hover:bg-card-hover hover:text-(--text)',
           className,
@@ -313,6 +323,7 @@ export const NavbarRoot = ({
   elevated = false,
   fluid = false,
   className,
+  ...rest
 }: Readonly<NavbarProps>) => {
   const uid = useId();
   const [openPanel, setOpenPanel] = useState<string | null>(null);
@@ -346,10 +357,11 @@ export const NavbarRoot = ({
     : sticky
       ? 'sticky top-0 z-50'
       : '';
-  const glassClass = glass ? 'bg-overlay-drag backdrop-blur-md' : '';
+  const glassClass = glass ? 'bg-surface-glass backdrop-blur-md' : '';
 
   return (
     <nav
+      {...rest}
       className={cn(
         bgColor,
         positionClass,

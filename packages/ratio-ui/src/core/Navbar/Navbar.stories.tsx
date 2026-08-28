@@ -262,8 +262,70 @@ export const EditorialSplit: Story = {
 };
 
 /**
- * `overlay` + `glass` float a translucent navbar over a hero — here the
- * night sky Hypatia lectured on. The nav scrolls away with the page
+ * `sticky` + `glass` pins a frosted bar: the page surface at 88% with a
+ * backdrop blur, so what scrolls under it still shows through — fitting,
+ * for a page about a text read through the one written over it. The
+ * Archimedes Palimpsest is a 10th-century copy of Archimedes scraped and
+ * overwritten with prayers in the 13th; multispectral imaging (1998–2008)
+ * read the under-text back, including the only surviving copy of *The
+ * Method*. `aria-label` names the landmark, as any nav prop now passes
+ * through to the root.
+ */
+export const StickyGlass: Story = {
+  render: () => (
+    <div>
+      <Navbar sticky glass aria-label="Site">
+        <Navbar.Brand>
+          <span className="font-serif text-lg font-bold tracking-tight">Palimpsest</span>
+        </Navbar.Brand>
+        <Navbar.Spacer />
+        <Navbar.Links>
+          <Navbar.Link href="#under-text" aria-current="location">
+            Under-text
+          </Navbar.Link>
+          <Navbar.Link href="#over-text">Over-text</Navbar.Link>
+          <Navbar.Link href="#imaging">Imaging</Navbar.Link>
+        </Navbar.Links>
+      </Navbar>
+      <div className="container mx-auto px-4">
+        <section id="under-text">
+          <h2>Under-text</h2>
+          <p>
+            Seven treatises by Archimedes, copied in Constantinople around 950: among them
+            <em> The Method of Mechanical Theorems</em>, in which he explains how he found
+            results by weighing shapes against each other before proving them — the working,
+            not just the proof.
+          </p>
+          <p>
+            No other copy of <em>The Method</em> survives. Everything we know of how Archimedes
+            actually thought comes through this one, scraped-off text.
+          </p>
+        </section>
+        <section id="over-text">
+          <h2>Over-text</h2>
+          <p>
+            In 1229 the parchment was washed, cut, folded and rebound as a prayer book. The
+            scribe was not destroying Archimedes; he was reusing expensive material for a text
+            he needed. Reuse was how most parchment survived at all.
+          </p>
+        </section>
+        <section id="imaging">
+          <h2>Imaging</h2>
+          <p>
+            Between 1998 and 2008 the pages were photographed under a dozen wavelengths and the
+            faint iron-gall traces of the under-text separated from the over-text — and, on the
+            worst pages, teased out with synchrotron X-ray fluorescence. Every image was
+            published under an open licence.
+          </p>
+        </section>
+      </div>
+    </div>
+  ),
+};
+
+/**
+ * `overlay` + `glass dark` float a frosted, dark navbar over a hero — here
+ * the night sky Hypatia lectured on. The nav scrolls away with the page
  * (unlike `sticky`, which stays pinned).
  */
 export const OverlayGlass: Story = {

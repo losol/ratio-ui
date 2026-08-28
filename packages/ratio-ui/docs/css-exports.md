@@ -61,6 +61,28 @@ import '@eventuras/ratio-ui/global.css';
 - You want the page structure but will use custom components
 - Building a custom design system on top of ratio-ui foundations
 
+## Which utility classes are in the bundle
+
+The bundled CSS is generated from ratio-ui's own sources, so it contains the
+Tailwind utilities the components use — not the whole of Tailwind. On top of
+that, `global.css` safelists a few whole scales so an app **without a
+Tailwind build of its own** has something predictable to lean on:
+
+| Family | Guaranteed |
+| --- | --- |
+| Spacing | `p`, `px`, `py`, `pt`, `pb`, `pl`, `pr`, `m`, `mx`, `my`, `mt`, `mb`, `ml`, `mr`, `gap` × `0`–`16`, `20`, `24`, `28`, `32`, `40` |
+| Stacking | `z-0`, `z-10`, `z-20`, `z-30`, `z-40`, `z-50` |
+| Responsive display | `sm:` / `md:` / `lg:` × `block`, `hidden`, `inline`, `flex`, `inline-flex` |
+| Section heights | `min-h-[20vh]` … `min-h-[80vh]` |
+| Surface tone | `surface-dark`, `surface-light` |
+
+Anything else (`scroll-mt-*`, `w-*`, colours, other breakpoints) is present
+only if a component happens to use it — do not rely on it. Apps that need
+utilities beyond the table should run Tailwind themselves and scan their own
+sources; the tokens and `@theme` aliases are all in the bundle, so the app's
+utilities resolve to the same values. Whole scales are added here on request;
+individual classes are not.
+
 ## Theming and the flash guard
 
 The light theme is defined on bare `:root`, so **importing the CSS is enough to

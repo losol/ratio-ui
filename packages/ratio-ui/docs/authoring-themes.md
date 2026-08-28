@@ -80,6 +80,7 @@ standard theme.
 | Token | Role |
 | --- | --- |
 | `--surface` | page background |
+| `--surface-glass` | the surface as frosted glass (Navbar `glass`) — declare it in every arm, `var(--surface)` resolves where it is written |
 | `--card` | raised cards/panels |
 | `--card-hover` | card hover state |
 | `--border-1` | hairline border |
