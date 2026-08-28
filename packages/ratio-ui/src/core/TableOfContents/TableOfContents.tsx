@@ -4,7 +4,8 @@
 
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
+import { useActiveSection } from '../../hooks/useActiveSection';
 
 export interface TocHeading {
   id: string;
@@ -14,45 +15,26 @@ export interface TocHeading {
 
 export interface TableOfContentsProps {
   headings: TocHeading[];
+  /**
+   * Px of sticky chrome above the content (a navbar). A heading is current
+   * once it has scrolled up to that line. @default 0
+   */
+  offset?: number;
   className?: string;
 }
 
 /**
  * Sticky table-of-contents sidebar with scroll-spy.
  *
- * Highlights the heading currently visible in the viewport
- * using an IntersectionObserver.
+ * Highlights the heading whose section is being read — the last one that
+ * has scrolled past the top of the viewport (or past `offset`), via
+ * `useActiveSection` — and marks it `aria-current="location"`.
  */
-export function TableOfContents({ headings, className = '' }: Readonly<TableOfContentsProps>) {
-  const [activeId, setActiveId] = useState<string>('');
-  const observerRef = useRef<IntersectionObserver | null>(null);
-
-  useEffect(() => {
-    if (headings.length === 0) return;
-
-    const elements = headings
-      .map((h) => document.getElementById(h.id))
-      .filter(Boolean) as HTMLElement[];
-
-    if (elements.length === 0) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        // Find the first intersecting heading
-        const visible = entries.find((e) => e.isIntersecting);
-        if (visible) {
-          setActiveId(visible.target.id);
-        }
-      },
-      { rootMargin: '0px 0px -80% 0px', threshold: 0 },
-    );
-
-    for (const el of elements) {
-      observerRef.current.observe(el);
-    }
-
-    return () => observerRef.current?.disconnect();
-  }, [headings]);
+export function TableOfContents({ headings, offset = 0, className = '' }: Readonly<TableOfContentsProps>) {
+  const activeId = useActiveSection(
+    headings.map((h) => h.id),
+    { offset },
+  );
 
   if (headings.length === 0) return null;
 
@@ -64,7 +46,7 @@ export function TableOfContents({ headings, className = '' }: Readonly<TableOfCo
           <li key={heading.id}>
             <a
               href={`#${heading.id}`}
-              aria-current={activeId === heading.id ? true : undefined}
+              aria-current={activeId === heading.id ? 'location' : undefined}
               className={`block transition-colors ${heading.level === 3 ? 'pl-3' : ''}
                 ${activeId === heading.id
                   ? 'font-medium text-(--primary)'

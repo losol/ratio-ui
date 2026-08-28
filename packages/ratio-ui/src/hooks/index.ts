@@ -6,3 +6,5 @@ export { useCopyToClipboard } from './useCopyToClipboard';
 export type { UseCopyToClipboardOptions, CopyToClipboard } from './useCopyToClipboard';
 export { useKeyboardShortcut, shortcutLabel, isApplePlatform } from './useKeyboardShortcut';
 export type { UseKeyboardShortcutOptions } from './useKeyboardShortcut';
+export { useActiveSection } from './useActiveSection';
+export type { UseActiveSectionOptions } from './useActiveSection';
