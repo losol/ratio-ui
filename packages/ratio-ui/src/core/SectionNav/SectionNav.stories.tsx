@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
+import type React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor, within } from 'storybook/test';
 import { SectionNav } from './SectionNav';
@@ -69,13 +70,14 @@ const items = [
 /**
  * The full detail page: `Navbar sticky` as row one, `SectionNav` pinned
  * right under it with `top` in the same unit the navbar is sized in, and
- * the sections offset by `scroll-mt-*` so anchor jumps land below both
- * rows. The current section is highlighted as you scroll; "Register"
- * points into the sticky aside and stays out of the spy (`track: false`).
+ * `--scroll-margin-top` set once on the page so anchor jumps land below
+ * both rows (every element with an id picks it up from `global.css`). The
+ * current section is highlighted as you scroll; "Register" points into
+ * the sticky aside and stays out of the spy (`track: false`).
  */
 export const DetailPage: Story = {
   render: () => (
-    <div>
+    <div style={{ '--scroll-margin-top': 'calc(var(--spacing) * 34)' } as React.CSSProperties}>
       <Navbar sticky className="flex h-16 items-center" aria-label="Site">
         <Navbar.Brand>
           <span className="font-serif text-lg font-bold tracking-tight">Lecture series</span>
@@ -97,7 +99,7 @@ export const DetailPage: Story = {
               <Heading as="h1">How knowledge travelled</Heading>
             </Heading.Group>
             {evenings.map((section) => (
-              <section key={section.id} id={section.id} className="scroll-mt-34 min-h-[70vh]">
+              <section key={section.id} id={section.id} className="min-h-[70vh]">
                 <Heading as="h2">{section.title}</Heading>
                 {section.body.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
@@ -105,9 +107,8 @@ export const DetailPage: Story = {
               </section>
             ))}
           </AsideLayout.Main>
-          {/* Sticks under both rows: 34 spacing units at the largest root font size. */}
-          <AsideLayout.Aside top={136} aria-label="Registration">
-            <div id="register" className="scroll-mt-34">
+          <AsideLayout.Aside top="calc(var(--spacing) * 34)" aria-label="Registration">
+            <div id="register">
               <Card padding="md">
                 <Heading as="h2" size="sm">
                   Register
@@ -160,11 +161,11 @@ export const Standalone: Story = {
     items: evenings.map(({ id, title }) => ({ id, title })),
   },
   render: (args) => (
-    <div>
+    <div style={{ '--scroll-margin-top': 'calc(var(--spacing) * 14)' } as React.CSSProperties}>
       <SectionNav {...args} />
       <div className="container mx-auto px-3">
         {evenings.map((section) => (
-          <section key={section.id} id={section.id} className="scroll-mt-14 min-h-[70vh]">
+          <section key={section.id} id={section.id} className="min-h-[70vh]">
             <Heading as="h2">{section.title}</Heading>
             {section.body.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
