@@ -8,7 +8,8 @@ is a real worked example.
 
 A ready-to-edit starting point ships at
 [`src/tokens/theme-template.css`](../src/tokens/theme-template.css) — copy it,
-rename, and fill in.
+rename, and fill in. The built-in [`ink`](../src/tokens/ink.css) theme is a
+second worked example: semantic tokens only, two arms, nothing else.
 
 ## The two axes
 
@@ -24,6 +25,19 @@ Custom (named) themes use two orthogonal attributes on `<html>`:
 ```
 
 A named theme with no `data-color-scheme` falls back to its light block.
+
+### A theme whose identity is dark
+
+`ink` is a near-black theme, yet its light ("paper") arm is still the default
+and the dark arm still sits on `data-color-scheme="dark"`. That is not a
+convention for its own sake: ratio-ui's `dark:` utilities key on the page
+attributes, so a theme that declared itself dark without the attribute would
+get dark tokens but light `dark:`-variant styles. For a site that is always
+ink, pin the attribute instead of syncing it to the OS:
+
+```html
+<html data-theme="ink" data-color-scheme="dark">
+```
 
 > **Standard (built-in) theme:** it currently carries mode in the palette
 > attribute itself — `data-theme="light"` or `data-theme="dark"` — not on the

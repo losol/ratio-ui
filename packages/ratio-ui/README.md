@@ -92,6 +92,9 @@ Longer package-level notes live in [`docs`](docs).
 Ratio UI themes are CSS custom properties. Custom theme authoring is documented
 in [`docs/authoring-themes.md`](docs/authoring-themes.md), with the built-in
 Bureau theme documented in [`docs/bureau-theme-spec.md`](docs/bureau-theme-spec.md).
+The quiet, near-black `ink` theme (`data-theme="ink"`, pin
+`data-color-scheme="dark"` for always-ink) lives in
+[`src/tokens/ink.css`](src/tokens/ink.css).
 
 If you import `ratio-ui.css` or `global.css`, set `data-theme` on `<html>`
 before first paint. The CSS export guide includes a small initialization
