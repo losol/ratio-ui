@@ -1,0 +1,57 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * The memorial hero (`Hero variant="memorial"`) — its effects come with the
+ * variant, not as free tools: fine grain on the ink surface and a black band
+ * across the top-left corner. The years are a `Hero.Watermark`.
+ */
+.ratio-hero--memorial {
+  background-image: radial-gradient(rgb(255 255 255 / 0.18) 0.5px, transparent 0.6px);
+  background-size: 3px 3px;
+}
+
+.ratio-hero__flor {
+  position: absolute;
+  left: -2.5rem;
+  top: -1rem;
+  width: 10.625rem;
+  height: 1.625rem;
+  transform: rotate(-42deg);
+  background-color: #0d0d0d;
+  background-image: radial-gradient(rgb(255 255 255 / 0.18) 0.5px, transparent 0.6px);
+  background-size: 3px 3px;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.35);
+  pointer-events: none;
+}
+
+/*
+ * Watermark (`Hero.Watermark`) — display text as a background layer, in the
+ * surface's own ink at 22% so it reads on light and dark heroes alike.
+ */
+.ratio-hero__watermark {
+  position: absolute;
+  right: -0.875rem;
+  bottom: -0.3em;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(5rem, 14vw, 11rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in oklch, var(--text) 22%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Where text-stroke is unsupported, a faint fill instead of nothing. */
+@supports not (-webkit-text-stroke: 1px black) {
+  .ratio-hero__watermark {
+    color: color-mix(in oklch, var(--text) 10%, transparent);
+  }
+}

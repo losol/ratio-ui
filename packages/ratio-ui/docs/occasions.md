@@ -21,6 +21,9 @@ dates — belong to the app.
    | `ratio-navbar` | the `<nav>` root |
    | `ratio-navbar__brand` / `__links` / `__link` / `__actions` | the parts |
    | `ratio-navbar__motif` / `__wash` | the occasion layers |
+   | `ratio-hero` | the `<section>` root (`ratio-hero--memorial` when memorial) |
+   | `ratio-hero__eyebrow` / `__title` / `__lead` | the parts — the eyebrow accent and the title's `em` colour are the usual occasion targets |
+   | `ratio-hero__arcs` / `__flor` / `__watermark` / `__motif` | the occasion layers |
 
    Because ratio-ui's utilities live in `@layer utilities`, a plain app rule
    always wins — but only while the attribute is set:
@@ -42,6 +45,10 @@ dates — belong to the app.
    | --- | --- | --- |
    | `Navbar.Motif` (+ `entry`) | Navbar | one SVG silhouette, one colour, 32px tall, hidden below 880px; `entry` slides it in once on load |
    | `wash` | Navbar | one multiply zone per colour; the app checks AA contrast of the bar text over each |
+   | `Hero.Motif` | Hero | one SVG silhouette, one colour, anchored bottom-right and cropped by the edge |
+   | `arcs` | Hero | concentric multiply rings off the top-right corner, one per colour |
+   | `variant="memorial"` | Hero | the memorial hero — ink, grain and band; a fixed variant |
+   | `Hero.Watermark` | Hero | display text as a background layer (years, a volume, a date) in the surface's ink |
 
 A new occasion is one CSS block and one row of config — no new component.
 
