@@ -20,6 +20,22 @@
      completes (copy ✓, save ✓, …). Use via the `animate-pop` utility. */
   --animate-pop: pop 0.32s ease-out;
 
+  /* One entrance for an occasion motif (`Navbar.Motif entry`): 16px in from
+     the right over 700 ms on the buttons' easing, then still. Once per page
+     load, never a loop. Use via the `animate-motif-in` utility. */
+  --animate-motif-in: motif-in 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+
+  @keyframes motif-in {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   @keyframes pop {
     0% {
       transform: scale(0.6);
@@ -33,4 +49,24 @@
       opacity: 1;
     }
   }
+}
+
+/*
+ * Motion switch — `<html data-motion="none">` (or any ancestor) stops every
+ * animation and transition beneath it. For occasions where stillness is the
+ * device (mourning), set alongside `data-occasion` in the app. An attribute
+ * rather than a custom property: CSS cannot switch animations off on a
+ * variable's value without style queries, which not every browser has.
+ * `!important` so it also beats `animate-*` / `transition-*` utilities.
+ * The element carrying the attribute is included, so it works on any
+ * animated element, not only on an ancestor.
+ */
+[data-motion='none'],
+[data-motion='none'] *,
+[data-motion='none']::before,
+[data-motion='none']::after,
+[data-motion='none'] *::before,
+[data-motion='none'] *::after {
+  animation: none !important;
+  transition: none !important;
 }

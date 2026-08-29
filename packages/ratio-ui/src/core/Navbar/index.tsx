@@ -25,6 +25,7 @@ import {
   NavbarContent,
   NavbarLink,
   NavbarLinks,
+  NavbarMotif,
   NavbarRoot,
   NavbarRow,
   NavbarSearch,
@@ -76,6 +77,7 @@ export const Navbar = Object.assign(NavbarShell, {
   Link: NavbarLink,
   Actions: NavbarActions,
   Spacer: NavbarSpacer,
+  Motif: NavbarMotif,
 });
 
 export type {
@@ -88,6 +90,7 @@ export type {
   NavbarLinksProps,
   NavbarLinkProps,
   NavbarActionsProps,
+  NavbarMotifProps,
   NavbarToggleProps,
   NavbarCollapseProps,
 } from './Navbar';
@@ -104,6 +107,7 @@ export {
   NavbarContent,
   NavbarLink,
   NavbarLinks,
+  NavbarMotif,
   NavbarRow,
   NavbarSearch,
   NavbarSpacer,
