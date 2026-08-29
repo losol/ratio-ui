@@ -117,3 +117,112 @@ export const DarkSurface: Story = {
     </Hero>
   ),
 };
+
+// ── Occasions ────────────────────────────────────────────────────────────
+// The hero's named openings for a marked day — set by the app from its
+// occasion config, see docs/occasions.md. Colour, a motif, a memorial;
+// never layout.
+
+/**
+ * `variant="memorial"` is the memorial hero: an ink surface with fine
+ * grain and a black band across the top-left corner — a fixed variant, so
+ * the effects come with it rather than as free tools — with the years as
+ * a `Hero.Watermark`. The one hero that asks for stillness: the app sets
+ * `data-motion="none"` alongside it. The copy is Marie Curie's: her
+ * laboratory notebooks are still radioactive and are kept in lead-lined
+ * boxes; readers sign a waiver to consult them.
+ */
+export const Memorial: Story = {
+  render: () => (
+    <div data-motion="none">
+      <Hero variant="memorial">
+        <Hero.Watermark>1867–1934</Hero.Watermark>
+        <Hero.Main>
+          <Hero.Eyebrow className="text-(--text-subtle)">In memoriam</Hero.Eyebrow>
+          <Hero.Title className="text-(--text)">
+            Marie Curie{' '}
+            <em className="font-serif text-(--text-muted)">1867–1934</em>
+          </Hero.Title>
+          <Hero.Lead>
+            Her notebooks are still radioactive, and still read. The condolence book is open in
+            the reading room this week.
+          </Hero.Lead>
+        </Hero.Main>
+      </Hero>
+    </div>
+  ),
+};
+
+/**
+ * `Hero.Watermark` on its own: display text as a background layer — a
+ * year, a volume number, a date — in outline serif, anchored bottom-right
+ * and cropped by the edge, in the surface's ink at 22% so it works on a
+ * light hero too. 1543 is the year *De revolutionibus* was printed, and
+ * Copernicus is said to have been handed the first copy on his deathbed.
+ */
+export const Watermark: Story = {
+  render: () => (
+    <Hero>
+      <Hero.Watermark>1543</Hero.Watermark>
+      <Hero.Main>
+        <Hero.Eyebrow>Anniversary lecture</Hero.Eyebrow>
+        <Hero.Title>
+          The year the <em className="font-serif text-(--accent)">sky</em> moved
+        </Hero.Title>
+        <Hero.Lead>
+          Copernicus put the sun at the centre in a book he waited thirty years to print. One
+          evening on what the argument was, and why it took another century to land.
+        </Hero.Lead>
+      </Hero.Main>
+    </Hero>
+  ),
+};
+
+/**
+ * `arcs` draws concentric rings off the top-right corner — one per colour,
+ * the first colour outermost, blended with `multiply` so they sit *in* the
+ * surface rather than on it. It is the brand mark's circle at hero scale,
+ * and the occasion slot for flag colours; the app owns the list.
+ */
+export const Arcs: Story = {
+  render: () => (
+    <Hero arcs={['#E4322B', '#F08A1D', '#F5C93B', '#3E9B54', '#2C5FA8', '#7A4A9E']}>
+      <Hero.Main>
+        <Hero.Eyebrow className="text-[#7A4A9E]">Pride week · 20–28 June</Hero.Eyebrow>
+        <Hero.Title className="text-(--text)">
+          Everyone is <em className="font-serif text-[#7A4A9E]">welcome</em> in the reading room
+        </Hero.Title>
+        <Hero.Lead>
+          The library has been open to all since it opened. This week we say so out loud.
+        </Hero.Lead>
+      </Hero.Main>
+    </Hero>
+  ),
+};
+
+/**
+ * `Hero.Motif` is the silhouette slot: one SVG in one colour, anchored to
+ * the bottom-right corner and always cropped by the hero's edge — big,
+ * partly out of frame, half opacity. Size it with `className`; the width
+ * follows the SVG. Here a comet for the winter lecture series, in the
+ * season's palette (`bgColor`-style classes on the hero plus `dark`).
+ */
+export const Motif: Story = {
+  render: () => (
+    <Hero dark className="bg-[#1B3A32] border-[#173029]">
+      <Hero.Main>
+        <Hero.Eyebrow className="text-accent-300">Winter lectures · December</Hero.Eyebrow>
+        <Hero.Title className="text-(--text)">
+          Long nights, <em className="font-serif text-accent-300">clear skies</em>, and a telescope
+          on the roof
+        </Hero.Title>
+        <Hero.Lead>
+          Five evenings in the last week of the year. The observatory is heated; the roof is not.
+        </Hero.Lead>
+      </Hero.Main>
+      <Hero.Motif className="h-40 text-accent-300">
+        <svg viewBox="0 0 240 120" fill="currentColor"><path d="M0 118 C 70 96, 140 70, 196 50 L 200 62 C 150 84, 80 104, 0 118 Z" opacity=".55" /><polygon points="204.0,28.0 209.3,42.7 224.9,43.2 212.6,52.8 216.9,67.8 204.0,59.0 191.1,67.8 195.4,52.8 183.1,43.2 198.7,42.7" /></svg>
+      </Hero.Motif>
+    </Hero>
+  ),
+};

@@ -3,4 +3,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Hero } from './Hero';
-export type { HeroProps } from './Hero';
+export type {
+  HeroProps,
+  HeroVariant,
+  HeroSlotProps,
+  HeroTitleProps,
+  HeroMotifProps,
+  HeroWatermarkProps,
+} from './Hero';
