@@ -1,0 +1,125 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * ink theme — quiet, near-black, elegant. The palette a site wears when it
+ * wants to be still: a memorial page, an evening programme, a literary
+ * brand — and, with `data-motion="none"`, the mourning occasion
+ * (docs/occasions.md). Named for its look, not for a day.
+ *
+ * Axes (named-theme convention, see docs/authoring-themes.md):
+ *   palette → data-theme="ink"
+ *   mode    → data-color-scheme="light|dark"
+ * The dark arm is the theme's identity; the light arm is "paper": the same
+ * quiet, with the ink and the paper swapped. Without data-color-scheme an
+ * ink page is paper, as every named theme is — the `dark:` utilities key
+ * on the attribute, so a theme cannot be dark on its own. For a site that
+ * is always ink, pin the attribute: <html data-theme="ink"
+ * data-color-scheme="dark">.
+ *
+ * Brand is the ink itself: --primary is the ink on paper and the paper on
+ * ink, so buttons and links go quiet without any component knowing. One
+ * accent, a restrained ochre, for the rare thing that must stand out.
+ * Status colours inherit the standard arms — an error stays red.
+ *
+ * The primary *scale* is a warm-grey ramp as well: chrome that reaches for
+ * a step directly (`bg-primary-100` pills, steppers, toggles, menu rows)
+ * would otherwise show Linseed blue inside an ink page. Shared by both
+ * arms — the steps are absolute, light to dark.
+ */
+
+/* --------------------------------------------
+   ink — paper (light) — also the `.surface-light` context
+   -------------------------------------------- */
+:root[data-theme="ink"],
+:root[data-theme="ink"] .surface-light {
+  color-scheme: light;
+
+  /* Primary scale — warm grey, light to dark (see header). */
+  --color-primary-50: oklch(0.985 0.003 85);
+  --color-primary-100: oklch(0.96 0.004 85);
+  --color-primary-200: oklch(0.92 0.005 85);
+  --color-primary-300: oklch(0.86 0.006 85);
+  --color-primary-400: oklch(0.72 0.006 82);
+  --color-primary-500: oklch(0.58 0.006 80);
+  --color-primary-600: oklch(0.46 0.006 80);
+  --color-primary-700: oklch(0.36 0.006 80);
+  --color-primary-800: oklch(0.28 0.006 80);
+  --color-primary-900: oklch(0.215 0.006 80);
+  --color-primary-950: oklch(0.165 0.005 75);
+
+  /* Brand — the ink is the brand. */
+  --primary: oklch(0.22 0.006 80);
+  --secondary: oklch(0.88 0.008 85);
+  /* Dark enough to carry small text (eyebrows) at AA on the paper. */
+  --accent: oklch(0.5 0.085 72);
+
+  --text-on-primary: oklch(0.96 0.006 85);
+  --text-on-secondary: oklch(0.22 0.006 80);
+  --text-on-accent: oklch(0.96 0.006 85);
+
+  /* Text — warm near-black, low chroma. */
+  --text: oklch(0.2 0.005 80);
+  --text-muted: oklch(0.42 0.006 80);
+  --text-subtle: oklch(0.5 0.006 80);
+  --text-light: oklch(0.96 0.006 85);
+  --text-dark: oklch(0.165 0.005 75);
+
+  /* Surfaces — a greyer paper than Linen, a shade quieter. */
+  --surface: oklch(0.93 0.006 85);
+  --surface-glass: color-mix(in oklch, var(--surface) 88%, transparent);
+  --card: oklch(0.975 0.004 85);
+  --card-hover: oklch(0.99 0.003 85);
+
+  /* Borders */
+  --border-1: oklch(0.87 0.008 85);
+  --border-2: oklch(0.76 0.01 85);
+
+  --focus-ring: oklch(0.22 0.006 80 / 0.4);
+
+  --overlay-ink: 20 19 17;
+  --scrim: rgb(20 19 17 / 0.6);
+}
+
+/* --------------------------------------------
+   ink — ink (dark) — also the `.surface-dark` context
+   -------------------------------------------- */
+:root[data-theme="ink"][data-color-scheme="dark"],
+:root[data-theme="ink"] .surface-dark {
+  color-scheme: dark;
+
+  /* Brand — paper on ink. */
+  --primary: oklch(0.9 0.012 85);
+  --secondary: oklch(0.26 0.006 80);
+  --accent: oklch(0.8 0.09 80);
+
+  --text-on-primary: oklch(0.165 0.005 75);
+  --text-on-secondary: oklch(0.94 0.012 85);
+  --text-on-accent: oklch(0.165 0.005 75);
+
+  /* Text — warm off-white, then two quieter steps. */
+  --text: oklch(0.94 0.012 85);
+  --text-muted: oklch(0.78 0.012 85);
+  --text-subtle: oklch(0.66 0.01 85);
+  --text-light: oklch(0.94 0.012 85);
+  --text-dark: oklch(0.165 0.005 75);
+
+  /* Surfaces — near-black with a trace of warmth, never pure black. */
+  --surface: oklch(0.165 0.005 75);
+  --surface-glass: color-mix(in oklch, var(--surface) 88%, transparent);
+  --card: oklch(0.215 0.006 80);
+  --card-hover: oklch(0.245 0.007 80);
+
+  /* Borders */
+  --border-1: oklch(0.26 0.006 80);
+  --border-2: oklch(0.36 0.008 80);
+
+  --focus-ring: oklch(0.9 0.012 85 / 0.45);
+
+  /* Overlays flip to paper ink on the dark field. */
+  --overlay-ink: 242 239 232;
+  --scrim: rgb(0 0 0 / 0.7);
+}

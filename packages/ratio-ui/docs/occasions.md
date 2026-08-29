@@ -52,6 +52,12 @@ dates — belong to the app.
 
 A new occasion is one CSS block and one row of config — no new component.
 
+**Mourning** needs no occasion CSS at all: it is the built-in `ink` theme
+pinned dark plus the motion switch —
+`<html data-theme="ink" data-color-scheme="dark" data-motion="none">` — with an
+`Announcement tone="ink"` for the words, and the site's own palette back when
+the period ends.
+
 ## Rules
 
 - One motif per surface, in a fixed field. Never repeated patterns, never a

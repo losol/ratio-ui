@@ -15,6 +15,8 @@ const VARIANTS: Variant[] = [
   { label: '☀️ Light', theme: 'light' },
   { label: '🗂️ Bureau', theme: 'bureau', colorScheme: 'light' },
   { label: '🗂️ Bureau dark', theme: 'bureau', colorScheme: 'dark' },
+  { label: '🖋️ Ink', theme: 'ink', colorScheme: 'dark' },
+  { label: '📄 Ink paper', theme: 'ink', colorScheme: 'light' },
 ];
 
 const apply = (v: Variant) => {
