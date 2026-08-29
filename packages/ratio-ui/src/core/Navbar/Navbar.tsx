@@ -64,6 +64,17 @@ export interface NavbarProps extends React.ComponentPropsWithoutRef<'nav'> {
    * (marketing pages).
    */
   fluid?: boolean;
+  /**
+   * Painted zones behind the bar — one soft pill per colour, side by side,
+   * blended into the bar's own background (`multiply` on a light bar,
+   * `screen` on a dark one) so the bar's text stays legible over each. The
+   * bar is isolated while a wash is on, so the blend never reaches the
+   * page behind it — give the bar a background (`bgColor`, `glass`) for
+   * the zones to tint. The occasion slot for flag colours (pride, a
+   * national day, a season); the app owns the list and must check AA
+   * contrast of the bar text over every colour.
+   */
+  wash?: readonly string[];
   className?: string;
 }
 
@@ -150,9 +161,21 @@ export interface NavbarActionsProps {
   className?: string;
 }
 
+export interface NavbarMotifProps {
+  /** The motif — an inline SVG in one colour, drawn in `currentColor`. */
+  children?: ReactNode;
+  /**
+   * Slide in once on page load — 16px from the right over 700 ms, then
+   * still. Never a loop. Off under `prefers-reduced-motion` and under
+   * `data-motion="none"`.
+   */
+  entry?: boolean;
+  className?: string;
+}
+
 export function NavbarBrand({ children, className }: Readonly<NavbarBrandProps>) {
   return (
-    <div className={cn('flex shrink-0 items-center text-(--text)', className)}>
+    <div className={cn('ratio-navbar__brand flex shrink-0 items-center text-(--text)', className)}>
       {children}
     </div>
   );
@@ -182,7 +205,7 @@ export function NavbarSearch({ children, className }: Readonly<NavbarSearchProps
 /** Horizontal pill links — pair with {@link NavbarLink}. */
 export function NavbarLinks({ children, className }: Readonly<NavbarLinksProps>) {
   return (
-    <ul className={cn('flex list-none items-center gap-1 p-0 m-0', className)}>
+    <ul className={cn('ratio-navbar__links flex list-none items-center gap-1 p-0 m-0', className)}>
       {children}
     </ul>
   );
@@ -206,10 +229,10 @@ export function NavbarLink({
         href={href}
         aria-current={ariaCurrent}
         className={cn(
-          'inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium',
+          'ratio-navbar__link inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium',
           'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring)',
           current
-            ? 'bg-primary-100 font-semibold text-(--text) dark:bg-primary-900'
+            ? 'bg-primary-100 font-semibold text-(--text) dark:bg-primary-900 [.surface-dark_&]:bg-primary-900'
             : 'text-(--text-muted) hover:bg-card-hover hover:text-(--text)',
           className,
         )}
@@ -228,13 +251,34 @@ export function NavbarLink({
 /** Right-hand cluster — bell, theme toggle, user menu. */
 export function NavbarActions({ children, className }: Readonly<NavbarActionsProps>) {
   return (
-    <div className={cn('flex shrink-0 items-center gap-2', className)}>{children}</div>
+    <div className={cn('ratio-navbar__actions flex shrink-0 items-center gap-2', className)}>{children}</div>
   );
 }
 
 /** Flexible gap — pushes whatever follows to the right edge. */
 export function NavbarSpacer({ className }: Readonly<{ className?: string }>) {
   return <div aria-hidden className={cn('grow', className)} />;
+}
+
+/**
+ * The motif slot at the bar's right edge — one silhouette per occasion (a
+ * sleigh in December, a flag at half mast), never content. A fixed 32px
+ * tall; the width follows the SVG. Hidden below 880px, where the bar has
+ * no room to spare. Decorative, so `aria-hidden`.
+ */
+export function NavbarMotif({ children, entry = false, className }: Readonly<NavbarMotifProps>) {
+  return (
+    <div
+      aria-hidden
+      className={cn(
+        'ratio-navbar__motif hidden h-8 shrink-0 items-center min-[55rem]:flex [&>svg]:h-full [&>svg]:w-auto',
+        entry && 'animate-motif-in motion-reduce:animate-none',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -322,6 +366,7 @@ export const NavbarRoot = ({
   dark = false,
   elevated = false,
   fluid = false,
+  wash,
   className,
   ...rest
 }: Readonly<NavbarProps>) => {
@@ -351,21 +396,26 @@ export const NavbarRoot = ({
   const barChildren = collapses.length
     ? childArray.filter((c) => !collapses.includes(c))
     : childArray;
-  // overlay takes precedence over sticky when both are passed.
+  // overlay takes precedence over sticky when both are passed. A static bar
+  // is still positioned, so the wash layer anchors to it.
   const positionClass = overlay
     ? 'absolute top-0 left-0 right-0 z-50'
     : sticky
       ? 'sticky top-0 z-50'
-      : '';
+      : 'relative';
   const glassClass = glass ? 'bg-surface-glass backdrop-blur-md' : '';
+  const zones = wash?.length ?? 0;
 
   return (
     <nav
       {...rest}
       className={cn(
+        'ratio-navbar',
         bgColor,
         positionClass,
         glassClass,
+        // Keep the wash's blend inside the bar, off the page behind it.
+        zones > 0 && 'isolate',
         dark && 'surface-dark',
         // Elevation, never lines. Fluid bars stay flat (app header); centered
         // bars become a floating card from md (full-bleed below).
@@ -379,9 +429,31 @@ export const NavbarRoot = ({
         className,
       )}
     >
+      {zones > 0 && (
+        // multiply tints a light bar; on a dark one it goes black, so the
+        // dark theme and a `dark` bar switch to screen.
+        <div
+          aria-hidden
+          className="ratio-navbar__wash pointer-events-none absolute inset-0 overflow-hidden mix-blend-multiply dark:mix-blend-screen [.surface-dark_&]:mix-blend-screen"
+        >
+          {wash!.map((color, i) => (
+            <span
+              key={`${i}-${color}`}
+              className="absolute h-[180%] rounded-full opacity-45"
+              style={{
+                left: `${(i / zones) * 100 - 6}%`,
+                width: `${100 / zones + 14}%`,
+                top: i % 2 ? '-30%' : '-40%',
+                background: color,
+              }}
+            />
+          ))}
+        </div>
+      )}
       <NavbarDisclosureContext.Provider value={disclosureApi}>
         <div
           className={cn(
+            'relative',
             hasRows
               ? 'w-full'
               : cn(

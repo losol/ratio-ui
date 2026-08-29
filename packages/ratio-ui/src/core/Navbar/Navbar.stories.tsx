@@ -354,3 +354,128 @@ export const OverlayGlass: Story = {
     </div>
   ),
 };
+
+// ── Occasions ────────────────────────────────────────────────────────────
+// The same bar on a different day. An occasion is set once by the app
+// (`<html data-occasion="…">`), which styles the stable hook classes
+// (`ratio-navbar`, `ratio-navbar__brand`, …) and passes the slot props from
+// its occasion config — see docs/occasions.md. Here the palette comes in as
+// `bgColor` + `dark`, which is what such a rule amounts to.
+
+const athenaeum = (
+  <>
+    <Navbar.Brand>
+      <span className="font-serif text-lg font-bold tracking-tight">Athenaeum</span>
+    </Navbar.Brand>
+    <Navbar.Links>
+      <Navbar.Link href="#" isCurrent>
+        Lectures
+      </Navbar.Link>
+      <Navbar.Link href="#">Library</Navbar.Link>
+      <Navbar.Link href="#">Visit</Navbar.Link>
+    </Navbar.Links>
+    <Navbar.Spacer />
+  </>
+);
+
+// A motif is one silhouette in one colour, drawn in currentColor — here a
+// comet for the December lecture series, 3:1 like the board asks. Real
+// occasions ship their own SVG (a sleigh, a flag at half mast); the slot
+// only sizes and places it.
+const winterSky = (
+  <svg viewBox="0 0 96 32" fill="currentColor"><path d="M0 30 C 24 22, 50 15, 74 10 L 76 15 C 52 20, 26 26, 0 30 Z" opacity=".6" /><polygon points="80.0,1.0 82.7,8.3 90.5,8.6 84.4,13.4 86.5,20.9 80.0,16.6 73.5,20.9 75.6,13.4 69.5,8.6 77.3,8.3" /></svg>
+);
+
+/**
+ * `Navbar.Motif` is the motif slot at the bar's right edge: 32px tall, the
+ * width follows the SVG, hidden below 880px (widen the canvas if you don't
+ * see it), `aria-hidden`. Still by
+ * default — the base level that works for every occasion. With `entry` the
+ * motif slides 16px in from the right once on page load (700 ms, the
+ * buttons' easing) and then stays put: never a loop, off under
+ * `prefers-reduced-motion` and `data-motion="none"`. The bar itself is the
+ * app's seasonal palette via `bgColor` + `dark` — colour and text, never
+ * layout.
+ */
+export const OccasionMotif: Story = {
+  render: () => (
+    <div className="space-y-6">
+      <Navbar bgColor="bg-[#22463C]" dark aria-label="Site — still motif">
+        {athenaeum}
+        <Navbar.Motif className="text-accent-300">{winterSky}</Navbar.Motif>
+        <Navbar.Actions>
+          <Button variant="primary" size="sm">
+            Sign in
+          </Button>
+        </Navbar.Actions>
+      </Navbar>
+      <Navbar bgColor="bg-[#22463C]" dark aria-label="Site — motif with entry">
+        {athenaeum}
+        <Navbar.Motif entry className="text-accent-300">
+          {winterSky}
+        </Navbar.Motif>
+        <Navbar.Actions>
+          <Button variant="primary" size="sm">
+            Sign in
+          </Button>
+        </Navbar.Actions>
+      </Navbar>
+    </div>
+  ),
+};
+
+/**
+ * `wash` paints one soft zone per colour behind the bar, side by side and
+ * blended into the surface — `multiply` on a light bar, `screen` on a dark
+ * one — so the bar's text stays readable over each — the
+ * occasion slot for flag colours. Six zones for a pride week, three for a
+ * national day; the app owns the list, and must check AA contrast of the
+ * bar text over every colour it passes.
+ */
+export const OccasionWash: Story = {
+  render: () => (
+    <div className="space-y-6">
+      <Navbar
+        bgColor="bg-surface"
+        wash={['#E4322B', '#F08A1D', '#F5C93B', '#3E9B54', '#2C5FA8', '#7A4A9E']}
+        aria-label="Site — six colours"
+      >
+        {athenaeum}
+      </Navbar>
+      <Navbar bgColor="bg-surface" wash={['#E4322B', '#F5C93B', '#2C5FA8']} aria-label="Site — three colours">
+        {athenaeum}
+      </Navbar>
+    </div>
+  ),
+};
+
+/**
+ * Mourning is the quietest occasion and needs no new element: the bar
+ * switches tone — ink surface, light text via `dark` — and everything else
+ * stays put. It is the one occasion where stillness is the device, so the
+ * app sets `data-motion="none"` on `<html>` (any ancestor works, as the
+ * wrapper here shows) and every animation and transition beneath it stops,
+ * including a motif's `entry`. An `Announcement` above the bar carries the
+ * words, if there are any.
+ */
+export const OccasionMourning: Story = {
+  render: () => (
+    <div data-motion="none">
+      <Navbar sticky bgColor="bg-primary-950" dark aria-label="Site">
+        {athenaeum}
+        <Navbar.Actions>
+          <Button variant="outline" size="sm">
+            Sign in
+          </Button>
+        </Navbar.Actions>
+      </Navbar>
+      <div className="container mx-auto px-4 pt-10">
+        <h2>Condolence book</h2>
+        <p>
+          The reading room is open for signatures this week. Lectures go ahead as planned; the
+          evening programme is paused until Monday.
+        </p>
+      </div>
+    </div>
+  ),
+};
