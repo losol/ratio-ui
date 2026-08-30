@@ -1,13 +1,13 @@
-name: Ratio UI Next Publish
+name: Ratio UI Shiki Publish
 
 on:
   push:
     tags:
-      - '@eventuras/ratio-ui-next@*'
+      - '@eventuras/ratio-ui-shiki@*'
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag (e.g., @eventuras/ratio-ui-next@0.1.0)'
+        description: 'Release tag (e.g., @eventuras/ratio-ui-shiki@0.1.0)'
         required: true
 
 jobs:
@@ -44,10 +44,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: pnpm install --filter @eventuras/ratio-ui-next... --frozen-lockfile --ignore-scripts
+        run: pnpm install --filter @eventuras/ratio-ui-shiki... --frozen-lockfile --ignore-scripts
 
       - name: Build package
-        run: pnpm --filter @eventuras/ratio-ui-next... build
+        run: pnpm --filter @eventuras/ratio-ui-shiki... build
 
+      # The alpha dist-tag comes from the package's own publishConfig, so no
+      # --tag here: it must not land on `latest` while the package is alpha.
       - name: Publish to npm
-        run: pnpm --filter @eventuras/ratio-ui-next publish --access public --provenance --no-git-checks
+        run: pnpm --filter @eventuras/ratio-ui-shiki publish --access public --provenance --no-git-checks
