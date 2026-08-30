@@ -51,55 +51,71 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # No pending changesets (e.g. the version PR was just merged) -> tag the
-      # released versions. The publish workflows below do the actual npm publish.
+      # released versions, cut a GitHub release per tag, and hand each package
+      # to its publish workflow.
+      #
+      # Shell rather than changesets/action: the action decides what was
+      # released by grepping the CLI's output for "New tag: ", and
+      # @changesets/cli 3 prints "Created git tags:" instead. Since the v3 bump
+      # every release was therefore tagged inside the runner and thrown away
+      # with it — 2.20.0 through 2.22.0 never reached npm, while the workflow
+      # stayed green. Here the tags are the source of truth: whatever
+      # `changeset git-tag` newly created is what gets pushed.
       - name: Tag released packages
         if: steps.changesets.outputs.count == '0'
-        id: tag
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
-        with:
-          publish: pnpm changeset:tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create GitHub releases
-        if: steps.tag.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISHED: ${{ steps.tag.outputs.publishedPackages }}
         run: |
-          echo "$PUBLISHED" | jq -c '.[]' | while read -r pkg; do
-            NAME=$(echo "$pkg" | jq -r '.name')
-            VERSION=$(echo "$pkg" | jq -r '.version')
-            TAG="${NAME}@${VERSION}"
-            TITLE="$(echo "$NAME" | sed 's|@eventuras/||') v${VERSION}"
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch --tags --force --quiet
 
-            echo "Creating release for ${TAG}"
-            gh release create "$TAG" --title "$TITLE" --generate-notes \
-              || echo "Failed to create release for ${TAG}"
-          done
+          git tag --list | sort > /tmp/tags-before
+          pnpm changeset:tag
+          git tag --list | sort > /tmp/tags-after
+          comm -13 /tmp/tags-before /tmp/tags-after > /tmp/tags-new
 
-      # GITHUB_TOKEN-pushed tags do not cascade into other workflows, so the
-      # publish jobs are dispatched explicitly here.
-      - name: Trigger npm publish for released packages
-        if: steps.tag.outputs.published == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISHED: ${{ steps.tag.outputs.publishedPackages }}
-        run: |
-          echo "$PUBLISHED" | jq -c '.[]' | while read -r pkg; do
-            NAME=$(echo "$pkg" | jq -r '.name')
-            TAG="${NAME}@$(echo "$pkg" | jq -r '.version')"
+          if [ ! -s /tmp/tags-new ]; then
+            echo "No new tags — every package version is already released."
+            exit 0
+          fi
 
-            case "$NAME" in
-              @eventuras/ratio-ui)
-                gh workflow run ratio-ui-publish.yml -f "tag=${TAG}" ;;
-              @eventuras/ratio-ui-next)
-                gh workflow run ratio-ui-next-publish.yml -f "tag=${TAG}" ;;
-              @eventuras/datatable)
-                gh workflow run datatable-publish.yml -f "tag=${TAG}" ;;
-              @eventuras/markdown)
-                gh workflow run markdown-publish.yml -f "tag=${TAG}" ;;
-              *)
-                echo "No publish workflow configured for ${NAME}" ;;
-            esac
-          done
+          UNDISPATCHED=""
+          while read -r TAG; do
+            [ -n "$TAG" ] || continue
+            NAME="${TAG%@*}"        # @eventuras/ratio-ui
+            VERSION="${TAG##*@}"    # 2.22.0
+            SLUG="${NAME##*/}"      # ratio-ui
+
+            echo "::group::${TAG}"
+            git push origin "refs/tags/${TAG}"
+
+            # A missing release is cosmetic, and re-runs hit "already exists" —
+            # warn, don't fail.
+            gh release create "$TAG" --title "${SLUG} v${VERSION}" --generate-notes \
+              || echo "::warning::Could not create the GitHub release for ${TAG}"
+
+            # A tag pushed with GITHUB_TOKEN does not trigger workflows, so the
+            # publish workflow's tag trigger never fires here. Dispatching it
+            # explicitly does run — that API call is not subject to the same
+            # restriction. This is the last link to npm: if it fails, the
+            # package is tagged but never published, which is precisely the
+            # silence this workflow was rewritten to end. Collect the failures
+            # so one bad package still lets the others through, then go red.
+            if [ -f ".github/workflows/${SLUG}-publish.yml" ]; then
+              if ! gh workflow run "${SLUG}-publish.yml" -f tag="$TAG"; then
+                echo "::error::Could not dispatch ${SLUG}-publish.yml for ${TAG} — tagged, not published."
+                UNDISPATCHED="${UNDISPATCHED} ${TAG}"
+              fi
+            else
+              echo "::warning::No publish workflow for ${NAME} — ${TAG} is tagged but will not reach npm."
+            fi
+            echo "::endgroup::"
+          done < /tmp/tags-new
+
+          if [ -n "$UNDISPATCHED" ]; then
+            echo "::error::Publish was not dispatched for:${UNDISPATCHED}"
+            echo "Re-run manually: gh workflow run <slug>-publish.yml -f tag=<tag>"
+            exit 1
+          fi

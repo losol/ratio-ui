@@ -15,7 +15,7 @@
     "build": "turbo run build",
     "changeset": "changeset",
     "changeset:version": "changeset version",
-    "changeset:tag": "changeset tag",
+    "changeset:tag": "changeset git-tag",
     "clean": "pnpm clean:build && pnpm clean:deps",
     "clean:build": "npx rimraf \"**/{.turbo,dist,storybook-static}\" \"!**/node_modules/**\"",
     "clean:deps": "pnpm -r exec rm -rf node_modules && rm -rf node_modules pnpm-lock.yaml",

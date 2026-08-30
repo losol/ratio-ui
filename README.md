@@ -104,6 +104,13 @@ pnpm release            # publish packages to npm
 The PR workflow warns when a changeset is missing. Documentation-only and
 internal-only changes may not need one.
 
+Releasing is automatic, and `pnpm release` above is only the manual fallback.
+Merging a PR that carries a changeset makes the Release workflow open a
+`chore: version packages` PR; merging *that* one bumps the versions, and the
+same workflow then tags the released packages, cuts a GitHub release per tag,
+and dispatches each package's `*-publish.yml` to publish it to npm. A package
+without such a workflow is tagged but never published — the run log says so.
+
 ## Contributing
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the local development workflow,
