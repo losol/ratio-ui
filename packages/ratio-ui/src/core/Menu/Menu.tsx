@@ -11,6 +11,7 @@ import {
   useEffect,
   useId,
   useRef,
+  useState,
 } from 'react';
 import {
   Button as AriaButton,
@@ -190,6 +191,52 @@ const Menu = ({ children, placement = 'bottom end', isOpen, defaultOpen, onOpenC
   const actionsRef = useRef(new Map<string, () => void>());
   const headerLabelId = useId();
 
+  // The popover is non-modal, so opening the menu doesn't lock scrolling.
+  // React Aria's scroll lock sets `overflow: hidden` on the root element;
+  // that propagates to the viewport, leaving `position: sticky` chrome with
+  // no scrollport, so a sticky navbar drops out of view the moment a menu
+  // opens on a scrolled page. A menu has no business freezing the page
+  // anyway. The catch: one switch drives both behaviours in usePopover
+  // (`isDismissable: !isNonModal`), so dismissal on outside press is ours to
+  // handle — below. Escape, blur and scroll still close it via React Aria.
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen ?? false);
+  const open = isOpen ?? uncontrolledOpen;
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const popoverRef = useRef<HTMLElement>(null);
+
+  const handleOpenChange = (next: boolean) => {
+    if (isOpen === undefined) setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => {
+      if (isOpen === undefined) setUncontrolledOpen(false);
+      onOpenChange?.(false);
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (!target) return;
+      if (popoverRef.current?.contains(target)) return;
+      if (triggerRef.current?.contains(target)) {
+        // Pressing the trigger while open must close the menu. Left to React
+        // Aria the two halves cancel out — its blur-close runs first, then it
+        // toggles on press start and opens again — so take the press here and
+        // stop it before React sees it. Keyboard activation sends no pointer
+        // event and keeps React Aria's own toggle.
+        event.preventDefault();
+        event.stopPropagation();
+        close();
+        return;
+      }
+      close();
+    };
+    // Capture phase, so a handler that stops propagation can't keep the menu open.
+    document.addEventListener('pointerdown', onPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onPointerDown, true);
+  }, [open, isOpen, onOpenChange]);
+
   const api = useRef<MenuActionsApi>({
     register: (id, fn) => actionsRef.current.set(id, fn),
     unregister: (id) => actionsRef.current.delete(id),
@@ -224,9 +271,18 @@ const Menu = ({ children, placement = 'bottom end', isOpen, defaultOpen, onOpenC
   }
 
   return (
-    <AriaMenuTrigger isOpen={isOpen} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
-      {trigger}
-      <Popover placement={placement} maxHeight={maxHeight} className={styles.popover}>
+    <AriaMenuTrigger isOpen={open} onOpenChange={handleOpenChange}>
+      {/* `display: contents` — a hit-testing handle for the trigger, no box of its own. */}
+      <span ref={triggerRef} style={{ display: 'contents' }}>
+        {trigger}
+      </span>
+      <Popover
+        ref={popoverRef}
+        isNonModal
+        placement={placement}
+        maxHeight={maxHeight}
+        className={styles.popover}
+      >
         {header && <div id={headerLabelId} className="shrink-0 bg-card">{header}</div>}
         <MenuActionsContext.Provider value={api}>
           <AriaMenu

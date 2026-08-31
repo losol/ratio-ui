@@ -77,8 +77,8 @@ const items = [
  */
 export const DetailPage: Story = {
   render: () => (
-    <div style={{ '--scroll-margin-top': 'calc(var(--spacing) * 34)' } as React.CSSProperties}>
-      <Navbar sticky className="flex h-16 items-center" aria-label="Site">
+    <div style={{ '--scroll-margin-top': 'calc(var(--spacing) * 28)' } as React.CSSProperties}>
+      <Navbar sticky glass className="flex h-16 items-center" aria-label="Site">
         <Navbar.Brand>
           <span className="font-serif text-lg font-bold tracking-tight">Lecture series</span>
         </Navbar.Brand>
@@ -90,7 +90,7 @@ export const DetailPage: Story = {
           <Navbar.Link href="#">Archive</Navbar.Link>
         </Navbar.Links>
       </Navbar>
-      <SectionNav aria-label="Contents" top="calc(var(--spacing) * 16)" items={items} />
+      <SectionNav aria-label="Contents" glass size="sm" top="calc(var(--spacing) * 16)" items={items} />
       <div className="container mx-auto px-3 py-8">
         <AsideLayout>
           <AsideLayout.Main>
@@ -98,16 +98,21 @@ export const DetailPage: Story = {
               <Heading.Eyebrow>Autumn series</Heading.Eyebrow>
               <Heading as="h1">How knowledge travelled</Heading>
             </Heading.Group>
-            {evenings.map((section) => (
-              <section key={section.id} id={section.id} className="min-h-[70vh]">
-                <Heading as="h2">{section.title}</Heading>
-                {section.body.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </section>
-            ))}
+            {/* Room below the last section, so every section can reach the top
+                of the viewport — otherwise the final ones can never become
+                current, on the page as much as in the test. */}
+            <div className="pb-[70vh]">
+              {evenings.map((section) => (
+                <section key={section.id} id={section.id} className="pb-16">
+                  <Heading as="h2">{section.title}</Heading>
+                  {section.body.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+                </section>
+              ))}
+            </div>
           </AsideLayout.Main>
-          <AsideLayout.Aside top="calc(var(--spacing) * 34)" aria-label="Registration">
+          <AsideLayout.Aside top="calc(var(--spacing) * 28)" aria-label="Registration">
             <div id="register">
               <Card padding="md">
                 <Heading as="h2" size="sm">
@@ -165,7 +170,7 @@ export const Standalone: Story = {
       <SectionNav {...args} />
       <div className="container mx-auto px-3">
         {evenings.map((section) => (
-          <section key={section.id} id={section.id} className="min-h-[70vh]">
+          <section key={section.id} id={section.id} className="pb-16">
             <Heading as="h2">{section.title}</Heading>
             {section.body.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>

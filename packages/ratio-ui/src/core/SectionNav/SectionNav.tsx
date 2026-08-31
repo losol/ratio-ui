@@ -31,6 +31,19 @@ export interface SectionNavProps extends Omit<React.ComponentPropsWithoutRef<'na
   /** Pin the row while the page scrolls. @default true */
   sticky?: boolean;
   /**
+   * Row height: `sm` 2.5rem, `md` 3rem (default). A pinned row is viewport
+   * a reader never gets back, so `sm` is worth it on a long page — the
+   * labels are the same size either way, only the air around them changes.
+   */
+  size?: 'sm' | 'md';
+  /**
+   * Frosted glass instead of the opaque surface — the page surface at 88%
+   * with a backdrop blur, so the text scrolling under the row stays faintly
+   * visible. Pair with `glass` on the `Navbar` above it, or the two rows
+   * read as different materials.
+   */
+  glass?: boolean;
+  /**
    * Full-width row (app shells) instead of the centered `container` that
    * lines up with `Navbar`.
    */
@@ -64,6 +77,8 @@ export function SectionNav({
   items,
   top = 0,
   sticky = true,
+  glass = false,
+  size = 'md',
   fluid = false,
   className,
   ...rest
@@ -91,7 +106,11 @@ export function SectionNav({
       observer?.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [sticky, top]);
+    // `size` changes the row height: ResizeObserver catches that where it
+    // exists, but the measurement has to be redone regardless of it.
+  }, [sticky, top, size]);
+
+  const rowHeight = size === 'sm' ? 'h-10' : 'h-12';
 
   const activeId = useActiveSection(
     items.filter((item) => item.track !== false).map((item) => item.id),
@@ -102,7 +121,8 @@ export function SectionNav({
     <nav
       ref={navRef}
       className={cn(
-        'm-0 border-b border-border-1 bg-surface p-0',
+        'm-0 border-b border-border-1 p-0',
+        glass ? 'bg-surface-glass backdrop-blur-md' : 'bg-surface',
         sticky && 'sticky z-40',
         className,
       )}
@@ -111,7 +131,8 @@ export function SectionNav({
     >
       <ul
         className={cn(
-          'm-0 flex h-12 list-none items-center gap-6 overflow-x-auto p-0',
+          'm-0 flex list-none items-center gap-6 overflow-x-auto p-0',
+          rowHeight,
           fluid ? 'w-full px-4' : 'container mx-auto px-3',
         )}
       >
@@ -123,7 +144,8 @@ export function SectionNav({
                 href={`#${item.id}`}
                 aria-current={current ? 'location' : undefined}
                 className={cn(
-                  'inline-flex h-12 items-center font-mono text-[10.5px] font-bold uppercase tracking-[0.18em] no-underline',
+                  'inline-flex items-center font-mono text-[10.5px] font-bold uppercase tracking-[0.18em] no-underline',
+                  rowHeight,
                   'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring)',
                   current ? 'text-(--text)' : 'text-(--text-subtle) hover:text-(--text)',
                 )}
