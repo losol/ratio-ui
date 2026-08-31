@@ -284,8 +284,26 @@ export const StickyGlass: Story = {
             Under-text
           </Navbar.Link>
           <Navbar.Link href="#over-text">Over-text</Navbar.Link>
+          <Navbar.Link href="#provenance">Provenance</Navbar.Link>
           <Navbar.Link href="#imaging">Imaging</Navbar.Link>
         </Navbar.Links>
+        <Navbar.Actions>
+          <Menu>
+            <Menu.Trigger className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border-1 bg-card py-1 pl-1 pr-2.5">
+              <Avatar name="Reviel Netz" size="sm" />
+              <Menu.Chevron className="h-5 w-5" />
+            </Menu.Trigger>
+            <Menu.Header>
+              <Avatar name="Reviel Netz" size="lg" />
+              <Menu.Header.Name>Reviel Netz</Menu.Header.Name>
+              <Menu.Header.Email>netz@palimpsest.org</Menu.Header.Email>
+            </Menu.Header>
+            <Menu.Link href="#folios">Your folios</Menu.Link>
+            <Menu.Button id="logout" onClick={() => {}}>
+              Log out
+            </Menu.Button>
+          </Menu>
+        </Navbar.Actions>
       </Navbar>
       <div className="container mx-auto px-4">
         <section id="under-text">
@@ -307,6 +325,21 @@ export const StickyGlass: Story = {
             In 1229 the parchment was washed, cut, folded and rebound as a prayer book. The
             scribe was not destroying Archimedes; he was reusing expensive material for a text
             he needed. Reuse was how most parchment survived at all.
+          </p>
+        </section>
+        <section id="provenance">
+          <h2>Provenance</h2>
+          <p>
+            The book surfaced in a Constantinople library catalogue in 1846, was read and
+            photographed by Johan Ludvig Heiberg in 1906, then vanished for most of a century —
+            long enough to acquire forged gold-leaf portraits painted over four of its pages by
+            someone hoping to raise the price.
+          </p>
+          <p>
+            It reappeared at auction in 1998, sold to a private buyer, and was deposited at the
+            Walters Art Museum in Baltimore the same year. Conservation took a decade: the
+            forgeries had to come off, the mould had to be stabilised, and the binding had to be
+            taken apart leaf by leaf before anything could be photographed flat.
           </p>
         </section>
         <section id="imaging">
