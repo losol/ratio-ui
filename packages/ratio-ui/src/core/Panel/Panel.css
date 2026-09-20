@@ -1,0 +1,30 @@
+/* ratio-ui · design system for knowledge sharing
+   SPDX-FileCopyrightText: 2026 Losol AS
+   SPDX-License-Identifier: MPL-2.0 */
+
+/* Skeleton shimmer for `loading`. Stops for reduced-motion. */
+@keyframes panel-shimmer {
+  0% {
+    background-position: -240px 0;
+  }
+  100% {
+    background-position: 240px 0;
+  }
+}
+
+.panel-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border-1) 0%,
+    var(--border-2) 40%,
+    var(--border-1) 80%
+  );
+  background-size: 240px 100%;
+  animation: panel-shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-skeleton {
+    animation: none;
+  }
+}
