@@ -70,6 +70,10 @@
       "types": "./dist/console/index.d.ts",
       "import": "./dist/console/index.js"
     },
+    "./chat": {
+      "types": "./dist/chat/index.d.ts",
+      "import": "./dist/chat/index.js"
+    },
     "./hooks": {
       "types": "./dist/hooks/index.d.ts",
       "import": "./dist/hooks/index.js"
