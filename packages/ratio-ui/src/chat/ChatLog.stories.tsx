@@ -39,7 +39,14 @@ const volunteers: ChatLogMessage[] = [
     role: 'op',
     text: 'Morning all — badge printing starts at 10 in the foyer.',
   },
-  { id: 'm2', time: '09:44', nick: 'aisha', role: 'voice', text: '@tor do we have extra lanyards?' },
+  {
+    id: 'm2',
+    time: '09:44',
+    nick: 'aisha',
+    role: 'voice',
+    text: '@tor do we have extra lanyards?',
+    reactions: [{ emoji: '👍', count: 2, me: true }],
+  },
   { id: 'm3', time: '09:46', nick: 'tor', role: 'op', text: 'Two boxes behind the desk. Ask for @jonas.' },
   { id: 'a1', type: 'action', time: '09:53', nick: 'marcus', text: 'heads to room 2.04' },
   {
@@ -55,6 +62,10 @@ const volunteers: ChatLogMessage[] = [
     nick: 'ingrid',
     role: 'op',
     text: 'Printers are live. Queue is short, come by if you have five minutes.',
+    reactions: [
+      { emoji: '🎉', count: 3 },
+      { emoji: '🙏', count: 1 },
+    ],
   },
   {
     id: 'm5',
@@ -75,7 +86,41 @@ const volunteers: ChatLogMessage[] = [
  * takes the voice colour, and a row that mentions you gets the accent band.
  */
 export const Channel: Story = {
-  args: { messages: volunteers, me: 'tor', 'aria-label': '#volunteers' },
+  args: { messages: volunteers, me: 'tor', 'aria-label': '#volunteers', reactionsLabel: 'Reactions' },
+};
+
+/**
+ * Reactions sit under the message text. The log reports the message and the
+ * emoji; the caller updates `reactions`, here in local state.
+ */
+export const Reactions: Story = {
+  render: function ReactionsStory() {
+    const [messages, setMessages] = useState(volunteers);
+
+    const toggleReaction = (messageId: string, emoji: string) =>
+      setMessages(prev =>
+        prev.map(m =>
+          m.id !== messageId
+            ? m
+            : {
+                ...m,
+                reactions: m.reactions?.map(r =>
+                  r.emoji === emoji ? { ...r, me: !r.me, count: r.count + (r.me ? -1 : 1) } : r,
+                ),
+              },
+        ),
+      );
+
+    return (
+      <ChatLog
+        messages={messages}
+        me="tor"
+        aria-label="#volunteers"
+        reactionsLabel="Reactions"
+        onToggleReaction={toggleReaction}
+      />
+    );
+  },
 };
 
 /**
