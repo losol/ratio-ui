@@ -1,0 +1,25 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * ToggleButton tokens — the selected fill of the `tint` variant. Overridable
+ * per scope: chat maps them to its reaction tokens, for instance.
+ */
+
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-light {
+  --toggle-tint-bg: var(--color-primary-100);
+  --toggle-tint-border: var(--color-primary-300);
+}
+
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"],
+.surface-dark {
+  --toggle-tint-bg: var(--color-primary-900);
+  --toggle-tint-border: var(--color-primary-700);
+}

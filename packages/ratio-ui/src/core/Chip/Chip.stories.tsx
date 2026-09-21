@@ -103,6 +103,30 @@ export const PulsingDot: Story = {
   ),
 };
 
+export const OutlineDot: Story = {
+  name: 'Composing — Chip.Dot outline',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`variant="outline"` (beta) draws the dot as a ring in `currentColor` — a state that is present but inactive, like a colleague who is away.',
+      },
+    },
+  },
+  render: () => (
+    <div className="flex gap-3 items-center">
+      <Chip>
+        <Chip.Dot />
+        available
+      </Chip>
+      <Chip>
+        <Chip.Dot variant="outline" />
+        away
+      </Chip>
+    </div>
+  ),
+};
+
 export const Outline: Story = {
   name: 'Outline — transparent + border',
   parameters: {

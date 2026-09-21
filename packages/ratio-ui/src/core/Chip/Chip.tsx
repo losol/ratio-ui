@@ -148,6 +148,13 @@ ChipRoot.displayName = 'Chip';
 
 interface DotProps {
   /**
+   * `'solid'` fills the dot; `'outline'` draws a ring in the same colour —
+   * a state that is present but inactive, such as "away".
+   * @default 'solid'
+   * @beta
+   */
+  variant?: 'solid' | 'outline';
+  /**
    * When true, the dot animates an expanding-ring pulse in its current
    * color. Used by `LiveIndicator` for live-status pills, but available
    * to any chip composition (e.g. a recording indicator). Respects
@@ -161,11 +168,12 @@ interface DotProps {
  * Small leading/trailing dot in `currentColor`. Compose inside `<Chip>`
  * before or after the label. Opt-in to a pulsing animation via `pulse`.
  */
-const Dot: React.FC<DotProps> = ({ pulse, className }) => (
+const Dot: React.FC<DotProps> = ({ variant = 'solid', pulse, className }) => (
   <span
     aria-hidden="true"
     className={cn(
-      'size-2 rounded-full bg-current opacity-70 shrink-0',
+      'size-2 rounded-full opacity-70 shrink-0',
+      variant === 'outline' ? 'border-[1.5px] border-current' : 'bg-current',
       pulse && 'animate-[chip-dot-pulse_3s_ease-out_infinite] motion-reduce:animate-none',
       className,
     )}

@@ -6,7 +6,10 @@ import React from 'react';
 import type { Status } from '../../tokens/colors';
 import { cn } from '../../utils/cn';
 
-export type BadgeVariant = 'filled' | 'subtle';
+export type BadgeVariant = 'filled' | 'subtle' | 'count';
+
+/** Brand tone, for badges that carry no status — same vocabulary as `Heading`. */
+export type BadgeTone = 'primary' | 'accent';
 
 export type BadgeProps = {
   children: React.ReactNode;
@@ -20,8 +23,17 @@ export type BadgeProps = {
    * - `'subtle'` — outline pill with mono-uppercase text on a quiet
    *   tinted background. Use as a category tag or kicker where the
    *   badge sits inside a larger card or list row and shouldn't shout.
+   * - `'count'` (beta) — a small solid pill for a number or a single
+   *   glyph: unread counts, tallies, an `@` for a mention.
    */
   variant?: BadgeVariant;
+  /**
+   * Colour from the brand instead of `status`, for a badge that reports no
+   * state — an unread count is news, not a warning. Applies to `filled` and
+   * `count`.
+   * @beta
+   */
+  tone?: BadgeTone;
   block?: boolean;
   definition?: boolean;
   label?: string;
@@ -43,17 +55,41 @@ const subtleStatusClasses: Record<Status, string> = {
   error: 'bg-error-bg border border-error-border text-error-text',
 };
 
+const toneClasses: Record<BadgeTone, string> = {
+  primary: 'bg-(--primary) text-(--text-on-primary)',
+  accent: 'bg-(--accent) text-(--text-on-accent)',
+};
+
 export const Badge: React.FC<BadgeProps> = ({
   children,
   className,
   status = 'neutral',
   variant = 'filled',
+  tone,
   block = false,
   definition = false,
   label,
 }) => {
   const isSubtle = variant === 'subtle';
-  const variantClasses = isSubtle ? subtleStatusClasses[status] : filledStatusClasses[status];
+  const variantClasses = isSubtle
+    ? subtleStatusClasses[status]
+    : tone
+      ? toneClasses[tone]
+      : filledStatusClasses[status];
+
+  if (variant === 'count') {
+    return (
+      <span
+        className={cn(
+          'inline-block rounded-full px-1.75 py-px text-center text-[11px] leading-4 font-bold tabular-nums',
+          variantClasses,
+          className,
+        )}
+      >
+        {children}
+      </span>
+    );
+  }
 
   const base = cn(
     block && 'block',

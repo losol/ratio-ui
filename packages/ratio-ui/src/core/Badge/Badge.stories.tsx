@@ -12,7 +12,11 @@ const meta: Meta<typeof Badge> = {
     },
     variant: {
       control: 'inline-radio',
-      options: ['filled', 'subtle'],
+      options: ['filled', 'subtle', 'count'],
+    },
+    tone: {
+      control: 'inline-radio',
+      options: [undefined, 'primary', 'accent'],
     },
     block: { control: 'boolean' },
   },
@@ -105,4 +109,33 @@ export const SubtleDefinition: Story = {
     status: 'neutral',
     variant: 'subtle',
   },
+};
+
+/**
+ * `tone` (beta) takes the brand colours instead of a status, for a badge that
+ * reports no state.
+ */
+export const Tones: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+      <Badge tone="primary">New</Badge>
+      <Badge tone="accent">Featured</Badge>
+    </div>
+  ),
+};
+
+/**
+ * `count` (beta) is a small solid pill for a number or a single glyph — an
+ * unread count on `primary`, an `@` for a mention on `accent`. Without a
+ * tone it follows `status` like any badge.
+ */
+export const Count: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+      <Badge variant="count" tone="primary">3</Badge>
+      <Badge variant="count" tone="primary">128</Badge>
+      <Badge variant="count" tone="accent">@</Badge>
+      <Badge variant="count" status="error">!</Badge>
+    </div>
+  ),
 };
