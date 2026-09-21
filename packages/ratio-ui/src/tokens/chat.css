@@ -1,0 +1,56 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Chat tokens — the only additions `chat/` makes; everything else reads the
+ * semantic tokens. Named themes (bureau, retro, ink) re-skin chat by
+ * overriding these, not the components.
+ *
+ * Beta, like the chat components: names and values may change before release.
+ */
+
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-light {
+  --chat-sidebar-bg: var(--color-secondary-100);
+  --chat-active-bg: var(--color-primary-100);
+  --chat-active-fg: var(--color-primary-900);
+  --chat-mention-bg: var(--color-accent-100);
+  --chat-nick: var(--color-neutral-700);
+  --chat-nick-op: var(--color-primary-700);
+  --chat-nick-voice: var(--color-accent-700);
+  --chat-avatar-bg: var(--color-primary-700);
+  --chat-avatar-fg: var(--color-secondary-100);
+  --chat-avatar-alt-bg: var(--color-accent-200);
+  --chat-avatar-alt-fg: var(--color-accent-900);
+  --chat-bubble-bg: var(--card);
+  --chat-bubble-me-bg: var(--color-primary-700);
+  --chat-bubble-me-fg: var(--color-secondary-100);
+  --chat-reaction-me-bg: var(--color-primary-100);
+  --chat-reaction-me-border: var(--color-primary-300);
+}
+
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"],
+.surface-dark {
+  --chat-sidebar-bg: var(--card);
+  --chat-active-bg: var(--color-primary-900);
+  --chat-active-fg: var(--color-secondary-100);
+  --chat-mention-bg: oklch(0.26 0.05 75);
+  --chat-nick: var(--color-secondary-400);
+  --chat-nick-op: var(--color-primary-300);
+  --chat-nick-voice: var(--color-accent-300);
+  --chat-avatar-bg: var(--color-primary-400);
+  --chat-avatar-fg: var(--color-primary-950);
+  --chat-avatar-alt-bg: var(--color-accent-200);
+  --chat-avatar-alt-fg: var(--color-accent-900);
+  --chat-bubble-bg: var(--card);
+  --chat-bubble-me-bg: var(--color-primary-400);
+  --chat-bubble-me-fg: var(--color-primary-950);
+  --chat-reaction-me-bg: var(--color-primary-900);
+  --chat-reaction-me-border: var(--color-primary-700);
+}
