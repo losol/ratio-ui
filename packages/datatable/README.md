@@ -14,8 +14,11 @@ pnpm add @eventuras/datatable @eventuras/ratio-ui
 Install the peer dependencies it expects:
 
 ```bash
-pnpm add @tanstack/react-table @tanstack/table-core @tanstack/match-sorter-utils lucide-react react react-dom
+pnpm add lucide-react react react-dom
 ```
+
+TanStack Table comes with the package — there is no need to install it
+yourself.
 
 Import Ratio UI's styles once in your app root:
 
@@ -44,7 +47,7 @@ const columns = [
 
 | Prop | Type | Notes |
 |---|---|---|
-| `columns` | `ColumnDef[]` | TanStack column definitions — build them with `createColumnHelper`. |
+| `columns` | `DataTableColumnDef<T>[]` | Column definitions — build them with `createColumnHelper`. |
 | `data` | `T[]` | The rows to render. |
 | `pageSize` | `number` | Rows per page. Applied when `clientsidePagination` is on. |
 | `clientsidePagination` | `boolean` | Paginate in the browser and render Ratio UI's `Pagination`. |
@@ -67,8 +70,9 @@ const columns = [
 Built on TanStack Table v9, which registers no features automatically. This
 package registers the ones it needs — column and global filtering, client
 pagination, expandable rows and column visibility — and exports the set as
-`dataTableFeatures` (with `DataTableFeatures` and `DataTableRow<T>` types) for
-callers that need to name a row or state type.
+`dataTableFeatures` (with `DataTableFeatures`, `DataTableRow<T>` and
+`DataTableColumnDef<T>` types) for callers that need to name a row, a column
+or a state type.
 
 `createColumnHelper` is re-exported bound to that feature set, so the call
 shape is unchanged from v8: `createColumnHelper<Manuscript>()`. If you build

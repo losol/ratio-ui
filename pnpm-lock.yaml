@@ -96,6 +96,12 @@ importers:
 
   packages/datatable:
     dependencies:
+      '@tanstack/match-sorter-utils':
+        specifier: ^9.1.2
+        version: 9.1.2
+      '@tanstack/react-table':
+        specifier: ^9.2.4
+        version: 9.2.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: ^19.0.0
         version: 19.2.8
@@ -112,15 +118,6 @@ importers:
       '@eventuras/vite-config':
         specifier: ^0.3.1
         version: 0.3.1(@swc/helpers@0.5.23)(esbuild@0.28.2)(rolldown@1.2.6)(typescript@6.0.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
-      '@tanstack/match-sorter-utils':
-        specifier: ^9.1.2
-        version: 9.1.2
-      '@tanstack/react-table':
-        specifier: ^9.2.4
-        version: 9.2.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@tanstack/table-core':
-        specifier: ^9.2.4
-        version: 9.2.4
       '@types/react':
         specifier: ^19.2.18
         version: 19.2.18
@@ -4175,7 +4172,7 @@ snapshots:
       '@babel/helper-compilation-targets': 7.29.7
       '@babel/helper-module-transforms': 7.29.7(@babel/core@7.29.7)
       '@babel/helpers': 7.29.7
-      '@babel/parser': 7.29.7
+      '@babel/parser': 7.29.8
       '@babel/template': 7.29.7
       '@babel/traverse': 7.29.8
       '@babel/types': 7.29.8
