@@ -8,7 +8,9 @@ on:
 
 concurrency:
   group: storybook-${{ github.ref }}
-  cancel-in-progress: true
+  # PR previews cancel each other; main deploys queue instead, since a
+  # cancelled one shows up as a failed "storybook" deployment.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   CLOUDFLARE_PAGES_PROJECT: ratio-ui
