@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { cn } from '../utils/cn';
+import { ChatReactions, type ChatReaction } from './ChatReactions';
 
 /**
  * Channel role, shown as a glyph before the nick: `@` op, `+` voice.
@@ -23,6 +24,8 @@ export interface ChatLogMessage {
   role?: ChatRole;
   /** The message; `@nick` mentions are highlighted. A divider's label. */
   text: string;
+  /** Emoji reactions, shown under a `msg`. */
+  reactions?: ChatReaction[];
 }
 
 /** @beta Prop shape may change before release. */
@@ -30,6 +33,10 @@ export interface ChatLogProps {
   messages: ChatLogMessage[];
   /** Your own nick — tinted in the log, and rows that mention it are highlighted. */
   me?: string;
+  /** Called with the message and the emoji when you add or remove a reaction. */
+  onToggleReaction?: (messageId: string, emoji: string) => void;
+  /** Accessible name for each message's reaction row, e.g. "Reactions". */
+  reactionsLabel?: string;
   /** Accessible name, e.g. the channel. */
   'aria-label'?: string;
   className?: string;
@@ -68,7 +75,7 @@ const TIME = 'font-mono text-xs not-italic tabular-nums text-(--text-subtle)';
  * @beta This component is experimental — prop shape may change before release.
  */
 export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function ChatLog(
-  { messages, me, 'aria-label': ariaLabel, className, testId },
+  { messages, me, onToggleReaction, reactionsLabel, 'aria-label': ariaLabel, className, testId },
   ref,
 ) {
   return (
@@ -88,15 +95,26 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
       )}
     >
       {messages.map(message => (
-        <ChatLogRow key={message.id} message={message} me={me} />
+        <ChatLogRow
+          key={message.id}
+          message={message}
+          me={me}
+          onToggleReaction={onToggleReaction}
+          reactionsLabel={reactionsLabel}
+        />
       ))}
     </div>
   );
 });
 ChatLog.displayName = 'Chat.Log';
 
-const ChatLogRow: React.FC<{ message: ChatLogMessage; me?: string }> = ({ message, me }) => {
-  const { type = 'msg', time, nick, role, text } = message;
+type ChatLogRowProps = { message: ChatLogMessage } & Pick<
+  ChatLogProps,
+  'me' | 'onToggleReaction' | 'reactionsLabel'
+>;
+
+const ChatLogRow: React.FC<ChatLogRowProps> = ({ message, me, onToggleReaction, reactionsLabel }) => {
+  const { id, type = 'msg', time, nick, role, text, reactions } = message;
 
   if (type === 'divider') {
     return (
@@ -151,17 +169,28 @@ const ChatLogRow: React.FC<{ message: ChatLogMessage; me?: string }> = ({ messag
         {role && ROLE_GLYPH[role]}
         {nick}
       </span>
-      <span className="min-w-0 break-words text-pretty">
-        {parts.map((part, i) =>
-          i % 2 === 1 ? (
-            <span key={i} className="font-semibold text-(--primary)">
-              {part}
-            </span>
-          ) : (
-            part
-          ),
+      <div className="flex min-w-0 flex-col gap-1">
+        <span className="break-words text-pretty">
+          {parts.map((part, i) =>
+            i % 2 === 1 ? (
+              <span key={i} className="font-semibold text-(--primary)">
+                {part}
+              </span>
+            ) : (
+              part
+            ),
+          )}
+        </span>
+        {reactions && reactions.length > 0 && (
+          <ChatReactions
+            reactions={reactions}
+            // `bind`, not a closure: a Server Action bound here can still cross
+            // into the client component; a closure made on the server cannot.
+            onToggle={onToggleReaction?.bind(null, id)}
+            aria-label={reactionsLabel}
+          />
         )}
-      </span>
+      </div>
     </div>
   );
 };

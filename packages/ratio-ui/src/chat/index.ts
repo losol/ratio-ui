@@ -4,3 +4,9 @@
 
 export { ChatLog } from './ChatLog';
 export type { ChatLogProps, ChatLogMessage, ChatRole } from './ChatLog';
+export { ChatReactions } from './ChatReactions';
+export type { ChatReaction, ChatReactionsProps } from './ChatReactions';
+export { ChatPresenceDot } from './ChatPresenceDot';
+export type { ChatPresence, ChatPresenceDotProps } from './ChatPresenceDot';
+export { ChatUnreadBadge } from './ChatUnreadBadge';
+export type { ChatUnreadBadgeProps } from './ChatUnreadBadge';
