@@ -10,7 +10,7 @@ import { ToggleButton } from '../ToggleButton';
 import { cn } from '../../utils/cn';
 
 export type ToggleButtonGroupSize = 'sm' | 'md' | 'lg';
-export type ToggleButtonGroupVariant = 'segmented' | 'chips';
+export type ToggleButtonGroupVariant = 'segmented' | 'chips' | 'tints';
 
 export interface ToggleButtonOption {
   /** Stable identity of the segment; the key reported in the selection. */
@@ -33,7 +33,9 @@ export interface ToggleButtonGroupProps {
    * a few mutually exclusive views of the same thing, always visible
    * together. `'chips'` drops the track and lets each option stand as its
    * own outlined pill, wrapping onto further lines: the filter-chip row,
-   * where the set can be long and any number may be on at once.
+   * where the set can be long and any number may be on at once. `'tints'`
+   * (beta) is the same row with a soft selected fill, for toggles inside
+   * content — reactions under a message.
    * @default 'segmented'
    */
   variant?: ToggleButtonGroupVariant;
@@ -113,6 +115,8 @@ export interface ToggleButtonGroupProps {
  *   ]}
  * />
  */
+const VARIANT_PILL = { segmented: 'segmented', chips: 'chip', tints: 'tint' } as const;
+
 export function ToggleButtonGroup({
   variant = 'segmented',
   options,
@@ -172,8 +176,9 @@ export function ToggleButtonGroup({
             // both light and dark surfaces without a dedicated token.
             'inline-flex gap-1 p-0.75 rounded-full border border-border-1 bg-[color-mix(in_srgb,var(--text)_7%,transparent)]'
           : // Chips carry their own outline, so the row is just layout — and it
-            // wraps, since a filter set has no fixed length.
-            'flex flex-wrap items-center gap-2',
+            // wraps, since a filter set has no fixed length. Tints sit inside
+            // content, so they pack a little tighter.
+            cn('flex flex-wrap items-center', variant === 'tints' ? 'gap-1.5' : 'gap-2'),
         variant === 'segmented' && fullWidth && 'flex w-full',
         className,
       )}
@@ -184,7 +189,7 @@ export function ToggleButtonGroup({
         <ToggleButton
           key={option.value}
           id={option.value}
-          variant={variant === 'chips' ? 'chip' : 'segmented'}
+          variant={VARIANT_PILL[variant]}
           size={size}
           isDisabled={option.isDisabled}
           // When `label` isn't plain text (e.g. an icon), the button would have

@@ -2,4 +2,4 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-export { Badge, type BadgeProps } from './Badge';
+export { Badge, type BadgeProps, type BadgeTone, type BadgeVariant } from './Badge';

@@ -12,7 +12,7 @@ const meta: Meta<typeof ToggleButton> = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'primary', 'outline'],
+      options: ['default', 'primary', 'outline', 'tint'],
     },
     isDisabled: { control: 'boolean' },
   },
@@ -90,6 +90,27 @@ export const AllVariants: ToggleButtonStory = () => {
       </ToggleButton>
       <ToggleButton variant="outline" isSelected={selected3} onChange={setSelected3}>
         Outline
+      </ToggleButton>
+    </div>
+  );
+};
+
+/**
+ * `tint` (beta) is a standalone pill whose selected state is a soft fill and
+ * whose text never changes — for toggles that sit inside content, where a
+ * solid fill would outshout the text around them.
+ */
+export const Tint: ToggleButtonStory = () => {
+  const [saved, setSaved] = useState(true);
+  const [following, setFollowing] = useState(false);
+
+  return (
+    <div className="flex gap-2">
+      <ToggleButton variant="tint" size="sm" isSelected={saved} onChange={setSaved}>
+        Saved
+      </ToggleButton>
+      <ToggleButton variant="tint" size="sm" isSelected={following} onChange={setFollowing}>
+        Follow thread
       </ToggleButton>
     </div>
   );

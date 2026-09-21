@@ -7,7 +7,7 @@ import { ToggleButton as AriaToggleButton, ToggleButtonProps as AriaToggleButton
 import { cn } from '../../utils/cn';
 
 export type ToggleButtonSize = 'sm' | 'md' | 'lg';
-export type ToggleButtonVariant = 'default' | 'primary' | 'outline' | 'segmented' | 'chip';
+export type ToggleButtonVariant = 'default' | 'primary' | 'outline' | 'segmented' | 'chip' | 'tint';
 
 /** Pill sizes, shared with `ToggleButtonGroup` so a lone toggle matches a row of them. */
 const PILL_SIZE: Record<ToggleButtonSize, string> = {
@@ -26,9 +26,12 @@ export interface ToggleButtonProps extends Omit<AriaToggleButtonProps, 'classNam
    *   no border of its own, since the track frames the set
    * - 'chip': a standalone filter pill that carries its own outline, for a
    *   loose wrapping row rather than a shared track
+   * - 'tint' (beta): a chip whose selected state is a soft fill
+   *   (`--toggle-tint-bg/-border`) and whose text never changes — for toggles
+   *   that sit inside content, like reactions, where a solid fill would shout
    *
-   * `segmented` and `chip` are what `ToggleButtonGroup` renders; reach for
-   * `chip` directly only for a toggle that stands alone.
+   * `segmented`, `chip` and `tint` are what `ToggleButtonGroup` renders;
+   * reach for them directly only for a toggle that stands alone.
    */
   variant?: ToggleButtonVariant;
   /**
@@ -88,7 +91,7 @@ const variantStyles = {
  * </ToggleButton>
  * ```
  */
-const PILL_VARIANTS = ['segmented', 'chip'] as const;
+const PILL_VARIANTS = ['segmented', 'chip', 'tint'] as const;
 type PillVariant = (typeof PILL_VARIANTS)[number];
 const isPill = (v: string): v is PillVariant =>
   (PILL_VARIANTS as readonly string[]).includes(v);
@@ -109,11 +112,18 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
             'inline-flex items-center justify-center rounded-full font-semibold',
             'cursor-pointer whitespace-nowrap outline-none transition-colors duration-150',
             PILL_SIZE[size],
-            // A chip stands alone, so its own outline is what makes it read as
-            // a control when off. A segment sits in a track that frames it.
-            variant === 'chip' ? 'border' : 'border-0',
-            isSelected ? 'text-(--text-on-primary) bg-(--primary)' : 'text-(--text-muted)',
-            variant === 'chip' && (isSelected ? 'border-(--primary)' : 'border-border-2'),
+            // A chip or a tint stands alone, so its own outline is what makes it
+            // read as a control when off. A segment sits in a track that frames it.
+            variant === 'segmented' ? 'border-0' : 'border',
+            variant === 'tint'
+              ? cn(
+                  'text-(--text)',
+                  isSelected ? 'border-(--toggle-tint-border) bg-(--toggle-tint-bg)' : 'border-border-2',
+                )
+              : cn(
+                  isSelected ? 'text-(--text-on-primary) bg-(--primary)' : 'text-(--text-muted)',
+                  variant === 'chip' && (isSelected ? 'border-(--primary)' : 'border-border-2'),
+                ),
             !isSelected &&
               isHovered &&
               'text-(--text) bg-[color-mix(in_srgb,var(--text)_5%,transparent)]',

@@ -247,3 +247,35 @@ export const Chips: ToggleButtonGroupStory = () => {
     </div>
   );
 };
+
+/**
+ * `tints` (beta) is a wrapping row of soft toggles for content — reactions
+ * under a comment. Any number can be on, and the whole row is one tab stop:
+ * the arrow keys move between reactions.
+ */
+export const Tints: ToggleButtonGroupStory = () => {
+  const [counts, setCounts] = useState<Record<string, number>>({ '👍': 4, '🎉': 1, '👀': 2 });
+  const [mine, setMine] = useState<Set<Key>>(() => new Set(['👍']));
+
+  return (
+    <ToggleButtonGroup
+      aria-label="Reactions"
+      variant="tints"
+      size="sm"
+      selectionMode="multiple"
+      selectedKeys={mine}
+      onSelectionChange={next => {
+        setCounts(prev =>
+          Object.fromEntries(
+            Object.entries(prev).map(([emoji, n]) => [
+              emoji,
+              n + Number(next.has(emoji)) - Number(mine.has(emoji)),
+            ]),
+          ),
+        );
+        setMine(next);
+      }}
+      options={Object.entries(counts).map(([emoji, n]) => ({ value: emoji, label: `${emoji} ${n}` }))}
+    />
+  );
+};
