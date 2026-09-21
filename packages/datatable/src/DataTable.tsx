@@ -16,6 +16,8 @@ import {
   rowPaginationFeature,
   tableFeatures,
   useTable,
+  type CellData,
+  type ColumnDef,
   type ColumnFilter,
   type ColumnFiltersState,
   type ExpandedState,
@@ -68,6 +70,16 @@ export const dataTableFeatures = tableFeatures({
 export type DataTableFeatures = typeof dataTableFeatures;
 /** The row type handed to `renderSubComponent`, `onRowClick` and friends. */
 export type DataTableRow<TData extends RowData> = Row<DataTableFeatures, TData>;
+/**
+ * A column definition bound to this table's features, so callers can type
+ * columns without importing TanStack. `TValue` defaults to `any` because one
+ * table mixes columns of different value types.
+ */
+export type DataTableColumnDef<TData extends RowData, TValue extends CellData = any> = ColumnDef<
+  DataTableFeatures,
+  TData,
+  TValue
+>;
 
 /**
  * `createColumnHelper` bound to this table's features — v9's helper takes the
@@ -82,8 +94,8 @@ export function createColumnHelper<TData extends RowData>() {
 export type DataTableExpansionMode = 'single' | 'multiple';
 
 export type DataTableProps<TData extends RowData = any> = {
-  /** TanStack column definitions — build them with `createColumnHelper`. */
-  columns: any[];
+  /** Column definitions — build them with `createColumnHelper`. */
+  columns: DataTableColumnDef<TData>[];
   data: TData[];
   pageSize?: number;
   clientsidePagination?: boolean;
