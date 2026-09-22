@@ -49,6 +49,7 @@ export {
   // Admin / console navigation
   Menu as MenuIcon,
   Bell,
+  BellOff,
   LayoutGrid,
   Database,
   ShieldCheck,
