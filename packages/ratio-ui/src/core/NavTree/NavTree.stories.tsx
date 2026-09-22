@@ -19,6 +19,7 @@ import {
   Upload,
   Users,
 } from '../../icons';
+import { Badge } from '../Badge';
 import { Chip } from '../Chip';
 import { NavTree } from './NavTree';
 
@@ -212,6 +213,72 @@ export const RowsWithoutDestination: Story = {
     await userEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(canvas.getByRole('link', { name: 'Almagest' })).toBeVisible();
+  },
+};
+
+/**
+ * With `onAction`, rows without an `href` are buttons that report their key,
+ * and `selectedKey` marks the current one — navigation held in state rather
+ * than in the URL, like the rooms of a chat. `emphasized` bolds a row with
+ * something new; `muted` dims one that is quiet on purpose. Opening a room
+ * here clears its unread count, the way a reader would expect.
+ */
+export const ButtonMode: Story = {
+  render: function ButtonModeStory() {
+    const [room, setRoom] = useState('astronomy');
+    const [unread, setUnread] = useState<Record<string, number>>({ mathematics: 3, medicine: 1 });
+    const open = (key: string) => {
+      setRoom(key);
+      setUnread((prev) => ({ ...prev, [key]: 0 }));
+    };
+    const item = (id: string, title: string, extra: { muted?: boolean } = {}) => ({
+      id,
+      title,
+      emphasized: !!unread[id],
+      trailing: unread[id] ? (
+        <Badge variant="count" tone="primary">
+          {unread[id]}
+        </Badge>
+      ) : undefined,
+      ...extra,
+    });
+
+    return (
+      <div style={{ width: 280 }}>
+        <NavTree
+          aria-label="Reading rooms"
+          selectedKey={room}
+          onAction={open}
+          groups={[
+            {
+              label: 'Reading rooms',
+              items: [
+                item('astronomy', 'Astronomy'),
+                item('mathematics', 'Mathematics'),
+                item('medicine', 'Medicine'),
+                item('geography', 'Geography', { muted: true }),
+              ],
+            },
+          ]}
+        />
+      </div>
+    );
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+
+    // Buttons, not links — nothing here has a URL.
+    expect(canvas.queryAllByRole('link')).toHaveLength(0);
+    const astronomy = canvas.getByRole('button', { name: 'Astronomy' });
+    expect(astronomy).toHaveAttribute('aria-current', 'true');
+
+    const mathematics = canvas.getByRole('button', { name: /Mathematics/ });
+    await userEvent.click(mathematics);
+    expect(mathematics).toHaveAttribute('aria-current', 'true');
+    expect(astronomy).not.toHaveAttribute('aria-current');
+    expect(mathematics).toHaveTextContent(/^Mathematics$/);
+    // The other unread room keeps its bold row and count.
+    expect(canvas.getByRole('button', { name: /Medicine/ })).toHaveTextContent('Medicine1');
   },
 };
 

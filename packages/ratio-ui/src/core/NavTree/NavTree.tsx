@@ -35,6 +35,10 @@ export interface NavTreeLinkItem extends NavTreeItemBase {
   icon?: React.ReactNode;
   /** Right-aligned adornment — a count `<Chip>`, status dot, or badge. */
   trailing?: React.ReactNode;
+  /** Bold the row for unseen activity — unread messages, new items. @beta */
+  emphasized?: boolean;
+  /** Dim the row: present but quiet, like a muted channel. @beta */
+  muted?: boolean;
   /** Nested items. The row gains a chevron and collapses. */
   children?: NavTreeItem[];
   /**
@@ -118,6 +122,21 @@ export interface NavTreeProps {
   items?: NavTreeItem[];
   /** Current path — highlights the active item and auto-expands its ancestors. */
   currentPath?: string;
+  /**
+   * The current item by key (`id`, else a string `title`) — for rows that
+   * are buttons rather than links. Highlights and auto-expands like
+   * `currentPath`. Mirrors React Aria.
+   * @beta
+   */
+  selectedKey?: string | null;
+  /**
+   * Makes rows without an `href` into buttons that report their key (`id`,
+   * else a string `title`) — for navigation held in state rather than in
+   * the URL, like the rooms of a chat. Branches without an `href` still
+   * toggle. Mirrors React Aria.
+   * @beta
+   */
+  onAction?: (key: string) => void;
   /**
    * Start every branch above this depth expanded — `1` opens the top-level
    * branches, `Infinity` opens everything. Per-item `defaultOpen` and the
@@ -216,6 +235,8 @@ export function NavTree({
   groups,
   items,
   currentPath,
+  selectedKey,
+  onAction,
   orientation = 'vertical',
   defaultExpandedDepth = 0,
   defaultExpandedKeys,
@@ -236,18 +257,18 @@ export function NavTree({
   const controlledSet = useMemo(() => new Set(expandedKeys ?? []), [expandedKeys]);
   const defaultSet = useMemo(() => new Set(defaultExpandedKeys ?? []), [defaultExpandedKeys]);
   const [manual, setManual] = useState<Record<string, boolean>>({});
-  const [prevPath, setPrevPath] = useState(currentPath);
-  if (prevPath !== currentPath) {
-    setPrevPath(currentPath);
+  const [prevCurrent, setPrevCurrent] = useState({ path: currentPath, key: selectedKey });
+  if (prevCurrent.path !== currentPath || prevCurrent.key !== selectedKey) {
+    setPrevCurrent({ path: currentPath, key: selectedKey });
     setManual({});
   }
+  const current: Current = { path: currentPath, key: selectedKey };
 
   const isOpenWith = (overrides: Record<string, boolean>) =>
     (node: NavTreeLinkItem, key: string, depth: number): boolean => {
       if (controlled) return controlledSet.has(key);
       const derived =
-        isActive(node.href, currentPath) ||
-        hasActiveChild(node, currentPath) ||
+        hasCurrentChild(node, current) ||
         !!node.defaultOpen ||
         depth < defaultExpandedDepth ||
         defaultSet.has(key);
@@ -282,8 +303,9 @@ export function NavTree({
       <nav aria-label={ariaLabel} className={className}>
         <ul className="m-0 flex list-none items-center gap-6 border-b border-border-1 p-0">
           {flat.map((node, i) => {
-            const active = isActive(node.href, currentPath) || hasActiveChild(node, currentPath);
-            const tabClass = cn(HTAB, active ? HTAB_ACTIVE : HTAB_IDLE);
+            const active = hasCurrentChild(node, current);
+            const tabClass = cn(HTAB, active ? HTAB_ACTIVE : cn(HTAB_IDLE, rowTone(node)));
+            const key = actionKey(node);
             const inner = (
               <>
                 {node.icon && (
@@ -305,6 +327,15 @@ export function NavTree({
                   >
                     {inner}
                   </LinkTag>
+                ) : onAction && key !== undefined ? (
+                  <button
+                    type="button"
+                    aria-current={active ? 'true' : undefined}
+                    onClick={() => onAction(key)}
+                    className={cn(tabClass, 'cursor-pointer')}
+                  >
+                    {inner}
+                  </button>
                 ) : (
                   // No destination, and horizontal renders no children to
                   // toggle — a label, not a link. An `href="#"` would look
@@ -337,7 +368,8 @@ export function NavTree({
                 key={nodeKey(node, i)}
                 node={node}
                 branchKey={branchKey(node, `g${index}`, i)}
-                currentPath={currentPath}
+                current={current}
+                onAction={onAction}
                 iconOnly={iconOnly}
                 expansion={expansion}
                 LinkComponent={LinkComponent}
@@ -400,17 +432,40 @@ function isActive(href: string | undefined, currentPath: string | undefined): bo
   return a === b;
 }
 
-function hasActiveChild(node: NavTreeItem, currentPath: string | undefined): boolean {
-  if (!currentPath) return false;
-  if (isActive(node.href, currentPath)) return true;
-  return node.children?.some((child) => hasActiveChild(child, currentPath)) ?? false;
+/** What makes a row current: its `href` matches the path, or its key matches `selectedKey`. */
+interface Current {
+  path?: string;
+  key?: string | null;
+}
+
+/** The key a row reports to `onAction` and matches `selectedKey` against. */
+function actionKey(node: NavTreeItem): string | undefined {
+  return node.id ?? (typeof node.title === 'string' ? node.title : undefined);
+}
+
+function isCurrent(node: NavTreeItem, current: Current): boolean {
+  return (
+    isActive(node.href, current.path) ||
+    (current.key != null && actionKey(node) === current.key)
+  );
+}
+
+function hasCurrentChild(node: NavTreeItem, current: Current): boolean {
+  if (isCurrent(node, current)) return true;
+  return node.children?.some((child) => hasCurrentChild(child, current)) ?? false;
+}
+
+/** Idle-row tone for `emphasized` / `muted`; `muted` wins the colour, `emphasized` keeps the weight. */
+function rowTone(node: NavTreeLinkItem): string {
+  return cn(node.emphasized && 'font-semibold text-(--text)', node.muted && 'text-(--text-subtle)');
 }
 
 interface NavTreeRowProps {
   node: NavTreeItem;
   /** Expansion key of this row (see `branchKey`). */
   branchKey: string;
-  currentPath?: string;
+  current: Current;
+  onAction?: NavTreeProps['onAction'];
   iconOnly?: boolean;
   expansion: Expansion;
   LinkComponent?: NavTreeProps['LinkComponent'];
@@ -420,7 +475,8 @@ interface NavTreeRowProps {
 function NavTreeRow({
   node,
   branchKey: key,
-  currentPath,
+  current,
+  onAction,
   iconOnly,
   expansion,
   LinkComponent,
@@ -465,12 +521,48 @@ function NavTreeRow({
   }
 
   const hasChildren = !!node.children?.length;
-  const active = isActive(node.href, currentPath);
-  const containsActive = hasActiveChild(node, currentPath);
+  const active = isCurrent(node, current);
+  const containsActive = hasCurrentChild(node, current);
+  const itemKey = actionKey(node);
   const isOpen = hasChildren && expansion.isOpen(node, key, depth);
   const toggle = () => expansion.toggle(node, key, depth);
 
   const LinkTag = (LinkComponent ?? 'a') as React.ElementType;
+
+  // A row with somewhere to go is a link; one that reports to `onAction` is a
+  // button; anything else is a plain row. Branches never take this path.
+  const renderTarget = (
+    className: string,
+    children: React.ReactNode,
+    extra: React.HTMLAttributes<HTMLElement> = {},
+  ) =>
+    node.href ? (
+      <LinkTag
+        href={node.href}
+        aria-current={active ? 'page' : undefined}
+        className={className}
+        {...extra}
+      >
+        {children}
+      </LinkTag>
+    ) : onAction && itemKey !== undefined ? (
+      <button
+        type="button"
+        aria-current={active ? 'true' : undefined}
+        onClick={() => onAction(itemKey)}
+        className={cn(className, 'w-full cursor-pointer text-left')}
+        {...extra}
+      >
+        {children}
+      </button>
+    ) : (
+      // Nothing to go to and nothing to report — a plain row (an empty
+      // state, a heading among the items). `href="#"` would offer a link
+      // that jumps to the top of the page and pushes a history entry.
+      <span className={cn(className, 'cursor-default')} {...extra}>
+        {children}
+      </span>
+    );
 
   // Text for the chevron's accessible name. A ReactNode title can't be
   // interpolated (it would stringify to "[object Object]"), so fall back to
@@ -501,7 +593,7 @@ function NavTreeRow({
     // Accessible name for the icon row: string title, else id, else href —
     // so a rail row is never announced empty.
     const railLabel = titleText ?? node.href;
-    const rowClass = cn(ROW, 'justify-center px-2', railActive ? ROW_ACTIVE : ROW_IDLE);
+    const rowClass = cn(ROW, 'justify-center px-2', railActive ? ROW_ACTIVE : cn(ROW_IDLE, rowTone(node)));
     const inner = node.icon ? (
       <span aria-hidden className="shrink-0">
         {node.icon}
@@ -511,29 +603,11 @@ function NavTreeRow({
         {(railLabel ?? '·').charAt(0)}
       </span>
     );
-    return (
-      <li>
-        {node.href ? (
-          <LinkTag
-            href={node.href}
-            aria-label={railLabel}
-            title={railLabel}
-            aria-current={active ? 'page' : undefined}
-            className={rowClass}
-          >
-            {inner}
-          </LinkTag>
-        ) : (
-          <span aria-label={railLabel} title={railLabel} className={cn(rowClass, 'cursor-default')}>
-            {inner}
-          </span>
-        )}
-      </li>
-    );
+    return <li>{renderTarget(rowClass, inner, { 'aria-label': railLabel, title: railLabel })}</li>;
   }
 
   if (!hasChildren) {
-    const rowClass = cn(ROW, active ? ROW_ACTIVE : ROW_IDLE);
+    const rowClass = cn(ROW, active ? ROW_ACTIVE : cn(ROW_IDLE, rowTone(node)));
     const inner = (
       <>
         {iconNode}
@@ -541,27 +615,7 @@ function NavTreeRow({
         {trailingNode}
       </>
     );
-    return (
-      <li>
-        {node.href ? (
-          <LinkTag
-            href={node.href}
-            aria-current={active ? 'page' : undefined}
-            className={rowClass}
-            style={{ paddingLeft }}
-          >
-            {inner}
-          </LinkTag>
-        ) : (
-          // Nothing to go to and nothing to toggle — a plain row (an empty
-          // state, a heading among the items). `href="#"` would offer a link
-          // that jumps to the top of the page and pushes a history entry.
-          <span className={cn(rowClass, 'cursor-default')} style={{ paddingLeft }}>
-            {inner}
-          </span>
-        )}
-      </li>
-    );
+    return <li>{renderTarget(rowClass, inner, { style: { paddingLeft } })}</li>;
   }
 
   return (
@@ -631,7 +685,8 @@ function NavTreeRow({
               key={nodeKey(child, i)}
               node={child}
               branchKey={branchKey(child, key, i)}
-              currentPath={currentPath}
+              current={current}
+              onAction={onAction}
               iconOnly={iconOnly}
               expansion={expansion}
               LinkComponent={LinkComponent}
