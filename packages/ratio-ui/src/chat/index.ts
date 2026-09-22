@@ -10,3 +10,13 @@ export { ChatPresenceDot } from './ChatPresenceDot';
 export type { ChatPresence, ChatPresenceDotProps } from './ChatPresenceDot';
 export { ChatUnreadBadge } from './ChatUnreadBadge';
 export type { ChatUnreadBadgeProps } from './ChatUnreadBadge';
+export { ChatChannelList } from './ChatChannelList';
+export type {
+  ChatChannelListProps,
+  ChatChannelListSection,
+  ChatChannelListLabels,
+  ChatRoom,
+  ChatRoomKind,
+} from './ChatChannelList';
+export { ChatUsers } from './ChatUsers';
+export type { ChatUser, ChatUsersProps } from './ChatUsers';
