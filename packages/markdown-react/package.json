@@ -55,13 +55,13 @@
     "@eventuras/vite-config": "^0.3.1",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "^16.3.3",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "jsdom": "30.0.1",
     "rehype-raw": "^7.0.0",
     "tslib": "2.8.1",
     "typescript": "6.0.3",
-    "vite": "8.2.2",
+    "vite": "8.3.0",
     "vitest": "4.1.11"
   },
   "peerDependencies": {

@@ -29,7 +29,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@changesets/cli": "^3.0.2",
+    "@changesets/cli": "^3.0.3",
     "@eventuras/eslint-config": "^1.0.4",
     "@eventuras/typescript-config": "^1.0.0",
     "@storybook/addon-a11y": "^10.6.0",
@@ -40,25 +40,25 @@
     "@storybook/react": "^10.6.0",
     "@storybook/react-vite": "^10.6.0",
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/node": "^24.13.3",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
+    "@types/node": "^24.13.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitest/browser-playwright": "^4.1.11",
     "@vitest/coverage-v8": "^5.0.0",
     "eslint": "^10.10.0",
     "playwright": "^1.63.0",
     "postcss": "^8.5.28",
     "prettier": "^3.9.6",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "storybook": "^10.6.0",
     "tsx": "^4.23.13",
     "typescript": "^6.0.2",
-    "vite": "8.2.2",
+    "vite": "8.3.0",
     "vitest": "^4.1.11"
   },
   "dependencies": {
-    "turbo": "^2.10.12"
+    "turbo": "^2.10.13"
   },
   "packageManager": "pnpm@11.5.1",
   "engines": {
