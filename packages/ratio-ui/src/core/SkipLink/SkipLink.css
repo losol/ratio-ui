@@ -40,6 +40,6 @@
 
 /* The target receives programmatic focus only so the next Tab continues
    from the main content; it is not an interactive control, so no ring. */
-[data-skip-link-target]:focus {
+[data-skip-link-target][tabindex="-1"]:focus {
   outline: none;
 }

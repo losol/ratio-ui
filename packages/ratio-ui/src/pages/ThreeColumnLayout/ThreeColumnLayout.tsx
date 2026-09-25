@@ -11,8 +11,11 @@ export interface ThreeColumnLayoutProps {
   right?: React.ReactNode;
   /** Main content */
   children: React.ReactNode;
-  /** Id of the `<main>` element, the default target of `SkipLink`. */
-  mainId?: string;
+  /**
+   * Id of the `<main>` element, the default target of `SkipLink`. Pass
+   * `null` to omit it, e.g. when another element on the page owns `main`.
+   */
+  mainId?: string | null;
   className?: string;
 }
 
@@ -39,7 +42,7 @@ export function ThreeColumnLayout({ left, right, children, mainId = 'main', clas
         </aside>
 
         {/* Main content */}
-        <main id={mainId} className="min-w-0 py-8">
+        <main id={mainId ?? undefined} className="min-w-0 py-8">
           {children}
         </main>
 
