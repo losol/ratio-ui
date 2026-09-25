@@ -5,7 +5,8 @@
 Field labels are now driven by `--label-*` tokens (`tokens/form.css`):
 `--label-font-size`, `--label-line-height`, `--label-font-weight`,
 `--label-color` and `--label-gap`. Override them per theme or scope to
-restyle every form label at once.
+restyle every form label at once. Labels use the fluid `--font-size-sm`
+(0.88–0.96rem), so they grow slightly on wide screens.
 
 `Select`, `NumberField`, `FileUpload`, `RadioGroup` and `Lookup` now render
 their label through the shared `Label` styling instead of their own copies,

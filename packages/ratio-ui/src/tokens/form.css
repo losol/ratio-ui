@@ -13,8 +13,10 @@
  * `--label-gap` is the space between a label and its control.
  */
 :root {
-  --label-font-size: 0.875rem;
-  --label-line-height: 1.25rem;
+  --label-font-size: var(--font-size-sm);
+  /* Unitless so it scales with the fluid font size (same ratio as
+     Tailwind's text-sm: 1.25rem / 0.875rem). */
+  --label-line-height: calc(1.25 / 0.875);
   --label-font-weight: 500;
   --label-color: var(--text);
   --label-gap: 0.25rem;
