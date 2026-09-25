@@ -32,9 +32,14 @@ newly published packages during installs.
 pnpm storybook      # run the Ratio UI Storybook on http://localhost:6006
 pnpm build          # build all packages with Turbo
 pnpm lint           # lint all packages
-pnpm test           # run package test suites
+pnpm test           # run all tests (unit + Storybook play tests; needs Chromium)
+pnpm test:unit      # package unit tests only
+pnpm test:storybook # Storybook play tests in Chromium
 pnpm dev            # run package dev tasks configured for Turbo
 ```
+
+The Storybook play tests need a Chromium binary: run
+`pnpm exec playwright install chromium` once.
 
 ## Storybook MCP
 
