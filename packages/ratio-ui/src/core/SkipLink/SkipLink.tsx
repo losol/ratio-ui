@@ -57,10 +57,18 @@ export const SkipLink = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
       onClick?.(event);
       if (event.defaultPrevented) return;
 
-      const target = document.getElementById(decodeURIComponent(href.slice(1)));
+      let id = href.slice(1);
+      try {
+        id = decodeURIComponent(id);
+      } catch {
+        // Malformed escape sequence: look the id up as written.
+      }
+      const target = document.getElementById(id);
       if (!target) return;
 
-      if (!target.hasAttribute('tabindex')) {
+      // Only make non-focusable targets (e.g. `<main>`) focusable. A native
+      // control keeps its place in the tab order and its focus ring.
+      if (!target.hasAttribute('tabindex') && target.tabIndex < 0) {
         target.setAttribute('tabindex', '-1');
         target.setAttribute('data-skip-link-target', '');
       }
