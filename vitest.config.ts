@@ -2,10 +2,10 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
-// Storybook play tests run in real Chromium via Playwright. They're useful
-// locally and in Storybook UI but require a browser binary, so we opt out
-// of running them during CI builds to keep `pnpm test` fast and dependency-free.
-const isCI = process.env.CI === 'true';
+// Storybook play tests run in real Chromium via Playwright, so they need a
+// browser binary (`pnpm exec playwright install chromium`). CI runs them in
+// their own job; `pnpm test:unit` skips them, `pnpm test:storybook` runs
+// only them.
 
 export default defineConfig({
   test: {
@@ -19,28 +19,24 @@ export default defineConfig({
       './packages/markdown-react',
       './packages/markdown-core',
 
-      // Browser-backed Storybook tests: local only, see note above.
-      ...(isCI
-        ? []
-        : [
-            {
-              plugins: [
-                storybookTest({
-                  configDir: '.storybook',
-                  storybookScript: 'pnpm run storybook -- --ci',
-                }),
-              ],
-              test: {
-                name: 'storybook',
-                browser: {
-                  enabled: true,
-                  headless: true,
-                  provider: playwright(),
-                  instances: [{ browser: 'chromium' }],
-                },
-              },
-            },
-          ]),
+      // Browser-backed Storybook tests, see note above.
+      {
+        plugins: [
+          storybookTest({
+            configDir: '.storybook',
+            storybookScript: 'pnpm run storybook -- --ci',
+          }),
+        ],
+        test: {
+          name: 'storybook',
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
     ],
   },
 });

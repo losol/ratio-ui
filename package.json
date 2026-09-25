@@ -26,7 +26,9 @@
     "storybook": "storybook dev -p 6006 --no-open",
     "storybook:mcp": "npx -y storybook@latest mcp --storybook-url http://127.0.0.1:6006",
     "storybook:build": "storybook build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:storybook": "vitest run --project storybook",
+    "test:unit": "vitest run --project '!storybook'"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",

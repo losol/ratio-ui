@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react-vite';
 import React, { useState } from 'react';
-import { expect, screen } from 'storybook/test';
+import { expect, screen, waitFor } from 'storybook/test';
 
 import { Button } from '../../core/Button';
 import { ChevronLeft, ChevronRight } from '../../icons';
@@ -194,7 +194,9 @@ ActivityPanel.play = async () => {
   // And genuinely narrower than the responsive default would be here.
   expect(width).toBeLessThan(window.innerWidth * 0.58);
 
-  expect(screen.getByText(/Euclid/)).toBeVisible();
+  // The drawer opens with an enter transition (`data-[entering]:opacity-0`),
+  // so wait for it to finish rather than asserting mid-animation.
+  await waitFor(() => expect(screen.getByText(/Euclid/)).toBeVisible());
 };
 
 /**
