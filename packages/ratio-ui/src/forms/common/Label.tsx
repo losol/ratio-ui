@@ -5,16 +5,22 @@
 import { Label as AriaLabel } from 'react-aria-components';
 import type { ComponentProps } from 'react';
 
-const styles = {
-  label: 'block mb-2 text-sm font-medium text-(--text) cursor-default',
-};
+/**
+ * Shared field-label classes, driven by the `--label-*` tokens in
+ * tokens/form.css. Exported for form components that need a label-styled
+ * element other than `<Label>` (e.g. a group caption).
+ */
+export const labelClassName =
+  'block mb-(--label-gap) cursor-default ' +
+  'text-(length:--label-font-size) leading-(--label-line-height) ' +
+  'font-(--label-font-weight) text-(--label-color)';
 
 /**
  * Label component with ratio-ui default styling.
  *
  * Built on React Aria's Label component for proper accessibility.
- * Uses the standard ratio-ui label style (`text-sm font-medium`), matching the
- * labels rendered by Select, NumberField and FileUpload.
+ * Styled by the `--label-*` tokens (see tokens/form.css), and used by every
+ * ratio-ui form field so all labels look and space the same.
  *
  * If no children are provided, returns null to avoid rendering an empty label.
  *
@@ -48,7 +54,7 @@ export function Label({ children, className, ...props }: ComponentProps<typeof A
 
   return (
     <AriaLabel
-      className={className ?? styles.label}
+      className={className ?? labelClassName}
       {...props}
     >
       {children}

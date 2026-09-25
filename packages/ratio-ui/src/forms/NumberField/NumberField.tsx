@@ -10,13 +10,13 @@ import {
   FieldError,
   Group,
   Input,
-  Label,
   NumberField as AriaNumberField,
   type NumberFieldProps as AriaNumberFieldProps,
   Text,
 } from 'react-aria-components';
 
 import { Minus, Plus } from '../../icons';
+import { Label } from '../common/Label';
 
 export type NumberFieldVariant = 'separated' | 'segmented';
 export type NumberFieldSize = 'sm' | 'md' | 'lg';
@@ -35,11 +35,10 @@ export interface NumberFieldProps
 }
 
 const styles = {
-  wrapper: 'flex flex-col gap-1',
-  label: 'text-sm font-medium text-(--text) cursor-default',
+  wrapper: 'flex flex-col',
 
-  description: 'text-sm text-(--text-muted)',
-  error: 'text-sm text-error-text',
+  description: 'mt-1 text-sm text-(--text-muted)',
+  error: 'mt-1 text-sm text-error-text',
 
   separatedGroup: 'flex items-center gap-2',
   separatedButton: [
@@ -137,7 +136,7 @@ export function NumberField({
       {...props}
       className={clsx(styles.wrapper, className)}
     >
-      {label && <Label className={styles.label}>{label}</Label>}
+      {label && <Label>{label}</Label>}
 
       <Group className={groupClassName}>
         <Button

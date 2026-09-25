@@ -1,0 +1,21 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Form tokens — defaults consumed by `forms/common/Label` and every form
+ * field that renders a label through it (TextField, PhoneInput, Select,
+ * NumberField, FileUpload, RadioGroup, Lookup). Override per theme or
+ * per scope to restyle all field labels without touching the components.
+ *
+ * `--label-gap` is the space between a label and its control.
+ */
+:root {
+  --label-font-size: 0.875rem;
+  --label-line-height: 1.25rem;
+  --label-font-weight: 500;
+  --label-color: var(--text);
+  --label-gap: 0.25rem;
+}

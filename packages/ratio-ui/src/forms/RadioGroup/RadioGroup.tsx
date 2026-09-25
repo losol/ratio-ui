@@ -2,6 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
+import { cn } from '../../utils/cn';
+import { labelClassName } from '../common/Label';
+
 export interface RadioOption<T extends string = string> {
   value: T;
   label: string;
@@ -59,7 +62,7 @@ export function RadioGroup<T extends string = string>({
   return (
     <div className={className}>
       {label && (
-        <label className="block text-sm font-medium text-(--text) mb-3">
+        <label className={cn(labelClassName, 'mb-3')}>
           {label}
         </label>
       )}

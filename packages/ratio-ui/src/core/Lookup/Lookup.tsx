@@ -8,7 +8,6 @@ import { useState, type ReactNode } from 'react';
 import {
   Button,
   Input,
-  Label,
   type Key,
   type Selection,
 } from 'react-aria-components';
@@ -17,6 +16,7 @@ import { useAsyncList } from 'react-stately';
 import { AutoComplete } from '../../forms/Autocomplete/AutoComplete';
 import { ListBox, ListBoxItem, SearchField } from '../../forms/Autocomplete/StyledComponents';
 import { X } from '../../icons';
+import { Label } from '../../forms/common/Label';
 
 export interface LookupProps<T> {
   /** Label shown above the input. */
@@ -198,8 +198,8 @@ export function Lookup<T>({
       }}
       isLoading={list.isLoading}
     >
-      <SearchField className="group flex flex-col gap-1">
-        <Label className="text-sm font-medium text-(--text)">{label}</Label>
+      <SearchField className="group flex flex-col">
+        <Label>{label}</Label>
         <div className="relative">
           <Input
             id={inputId}
