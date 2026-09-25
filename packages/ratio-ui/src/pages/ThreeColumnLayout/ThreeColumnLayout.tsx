@@ -11,6 +11,8 @@ export interface ThreeColumnLayoutProps {
   right?: React.ReactNode;
   /** Main content */
   children: React.ReactNode;
+  /** Id of the `<main>` element, the default target of `SkipLink`. */
+  mainId?: string;
   className?: string;
 }
 
@@ -20,8 +22,11 @@ export interface ThreeColumnLayoutProps {
  * On large screens: left (16rem) | content (flex) | right (14rem).
  * On smaller screens the side columns are hidden and only
  * the main content is shown.
+ *
+ * The `<main>` element gets `id="main"` (see `mainId`), so a `SkipLink`
+ * with its default `href` works without extra wiring.
  */
-export function ThreeColumnLayout({ left, right, children, className = '' }: Readonly<ThreeColumnLayoutProps>) {
+export function ThreeColumnLayout({ left, right, children, mainId = 'main', className = '' }: Readonly<ThreeColumnLayoutProps>) {
   return (
     <div className={`mx-auto max-w-8xl px-4 sm:px-6 lg:px-8 ${className}`}>
       <div className="lg:grid lg:grid-cols-[16rem_1fr_14rem] lg:gap-8">
@@ -34,7 +39,7 @@ export function ThreeColumnLayout({ left, right, children, className = '' }: Rea
         </aside>
 
         {/* Main content */}
-        <main className="min-w-0 py-8">
+        <main id={mainId} className="min-w-0 py-8">
           {children}
         </main>
 

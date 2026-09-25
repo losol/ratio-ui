@@ -1,0 +1,45 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Skip link chrome — consumes the --skip-link-* tokens (defaults in
+ * tokens/skip-link.css). Parked just above the viewport and slid in on
+ * keyboard focus. It stays in the accessibility tree the whole time, so
+ * screen readers announce it as the first link on the page.
+ */
+.ratio-skip-link {
+  position: fixed;
+  top: var(--skip-link-offset, 0.75rem);
+  left: var(--skip-link-offset, 0.75rem);
+  z-index: var(--skip-link-z, 1000);
+  padding: 0.5rem 1rem;
+  border-radius: var(--skip-link-radius, 0.5rem);
+  background: var(--skip-link-bg, var(--primary));
+  color: var(--skip-link-fg, var(--text-on-primary));
+  box-shadow: var(--skip-link-shadow, none);
+  font-weight: 500;
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--skip-link-offset, 0.75rem) - 1rem));
+  transition: transform 150ms ease-out;
+}
+
+.ratio-skip-link:focus {
+  transform: none;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ratio-skip-link {
+    transition: none;
+  }
+}
+
+/* The target receives programmatic focus only so the next Tab continues
+   from the main content; it is not an interactive control, so no ring. */
+[data-skip-link-target]:focus {
+  outline: none;
+}

@@ -1,0 +1,19 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Skip link tokens — defaults consumed by `core/SkipLink` (via the
+ * `.ratio-skip-link` rules in core/SkipLink/SkipLink.css). Override per
+ * theme or scope to reskin the link without touching the component.
+ */
+:root {
+  --skip-link-bg: var(--primary);
+  --skip-link-fg: var(--text-on-primary);
+  --skip-link-radius: var(--radius);
+  --skip-link-shadow: 0 4px 12px rgb(0 0 0 / 0.2);
+  --skip-link-offset: 0.75rem;   /* distance from the viewport edge when shown */
+  --skip-link-z: 1000;           /* above sticky navbars, drawers and toasts */
+}
