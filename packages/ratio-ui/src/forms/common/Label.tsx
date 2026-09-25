@@ -6,14 +6,15 @@ import { Label as AriaLabel } from 'react-aria-components';
 import type { ComponentProps } from 'react';
 
 const styles = {
-  label: 'block mb-2',
+  label: 'block mb-2 text-sm font-medium text-(--text) cursor-default',
 };
 
 /**
  * Label component with ratio-ui default styling.
  *
  * Built on React Aria's Label component for proper accessibility.
- * Uses the standard ratio-ui label style: 'block font-bold mb-2'.
+ * Uses the standard ratio-ui label style (`text-sm font-medium`), matching the
+ * labels rendered by Select, NumberField and FileUpload.
  *
  * If no children are provided, returns null to avoid rendering an empty label.
  *
