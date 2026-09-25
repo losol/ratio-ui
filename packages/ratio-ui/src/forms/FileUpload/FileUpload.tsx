@@ -7,6 +7,7 @@ import { Button, DropZone, FileTrigger, Text } from 'react-aria-components';
 import type { DropItem } from 'react-aria-components';
 import { AlertCircle, Check, CloudUpload, File as FileIcon, LoaderCircle, X } from '../../icons';
 import { cn } from '../../utils/cn';
+import { labelClassName } from '../common/Label';
 
 export type FileUploadStatus = 'pending' | 'uploading' | 'success' | 'error';
 
@@ -61,9 +62,8 @@ export interface FileUploadProps {
 }
 
 const styles = {
-  wrapper: 'flex flex-col gap-2 w-full',
-  label: 'text-sm font-medium text-(--text) cursor-default',
-  description: 'text-xs text-(--text-muted)',
+  wrapper: 'flex flex-col w-full',
+  description: 'mt-2 text-xs text-(--text-muted)',
   dropzone: {
     base: [
       'flex flex-col items-center justify-center gap-2',
@@ -86,7 +86,7 @@ const styles = {
     'data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed',
     'transition-colors',
   ].join(' '),
-  list: 'flex flex-col gap-2',
+  list: 'mt-2 flex flex-col gap-2',
   item: {
     base: 'flex items-center gap-3 p-2 rounded-lg border border-border-1 bg-card',
     thumb: 'h-10 w-10 shrink-0 rounded object-cover bg-card-hover',
@@ -264,7 +264,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <div className={cn(styles.wrapper, className)} data-testid={testId}>
-      {label && <span className={styles.label}>{label}</span>}
+      {label && <span className={labelClassName}>{label}</span>}
 
       <DropZone
         isDisabled={isDisabled}

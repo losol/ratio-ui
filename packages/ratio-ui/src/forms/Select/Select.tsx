@@ -7,7 +7,6 @@
 import React from 'react';
 import {
   Button,
-  Label,
   ListBox,
   ListBoxItem,
   Popover,
@@ -16,6 +15,7 @@ import {
 } from 'react-aria-components';
 import { Check, ChevronDown } from '../../icons';
 import { cn } from '../../utils/cn';
+import { Label } from '../common/Label';
 
 export type SelectSize = 'sm' | 'md' | 'lg';
 
@@ -84,8 +84,7 @@ const SIZE: Record<SelectSize, { trigger: string; icon: string; item: string }> 
 };
 
 const styles = {
-  wrapper: 'flex flex-col gap-1 w-full',
-  label: 'text-sm font-medium text-(--text) cursor-default',
+  wrapper: 'flex flex-col w-full',
   trigger:
     'w-full flex items-center justify-between gap-2 bg-card border text-(--text) transition-colors ' +
     'hover:border-(--primary) ' +
@@ -171,7 +170,7 @@ export const Select: React.FC<SelectProps> = ({
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
     >
-      {label && <Label className={styles.label}>{label}</Label>}
+      {label && <Label>{label}</Label>}
       <Button
         data-testid={testId}
         className={cn(
