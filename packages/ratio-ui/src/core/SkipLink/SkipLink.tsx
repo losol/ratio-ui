@@ -21,11 +21,12 @@ export interface SkipLinkProps
  * Skip link for keyboard and screen reader users (WCAG 2.4.1 Bypass Blocks).
  *
  * Hidden until it receives keyboard focus, then slides in at the top of the
- * viewport. Activating it moves focus to the target, so the next Tab
- * continues from the main content instead of the navigation. Browsers and
- * client-side routers don't reliably move focus on fragment navigation, so
- * the component does it, making a non-focusable target focusable
- * (`tabindex="-1"`) when needed.
+ * viewport. Activating it moves focus (and scroll) to the target, so the
+ * next Tab continues from the main content instead of the navigation. This
+ * is done in script rather than by fragment navigation, which doesn't
+ * reliably move focus and would add `#main` to the URL; a non-focusable
+ * target is made focusable (`tabindex="-1"`) when needed. Without
+ * JavaScript the link still works as a plain fragment link.
  *
  * Render it as the first focusable element on the page, before the navbar,
  * and give the main content a matching id.
@@ -63,6 +64,9 @@ export const SkipLink = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
         target.setAttribute('tabindex', '-1');
         target.setAttribute('data-skip-link-target', '');
       }
+      // Handle the jump ourselves rather than via fragment navigation: no
+      // `#main` in the URL or history, and no clash with hash-based routers.
+      event.preventDefault();
       target.focus();
     };
 
