@@ -164,7 +164,12 @@ function roomTrailing(room: ChatRoom, labels: Required<ChatChannelListLabels>): 
         <ChatUnreadBadge
           count={room.unread}
           mention={room.mention}
-          label={room.unread ? labels.unread(room.unread) : labels.mention}
+          // The badge shows one thing; the label says both.
+          label={
+            room.unread
+              ? [labels.unread(room.unread), room.mention && labels.mention].filter(Boolean).join(', ')
+              : labels.mention
+          }
         />
       </>
     );

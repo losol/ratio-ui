@@ -11,7 +11,7 @@ const meta: Meta<typeof ChatUsers> = {
     docs: {
       description: {
         component:
-          'Who is in the room: ops first, then voiced users, then everyone else, alphabetically. Away people collapse to one line at the bottom — a long list of absent names is noise. Every label is passed in, so no English ships in the component.',
+          'Who is in the room: ops first, then voiced users, then everyone else, alphabetically. Away people collapse to one alphabetical line at the bottom — a long list of absent names is noise. Built-in text is English by default; pass `labels` to translate it.',
       },
     },
   },
@@ -42,6 +42,13 @@ export const InAChannel: Story = {
   args: {
     users,
     'aria-label': 'People in #volunteers',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Away people are listed alphabetically, not in the order they came.
+    await expect(canvas.getByText('elias, nora')).toBeInTheDocument();
+    // Voiced users have no visible tag, so screen readers get the role's name.
+    await expect(canvas.getAllByText('(voice)', { exact: false })).toHaveLength(2);
   },
 };
 

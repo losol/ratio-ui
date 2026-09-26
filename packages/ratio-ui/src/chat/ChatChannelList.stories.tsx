@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { ChatChannelList, type ChatChannelListSection } from './ChatChannelList';
 import { ChatPresenceDot } from './ChatPresenceDot';
 import { Avatar } from '../core/Avatar';
@@ -87,6 +88,15 @@ export const Rooms: Story = {
         />
       </div>
     );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The badge shows only the count; screen readers hear the mention too.
+    await expect(canvas.getByText('3 unread, mentioned')).toBeInTheDocument();
+    await expect(canvas.getByText('1 unread')).toBeInTheDocument();
+    // Opening the room reads it.
+    await userEvent.click(canvas.getByText('speakers'));
+    await expect(canvas.queryByText('3 unread, mentioned')).toBeNull();
   },
 };
 

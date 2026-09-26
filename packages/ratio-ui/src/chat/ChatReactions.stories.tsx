@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { ChatReactions, type ChatReaction } from './ChatReactions';
 
 const meta: Meta<typeof ChatReactions> = {
@@ -38,5 +39,16 @@ export const Toggle: Story = {
       );
 
     return <ChatReactions reactions={reactions} onToggle={toggle} aria-label="Reactions" />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Adding a reaction reports that emoji, and only that one.
+    await userEvent.click(canvas.getByText('🎉 1'));
+    await expect(canvas.getByText('🎉 2')).toBeInTheDocument();
+    await expect(canvas.getByText('👍 4')).toBeInTheDocument();
+    // Removing one of yours counts down.
+    await userEvent.click(canvas.getByText('👍 4'));
+    await expect(canvas.getByText('👍 3')).toBeInTheDocument();
+    await expect(canvas.getByText('🎉 2')).toBeInTheDocument();
   },
 };
