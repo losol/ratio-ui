@@ -90,6 +90,15 @@ get a fully styled, visible page** — the default palette is light and needs no
 `data-theme`. Set `data-theme` when you want a different palette (`dark`,
 `bureau`, …); it can even be set late without the page ever going blank.
 
+`light` and `dark` are built in. The named themes are separate stylesheets,
+so a page only downloads the ones it uses. Import them after the main one:
+
+```typescript
+import '@eventuras/ratio-ui/ratio-ui.css';
+import '@eventuras/ratio-ui/themes/bureau.css'; // data-theme="bureau"
+import '@eventuras/ratio-ui/themes/ink.css';    // data-theme="ink"
+```
+
 ### Avoiding a flash of the default theme
 
 If you resolve the palette in JS (localStorage / system preference) and apply it

@@ -6,6 +6,9 @@ import { ModeDecorator } from './modeDecorator';
 // `@source` globs in global.css are relative to that file, so each package's
 // own CSS scans its own `src`. Add a package's CSS entry here if it ships one.
 import '../packages/ratio-ui/src/ratio-ui.css';
+// Named themes are opt-in imports; Storybook loads them all for the theme switcher.
+import '../packages/ratio-ui/src/themes/bureau.css';
+import '../packages/ratio-ui/src/themes/ink.css';
 
 const preview: Preview = {
   parameters: {
