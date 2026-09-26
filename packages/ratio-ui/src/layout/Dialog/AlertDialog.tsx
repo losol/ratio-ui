@@ -104,9 +104,11 @@ export const AlertDialog = ({
 
   // Reset the typed phrase whenever the dialog (re-)opens so reusing the
   // same dialog instance doesn't leak state between confirmations.
-  useEffect(() => {
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (wasOpen !== isOpen) {
+    setWasOpen(isOpen);
     if (isOpen) setConfirmInput('');
-  }, [isOpen]);
+  }
 
   // Default focus: cancel for destructive/error (safer), primary otherwise.
   // `autoFocusButton` overrides the heuristic; either way we fall back to

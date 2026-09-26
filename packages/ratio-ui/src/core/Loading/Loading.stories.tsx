@@ -15,7 +15,6 @@ type LinkStory = StoryFn;
 const Template: LinkStory = (args) => <Loading {...args} />;
 
 export const Playground = Template.bind({});
-Playground.storyName = 'Playground';
 
 export const Default = Template.bind({});
 

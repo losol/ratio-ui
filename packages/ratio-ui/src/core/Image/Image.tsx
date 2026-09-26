@@ -43,6 +43,11 @@ export interface ImageProps {
   rendererProps?: Record<string, unknown>;
 }
 
+/** Native `<img>` fallback, lazy-loaded unless told otherwise. */
+const NativeImg = ({ loading, ...rest }: ImageRendererProps) => (
+  <img loading={(loading as ImageProps['loading']) ?? 'lazy'} decoding="async" {...rest} />
+);
+
 /**
  * Generic Image with optional figure/caption semantics and pluggable renderer.
  * - Default: renders <img|renderer>.
@@ -53,12 +58,7 @@ export interface ImageProps {
  */
 export function Image(props: Readonly<ImageProps>) {
   // pick renderer or native <img>
-  const Img: ComponentType<ImageRendererProps> =
-    props.renderer ??
-    ((p) => (
-      // native img fallback
-      <img loading={props.loading ?? 'lazy'} decoding="async" {...p} />
-    ));
+  const Img = props.renderer ?? NativeImg;
 
   // common image props
   const imgProps: ImageRendererProps = {

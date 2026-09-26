@@ -4,8 +4,8 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Mail } from '../../icons';
+import { useIsClient } from '../../hooks/useIsClient';
 
 /** Built-in text of `ObfuscatedEmail`. Each entry falls back to English. */
 export interface ObfuscatedEmailLabels {
@@ -41,22 +41,11 @@ export const ObfuscatedEmail = ({
   subject,
   labels,
 }: ObfuscatedEmailProps) => {
-  const [decodedEmail, setDecodedEmail] = useState<string>('');
-  const [mounted, setMounted] = useState(false);
+  // The address only reaches the DOM on the client, so it is absent from
+  // server-rendered HTML.
+  const mounted = useIsClient();
 
-  useEffect(() => {
-    setMounted(true);
-    // Decode the email client-side
-    // Simple obfuscation: reverse and base64
-    try {
-      const decoded = atob(btoa(email));
-      setDecodedEmail(decoded);
-    } catch {
-      setDecodedEmail(email);
-    }
-  }, [email]);
-
-  if (!mounted || !decodedEmail) {
+  if (!mounted || !email) {
     // Server-side render: show indicator but not the actual email
     return (
       <span className={className}>
@@ -69,11 +58,11 @@ export const ObfuscatedEmail = ({
   }
 
   const mailtoHref = subject
-    ? `mailto:${decodedEmail}?subject=${encodeURIComponent(subject)}`
-    : `mailto:${decodedEmail}`;
+    ? `mailto:${email}?subject=${encodeURIComponent(subject)}`
+    : `mailto:${email}`;
 
   // Split email into parts to further obfuscate in HTML
-  const [localPart, domain] = decodedEmail.split('@');
+  const [localPart, domain] = email.split('@');
 
   return (
     <span className={className}>

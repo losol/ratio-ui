@@ -177,11 +177,19 @@ export function CommandPalette({
       document.addEventListener('keydown', trapFocus);
       return () => document.removeEventListener('keydown', trapFocus);
     } else {
-      setQuery('');
-      setActiveIndex(0);
       previousFocusRef.current?.focus();
     }
   }, [isOpen]);
+
+  // Start from a blank search each time the palette closes.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (wasOpen !== isOpen) {
+    setWasOpen(isOpen);
+    if (!isOpen) {
+      setQuery('');
+      setActiveIndex(0);
+    }
+  }
 
   const handleQueryChange = useCallback(
     (value: string) => {

@@ -71,6 +71,8 @@ export interface InputFieldProps extends InputProps {
   description?: string;
   /** Keyed by input name. Takes `formState.errors` from react-hook-form as-is. */
   errors?: FieldErrorMap;
+  /** Drop the bottom margin the wrapper puts between stacked fields. */
   noMargin?: boolean;
+  /** Render without the wrapping `<div>` (and its margin). */
   noWrapper?: boolean;
 }

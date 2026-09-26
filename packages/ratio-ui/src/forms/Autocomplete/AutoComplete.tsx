@@ -6,7 +6,7 @@
 
 import { Autocomplete as AriaAutocomplete } from 'react-aria-components';
 import type { ReactNode } from 'react';
-import type { Selection } from 'react-aria-components';
+import type { AutocompleteProps as AriaAutocompleteProps, Selection } from 'react-aria-components';
 
 export interface AutoCompleteProps {
   /**
@@ -29,7 +29,7 @@ export interface AutoCompleteProps {
    * Optional filter function for client-side filtering.
    * When omitted, filtering is expected to be handled by the consumer (e.g., async).
    */
-  readonly filter?: (textValue: string, inputValue: string, node: any) => boolean;
+  readonly filter?: AriaAutocompleteProps['filter'];
 
   /**
    * Whether to auto-focus the first item after filtering.

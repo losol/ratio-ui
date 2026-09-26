@@ -14,6 +14,5 @@ type LinkStory = StoryFn;
 const Template: LinkStory = (args) => <Spinner {...args} />;
 
 export const Playground = Template.bind({});
-Playground.storyName = 'Playground';
 
 export const Default = Template.bind({});

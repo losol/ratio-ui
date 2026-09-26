@@ -252,10 +252,10 @@ const Menu = ({ children, placement = 'bottom end', isOpen, defaultOpen, onOpenC
     return () => document.removeEventListener('pointerdown', onPointerDown, true);
   }, [open, isOpen, onOpenChange]);
 
-  const api = useRef<MenuActionsApi>({
+  const [api] = useState<MenuActionsApi>(() => ({
     register: (id, fn) => actionsRef.current.set(id, fn),
     unregister: (id) => actionsRef.current.delete(id),
-  }).current;
+  }));
 
   // Split children:
   //   - first <Menu.Trigger>      → React Aria's button (next to Popover)
@@ -361,15 +361,12 @@ const MenuThemeToggle = ({
   const id = useId();
   const { register, unregister } = useContext(MenuActionsContext);
 
-  const handlerRef = useRef(onThemeChange);
-  handlerRef.current = onThemeChange;
-  const themeRef = useRef(isDark);
-  themeRef.current = isDark;
-
+  // Re-register when the handler or theme changes, so the action always
+  // toggles from the current theme.
   useEffect(() => {
-    register(id, () => handlerRef.current(themeRef.current ? 'light' : 'dark'));
+    register(id, () => onThemeChange(isDark ? 'light' : 'dark'));
     return () => unregister(id);
-  }, [id, register, unregister]);
+  }, [id, register, unregister, onThemeChange, isDark]);
 
   return (
     <MenuItem id={id} className={styles.menuItem}>

@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Unauthorized } from './Unauthorized';
 
-/** See: {@link Unauthorized} props (`homeUrl`, `variant`) */
+/** See: {@link Unauthorized} props (`variant`, `labels`) */
 const meta: Meta<typeof Unauthorized> = {
   // ➜ Folder in the sidebar
   title: 'Blocks/Unauthorized',
@@ -13,11 +13,9 @@ const meta: Meta<typeof Unauthorized> = {
       control: { type: 'inline-radio' },
       options: ['small', 'large'],
     },
-    homeUrl: { control: 'text' },
   },
   // ➜ Default args used by “Playground”
   args: {
-    homeUrl: '/',
     variant: 'large',
   },
 };

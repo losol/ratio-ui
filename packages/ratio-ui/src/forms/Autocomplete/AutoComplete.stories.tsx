@@ -1,6 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { useAsyncList } from 'react-stately';
+import type { Selection } from 'react-aria-components';
 
 import {
   AutoComplete,
@@ -351,7 +352,7 @@ export const ClientSideFiltering: Story = {
 const AsyncSearchExample = () => {
   const [selected, setSelected] = useState<string | null>(null);
   const list = useAsyncList<typeof countries[number]>({
-    async load({ signal, filterText }) {
+    async load({ filterText }) {
       if (selected && filterText === selected) {
         return { items: [] };
       }
@@ -510,7 +511,7 @@ const WithSelectionHandlerExample = () => {
   const [inputValue, setInputValue] = useState('');
   const [selected, setSelected] = useState<string | null>(null);
 
-    const handleSelectionChange = (keys: any) => {
+    const handleSelectionChange = (keys: Selection) => {
       const countryId = Array.from(keys)[0] as number;
       const country = countries.find(c => c.id === countryId);
       if (country) {

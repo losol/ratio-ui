@@ -73,6 +73,8 @@ export function Breadcrumb({ href, className = '', children, ...props }: Readonl
   let content: React.ReactNode;
   if (href && LinkComponent) {
     content = (
+      // The link component comes from context and is stable across renders.
+      // eslint-disable-next-line react-hooks/static-components
       <LinkComponent href={href} className={linkClasses}>
         {children}
       </LinkComponent>

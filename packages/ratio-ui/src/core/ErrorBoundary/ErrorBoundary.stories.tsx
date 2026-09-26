@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Panel } from '../Panel';
@@ -105,7 +105,6 @@ export const OnErrorLogging: Story = {
   render: () => (
     <ErrorBoundary
       onError={(error, info) => {
-        // eslint-disable-next-line no-console
         console.error('[ErrorBoundary]', error, info);
       }}
     >

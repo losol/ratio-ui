@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   ComboBox,
   Input as ComboBoxInput,
@@ -120,6 +120,22 @@ const defaultInvalidLength = ({ country, length, min, max, exact }: PhoneLengthE
     : `Phone number must be at most ${max} digits`;
 };
 
+/**
+ * Split a full number like `+4712345678` into its country and local part.
+ * An empty value clears the number and keeps the current country.
+ */
+function parsePhoneValue(
+  value: string | undefined,
+  countries: CountryCode[],
+  defaultCountry: CountryCode
+): { country?: CountryCode; localNumber: string } {
+  if (!value) return { localNumber: '' };
+  const matched = countries.find((c) => value.startsWith(c.code));
+  return matched
+    ? { country: matched, localNumber: value.slice(matched.code.length) }
+    : { country: defaultCountry, localNumber: value.replace(/^\+/, '') };
+}
+
 // Memoized country item component to prevent unnecessary re-renders
 const CountryItem = React.memo(({ country, stableId }: { country: CountryCode; stableId: string }) => (
   <ListBoxItem
@@ -155,10 +171,35 @@ export function PhoneInput({
     [countries, defaultCode]
   );
 
-  const [country, setCountry] = useState<CountryCode>(defaultCountry);
-  const [localNumber, setLocalNumber] = useState('');
-  const [comboInputValue, setComboInputValue] = useState('');
+  const [country, setCountry] = useState<CountryCode>(
+    () => parsePhoneValue(value, countries, defaultCountry).country ?? defaultCountry
+  );
+  const [localNumber, setLocalNumber] = useState(
+    () => parsePhoneValue(value, countries, defaultCountry).localNumber
+  );
+  const [comboInputValue, setComboInputValue] = useState(country.code);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  // Re-parse when the incoming value changes. Adjusting state during render
+  // (instead of in an effect) avoids a second commit with stale state.
+  const [parsedFrom, setParsedFrom] = useState({ value, countries, defaultCountry });
+  if (
+    parsedFrom.value !== value ||
+    parsedFrom.countries !== countries ||
+    parsedFrom.defaultCountry !== defaultCountry
+  ) {
+    setParsedFrom({ value, countries, defaultCountry });
+    const parsed = parsePhoneValue(value, countries, defaultCountry);
+    if (parsed.country) setCountry(parsed.country);
+    setLocalNumber(parsed.localNumber);
+  }
+
+  // The combo box shows the chosen country's code whenever the country changes.
+  const [shownCountry, setShownCountry] = useState(country);
+  if (shownCountry !== country) {
+    setShownCountry(country);
+    setComboInputValue(country.code);
+  }
 
   // Memoize emit change function
   const emitChange = useCallback(
@@ -172,28 +213,6 @@ export function PhoneInput({
     },
     [onChange]
   );
-
-  // Parse incoming value
-  useEffect(() => {
-    if (!value) {
-      setLocalNumber('');
-      return;
-    }
-
-    const matchedCountry = countries.find((c) => value.startsWith(c.code));
-    if (matchedCountry) {
-      setCountry(matchedCountry);
-      setLocalNumber(value.slice(matchedCountry.code.length));
-    } else {
-      setCountry(defaultCountry);
-      setLocalNumber(value.replace(/^\+/, ''));
-    }
-  }, [value, countries, defaultCountry]);
-
-  // Update ComboBox input value when country changes
-  useEffect(() => {
-    setComboInputValue(country.code);
-  }, [country]);
 
   // Change handlers
   const handleNumberChange = useCallback(

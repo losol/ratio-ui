@@ -1,4 +1,4 @@
-import { Meta, StoryFn } from '@storybook/react-vite';
+import type { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { Home } from '../../icons';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
@@ -42,7 +42,6 @@ const Template: ButtonStory = ({ icon, ...args }) => (
 );
 
 export const Playground = Template.bind({});
-Playground.storyName = 'Playground';
 
 /**
  * Trigger pill — a flush leading avatar + name (e.g. a user/account menu
@@ -165,7 +164,7 @@ let enabledSpy: ReturnType<typeof fn>;
 let disabledSpy: ReturnType<typeof fn>;
 let loadingSpy: ReturnType<typeof fn>;
 
-export const ButtonTest = {
+export const ButtonTest: StoryObj<typeof Button> = {
   // Custom render that sets up three buttons
   render: () => {
     enabledSpy  = fn();
@@ -186,7 +185,6 @@ export const ButtonTest = {
       </div>
     );
   },
-  // @ts-ignore
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 

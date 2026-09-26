@@ -13,12 +13,13 @@ export interface UnauthorizedLabels {
 }
 
 export type UnauthorizedProps = {
+  /** @deprecated Never rendered; will be removed in the next major. */
   homeUrl?: string;
   variant?: 'small' | 'large';
   labels?: UnauthorizedLabels;
 };
 
-export function Unauthorized({ homeUrl = '/', variant = 'large', labels }: Readonly<UnauthorizedProps>) {
+export function Unauthorized({ variant = 'large', labels }: Readonly<UnauthorizedProps>) {
   const isSmall = variant === 'small';
   const {
     title = 'Unauthorized',

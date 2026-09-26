@@ -39,12 +39,12 @@ const spacingKeys: readonly (keyof SpacingProps)[] = [
 export function extractSpacingProps<T extends SpacingProps>(
   props: T,
 ): [SpacingProps, Omit<T, keyof SpacingProps>] {
-  const spacing: Partial<SpacingProps> = {};
-  const rest = { ...props };
+  const spacing: Record<string, unknown> = {};
+  const rest = { ...props } as Record<string, unknown>;
   for (const key of spacingKeys) {
     if (key in rest) {
-      (spacing as any)[key] = rest[key];
-      delete (rest as any)[key];
+      spacing[key] = rest[key];
+      delete rest[key];
     }
   }
   return [spacing as SpacingProps, rest as Omit<T, keyof SpacingProps>];
