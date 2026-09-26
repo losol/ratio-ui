@@ -87,7 +87,7 @@ export const ChatUsers: React.FC<ChatUsersProps> = ({
 
   return (
     <div className={cn('flex h-full flex-col gap-0.5 overflow-auto p-4 text-[0.8125rem]', className)}>
-      {onlineHeading && <div className={cn(EYEBROW, 'px-1.5 pb-2')}>{onlineHeading}</div>}
+      {onlineHeading != null && <div className={cn(EYEBROW, 'px-1.5 pb-2')}>{onlineHeading}</div>}
       <ul aria-label={ariaLabel} className="m-0 flex list-none flex-col gap-0.5 p-0">
         {online.map(user => (
           <li
@@ -114,7 +114,7 @@ export const ChatUsers: React.FC<ChatUsersProps> = ({
       </ul>
       {away.length > 0 && (
         <div className="mt-auto flex flex-col gap-1.5 border-t border-border-1 pt-3 text-[11px] text-(--text-subtle)">
-          {awayHeading && <span className={EYEBROW}>{awayHeading}</span>}
+          {awayHeading != null && <span className={EYEBROW}>{awayHeading}</span>}
           <span>{away.map(u => u.nick).join(', ')}</span>
         </div>
       )}

@@ -60,6 +60,15 @@ const DEFAULT_LABELS: Required<ChatChannelListLabels> = {
   presence: (presence) => presence,
 };
 
+// Per field, so an explicit `undefined` still falls back to English.
+const withDefaults = (labels?: ChatChannelListLabels): Required<ChatChannelListLabels> => ({
+  unread: labels?.unread ?? DEFAULT_LABELS.unread,
+  mention: labels?.mention ?? DEFAULT_LABELS.mention,
+  muted: labels?.muted ?? DEFAULT_LABELS.muted,
+  members: labels?.members ?? DEFAULT_LABELS.members,
+  presence: labels?.presence ?? DEFAULT_LABELS.presence,
+});
+
 /** @beta Prop shape may change before release. */
 export interface ChatChannelListProps {
   sections: ChatChannelListSection[];
@@ -121,7 +130,7 @@ export const ChatChannelList: React.FC<ChatChannelListProps> = ({
           title: room.name,
           href: room.href,
           icon: roomGlyph(room, active),
-          trailing: roomTrailing(room, { ...DEFAULT_LABELS, ...labels }),
+          trailing: roomTrailing(room, withDefaults(labels)),
           // A room you have not read shouts; a muted one whispers. Both at
           // once keeps the weight and loses the colour, per `NavTree`.
           emphasized: !!room.unread || !!room.mention,

@@ -15,8 +15,8 @@ export interface ThemeToggleProps {
   className?: string;
   /**
    * Accessible name of the toggle. Defaults to what pressing it does
-   * (`labels.switchToLight` / `labels.switchToDark`), or 'Toggle theme' before
-   * the theme is known on the client.
+   * (`labels.switchToLight` / `labels.switchToDark`), or 'Toggle theme' while
+   * the theme is unknown: before mount, or when `theme` is null.
    */
   'aria-label'?: string;
   /** @deprecated Use the native `aria-label`. Still honoured until the next major. */
@@ -55,9 +55,13 @@ export const ThemeToggle = ({
   const [mounted, setMounted] = useState(false);
   const isDark = theme === 'dark';
   const explicitName = ariaLabelAttr ?? ariaLabel;
-  const actionName = isDark
-    ? (labels?.switchToLight ?? 'Switch to light mode')
-    : (labels?.switchToDark ?? 'Switch to dark mode');
+  // Until the theme is known there is no honest action to name.
+  const actionName =
+    theme == null
+      ? 'Toggle theme'
+      : isDark
+        ? (labels?.switchToLight ?? 'Switch to light mode')
+        : (labels?.switchToDark ?? 'Switch to dark mode');
 
   useEffect(() => {
     setMounted(true);
