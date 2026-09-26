@@ -1,5 +1,198 @@
 # @eventuras/ratio-ui
 
+## 2.25.0
+
+### Minor Changes
+
+- 1bde7d0: `Badge` takes `tone="inherit"` (beta): the host's text colour on a
+  translucent tint of it. Compose a count inside a button, tab or link and it
+  matches its host in every variant and theme. In a `Button`, wrap the text in
+  `Button.Label` so the badge is spaced like the icon:
+  
+  ```tsx
+  <Button icon={<ShoppingCart />}>
+    <Button.Label>Checkout</Button.Label>
+    <Badge variant="count" tone="inherit">3</Badge>
+  </Button>
+  ```
+- 3695975: The chat components (beta) and `ThemeToggle` follow the `labels` model.
+  
+  - `Chat.Users` takes `labels` (`online(n)`, `away(n)`, `you`, `op`) with
+    English defaults, so the headings and tags now show without setup; the
+    component passes the counts. `onlineLabel`, `awayLabel`, `youLabel` and
+    `opLabel` are deprecated. Return `null` from `labels.online` to hide the
+    heading.
+  - `Chat.Log` takes `labels.reactions` (`reactionsLabel` is deprecated), and
+    `Chat.Reactions` defaults its `aria-label` to "Reactions", so the
+    development warning about a missing name is gone.
+  - `Chat.ChannelList`'s `labels` get English defaults ("3 unread",
+    "Mentioned", "Muted", "12 members", the presence), so badges are never read
+    as bare numbers.
+  - `ThemeToggle` is named by what pressing it does ("Switch to dark mode" /
+    "Switch to light mode", from `labels`) instead of a fixed "Toggle theme"
+    plus a hidden text that the `aria-label` overrode and was never read. An
+    explicit `aria-label` still wins.
+- 58f7fbc: The chat layer (`@eventuras/ratio-ui/chat`) grows its room list and its
+  people list, and the changelog catches up with the parts that landed before
+  them. Everything in `chat/` is **beta**: prop shapes may change before
+  release.
+  
+  - `ChatChannelList` — channels, private groups and direct messages under
+    eyebrow labels, mapped onto `NavTree`. Rooms are buttons (`activeId` +
+    `onSelect`) or links (`href` + `currentPath`); a room with unread messages
+    reads as bold, a muted one recedes, and the right slot shows one thing at
+    a time: the unread count, an `@`, the bell, or the member count.
+  - `ChatUsers` — ops, then voiced users, then everyone else, alphabetically;
+    your own row is tinted, and away people collapse to one line.
+  - Earlier parts, for the record: `ChatLog` (the dense channel log with
+    mentions and reactions), `ChatReactions`, `ChatPresenceDot`,
+    `ChatUnreadBadge`, and the `--chat-*` tokens.
+  - `BellOff` is re-exported from `icons`.
+  
+  Every piece of screen-reader text is a prop, so no English ships inside the
+  components.
+- 0a31627: One `className` rule across the form parts and `Menu.Trigger`: extra classes
+  merge on top of the component's defaults (a later class wins a conflict), and
+  a new `unstyled` prop drops the defaults to style from scratch. It applies to
+  `Label`, `InputDescription`, `Input`, `TextField`, `Checkbox` (and
+  `Checkbox.Label` / `Checkbox.Description`), `Fieldset`, `Form`, `ListBox`,
+  `ListBoxItem` and `Menu.Trigger`, matching `Select` since 2.25.
+  
+  **Behaviour change:** these components used to drop their defaults whenever a
+  `className` was passed. If you pass `className` to restyle one from scratch,
+  for example an avatar-pill `Menu.Trigger`, add `unstyled`:
+  
+  ```tsx
+  <Menu.Trigger unstyled className="inline-flex items-center gap-2 rounded-full …">
+  ```
+- 46fde15: The older one-off text props move to the same model as the rest: built-in
+  text in `labels`, a component's own name in the native `aria-label`. The old
+  props keep working and are marked `@deprecated` until the next major; when
+  both are given, `labels` wins, then the old prop, then the English default.
+  
+  | Component | Old prop | Now |
+  |---|---|---|
+  | `FileDrawer` | `downloadLabel`, `closeLabel` | `labels.download`, `labels.close` |
+  | `Panel`, `Announcement` | `dismissLabel` | `labels.dismiss` |
+  | `Menu.ThemeToggle` | `lightLabel`, `darkLabel` | `labels.light`, `labels.dark` |
+  | `Lookup` | `emptyState`, `minCharsMessage` | `labels.empty`, `labels.minChars(n)` |
+  | `CommandPalette` | `emptyMessage` (with `{query}`) | `labels.empty(query)` |
+  | `FileUpload` | `dropzoneLabel`, `buttonLabel` | `labels.dropHint`, `labels.browse` |
+  | `Console.Group` | `countLabel` | `labels.count(n)` |
+  | `ActionButton`, `Avatar`, `ThemeToggle`, `CopyButton`, `Navbar.Toggle` | `ariaLabel` | `aria-label` |
+  | `CopyButton` | `withLabel` | `showLabel` |
+  
+  Content you choose per use stays an ordinary prop: `placeholder`,
+  `ProductCard`'s `buttonText`, `AlertDialog`'s action labels, and the chat
+  components' texts.
+- 04ebf28: Field labels are now driven by `--label-*` tokens (`tokens/form.css`):
+  `--label-font-size`, `--label-line-height`, `--label-font-weight`,
+  `--label-color` and `--label-gap`. Override them per theme or scope to
+  restyle every form label at once. Labels use the fluid `--font-size-sm`
+  (0.88–0.96rem), so they grow slightly on wide screens.
+  
+  `Select`, `NumberField`, `FileUpload`, `RadioGroup` and `Lookup` now render
+  their label through the shared `Label` styling instead of their own copies,
+  so label and spacing are identical across fields. The gap between label and
+  control is now 0.25rem everywhere (TextField and PhoneInput used 0.5rem).
+- 12753df: Built-in text moves out of the components. Each component that ships text
+  takes an optional `labels` object (with an exported `…Labels` type) whose
+  entries fall back to English; a component's own accessible name is the native
+  `aria-label`.
+  
+  - `labels`: `Loading` (with a new `showLabel`), `TableOfContents` (its
+    visible title, which now names the `<nav>` via `aria-labelledby`), `Lookup`,
+    `SearchField`, `ToastRenderer`, `PhoneInput` (including the length error, as
+    a function), `Tree`, `NavTree`, `ThreeColumnLayout`, `Dialog`, `Drawer`,
+    `ErrorBoundary` (the default fallback), `Unauthorized`, `CodeBlock`,
+    `CopyButton`, `CopyLabel`, `TextField` (its copy button), `FileUpload`,
+    `ThemeToggle`, `ObfuscatedEmail`, `Footer` (the publisher's organisation
+    number), `CartLineItem` and `OrderSummary`.
+  - `aria-label` with an English default: `Stepper`, `Schedule`, `Pagination`.
+    `Pagination`'s `labels.navigation` is deprecated in favour of `aria-label`.
+  
+  **Visible change:** `CartLineItem`, `OrderSummary` and the footer publisher
+  block shipped Norwegian text ("Fjern", "Antall", "inkl. mva",
+  "Ordresammendrag", "Subtotal (eks. mva)", "MVA", "Org.nr."). They now default
+  to English. To keep Norwegian:
+  
+  ```tsx
+  <CartLineItem
+    labels={{
+      vatAmount: (vat) => `inkl. mva ${vat}`,
+      totalIncludesVat: 'inkl. mva',
+      quantity: 'Antall',
+      decreaseQuantity: 'Reduser antall',
+      increaseQuantity: 'Øk antall',
+      remove: 'Fjern',
+    }}
+  />
+  <OrderSummary
+    title="Ordresammendrag"
+    labels={{ subtotalExVat: 'Subtotal (eks. mva)', vat: 'MVA', total: 'Total' }}
+  />
+  <Footer.Publisher
+    publisher={publisher}
+    labels={{ organizationNumber: (n) => `Org.nr. ${n}` }}
+  />
+  ```
+- c23bc9a: `NavTree` gains a button mode, beta: with `onAction`, rows without an `href`
+  become buttons that report their key (`id`, else a string `title`), and
+  `selectedKey` marks the current one — highlighted and auto-expanded like
+  `currentPath`, announced with `aria-current="true"`. For navigation held in
+  state rather than in the URL, like the rooms of a chat. Branches without an
+  `href` still toggle, and links and buttons mix freely.
+  
+  Items also gain `emphasized` (bold, for unseen activity such as unread
+  messages) and `muted` (dimmed, for something quiet on purpose).
+- 9e1f8e0: `Pagination` takes `labels` to translate its text: `navigation`, `previous`,
+  `next` and `status` (a function of the current and total page numbers). Each falls
+  back to the English default. The root is now a `<nav>` landmark, named by
+  `labels.navigation` (default "Pagination"). `PaginationProps` and
+  `PaginationLabels` are exported.
+- 22ae0ab: New `SkipLink` (`core/SkipLink`) for keyboard and screen reader users
+  (WCAG 2.4.1). Hidden until focused, it slides in at the top of the viewport
+  and moves focus to the target (default `#main`) when activated. Styled by
+  new `--skip-link-*` tokens (`tokens/skip-link.css`).
+  
+  `ThreeColumnLayout` gives its `<main>` `id="main"` (configurable with
+  `mainId`), so a default `SkipLink` works with it out of the box.
+
+### Patch Changes
+
+- 6afe504: Chat (beta) accessibility fixes:
+  
+  - `Chat.Log` tells screen readers when a message mentions you (`labels.mentionsYou`). Before, only the band showed it.
+  - `Chat.Log` hides the `@` and `+` role glyphs and names the role instead (`labels.op`, `labels.voice`).
+  - `Chat.Users` names the voice role for screen readers (`labels.voice`) and lists away people alphabetically.
+  - `Chat.ChannelList` includes the mention in a room's screen-reader text when it also has unread messages.
+- fa096f3: Drop unused dependencies. `@eventuras/datatable` no longer lists `lucide-react` as a peer dependency, since its icons come through `@eventuras/ratio-ui`. `@eventuras/ratio-ui` drops the `./components/*` export, which pointed at a folder that doesn't exist.
+- 78b42b8: `Link` with a `button-*` variant now uses `Button`'s size classes, so it is
+  the same height as a `Button` next to it (it used to inherit a larger font
+  size). New `size` prop (`sm` | `md` | `lg`, default `md`) to match
+  `Button`'s sizes.
+- 1f3d52d: Clear all lint warnings, fixing the real bugs behind them:
+  
+  - `TextField`: `cols` now reaches the textarea and `noMargin` drops the wrapper's bottom margin. Both were accepted but ignored.
+  - `Image`: the native `<img>` fallback no longer remounts on every render, and is lazy-loaded by default as documented.
+  - `PhoneInput`, `CommandPalette`, `AlertDialog`, `ThemeToggle` and `ObfuscatedEmail` no longer set state in effects, which saves an extra render.
+  - `Menu.ThemeToggle` no longer writes refs during render.
+  - `Form`: `action` and `onSubmit` are typed as the native form's props instead of `any`.
+  - `AutoComplete`: `filter` takes React Aria's type instead of `any`.
+  - `Unauthorized`: `homeUrl` was never used and is now deprecated.
+- 5c6a62f: `List`'s `markdown` and `markdown-compact` variants colour their markers
+  with the theme's `--primary` instead of a fixed `blue-600`.
+- b82e9a6: - `Link` with a `button-*` variant and `block` fills the row as a flex item,
+    like `Button block`. It used to switch to plain `display: block`, which
+    dropped the icon and label alignment.
+  - `InputError` defaults to the theme's `text-error-text` instead of a fixed
+    `text-red-500`, and `Unauthorized` uses `bg-error` / `text-error-on`
+    instead of `bg-red-500` / `text-white`.
+- a35be4f: `Select`'s `className` is now merged on top of the default wrapper classes
+  instead of replacing them, so adding e.g. a width no longer drops the
+  label-above-trigger layout. A conflicting class still wins (`w-48` over the
+  default `w-full`).
+
 ## 2.24.0
 
 ### Minor Changes
