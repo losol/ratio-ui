@@ -20,31 +20,31 @@ describe('MarkdownContent', () => {
   // renders heading when provided
   it('renders a heading', () => {
     render(<MarkdownContent heading="Hello" markdown="Body" />)
-    expect(screen.getByRole('heading', { level: 2, name: 'Hello' })).toBeInTheDocument()
-    expect(screen.getByText('Body')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Hello' })).not.toBeNull()
+    expect(screen.getByText('Body')).not.toBeNull()
   })
 
   // renders bold text correctly
   it('renders bold text with **asterisks**', () => {
     const { container } = render(<MarkdownContent markdown="Join us for **Amazing Event**, an exciting opportunity." />)
     const strong = container.querySelector('strong')
-    expect(strong).toBeInTheDocument()
-    expect(strong).toHaveTextContent('Amazing Event')
+    expect(strong).not.toBeNull()
+    expect(strong?.textContent).toContain('Amazing Event')
   })
 
   // renders italic text correctly
   it('renders italic text with *asterisks*', () => {
     const { container } = render(<MarkdownContent markdown="This is *emphasized* text." />)
     const em = container.querySelector('em')
-    expect(em).toBeInTheDocument()
-    expect(em).toHaveTextContent('emphasized')
+    expect(em).not.toBeNull()
+    expect(em?.textContent).toContain('emphasized')
   })
 
   // strips invisible chars by default
   it('sanitizes invisible spaces by default', () => {
     const md = 'Text\u00A0\u200Bend'
     render(<MarkdownContent markdown={md} />)
-    expect(screen.getByText('Text end')).toBeInTheDocument()
+    expect(screen.getByText('Text end')).not.toBeNull()
   })
 
   // allows turning off sanitation
@@ -52,19 +52,19 @@ describe('MarkdownContent', () => {
     const md = '\uFEFFStart'
     render(<MarkdownContent markdown={md} keepInvisibleCharacters={true}/>)
     // BOM may still render as empty, assert literal node presence
-    expect(screen.getByText('Start')).toBeInTheDocument()
+    expect(screen.getByText('Start')).not.toBeNull()
   })
 
   // blocks raw HTML by default — rehype-raw is not installed unless asked for
   it('blocks raw HTML by default', () => {
     render(<MarkdownContent markdown={'<div data-x="1">XSS</div>'} />)
-    expect(screen.queryByText('XSS')).not.toBeInTheDocument()
+    expect(screen.queryByText('XSS')).toBeNull()
   })
 
   // permits raw HTML only when the consumer supplies rehype-raw
   it('renders raw HTML when rehype-raw is passed via rehypePlugins', () => {
     render(<MarkdownContent markdown={'<div>X</div>'} rehypePlugins={[rehypeRaw]} />)
-    expect(screen.getByText('X')).toBeInTheDocument()
+    expect(screen.getByText('X')).not.toBeNull()
   })
 
   // sanitization runs after consumer plugins, so raw HTML is still filtered
@@ -75,7 +75,7 @@ describe('MarkdownContent', () => {
         rehypePlugins={[rehypeRaw]}
       />
     )
-    expect(screen.getByText('X')).toBeInTheDocument()
+    expect(screen.getByText('X')).not.toBeNull()
     expect(container.querySelector('[onclick]')).toBeNull()
     expect(container.querySelector('script')).toBeNull()
   })
@@ -84,14 +84,14 @@ describe('MarkdownContent', () => {
   it('blocks external links by default', () => {
     const { container } = render(<MarkdownContent markdown={'[go](https://example.com)'} />)
     expect(screen.queryByRole('link')).toBeNull()
-    expect(container).toHaveTextContent('go')
+    expect(container.textContent).toContain('go')
   })
 
   // renders external link when allowExternalLinks = true
   it('renders external link when allowExternalLinks = true', () => {
     render(<MarkdownContent markdown={'[go](https://example.com)'} allowExternalLinks={true} />)
     const a = screen.getByRole('link', { name: 'go' }) as HTMLAnchorElement
-    expect(a).toBeInTheDocument()
+    expect(a).not.toBeNull()
     expect(a.href).toMatch(/^https:\/\/example\.com\/?/)
     expect(a.rel).toMatch(/noopener/)
     expect(a.target).toBe('_blank')
@@ -106,23 +106,23 @@ describe('MarkdownContent', () => {
     expect(screen.queryByRole('link')).toBeNull()
 
     // content survives
-    expect(container).toHaveTextContent('Before')
-    expect(container).toHaveTextContent('After')
-    expect(container).toHaveTextContent(/\bx\b/)
+    expect(container.textContent).toContain('Before')
+    expect(container.textContent).toContain('After')
+    expect(container.textContent).toMatch(/\bx\b/)
   })
 
   // resolves relative links safely
   it('allows relative links', () => {
     render(<MarkdownContent markdown={'[home](/)'} />)
     const a = screen.getByRole('link', { name: 'home' }) as HTMLAnchorElement
-    expect(a).toBeInTheDocument()
+    expect(a).not.toBeNull()
     expect(a.getAttribute('href')).toBe('/') // stays relative
   })
 
   // blocks external images by default
   it('blocks external images by default', () => {
     render(<MarkdownContent markdown={'![alt](https://example.com/a.png)'} />)
-    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+    expect(screen.queryByRole('img')).toBeNull()
   })
 
   // renders external image when allowExternalLinks = true
@@ -143,7 +143,7 @@ describe('MarkdownContent', () => {
     render(<MarkdownContent markdown={'![x](javascript:alert(1))'} />)
     const img = screen.queryByRole('img')
     // Image renders but without the dangerous src
-    expect(img).toBeInTheDocument()
+    expect(img).not.toBeNull()
     expect(img?.getAttribute('src')).toBeFalsy()
   })
 
@@ -151,16 +151,16 @@ describe('MarkdownContent', () => {
   // This is intentional - small inline images via data: URLs are a legitimate use case
   it('allows data: image URLs (per GitHub defaults)', () => {
     render(<MarkdownContent markdown={'![x](data:image/png;base64,aaaa)'} />)
-    expect(screen.getByRole('img')).toBeInTheDocument()
+    expect(screen.getByRole('img')).not.toBeNull()
   })
 
   // stripHtmlTags option for legacy content with HTML-wrapped markdown
   it('strips HTML tags when stripHtmlTags = true', () => {
     render(<MarkdownContent markdown={'<p>**Questions?** Contact us</p>'} stripHtmlTags />)
-    expect(screen.getByText('Questions?')).toBeInTheDocument()
+    expect(screen.getByText('Questions?')).not.toBeNull()
     // Bold should be rendered as <strong>
     const strong = document.querySelector('strong')
-    expect(strong).toBeInTheDocument()
+    expect(strong).not.toBeNull()
     expect(strong?.textContent).toBe('Questions?')
   })
 
@@ -170,8 +170,8 @@ describe('MarkdownContent', () => {
     const escapedMarkdown = String.raw`Join us for \*\*Amazing Event\*\*, an exciting opportunity.`
     const { container } = render(<MarkdownContent markdown={escapedMarkdown} />)
     const strong = container.querySelector('strong')
-    expect(strong).toBeInTheDocument()
-    expect(strong).toHaveTextContent('Amazing Event')
+    expect(strong).not.toBeNull()
+    expect(strong?.textContent).toContain('Amazing Event')
   })
 
   describe('remarkCallout', () => {
@@ -197,9 +197,9 @@ describe('MarkdownContent', () => {
       // `callout` only exists as an intermediate hast node: react-markdown
       // swaps it for the Panel component, so no <callout> element ever reaches
       // the DOM. Assert on the transform and on what actually renders instead.
-      expect(container.querySelector('blockquote')).not.toBeInTheDocument();
-      expect(container).toHaveTextContent('Note');
-      expect(container).toHaveTextContent('This is a note.');
+      expect(container.querySelector('blockquote')).toBeNull();
+      expect(container.textContent).toContain('Note');
+      expect(container.textContent).toContain('This is a note.');
     });
 
     it('renders a WARNING callout', async () => {
@@ -213,9 +213,9 @@ describe('MarkdownContent', () => {
           sanitizeSchemaExtension={calloutSanitizeSchema}
         />
       );
-      expect(container.querySelector('blockquote')).not.toBeInTheDocument();
-      expect(container).toHaveTextContent('Warning');
-      expect(container).toHaveTextContent('Be careful here.');
+      expect(container.querySelector('blockquote')).toBeNull();
+      expect(container.textContent).toContain('Warning');
+      expect(container.textContent).toContain('Be careful here.');
     });
 
     it('leaves regular blockquotes unchanged', async () => {
@@ -229,8 +229,8 @@ describe('MarkdownContent', () => {
           sanitizeSchemaExtension={calloutSanitizeSchema}
         />
       );
-      expect(container.querySelector('callout')).not.toBeInTheDocument();
-      expect(container.querySelector('blockquote')).toBeInTheDocument();
+      expect(container.querySelector('callout')).toBeNull();
+      expect(container.querySelector('blockquote')).not.toBeNull();
     });
   });
 
@@ -253,7 +253,7 @@ describe('MarkdownContent', () => {
           sanitizeSchemaExtension={{ attributes: { a: ['data-track'] } }}
         />
       );
-      expect(container.querySelector('a')).toHaveAttribute('href', '/home');
+      expect(container.querySelector('a')?.getAttribute('href')).toBe('/home');
     });
   });
 
@@ -267,7 +267,7 @@ describe('MarkdownContent', () => {
         return <div data-testid="custom-fence">{props.code}</div>;
       };
       render(<MarkdownContent markdown={fence} codeBlock={Custom} />);
-      expect(screen.getByTestId('custom-fence')).toHaveTextContent('const x = 1;');
+      expect(screen.getByTestId('custom-fence').textContent).toContain('const x = 1;');
       expect(seen?.code).toBe('const x = 1;'); // trailing newline stripped
       expect(seen?.language).toBe('ts');
     });
@@ -303,8 +303,8 @@ describe('MarkdownContent', () => {
       const { container } = render(
         <MarkdownContent markdown={'Inline `code` here'} codeBlock={Custom} />
       );
-      expect(screen.queryByTestId('custom-fence')).not.toBeInTheDocument();
-      expect(container.querySelector('code')).toHaveTextContent('code');
+      expect(screen.queryByTestId('custom-fence')).toBeNull();
+      expect(container.querySelector('code')?.textContent).toContain('code');
     });
   });
 })

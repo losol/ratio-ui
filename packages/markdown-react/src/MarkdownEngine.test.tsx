@@ -47,26 +47,23 @@ const engine = (props: Partial<React.ComponentProps<typeof MarkdownEngine>>) => 
 describe('MarkdownEngine', () => {
   it('renders headings and paragraphs through the renderer slots', () => {
     render(engine({ markdown: '## Section\n\nBody text' }));
-    expect(screen.getByRole('heading', { level: 2, name: 'Section' })).toBeInTheDocument();
-    expect(screen.getByText('Body text')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Section' })).not.toBeNull();
+    expect(screen.getByText('Body text')).not.toBeNull();
   });
 
   it('renders the heading prop at level 2', () => {
     render(engine({ heading: 'Title', markdown: 'x' }));
-    expect(screen.getByRole('heading', { level: 2, name: 'Title' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Title' })).not.toBeNull();
   });
 
   it('blocks external links by default and allows them on opt-in', () => {
     const md = '[go](https://example.com)';
     const { container, rerender } = render(engine({ markdown: md }));
     expect(screen.queryByRole('link')).toBeNull();
-    expect(container).toHaveTextContent('go');
+    expect(container.textContent).toContain('go');
 
     rerender(engine({ markdown: md, allowExternalLinks: true }));
-    expect(screen.getByRole('link', { name: 'go' })).toHaveAttribute(
-      'href',
-      'https://example.com'
-    );
+    expect(screen.getByRole('link', { name: 'go' }).getAttribute('href')).toBe('https://example.com');
   });
 
   it('runs sanitization after consumer rehype plugins', () => {
@@ -76,7 +73,7 @@ describe('MarkdownEngine', () => {
         rehypePlugins: [rehypeRaw],
       })
     );
-    expect(screen.getByText('X')).toBeInTheDocument();
+    expect(screen.getByText('X')).not.toBeNull();
     expect(container.querySelector('[onclick]')).toBeNull();
     expect(container.querySelector('script')).toBeNull();
   });
@@ -84,8 +81,8 @@ describe('MarkdownEngine', () => {
   it('extracts fences to the codeBlock renderer with code and language', () => {
     render(engine({ markdown: '```ts\nconst x = 1;\n```' }));
     const fence = screen.getByTestId('fence');
-    expect(fence).toHaveAttribute('data-language', 'ts');
-    expect(fence).toHaveTextContent('const x = 1;');
+    expect(fence.getAttribute('data-language')).toBe('ts');
+    expect(fence.textContent).toContain('const x = 1;');
   });
 
   it('lets the codeBlock prop override the renderer set', () => {
@@ -95,7 +92,7 @@ describe('MarkdownEngine', () => {
       return <div data-testid="override" />;
     };
     render(engine({ markdown: '```\nplain\n```', codeBlock: Override }));
-    expect(screen.getByTestId('override')).toBeInTheDocument();
+    expect(screen.getByTestId('override')).not.toBeNull();
     expect(seen).toMatchObject({
       code: 'plain',
       language: 'Text',
@@ -108,7 +105,7 @@ describe('MarkdownEngine', () => {
   it('keeps inline code in the inlineCode renderer', () => {
     const { container } = render(engine({ markdown: 'Inline `code` here' }));
     expect(screen.queryByTestId('fence')).toBeNull();
-    expect(container.querySelector('code')).toHaveTextContent('code');
+    expect(container.querySelector('code')?.textContent).toContain('code');
   });
 
   it('forwards sanitized ids so GFM footnote anchors survive', () => {
@@ -122,7 +119,7 @@ describe('MarkdownEngine', () => {
 
   it('falls back to plain strong/em defaults when the slots are omitted', () => {
     const { container } = render(engine({ markdown: 'a **b** *c*' }));
-    expect(container.querySelector('strong')).toHaveTextContent('b');
-    expect(container.querySelector('em')).toHaveTextContent('c');
+    expect(container.querySelector('strong')?.textContent).toContain('b');
+    expect(container.querySelector('em')?.textContent).toContain('c');
   });
 });
