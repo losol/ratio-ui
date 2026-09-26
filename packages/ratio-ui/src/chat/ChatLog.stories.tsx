@@ -86,7 +86,7 @@ const volunteers: ChatLogMessage[] = [
  * takes the voice colour, and a row that mentions you gets the accent band.
  */
 export const Channel: Story = {
-  args: { messages: volunteers, me: 'tor', 'aria-label': '#volunteers', reactionsLabel: 'Reactions' },
+  args: { messages: volunteers, me: 'tor', 'aria-label': '#volunteers' },
 };
 
 /**
@@ -116,7 +116,6 @@ export const Reactions: Story = {
         messages={messages}
         me="tor"
         aria-label="#volunteers"
-        reactionsLabel="Reactions"
         onToggleReaction={toggleReaction}
       />
     );

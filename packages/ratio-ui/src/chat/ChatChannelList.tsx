@@ -38,14 +38,27 @@ export interface ChatChannelListSection {
   rooms: ChatRoom[];
 }
 
-/** Screen-reader text for what the row's badges say. Without it they are read as bare numbers. */
+/** Screen-reader text for what the row's badges say. Each entry falls back to English. */
 export interface ChatChannelListLabels {
+  /** @default (n) => `${n} unread` */
   unread?: (count: number) => string;
+  /** @default 'Mentioned' */
   mention?: string;
+  /** @default 'Muted' */
   muted?: string;
+  /** @default (n) => `${n} members` */
   members?: (count: number) => string;
+  /** @default (presence) => presence */
   presence?: (presence: ChatPresence) => string;
 }
+
+const DEFAULT_LABELS: Required<ChatChannelListLabels> = {
+  unread: (n) => `${n} unread`,
+  mention: 'Mentioned',
+  muted: 'Muted',
+  members: (n) => `${n} members`,
+  presence: (presence) => presence,
+};
 
 /** @beta Prop shape may change before release. */
 export interface ChatChannelListProps {
@@ -108,7 +121,7 @@ export const ChatChannelList: React.FC<ChatChannelListProps> = ({
           title: room.name,
           href: room.href,
           icon: roomGlyph(room, active),
-          trailing: roomTrailing(room, labels),
+          trailing: roomTrailing(room, { ...DEFAULT_LABELS, ...labels }),
           // A room you have not read shouts; a muted one whispers. Both at
           // once keeps the weight and loses the colour, per `NavTree`.
           emphasized: !!room.unread || !!room.mention,
@@ -129,9 +142,9 @@ function roomGlyph(room: ChatRoom, active: boolean): React.ReactNode {
 }
 
 /** One thing at a time, loudest first: unread, then a mention, then mute, then the member count. */
-function roomTrailing(room: ChatRoom, labels?: ChatChannelListLabels): React.ReactNode {
+function roomTrailing(room: ChatRoom, labels: Required<ChatChannelListLabels>): React.ReactNode {
   const presence =
-    room.kind === 'dm' && labels?.presence ? (
+    room.kind === 'dm' ? (
       <span className="sr-only">{labels.presence(room.presence ?? 'online')}</span>
     ) : null;
 
@@ -142,11 +155,7 @@ function roomTrailing(room: ChatRoom, labels?: ChatChannelListLabels): React.Rea
         <ChatUnreadBadge
           count={room.unread}
           mention={room.mention}
-          label={
-            room.unread
-              ? labels?.unread?.(room.unread)
-              : labels?.mention
-          }
+          label={room.unread ? labels.unread(room.unread) : labels.mention}
         />
       </>
     );
@@ -157,7 +166,7 @@ function roomTrailing(room: ChatRoom, labels?: ChatChannelListLabels): React.Rea
       <>
         {presence}
         <BellOff size={13} aria-hidden className="text-(--text-subtle)" />
-        {labels?.muted && <span className="sr-only">{labels.muted}</span>}
+        <span className="sr-only">{labels.muted}</span>
       </>
     );
   }
@@ -166,10 +175,10 @@ function roomTrailing(room: ChatRoom, labels?: ChatChannelListLabels): React.Rea
     return (
       <>
         {presence}
-        <span aria-hidden={labels?.members ? true : undefined} className="text-[11px] text-(--text-subtle)">
+        <span aria-hidden className="text-[11px] text-(--text-subtle)">
           {room.members}
         </span>
-        {labels?.members && <span className="sr-only">{labels.members(room.members)}</span>}
+        <span className="sr-only">{labels.members(room.members)}</span>
       </>
     );
   }

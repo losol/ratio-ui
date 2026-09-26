@@ -15,7 +15,7 @@ const meta: Meta<typeof ChatChannelList> = {
     docs: {
       description: {
         component:
-          'The room list, mapped onto `NavTree`. Rooms are buttons (`activeId` + `onSelect`) or links (`href` + `currentPath`); unread rooms read as bold, muted ones recede. All screen-reader text comes from `labels`, so nothing English ships in the component.',
+          'The room list, mapped onto `NavTree`. Rooms are buttons (`activeId` + `onSelect`) or links (`href` + `currentPath`); unread rooms read as bold, muted ones recede. Screen-reader text for the badges comes from `labels`, with English defaults.',
       },
     },
   },
