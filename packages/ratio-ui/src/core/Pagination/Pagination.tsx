@@ -10,7 +10,11 @@ import { Text } from '../Text/Text';
 
 /** Text for `Pagination`, for translating it. Each entry falls back to English. */
 export interface PaginationLabels {
-  /** Accessible name of the `<nav>` landmark. @default 'Pagination' */
+  /**
+   * Accessible name of the `<nav>` landmark.
+   * @deprecated Pass `aria-label` on `Pagination` instead; the component's
+   * own name is not a label. Still honoured until the next major.
+   */
   navigation?: string;
   /** Accessible name of the previous-page button. @default 'Previous Page' */
   previous?: string;
@@ -25,7 +29,9 @@ export type PaginationProps = {
   onNextPageClick: () => void;
   currentPage: number;
   totalPages: number;
-  /** Visible and screen-reader text, e.g. in Norwegian. */
+  /** Accessible name of the `<nav>` landmark. @default 'Pagination' */
+  'aria-label'?: string;
+  /** Built-in text. Each entry falls back to English. */
   labels?: PaginationLabels;
 };
 
@@ -40,17 +46,18 @@ export const Pagination: React.FC<PaginationProps> = ({
   onNextPageClick,
   currentPage,
   totalPages,
+  'aria-label': ariaLabel,
   labels = {},
 }) => {
   const {
-    navigation = 'Pagination',
+    navigation,
     previous = 'Previous Page',
     next = 'Next Page',
     status = defaultStatus,
   } = labels;
 
   return (
-    <nav aria-label={navigation} className="flex justify-center items-center py-5">
+    <nav aria-label={ariaLabel ?? navigation ?? 'Pagination'} className="flex justify-center items-center py-5">
       <Button aria-label={previous} onClick={onPreviousPageClick} disabled={currentPage <= 1}>
         <ChevronsLeft />
       </Button>

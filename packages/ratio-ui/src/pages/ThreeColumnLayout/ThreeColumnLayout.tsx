@@ -17,6 +17,15 @@ export interface ThreeColumnLayoutProps {
    */
   mainId?: string | null;
   className?: string;
+  labels?: ThreeColumnLayoutLabels;
+}
+
+/** Built-in text of `ThreeColumnLayout`. Each entry falls back to English. */
+export interface ThreeColumnLayoutLabels {
+  /** Name of the left `<aside>`. @default 'Primary sidebar' */
+  primarySidebar?: string;
+  /** Name of the right `<aside>`. @default 'Secondary sidebar' */
+  secondarySidebar?: string;
 }
 
 /**
@@ -29,13 +38,13 @@ export interface ThreeColumnLayoutProps {
  * The `<main>` element gets `id="main"` (see `mainId`), so a `SkipLink`
  * with its default `href` works without extra wiring.
  */
-export function ThreeColumnLayout({ left, right, children, mainId = 'main', className = '' }: Readonly<ThreeColumnLayoutProps>) {
+export function ThreeColumnLayout({ left, right, children, mainId = 'main', className = '', labels }: Readonly<ThreeColumnLayoutProps>) {
   return (
     <div className={`mx-auto max-w-8xl px-4 sm:px-6 lg:px-8 ${className}`}>
       <div className="lg:grid lg:grid-cols-[16rem_1fr_14rem] lg:gap-8">
         {/* Left column */}
         <aside
-          aria-label="Primary sidebar"
+          aria-label={labels?.primarySidebar ?? 'Primary sidebar'}
           className="hidden lg:block lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto lg:py-8 lg:pr-4"
         >
           {left}
@@ -49,7 +58,7 @@ export function ThreeColumnLayout({ left, right, children, mainId = 'main', clas
         {/* Right column */}
         {right && (
           <aside
-            aria-label="Secondary sidebar"
+            aria-label={labels?.secondarySidebar ?? 'Secondary sidebar'}
             className="hidden lg:block lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto lg:py-8 lg:pl-4"
           >
             {right}

@@ -34,9 +34,21 @@ export interface TreeNodeState {
   isSelected: boolean;
 }
 
+/** Built-in text of `Tree`. Each entry falls back to English. */
+export interface TreeLabels {
+  /** Name of a row's drag handle. @default 'Drag to reorder' */
+  dragHandle?: string;
+  /** Name of the chevron on a collapsed branch. @default 'Expand' */
+  expand?: string;
+  /** Name of the chevron on an expanded branch. @default 'Collapse' */
+  collapse?: string;
+}
+
 export interface TreeProps<T extends TreeNode> {
   /** Accessible label for the tree. */
   'aria-label': string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: TreeLabels;
   /** Initial tree data (uncontrolled — use `onChange` to persist). */
   items: T[];
   /** Fires with the new nested data after a drag reorder or reparent. */
@@ -119,6 +131,7 @@ export function Tree<T extends TreeNode>(props: TreeProps<T>): ReactElement {
     defaultExpandedKeys = 'all',
     onExpandedChange,
     className,
+    labels,
   } = props;
 
   const { tree, dragAndDropHooks } = useSortableTree<T>({
@@ -156,7 +169,7 @@ export function Tree<T extends TreeNode>(props: TreeProps<T>): ReactElement {
             data-drop-target={isDropTarget || undefined}
           >
             {sortable && dragHandle && (
-              <Button slot="drag" className="tree__handle" aria-label="Drag to reorder">
+              <Button slot="drag" className="tree__handle" aria-label={labels?.dragHandle ?? 'Drag to reorder'}>
                 <GripVertical size={15} aria-hidden />
               </Button>
             )}
@@ -183,7 +196,7 @@ export function Tree<T extends TreeNode>(props: TreeProps<T>): ReactElement {
                 slot="chevron"
                 className="tree__chevron"
                 data-open={isExpanded || undefined}
-                aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                aria-label={isExpanded ? (labels?.collapse ?? 'Collapse') : (labels?.expand ?? 'Expand')}
               >
                 <ChevronRight size={16} />
               </Button>

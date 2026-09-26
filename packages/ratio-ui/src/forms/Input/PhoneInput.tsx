@@ -63,13 +63,59 @@ export interface PhoneInputProps {
   onChange?: (value: PhoneInputChange) => void;
   /** Test ID for the phone number input */
   testId?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: PhoneInputLabels;
+}
+
+/** A phone number that failed the length check, passed to `labels.invalidLength`. */
+export interface PhoneLengthError {
+  country: CountryCode;
+  /** Digits entered. */
+  length: number;
+  min?: number;
+  max?: number;
+  exact?: number;
+}
+
+/** Built-in text of `PhoneInput`. Each entry falls back to English. */
+export interface PhoneInputLabels {
+  /** Name of the country code combobox. @default 'Select country code' */
+  countryCode?: string;
+  /** Placeholder of the country code combobox. @default 'Select country' */
+  countryPlaceholder?: string;
+  /** Placeholder of the number field. @default 'Enter phone number' */
+  numberPlaceholder?: string;
+  /** Error shown when the number has the wrong number of digits. */
+  invalidLength?: (error: PhoneLengthError) => string;
 }
 
 // Basic phone validation rules
-const PHONE_VALIDATION_RULES: Record<string, { min?: number; max?: number; exact?: number; message: string }> = {
-  '+47': { exact: 8, message: 'Norwegian phone numbers must be exactly 8 digits' },
-  '+46': { min: 7, max: 13, message: 'Swedish phone numbers must be 7 to 13 digits' },
-  '+45': { exact: 8, message: 'Danish phone numbers must be exactly 8 digits' },
+type LengthRule = { min?: number; max?: number; exact?: number };
+
+const PHONE_VALIDATION_RULES: Record<string, LengthRule> = {
+  '+47': { exact: 8 },
+  '+46': { min: 7, max: 13 },
+  '+45': { exact: 8 },
+};
+// Any other country: an E.164-ish plausibility range.
+const GENERIC_RULE: LengthRule = { min: 6, max: 15 };
+
+const COUNTRY_ADJECTIVE: Record<string, string> = {
+  '+47': 'Norwegian',
+  '+46': 'Swedish',
+  '+45': 'Danish',
+};
+
+const defaultInvalidLength = ({ country, length, min, max, exact }: PhoneLengthError): string => {
+  const adjective = COUNTRY_ADJECTIVE[country.code];
+  if (adjective) {
+    return exact !== undefined
+      ? `${adjective} phone numbers must be exactly ${exact} digits`
+      : `${adjective} phone numbers must be ${min} to ${max} digits`;
+  }
+  return min !== undefined && length < min
+    ? `Phone number must be at least ${min} digits`
+    : `Phone number must be at most ${max} digits`;
 };
 
 // Memoized country item component to prevent unnecessary re-renders
@@ -99,6 +145,7 @@ export function PhoneInput({
   disabled,
   onChange,
   testId,
+  labels,
 }: PhoneInputProps) {
   // Memoize default country calculation
   const defaultCountry = useMemo(
@@ -163,29 +210,16 @@ export function PhoneInput({
       return;
     }
 
-    const rule = PHONE_VALIDATION_RULES[country.code];
-    let error: string | null = null;
+    const rule = PHONE_VALIDATION_RULES[country.code] ?? GENERIC_RULE;
+    const length = localNumber.length;
+    const invalid =
+      (rule.exact !== undefined && length !== rule.exact) ||
+      (rule.min !== undefined && length < rule.min) ||
+      (rule.max !== undefined && length > rule.max);
 
-    if (rule) {
-      if (rule.exact !== undefined && localNumber.length !== rule.exact) {
-        error = rule.message;
-      } else if (
-        (rule.min !== undefined && localNumber.length < rule.min) ||
-        (rule.max !== undefined && localNumber.length > rule.max)
-      ) {
-        error = rule.message;
-      }
-    } else {
-      // Generic validation
-      if (localNumber.length < 6) {
-        error = 'Phone number must be at least 6 digits';
-      } else if (localNumber.length > 15) {
-        error = 'Phone number must be at most 15 digits';
-      }
-    }
-
-    setLocalError(error);
-  }, [country.code, localNumber]);
+    const invalidLength = labels?.invalidLength ?? defaultInvalidLength;
+    setLocalError(invalid ? invalidLength({ country, length, ...rule }) : null);
+  }, [country, localNumber, labels?.invalidLength]);
 
   const handleCountryChange = useCallback(
     (key: React.Key | null) => {
@@ -293,13 +327,13 @@ export function PhoneInput({
           className={`${componentStyles.integratedComboBoxContainer} min-w-16 max-w-24`}
           allowsCustomValue={false}
           isDisabled={disabled}
-          aria-label="Select country code"
+          aria-label={labels?.countryCode ?? 'Select country code'}
           menuTrigger="input"
         >
           <div className={componentStyles.comboBoxInputWrapper}>
             <ComboBoxInput
               className={componentStyles.comboBoxInputField}
-              placeholder="Select country"
+              placeholder={labels?.countryPlaceholder ?? 'Select country'}
               onBlur={handleInputBlur}
               onKeyDown={(e) => {
                 // Commit typed code on Tab or Enter before focus leaves/selection changes
@@ -340,7 +374,7 @@ export function PhoneInput({
           onChange={handleNumberChange}
           onBlur={handleNumberBlur}
           disabled={disabled}
-          placeholder="Enter phone number"
+          placeholder={labels?.numberPlaceholder ?? 'Enter phone number'}
           unstyled
           className="p-2 bg-card text-(--text) border-0 rounded-none focus:ring-0 flex-1 w-full"
           data-testid={testId}

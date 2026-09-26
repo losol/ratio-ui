@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { OrderSummary } from './OrderSummary';
-export type { OrderSummaryProps, OrderSummaryData } from './OrderSummary';
+export type { OrderSummaryLabels, OrderSummaryProps, OrderSummaryData } from './OrderSummary';

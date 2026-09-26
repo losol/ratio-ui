@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { TableOfContents } from './TableOfContents';
-export type { TableOfContentsProps, TocHeading } from './TableOfContents';
+export type { TableOfContentsLabels, TableOfContentsProps, TocHeading } from './TableOfContents';
