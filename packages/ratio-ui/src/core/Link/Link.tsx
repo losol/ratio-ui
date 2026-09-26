@@ -7,7 +7,7 @@ import React from 'react';
 import type { SpacingProps } from '../../tokens/spacing';
 import { buildSpacingClasses } from '../../tokens/spacing';
 import { cn } from '../../utils/cn';
-import { buttonStyles } from '../Button/Button';
+import { buttonSizes, buttonStyles } from '../Button/Button';
 import './Link.css';
 
 export interface LinkProps extends SpacingProps {
@@ -15,6 +15,8 @@ export interface LinkProps extends SpacingProps {
   children?: React.ReactNode;
   className?: string;
   variant?: 'button-primary' | 'button-secondary' | 'button-light' | 'button-outline' | 'button-text';
+  /** Size of a `button-*` link, matching `Button`'s sizes. @default 'md' */
+  size?: keyof typeof buttonSizes;
   block?: boolean;
   linkOverlay?: boolean;
   component?: React.ElementType; // e.g. next/link
@@ -32,6 +34,7 @@ export const Link = React.forwardRef<HTMLElement, LinkProps>(
       className = '',
       block = false,
       variant,
+      size = 'md',
       linkOverlay = false,
       padding, paddingX, paddingY, paddingTop, paddingBottom,
       margin, marginX, marginY, marginTop, marginBottom,
@@ -59,7 +62,9 @@ export const Link = React.forwardRef<HTMLElement, LinkProps>(
     let variantClasses = '';
     if (variant?.startsWith('button-')) {
       const key = variant.replace('button-', '') as keyof typeof buttonStyles;
-      if (buttonStyles[key]) variantClasses = 'px-4 py-2 inline-flex items-center gap-2 whitespace-nowrap ' + buttonStyles[key];
+      // Same size classes as `Button` (padding and font size), so a button
+      // link lines up with a button next to it.
+      if (buttonStyles[key]) variantClasses = cn(buttonSizes[size], 'inline-flex items-center justify-center gap-2 whitespace-nowrap', buttonStyles[key]);
     }
 
     const classes = cn(

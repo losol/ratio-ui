@@ -2,6 +2,7 @@ import { Meta, StoryFn } from '@storybook/react-vite';
 import type { MouseEvent } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { Button } from '../Button';
 import { Link, LinkProps } from './Link';
 
 const meta: Meta<typeof Link> = {
@@ -191,4 +192,26 @@ export const LinkTest = {
     await userEvent.click(buttonLink);
     await expect(clickSpy).toHaveBeenCalledTimes(2);
   },
+};
+
+/** A button link lines up with a `Button` of the same size next to it. */
+export const NextToButton: StoryFn = () => (
+  <div className="flex items-center gap-2">
+    <Button variant="secondary">Cancel</Button>
+    <Link href="#" variant="button-primary">Continue</Link>
+    <Link href="#" variant="button-outline" size="sm">Small link</Link>
+    <Button variant="outline" size="sm">Small button</Button>
+  </div>
+);
+NextToButton.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  const height = (el: HTMLElement) => el.getBoundingClientRect().height;
+  await expect(height(canvas.getByRole('link', { name: 'Continue' }))).toBeCloseTo(
+    height(canvas.getByRole('button', { name: 'Cancel' })),
+    0,
+  );
+  await expect(height(canvas.getByRole('link', { name: 'Small link' }))).toBeCloseTo(
+    height(canvas.getByRole('button', { name: 'Small button' })),
+    0,
+  );
 };
