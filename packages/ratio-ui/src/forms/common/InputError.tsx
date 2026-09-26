@@ -12,7 +12,7 @@ type ErrorProps = {
   className?: string;
 };
 
-const InputError: React.FC<ErrorProps> = ({ errors, name, className = 'text-red-500' }) => {
+const InputError: React.FC<ErrorProps> = ({ errors, name, className = 'text-error-text' }) => {
   const errorMessage = errors?.[name]?.message;
 
   if (!errorMessage) return null;
