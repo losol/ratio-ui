@@ -91,7 +91,7 @@ export function EmptyState({
           {icon}
         </span>
       )}
-      {/* `my-0`: global.css gives every <p> vertical margins, which would
+      {/* `my-0`: ratio-ui.css gives every <p> vertical margins, which would
           stack on top of the flex gap and pull the block apart. */}
       <p className={cn(styles.title, 'my-0 font-medium text-(--text)')}>{title}</p>
       {description && (

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Builds dist/components.css: ratio-ui.css without the page-level base
-// styles (html, body, headings, paragraphs) that live in src/global.css.
+// styles (html, body, headings, paragraphs) that live in src/ratio-ui.css.
 //
 // Vite emits one stylesheet for the library: the Tailwind build of
 // src/ratio-ui.css plus the plain CSS the components import (Button.css,

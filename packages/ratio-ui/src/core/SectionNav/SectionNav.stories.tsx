@@ -71,7 +71,7 @@ const items = [
  * The full detail page: `Navbar sticky` as row one, `SectionNav` pinned
  * right under it with `top` in the same unit the navbar is sized in, and
  * `--scroll-margin-top` set once on the page so anchor jumps land below
- * both rows (every element with an id picks it up from `global.css`). The
+ * both rows (every element with an id picks it up from `ratio-ui.css`). The
  * current section is highlighted as you scroll; "Register" points into
  * the sticky aside and stays out of the spy (`track: false`).
  */

@@ -104,7 +104,7 @@ them. Import the ones you use after the main stylesheet:
 @import '@eventuras/ratio-ui/themes/bureau.css';
 ```
 
-If you import `ratio-ui.css` or `global.css`, set `data-theme` on `<html>`
+If you import `ratio-ui.css` or `components.css`, set `data-theme` on `<html>`
 before first paint. The CSS export guide includes a small initialization
 example.
 

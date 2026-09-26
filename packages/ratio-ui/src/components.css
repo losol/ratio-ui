@@ -7,7 +7,7 @@
 /**
  * Ratio UI - Component styles
  * Tailwind, design tokens and the utilities the components use, without the
- * page-level base styles (html, body, headings, paragraphs) in global.css.
+ * page-level base styles (html, body, headings, paragraphs) in ratio-ui.css.
  * Import this to use ratio-ui components inside an app that styles its own
  * page. Brand fonts are opt-in — import `@eventuras/ratio-ui/fonts.css`
  * separately if you need Source Serif 4 + Source Sans 3.
