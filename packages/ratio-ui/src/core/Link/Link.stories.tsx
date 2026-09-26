@@ -2,6 +2,7 @@ import { Meta, StoryFn } from '@storybook/react-vite';
 import type { MouseEvent } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
+import { ShoppingCart } from '../../icons';
 import { Button } from '../Button';
 import { Link, LinkProps } from './Link';
 
@@ -195,7 +196,7 @@ export const LinkTest = {
 };
 
 /** A button link lines up with a `Button` of the same size next to it. */
-export const NextToButton: StoryFn = () => (
+export const NextToButton: LinkStory = () => (
   <div className="flex items-center gap-2">
     <Button variant="secondary">Cancel</Button>
     <Link href="#" variant="button-primary">Continue</Link>
@@ -212,6 +213,24 @@ NextToButton.play = async ({ canvasElement }) => {
   );
   await expect(height(canvas.getByRole('link', { name: 'Small link' }))).toBeCloseTo(
     height(canvas.getByRole('button', { name: 'Small button' })),
+    0,
+  );
+};
+
+/** `block` makes a button link fill the row and keep its icon/label alignment. */
+export const BlockButton: LinkStory = () => (
+  <div style={{ width: '20rem' }}>
+    <Link href="#" variant="button-primary" block>
+      <ShoppingCart size={16} aria-hidden="true" />
+      Go to checkout
+    </Link>
+  </div>
+);
+BlockButton.play = async ({ canvasElement }) => {
+  const link = within(canvasElement).getByRole('link', { name: 'Go to checkout' });
+  await expect(getComputedStyle(link).display).toBe('flex');
+  await expect(link.getBoundingClientRect().width).toBeCloseTo(
+    link.parentElement!.getBoundingClientRect().width,
     0,
   );
 };

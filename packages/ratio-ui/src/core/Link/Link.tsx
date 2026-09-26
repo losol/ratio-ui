@@ -58,9 +58,12 @@ export const Link = React.forwardRef<HTMLElement, LinkProps>(
     const isTransparentVariant = variant === 'button-outline' || variant === 'button-text';
     const textColor = isTransparentVariant ? 'text-(--text)' : '';
 
-    const blockClass = block ? 'block' : '';
+    const isButtonVariant = variant?.startsWith('button-') ?? false;
+    // A button link keeps its flex layout when it fills the row, like
+    // `Button block`; plain `block` would drop the icon/label alignment.
+    const blockClass = block ? (isButtonVariant ? 'flex w-full' : 'block') : '';
     let variantClasses = '';
-    if (variant?.startsWith('button-')) {
+    if (variant && isButtonVariant) {
       const key = variant.replace('button-', '') as keyof typeof buttonStyles;
       // Same size classes as `Button` (padding and font size), so a button
       // link lines up with a button next to it.

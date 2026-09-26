@@ -11,7 +11,7 @@ export function Unauthorized({ homeUrl = '/', variant = 'large' }: Readonly<Unau
   const isSmall = variant === 'small';
 
   return (
-    <div className={`text-center ${isSmall ? 'py-8' : 'py-20'} bg-red-500 text-white`}>
+    <div className={`text-center ${isSmall ? 'py-8' : 'py-20'} bg-error text-error-on`}>
       <div className="inline-flex items-center justify-center p-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
