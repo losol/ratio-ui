@@ -16,7 +16,6 @@ export default defineReactLibConfig({
     /^@react-aria\//,
     /^@react-stately\//,
     /^@internationalized\//,
-    /^@swc\/helpers/,
     /^lucide-react/,
     'clsx',
   ],
