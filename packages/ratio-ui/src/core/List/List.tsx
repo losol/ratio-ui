@@ -48,11 +48,11 @@ const variantStyles: Record<ListVariant, { list: string; item: string }> = {
     item: 'mb-4',
   },
   markdown: {
-    list: 'ml-6 pb-4 space-y-2 marker:text-blue-600',
+    list: 'ml-6 pb-4 space-y-2 marker:text-(--primary)',
     item: 'pl-2 leading-relaxed',
   },
   'markdown-compact': {
-    list: 'ml-6 pb-3 space-y-1.5 marker:text-blue-600',
+    list: 'ml-6 pb-3 space-y-1.5 marker:text-(--primary)',
     item: 'pl-2',
   },
 };
