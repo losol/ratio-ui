@@ -4,6 +4,7 @@
 
 import { Input as AriaInput } from 'react-aria-components';
 import type { ComponentPropsWithRef } from 'react';
+import { mergeClassName } from '../../utils/mergeClassName';
 
 /**
  * Default input styles for React Aria components
@@ -31,8 +32,9 @@ export const inputStyles = {
  * ```
  *
  * @example
- * // With custom styling
- * <Input className="w-full px-4 py-3" placeholder="Custom styled" />
+ * // Extra classes merge on top of the defaults; `unstyled` drops them
+ * <Input className="px-4 py-3" placeholder="Roomier" />
+ * <Input unstyled className="bg-transparent outline-none" />
  * ```
  *
  * @example
@@ -43,6 +45,17 @@ export const inputStyles = {
  * </SearchField>
  * ```
  */
-export function Input({ className, ref, ...props }: ComponentPropsWithRef<typeof AriaInput>) {
-  return <AriaInput ref={ref} className={className ?? inputStyles.default} {...props} />;
+export type InputProps = ComponentPropsWithRef<typeof AriaInput> & {
+  /** Drop the default classes and style from scratch with `className`. */
+  unstyled?: boolean;
+};
+
+export function Input({ className, unstyled = false, ref, ...props }: InputProps) {
+  return (
+    <AriaInput
+      ref={ref}
+      className={mergeClassName(inputStyles.default, className, unstyled)}
+      {...props}
+    />
+  );
 }

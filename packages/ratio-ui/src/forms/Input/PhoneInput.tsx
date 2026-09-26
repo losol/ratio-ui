@@ -341,6 +341,7 @@ export function PhoneInput({
           onBlur={handleNumberBlur}
           disabled={disabled}
           placeholder="Enter phone number"
+          unstyled
           className="p-2 bg-card text-(--text) border-0 rounded-none focus:ring-0 flex-1 w-full"
           data-testid={testId}
         />

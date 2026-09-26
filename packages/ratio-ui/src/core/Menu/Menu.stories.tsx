@@ -60,7 +60,7 @@ export const UserMenu: MenuStory = () => {
   return (
     <div className="flex justify-end">
       <Menu onOpenChange={fn()} maxHeight={480}>
-        <Menu.Trigger className="inline-flex items-center gap-2.5 pl-1 pr-4 py-1 rounded-full border border-border-2 bg-card text-(--text) hover:border-(--primary) focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-(--focus-ring) transition-all">
+        <Menu.Trigger unstyled className="inline-flex items-center gap-2.5 pl-1 pr-4 py-1 rounded-full border border-border-2 bg-card text-(--text) hover:border-(--primary) focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-(--focus-ring) transition-all">
           <Avatar name="Hypatia" size="sm" />
           <span className="text-sm">hypatia@museion.alexandria</span>
           <Menu.Chevron className="ml-0 h-3.5 w-3.5 text-(--text-muted)" />

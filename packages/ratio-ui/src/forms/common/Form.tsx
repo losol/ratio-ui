@@ -3,12 +3,16 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { FC, ReactNode } from 'react';
+import { cn } from '../../utils/cn';
 
 interface FormProps  {
   action?: any;
   children: ReactNode;
   onSubmit?: (data: any) => void;
+  /** Extra classes, merged on top of the defaults. */
   className?: string;
+  /** Drop the default classes and style from scratch with `className`. */
+  unstyled?: boolean;
   testId?: string;
 }
 
@@ -20,7 +24,7 @@ export const Form: FC<FormProps> = (props) => {
     <form
         action={props.action}
         onSubmit={props.onSubmit}
-        className={props.className ?? defaultFormClassName}
+        className={cn(!props.unstyled && defaultFormClassName, props.className)}
         data-testid={props.testId}
       >
         {props.children}

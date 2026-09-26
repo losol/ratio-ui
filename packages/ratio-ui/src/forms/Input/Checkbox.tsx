@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import React, { FC, InputHTMLAttributes, ReactNode } from 'react';
+import { cn } from '../../utils/cn';
 
 export const checkboxStyles = {
   container: 'my-2',
@@ -16,15 +17,22 @@ export const checkboxStyles = {
 
 interface CheckboxComponentProps {
   id: string;
+  /** Extra classes for the checkbox, merged on top of the defaults. */
   className?: string;
   defaultChecked?: boolean;
   disabled?: boolean;
+  /** Extra classes for the wrapper, merged on top of the defaults. */
   containerClassName?: string;
+  /** Drop the default classes of the checkbox and its wrapper. */
+  unstyled?: boolean;
 }
 
 interface SubComponentProps {
   children: ReactNode;
+  /** Extra classes, merged on top of the defaults. */
   className?: string;
+  /** Drop the default classes and style from scratch with `className`. */
+  unstyled?: boolean;
   htmlFor?: string;
 }
 
@@ -42,8 +50,8 @@ type CheckboxWithSubComponents = React.ForwardRefExoticComponent<
   Description: FC<SubComponentProps>;
 };
 
-export const CheckBoxLabel: FC<SubComponentProps> = ({ children, className, htmlFor }) => {
-  const labelClassName = className || checkboxStyles.label;
+export const CheckBoxLabel: FC<SubComponentProps> = ({ children, className, unstyled = false, htmlFor }) => {
+  const labelClassName = cn(!unstyled && checkboxStyles.label, className);
   return (
     <label htmlFor={htmlFor} className={labelClassName}>
       {children}
@@ -51,8 +59,8 @@ export const CheckBoxLabel: FC<SubComponentProps> = ({ children, className, html
   );
 };
 
-export const CheckBoxDescription: FC<SubComponentProps> = ({ children, className }) => {
-  const descriptionClassName = className || checkboxStyles.description;
+export const CheckBoxDescription: FC<SubComponentProps> = ({ children, className, unstyled = false }) => {
+  const descriptionClassName = cn(!unstyled && checkboxStyles.description, className);
   return <p className={descriptionClassName}>{children}</p>;
 };
 
@@ -60,6 +68,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>((props, ref) 
   const {
     className,
     containerClassName,
+    unstyled = false,
     children,
     id,
     disabled,
@@ -68,8 +77,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>((props, ref) 
     ...rest
   } = props;
 
-  const checkboxClassName = className || checkboxStyles.checkbox;
-  const containerClass = containerClassName || checkboxStyles.container;
+  const checkboxClassName = cn(!unstyled && checkboxStyles.checkbox, className);
+  const containerClass = cn(!unstyled && checkboxStyles.container, containerClassName);
 
   // Add the htmlFor attribute to the label
   const enhancedChildren = React.Children.map(children, child => {

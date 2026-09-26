@@ -234,6 +234,7 @@ export function Lookup<T>({
       {shouldShowList && (
         <ListBox
           items={list.items as Iterable<T & { id?: Key; }>}
+          unstyled
           className={
             listClassName ??
             'mt-1 bg-card border border-border-1 rounded-lg shadow-lg max-h-60 overflow-auto outline-none'
@@ -252,7 +253,6 @@ export function Lookup<T>({
               <ListBoxItem
                 id={getItemKey(typed)}
                 textValue={textValueOf(typed)}
-                className="px-3 py-2 cursor-pointer outline-none rounded text-(--text) hover:bg-card-hover focus:bg-card-hover selected:bg-(--primary) selected:text-(--text-on-primary)"
               >
                 {renderItem(typed)}
               </ListBoxItem>

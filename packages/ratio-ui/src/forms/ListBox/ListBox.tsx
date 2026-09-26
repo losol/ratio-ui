@@ -6,20 +6,29 @@
 
 import { ListBox as AriaListBox, ListBoxItem as AriaListBoxItem } from 'react-aria-components';
 import type { ComponentProps } from 'react';
+import { mergeClassName } from '../../utils/mergeClassName';
 
-export type ListBoxProps = ComponentProps<typeof AriaListBox>;
-export type ListBoxItemProps = ComponentProps<typeof AriaListBoxItem>;
+export type ListBoxProps = ComponentProps<typeof AriaListBox> & {
+  /** Drop the default classes and style from scratch with `className`. */
+  unstyled?: boolean;
+};
+export type ListBoxItemProps = ComponentProps<typeof AriaListBoxItem> & {
+  /** Drop the default classes and style from scratch with `className`. */
+  unstyled?: boolean;
+};
+
+const listBoxDefault =
+  'mt-1 p-1 bg-card border border-border-1 rounded-lg shadow-lg max-h-60 overflow-auto';
+const listBoxItemDefault =
+  'px-3 py-2 cursor-pointer outline-none rounded text-(--text) hover:bg-card-hover focus:bg-card-hover selected:bg-(--primary) selected:text-(--text-on-primary)';
 
 /**
  * ListBox with ratio-ui defaults
  */
-export function ListBox({ className, ...props }: ListBoxProps) {
+export function ListBox({ className, unstyled = false, ...props }: ListBoxProps) {
   return (
     <AriaListBox
-      className={
-        className ??
-        'mt-1 p-1 bg-card border border-border-1 rounded-lg shadow-lg max-h-60 overflow-auto'
-      }
+      className={mergeClassName(listBoxDefault, className, unstyled)}
       {...props}
     />
   );
@@ -28,13 +37,10 @@ export function ListBox({ className, ...props }: ListBoxProps) {
 /**
  * ListBoxItem with ratio-ui defaults
  */
-export function ListBoxItem({ className, ...props }: ListBoxItemProps) {
+export function ListBoxItem({ className, unstyled = false, ...props }: ListBoxItemProps) {
   return (
     <AriaListBoxItem
-      className={
-        className ??
-        'px-3 py-2 cursor-pointer outline-none rounded text-(--text) hover:bg-card-hover focus:bg-card-hover selected:bg-(--primary) selected:text-(--text-on-primary)'
-      }
+      className={mergeClassName(listBoxItemDefault, className, unstyled)}
       {...props}
     />
   );
