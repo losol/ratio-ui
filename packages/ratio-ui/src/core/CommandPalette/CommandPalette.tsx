@@ -116,7 +116,9 @@ export function CommandPalette({
 }: Readonly<CommandPaletteProps>) {
   const emptyText = (q: string) =>
     labels?.empty?.(q) ??
-    (emptyMessage ? emptyMessage.replace('{query}', q) : `No results for \u201c${q}\u201d`);
+    (emptyMessage !== undefined
+      ? emptyMessage.replace('{query}', q)
+      : `No results for \u201c${q}\u201d`);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
