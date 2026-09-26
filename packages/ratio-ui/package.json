@@ -83,23 +83,29 @@
       "import": "./dist/utils/index.js"
     },
     "./ratio-ui.css": "./dist/ratio-ui.css",
-    "./global.css": "./dist/global.css",
+    "./components.css": "./dist/components.css",
+    "./global.css": "./dist/ratio-ui.css",
     "./fonts.css": "./src/fonts.css",
     "./themes/*.css": "./src/themes/*.css"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "*.css",
+    "**/*.css"
+  ],
   "files": [
     "dist",
     "src/global.css",
+    "src/components.css",
     "src/tokens",
     "src/fonts",
     "src/fonts.css",
     "src/themes"
   ],
   "scripts": {
-    "build": "tsc && vite build && node scripts/check-client-statics.mjs && node scripts/check-token-syntax.mjs",
+    "build": "tsc && vite build && node scripts/build-components-css.mjs && node scripts/check-client-statics.mjs && node scripts/check-token-syntax.mjs",
     "lint": "eslint .",
     "check:client-statics": "node scripts/check-client-statics.mjs",
     "check:token-syntax": "node scripts/check-token-syntax.mjs"
@@ -115,9 +121,11 @@
     "@eventuras/eslint-config": "^1.0.4",
     "@eventuras/typescript-config": "^1.0.0",
     "@eventuras/vite-config": "^0.3.1",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint-plugin-storybook": "^10.6.0",
+    "postcss": "^8.5.28",
     "react-hook-form": "^7.88.0",
     "tailwindcss": "^4.3.3",
     "tailwindcss-react-aria-components": "^2.2.0",

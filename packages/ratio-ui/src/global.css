@@ -6,69 +6,12 @@
 
 /**
  * Ratio UI - Complete styling
- * Includes Tailwind, design tokens, and base styles.
- * Brand fonts are opt-in — import `@eventuras/ratio-ui/fonts.css`
+ * The component styles plus page-level base styles: html, body, headings and
+ * paragraphs. Brand fonts are opt-in — import `@eventuras/ratio-ui/fonts.css`
  * separately if you need Source Serif 4 + Source Sans 3.
  */
 
-/* Tailwind + plugins */
-@import 'tailwindcss';
-
-/* Design tokens — kept with the imports so every @import precedes the
-   @plugin/@source statements below.  */
-@import './tokens/index.css';
-
-@plugin 'tailwindcss-react-aria-components';
-@source '**/*.tsx';
-
-/*
- * Utilities the bundled CSS guarantees. Tailwind only scans ratio-ui's own
- * tsx, so a consumer that imports `ratio-ui.css` as-is (no Tailwind build of
- * its own) gets exactly the classes the components happen to use — plus this
- * list. Whole small scales, not individual holes, so what a consumer can rely
- * on is predictable (a `pt-8` that silently no-ops is worse than none):
- *   - spacing: p/m families and gap on steps 0–16 and 20/24/28/32/40
- *   - stacking: z-0 … z-50 in tens
- *   - responsive display: sm/md/lg × block/hidden/inline/flex/inline-flex
- * Anything beyond needs the consumer's own Tailwind build — see
- * docs/css-exports.md.
- */
-@source inline("{p,px,py,pt,pb,pl,pr,m,mx,my,mt,mb,ml,mr,gap}-{{0..16},20,24,28,32,40}");
-@source inline("z-{0,10,20,30,40,50}");
-@source inline("{sm,md,lg}:{block,hidden,inline,flex,inline-flex}");
-/* Hero/section viewport heights. */
-@source inline("min-h-[20vh] min-h-[30vh] min-h-[33vh] min-h-[40vh] min-h-[50vh] min-h-[60vh] min-h-[66vh] min-h-[70vh] min-h-[80vh]");
-/* Dialog size variants — safelisted because the class name is looked up
-   from the size prop at runtime, not written inline. */
-@source inline("max-w-md max-w-lg max-w-2xl max-w-4xl");
-/* Surface tone utilities — override --text for descendants. Used by
-   components like Heading/Button/Link/Navbar that read `var(--text)`
-   so a parent container can declare "everything inside me is on a
-   dark/light surface" without each child needing a per-component prop. */
-@source inline("surface-dark surface-light");
-/* Spacing token utilities (p-xs..xl, px/py/pt/pb, m/mx/my/mt/mb, gap)
-   — safelisted because `buildSpacingClasses()` constructs the class
-   names at runtime via template literals, which Tailwind's scanner
-   can't see. Defined as @utility in tokens/spacing.css. */
-@source inline("{p,px,py,pt,pb,m,mx,my,mt,mb,gap}-{xs,sm,md,lg,xl}");
-@source inline("{p,px,py,pt,pb,m,mx,my,mt,mb,gap}-0");
-
-/* Dark mode variant.
-   Named themes (e.g. bureau) carry mode on a separate axis
-   (data-color-scheme), so match that arm too — additive, the
-   legacy data-theme="dark" arms are untouched. */
-@custom-variant dark (&:where(html[data-theme="dark"] &, body[data-theme="dark"] &, [data-theme="dark"] *, [data-color-scheme="dark"] *));
-
-/* (Design tokens are imported at the top, with the other @import rules.) */
-
-/* Surface tone overrides. tokens/theme.css declares the full semantic set
-   on these classes, so a marked container is a complete local theme context.
-   `color: var(--text)` here lets plain HTML descendants inherit the tone.
-   (The `dark:` variant stays keyed to the page attributes — use tokens.) */
-.surface-dark,
-.surface-light {
-  color: var(--text);
-}
+@import './components.css';
 
 /* Base styles */
 @layer base {

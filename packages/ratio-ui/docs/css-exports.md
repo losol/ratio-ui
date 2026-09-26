@@ -12,15 +12,17 @@ import '@eventuras/ratio-ui/ratio-ui.css';
 
 **Includes:**
 - Design tokens (colors, spacing, typography, borders)
-- Global page layout (html, body, main)
-- Typography styles (h1-h6, p, blockquote)  
 - Component styles
 - Utility classes
+- Page-level base styles: `html`, `body`, `main`, headings, paragraphs, and
+  the opt-in flash guard
 
 **Use when:**
 - Building a new app from scratch
 - You want ratio-ui to control the entire page design
 - You're okay with global body and typography styles
+
+`@eventuras/ratio-ui/global.css` is the same stylesheet under its older name.
 
 ## 2. Component-Only Styling (`components.css`)
 
@@ -33,39 +35,26 @@ import '@eventuras/ratio-ui/components.css';
 **Includes:**
 - Design tokens (colors, spacing, typography, borders)
 - Component styles
-- Utility classes
+- Utility classes (the same guaranteed set as `ratio-ui.css`)
 
 **Excludes:**
-- Global html/body styling
-- Global typography (h1-h6, p, blockquote)
+- Global `html`/`body` styling
+- Global typography (h1-h6, p)
+- The flash guard and the `scroll-margin-top` on anchor targets
 
 **Use when:**
 - Integrating ratio-ui into an existing app with its own design system
 - You only want to use specific components
 - You want to control your own global styles
 
-## 3. Global Page Styles Only (`global.css`)
-
-Import this if you want only the page-level styles:
-
-```typescript
-import '@eventuras/ratio-ui/global.css';
-```
-
-**Includes:**
-- Global html/body styling (light theme by default)
-- Main layout styling
-- Opt-in flash guard for JS-resolved themes
-
-**Use when:**
-- You want the page structure but will use custom components
-- Building a custom design system on top of ratio-ui foundations
+Import one or the other, not both: `ratio-ui.css` already contains everything
+in `components.css`.
 
 ## Which utility classes are in the bundle
 
 The bundled CSS is generated from ratio-ui's own sources, so it contains the
 Tailwind utilities the components use — not the whole of Tailwind. On top of
-that, `global.css` safelists a few whole scales so an app **without a
+that, both stylesheets safelist a few whole scales so an app **without a
 Tailwind build of its own** has something predictable to lean on:
 
 | Family | Guaranteed |
@@ -128,7 +117,7 @@ can still paint light and then flip when `data-color-scheme` lands:
 resolved:
 
 ```css
-/* shipped in global.css */
+/* shipped in ratio-ui.css */
 html[data-theme-loading]:not([data-theme]):not([data-color-scheme]) { opacity: 0; }
 ```
 
