@@ -1,4 +1,5 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { List, ListProps, ListItem } from './List';
 
 const meta: Meta<typeof List> = {
@@ -40,6 +41,16 @@ export const UnorderedList: ListStory = () => (
     <ListItem>Fourth item in the list</ListItem>
   </List>
 );
+// Markers follow the theme's primary colour, not a fixed blue.
+UnorderedList.play = async ({ canvasElement }) => {
+  const item = within(canvasElement).getByText('First item in the list');
+  const probe = document.createElement('span');
+  probe.style.color = 'var(--primary)';
+  canvasElement.appendChild(probe);
+  const primary = getComputedStyle(probe).color;
+  probe.remove();
+  await expect(getComputedStyle(item, '::marker').color).toBe(primary);
+};
 
 export const OrderedList: ListStory = () => (
   <List as="ol" variant="markdown">
