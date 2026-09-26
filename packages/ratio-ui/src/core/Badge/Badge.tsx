@@ -9,9 +9,10 @@ import { cn } from '../../utils/cn';
 export type BadgeVariant = 'filled' | 'subtle' | 'count';
 
 /**
- * Brand tone, for badges that carry no status — same vocabulary as `Heading`.
- * `inherit` takes the surrounding text colour on a translucent tint of it, so
- * a badge composed inside a button, tab or link matches its host.
+ * Tone for badges that carry no status. `primary` and `accent` are the brand
+ * colours, as in `Heading.Eyebrow`. `inherit` takes the surrounding text
+ * colour on a translucent tint of it, so a badge composed inside a button, tab
+ * or link matches its host.
  */
 export type BadgeTone = 'primary' | 'accent' | 'inherit';
 
