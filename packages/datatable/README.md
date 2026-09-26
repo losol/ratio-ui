@@ -14,7 +14,7 @@ pnpm add @eventuras/datatable @eventuras/ratio-ui
 Install the peer dependencies it expects:
 
 ```bash
-pnpm add lucide-react react react-dom
+pnpm add react react-dom
 ```
 
 TanStack Table comes with the package — there is no need to install it

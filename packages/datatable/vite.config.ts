@@ -9,9 +9,6 @@ export default defineReactLibConfig({
     '@tanstack/match-sorter-utils',
     /^@tanstack\//,
 
-    // Icons
-    'lucide-react',
-
     // Workspace dependencies
     '@eventuras/ratio-ui',
     /^@eventuras\/ratio-ui/,
