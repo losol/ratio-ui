@@ -42,9 +42,17 @@ export interface CommandPaletteProps {
   shortcut?: 'cmd+k' | 'cmd+j' | 'cmd+p';
   /** Keyboard shortcut hint displayed on trigger button */
   shortcutHint?: string;
-  /** Message when query is entered but no items match. {query} is replaced with the current query */
+  /** Message when query is entered but no items match. {query} is replaced with the current query. @deprecated Use `labels.empty`. Still honoured until the next major. */
   emptyMessage?: string;
   className?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: CommandPaletteLabels;
+}
+
+/** Built-in text of `CommandPalette`. Each entry falls back to English. */
+export interface CommandPaletteLabels {
+  /** Shown when no item matches the query. @default (query) => `No results for “${query}”` */
+  empty?: (query: string) => string;
 }
 
 const SHORTCUT_KEYS: Record<string, string> = {
@@ -102,9 +110,13 @@ export function CommandPalette({
   placeholder = 'Search...',
   shortcut = 'cmd+k',
   shortcutHint = '⌘K',
-  emptyMessage = 'No results for \u201c{query}\u201d',
+  emptyMessage,
   className = '',
+  labels,
 }: Readonly<CommandPaletteProps>) {
+  const emptyText = (q: string) =>
+    labels?.empty?.(q) ??
+    (emptyMessage ? emptyMessage.replace('{query}', q) : `No results for \u201c${q}\u201d`);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
@@ -304,7 +316,7 @@ export function CommandPalette({
             {/* Empty state */}
             {query && items.length === 0 && (
               <div className="px-4 py-8 text-center text-sm text-(--text-subtle)">
-                {emptyMessage.replace('{query}', query)}
+                {emptyText(query)}
               </div>
             )}
           </div>

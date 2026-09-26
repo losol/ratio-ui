@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, within } from 'storybook/test';
 import { useState } from 'react';
 import { Panel } from './Panel';
 import { Button } from '../Button';
@@ -308,4 +309,33 @@ export const StaticContent: Story = {
       </Panel.Body>
     </Panel>
   ),
+};
+
+/**
+ * Built-in text resolves `labels` first, then the deprecated flat prop, then
+ * the English default.
+ */
+export const DismissLabelPrecedence: Story = {
+  render: () => (
+    <Stack gap="md">
+      <Panel dismissible onDismiss={() => {}}>Default name</Panel>
+      <Panel dismissible onDismiss={() => {}} dismissLabel="Skjul (gammel prop)">
+        Deprecated prop
+      </Panel>
+      <Panel
+        dismissible
+        onDismiss={() => {}}
+        dismissLabel="Skjul (gammel prop)"
+        labels={{ dismiss: 'Skjul' }}
+      >
+        labels wins
+      </Panel>
+    </Stack>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Skjul (gammel prop)' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Skjul' })).toBeInTheDocument();
+  },
 };

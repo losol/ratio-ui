@@ -4,6 +4,7 @@
 
 export { Panel } from './Panel';
 export type {
+  PanelLabels,
   PanelProps,
   PanelStatus,
   PanelAccent,

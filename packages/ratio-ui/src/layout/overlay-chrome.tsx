@@ -25,7 +25,7 @@ export const OverlayCloseButton = ({
     size="lg"
     onPress={onPress}
     className="-mt-1 -mr-1 h-11 min-w-11 border-border-1"
-    ariaLabel={label}
+    aria-label={label}
   >
     <X size={20} />
   </ActionButton>

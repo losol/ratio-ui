@@ -28,13 +28,13 @@ const ICON = 15;
 export const Toolbar: Story = {
   render: () => (
     <div className="flex items-center gap-1.5">
-      <ActionButton ariaLabel="Pause copying">
+      <ActionButton aria-label="Pause copying">
         <Pause size={ICON} />
       </ActionButton>
-      <ActionButton ariaLabel="Resume copying">
+      <ActionButton aria-label="Resume copying">
         <Play size={ICON} />
       </ActionButton>
-      <ActionButton ariaLabel="Proofread">
+      <ActionButton aria-label="Proofread">
         <Check size={ICON} />
       </ActionButton>
       <ActionButton variant="solid">
@@ -119,13 +119,13 @@ export const Sizes: Story = {
 export const Round: Story = {
   render: () => (
     <div className="flex items-center gap-3">
-      <ActionButton round ariaLabel="Open menu">
+      <ActionButton round aria-label="Open menu">
         <MenuIcon size={16} />
       </ActionButton>
-      <ActionButton round size="lg" ariaLabel="New deliveries">
+      <ActionButton round size="lg" aria-label="New deliveries">
         <Bell size={18} />
       </ActionButton>
-      <ActionButton round variant="solid" ariaLabel="Add scroll">
+      <ActionButton round variant="solid" aria-label="Add scroll">
         <Plus size={16} />
       </ActionButton>
     </div>

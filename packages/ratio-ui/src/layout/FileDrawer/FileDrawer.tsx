@@ -19,10 +19,20 @@ export interface FileDrawerProps {
   src?: string;
   /** If set, shows a download button with this filename */
   downloadFilename?: string;
-  /** Label for the download button */
+  /** Label for the download button. @deprecated Use `labels.download`. Still honoured until the next major. */
   downloadLabel?: string;
-  /** Label for the close button */
+  /** Label for the close button. @deprecated Use `labels.close`. Still honoured until the next major. */
   closeLabel?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: FileDrawerLabels;
+}
+
+/** Built-in text of `FileDrawer`. Each entry falls back to English. */
+export interface FileDrawerLabels {
+  /** @default 'Download' */
+  download?: string;
+  /** @default 'Close' */
+  close?: string;
 }
 
 /**
@@ -38,9 +48,12 @@ export const FileDrawer = ({
   contentType = 'text/html',
   src,
   downloadFilename,
-  downloadLabel = 'Download',
-  closeLabel = 'Close',
+  downloadLabel,
+  closeLabel,
+  labels,
 }: FileDrawerProps) => {
+  const download = labels?.download ?? downloadLabel ?? 'Download';
+  const close = labels?.close ?? closeLabel ?? 'Close';
   const blobUrl = useMemo(() => {
     if (!isOpen || src || !content) return null;
     return URL.createObjectURL(new Blob([content], { type: contentType }));
@@ -80,11 +93,11 @@ export const FileDrawer = ({
       <Drawer.Footer>
         {downloadFilename && iframeSrc && (
           <Button onClick={handleDownload} variant="primary">
-            {downloadLabel}
+            {download}
           </Button>
         )}
         <Button onClick={onClose} variant="secondary">
-          {closeLabel}
+          {close}
         </Button>
       </Drawer.Footer>
     </Drawer>

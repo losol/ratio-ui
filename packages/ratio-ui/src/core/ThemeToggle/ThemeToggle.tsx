@@ -13,7 +13,9 @@ export interface ThemeToggleProps {
   onThemeChange: (theme: 'light' | 'dark') => void;
   /** Optional className for custom styling */
   className?: string;
-  /** Optional aria-label for accessibility */
+  /** Accessible name of the toggle. @default 'Toggle theme' */
+  'aria-label'?: string;
+  /** @deprecated Use the native `aria-label`. Still honoured until the next major. */
   ariaLabel?: string;
   /** Built-in text. Each entry falls back to English. */
   labels?: ThemeToggleLabels;
@@ -42,9 +44,11 @@ export const ThemeToggle = ({
   theme,
   onThemeChange,
   className = '',
-  ariaLabel = 'Toggle theme',
+  'aria-label': ariaLabelAttr,
+  ariaLabel,
   labels,
 }: ThemeToggleProps) => {
+  const name = ariaLabelAttr ?? ariaLabel ?? 'Toggle theme';
   const [mounted, setMounted] = useState(false);
   const isDark = theme === 'dark';
 
@@ -64,7 +68,7 @@ export const ThemeToggle = ({
         size="sm"
         onClick={handleToggle}
         className={className}
-        aria-label={ariaLabel}
+        aria-label={name}
         type="button"
       >
         <span className="w-5 h-5 block" />
@@ -78,7 +82,7 @@ export const ThemeToggle = ({
       size="sm"
       onClick={handleToggle}
       className={className}
-      aria-label={ariaLabel}
+      aria-label={name}
       type="button"
       suppressHydrationWarning
     >

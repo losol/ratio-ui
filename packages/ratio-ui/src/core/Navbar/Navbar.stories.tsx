@@ -60,7 +60,7 @@ export const PocketLibrary: Story = {
       </Navbar.Search>
       <Navbar.Spacer className="lg:hidden" />
       <Navbar.Actions>
-        <Navbar.Toggle controls="search" ariaLabel="Search" className="lg:hidden">
+        <Navbar.Toggle controls="search" aria-label="Search" className="lg:hidden">
           <Search size={16} />
         </Navbar.Toggle>
         <Navbar.Toggle className="md:hidden" />
@@ -130,7 +130,7 @@ export const ConsoleHeader: Story = {
       <Navbar.Actions>
         {/* Below lg the inline search is hidden — this toggle folds a search
             panel out under the bar instead (custom icon, no burger morph). */}
-        <Navbar.Toggle controls="search" className="lg:hidden" ariaLabel="Search">
+        <Navbar.Toggle controls="search" className="lg:hidden" aria-label="Search">
           <Search size={16} />
         </Navbar.Toggle>
         <Menu>

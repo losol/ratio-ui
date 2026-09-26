@@ -12,5 +12,6 @@ export type {
   MenuSectionProps,
   MenuOptionProps,
   MenuSeparatorProps,
+  MenuThemeToggleLabels,
   MenuThemeToggleProps,
 } from './Menu';

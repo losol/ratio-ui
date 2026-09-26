@@ -103,7 +103,7 @@ export const Images: Story = {
       accept={['image/*']}
       multiple
       maxSize={5 * 1024 * 1024}
-      dropzoneLabel="Drag images here"
+      labels={{ dropHint: 'Drag images here' }}
     />
   ),
 };
@@ -114,8 +114,7 @@ export const Folder: Story = {
     <UploadExample
       label="Import folder"
       acceptDirectory
-      dropzoneLabel="Pick a folder to upload"
-      buttonLabel="Choose folder"
+      labels={{ dropHint: 'Pick a folder to upload', browse: 'Choose folder' }}
     />
   ),
 };

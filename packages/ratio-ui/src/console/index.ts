@@ -14,6 +14,7 @@ export type {
   ConsoleCounterProps,
   ConsoleActionButtonProps,
   ConsoleBodyProps,
+  ConsoleGroupLabels,
   ConsoleGroupProps,
   ConsoleEntryProps,
   ConsoleEntryDetailProps,

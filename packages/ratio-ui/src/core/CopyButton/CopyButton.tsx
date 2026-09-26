@@ -12,7 +12,7 @@ import { CopyStateIcon } from '../CopyStateIcon';
 
 /** Built-in text of `CopyButton`. Each entry falls back to English. */
 export interface CopyButtonLabels {
-  /** Visible text with `withLabel`. @default 'Copy' */
+  /** Visible text with `showLabel`. @default 'Copy' */
   copy?: string;
   /** Visible text after copying. @default 'Copied' */
   copied?: string;
@@ -21,13 +21,17 @@ export interface CopyButtonLabels {
 export interface CopyButtonProps {
   /** Text copied to the clipboard when pressed. */
   value: string;
-  /** Show a "Copy"/"Copied" text label beside the icon. Default false (icon-only). */
+  /** Show the "Copy"/"Copied" text beside the icon. Default false (icon-only). */
+  showLabel?: boolean;
+  /** @deprecated Use `showLabel`. Still honoured until the next major. */
   withLabel?: boolean;
   /** Icon size in px. Defaults to 16. */
   iconSize?: number;
   /** Frame size, forwarded to ActionButton. Defaults to `md`. */
   size?: ActionButtonSize;
-  /** Accessible name + tooltip. Defaults to "Copy to clipboard". */
+  /** Accessible name + tooltip. @default 'Copy to clipboard' */
+  'aria-label'?: string;
+  /** @deprecated Use the native `aria-label`. Still honoured until the next major. */
   ariaLabel?: string;
   /** Built-in text. Each entry falls back to English. */
   labels?: CopyButtonLabels;
@@ -56,29 +60,33 @@ export interface CopyButtonProps {
  *
  * @example
  * ```tsx
- * <CopyButton value="demo_api_key_abc123" ariaLabel="Copy API key" />
- * <CopyButton value={url} withLabel />
+ * <CopyButton value="demo_api_key_abc123" aria-label="Copy API key" />
+ * <CopyButton value={url} showLabel />
  * ```
  *
  * @beta This component is experimental — prop shape may change before release.
  */
 export const CopyButton: React.FC<CopyButtonProps> = ({
   value,
-  withLabel = false,
+  showLabel,
+  withLabel,
   iconSize = 16,
   size = 'md',
-  ariaLabel = 'Copy to clipboard',
+  'aria-label': ariaLabelAttr,
+  ariaLabel,
   onCopy,
   className,
   testId,
   labels,
 }) => {
   const { copied, copy } = useCopyToClipboard({ onCopy });
+  const name = ariaLabelAttr ?? ariaLabel ?? 'Copy to clipboard';
+  const labelShown = showLabel ?? withLabel ?? false;
 
   return (
     <ActionButton
-      ariaLabel={ariaLabel}
-      title={ariaLabel}
+      aria-label={name}
+      title={name}
       size={size}
       onClick={() => copy(value)}
       data-copied={copied || undefined}
@@ -88,7 +96,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       className={cn('[--action-button-border:transparent]', className)}
     >
       <CopyStateIcon copied={copied} size={iconSize} />
-      {withLabel && (
+      {labelShown && (
         <span className={cn('text-xs font-semibold', copied && 'text-(--primary)')}>
           {copied ? (labels?.copied ?? 'Copied') : (labels?.copy ?? 'Copy')}
         </span>

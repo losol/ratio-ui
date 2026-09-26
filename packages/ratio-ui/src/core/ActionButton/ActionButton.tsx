@@ -21,11 +21,11 @@ import { cn } from '../../utils/cn';
  * text-only buttons:
  *
  * ```tsx
- * <ActionButton ariaLabel="Close" onPress={onClose}>
+ * <ActionButton aria-label="Close" onPress={onClose}>
  *   <XIcon />
  * </ActionButton>
  *
- * <ActionButton round ariaLabel="Open menu" onPress={openDrawer}>
+ * <ActionButton round aria-label="Open menu" onPress={openDrawer}>
  *   <MenuIcon />
  * </ActionButton>
  * ```
@@ -59,9 +59,9 @@ export interface ActionButtonProps
   /** Disable the button (React Aria). Wins over the native `disabled`. */
   isDisabled?: boolean;
   /**
-   * Required when there is no visible text inside (e.g. icon-only). Read by
-   * screen readers as the button's accessible name. A native `aria-label`
-   * is also accepted and wins when both are set.
+   * The button's accessible name, required when there is no visible text
+   * inside (e.g. icon-only).
+   * @deprecated Use the native `aria-label`. Still honoured until the next major.
    */
   ariaLabel?: string;
   /**

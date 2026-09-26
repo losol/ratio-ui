@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { FileDrawer } from './FileDrawer';
-export type { FileDrawerProps } from './FileDrawer';
+export type { FileDrawerLabels, FileDrawerProps } from './FileDrawer';

@@ -138,26 +138,40 @@ export interface ConsoleGroupProps {
   label: React.ReactNode;
   /** Optional event count — rendered as "· N event(s)" next to the label. */
   count?: number;
-  /** Override the auto-rendered count text (e.g. for i18n). */
+  /** Override the auto-rendered count text. @deprecated Use `labels.count`. Still honoured until the next major. */
   countLabel?: React.ReactNode;
   className?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: ConsoleGroupLabels;
 }
+
+/** Built-in text of `Console.Group`. Each entry falls back to English. */
+export interface ConsoleGroupLabels {
+  /** The event count. @default (n) => `${n} event${n === 1 ? '' : 's'}` */
+  count?: (count: number) => string;
+}
+
+const defaultEventCount = (n: number) => `${n} event${n === 1 ? '' : 's'}`;
 
 const Group: React.FC<ConsoleGroupProps> = ({
   label,
   count,
   countLabel,
   className,
-}) => (
-  <div className={cn('console-group', className)}>
-    <span>{label}</span>
-    {(countLabel !== undefined || count !== undefined) && (
-      <span className="console-group-count">
-        · {countLabel ?? `${count} event${count === 1 ? '' : 's'}`}
-      </span>
-    )}
-  </div>
-);
+  labels,
+}) => {
+  const countText =
+    count !== undefined && labels?.count
+      ? labels.count(count)
+      : (countLabel ?? (count !== undefined ? defaultEventCount(count) : undefined));
+
+  return (
+    <div className={cn('console-group', className)}>
+      <span>{label}</span>
+      {countText !== undefined && <span className="console-group-count">· {countText}</span>}
+    </div>
+  );
+};
 Group.displayName = 'Console.Group';
 
 /* ── Entry rows ──────────────────────────────────────────── */

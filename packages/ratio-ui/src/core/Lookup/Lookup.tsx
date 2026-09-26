@@ -22,6 +22,10 @@ import { Label } from '../../forms/common/Label';
 export interface LookupLabels {
   /** Name of the clear button. @default 'Clear search' */
   clear?: string;
+  /** Shown when there are no results. @default 'No results' */
+  empty?: string;
+  /** Shown until enough characters are typed. @default (n) => `Type at least ${n} character(s) to search` */
+  minChars?: (minChars: number) => string;
 }
 
 export interface LookupProps<T> {
@@ -59,15 +63,9 @@ export interface LookupProps<T> {
   readonly renderItem: (item: T) => ReactNode;
   /** Called when the user selects an item. */
   readonly onItemSelected: (item: T) => void;
-  /**
-   * Message shown when the query is long enough but there are no results.
-   * @default 'No results'
-   */
+  /** Message shown when the query is long enough but there are no results. @deprecated Use `labels.empty`. Still honoured until the next major. */
   readonly emptyState?: string;
-  /**
-   * Message shown when the user has not typed enough characters. Defaults to
-   * a message derived from `minChars`.
-   */
+  /** Message shown when the user has not typed enough characters. @deprecated Use `labels.minChars`. Still honoured until the next major. */
   readonly minCharsMessage?: string;
   /** Built-in text. Each entry falls back to English. */
   readonly labels?: LookupLabels;
@@ -111,7 +109,7 @@ export interface LookupProps<T> {
  *     </>
  *   )}
  *   onItemSelected={u => setSelected(u)}
- *   emptyState="No users found"
+ *   labels={{ empty: 'No users found' }}
  * />
  * ```
  */
@@ -125,7 +123,7 @@ export function Lookup<T>({
   getItemTextValue,
   renderItem,
   onItemSelected,
-  emptyState = 'No results',
+  emptyState,
   minCharsMessage,
   inputClassName,
   listClassName,
@@ -173,12 +171,14 @@ export function Lookup<T>({
   };
 
   const textValueOf = getItemTextValue ?? getItemLabel;
+  const emptyText = labels?.empty ?? emptyState ?? 'No results';
   const pluralSuffix = minChars === 1 ? '' : 's';
   const resolvedMinCharsMessage =
-    minCharsMessage ??
-    (minChars > 0
-      ? `Type at least ${minChars} character${pluralSuffix} to search`
-      : undefined);
+    minChars > 0
+      ? (labels?.minChars?.(minChars) ??
+        minCharsMessage ??
+        `Type at least ${minChars} character${pluralSuffix} to search`)
+      : minCharsMessage;
 
   const clearInput = () => {
     setSelectedLabel(null);
@@ -252,7 +252,7 @@ export function Lookup<T>({
           onSelectionChange={handleSelectionChange}
           renderEmptyState={() => (
             <div className="px-3 py-2 text-sm text-(--text-subtle)">
-              {belowMinChars && resolvedMinCharsMessage ? resolvedMinCharsMessage : emptyState}
+              {belowMinChars && resolvedMinCharsMessage ? resolvedMinCharsMessage : emptyText}
             </div>
           )}
         >
