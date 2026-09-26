@@ -32,6 +32,12 @@ export interface ChatLogMessage {
 export interface ChatLogLabels {
   /** Name of each message's reaction row. @default 'Reactions' */
   reactions?: string;
+  /** Screen-reader note on a message that mentions you. @default 'Mentions you' */
+  mentionsYou?: string;
+  /** Screen-reader name of the `@` role. @default 'op' */
+  op?: string;
+  /** Screen-reader name of the `+` role. @default 'voice' */
+  voice?: string;
 }
 
 /** @beta Prop shape may change before release. */
@@ -86,7 +92,12 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
   { messages, me, onToggleReaction, reactionsLabel, labels, 'aria-label': ariaLabel, className, testId },
   ref,
 ) {
-  const reactionsName = labels?.reactions ?? reactionsLabel ?? 'Reactions';
+  const rowLabels: Required<ChatLogLabels> = {
+    reactions: labels?.reactions ?? reactionsLabel ?? 'Reactions',
+    mentionsYou: labels?.mentionsYou ?? 'Mentions you',
+    op: labels?.op ?? 'op',
+    voice: labels?.voice ?? 'voice',
+  };
   return (
     <div
       ref={ref}
@@ -109,7 +120,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
           message={message}
           me={me}
           onToggleReaction={onToggleReaction}
-          reactionsLabel={reactionsName}
+          labels={rowLabels}
         />
       ))}
     </div>
@@ -117,12 +128,12 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
 });
 ChatLog.displayName = 'Chat.Log';
 
-type ChatLogRowProps = { message: ChatLogMessage } & Pick<
+type ChatLogRowProps = { message: ChatLogMessage; labels: Required<ChatLogLabels> } & Pick<
   ChatLogProps,
-  'me' | 'onToggleReaction' | 'reactionsLabel'
+  'me' | 'onToggleReaction'
 >;
 
-const ChatLogRow: React.FC<ChatLogRowProps> = ({ message, me, onToggleReaction, reactionsLabel }) => {
+const ChatLogRow: React.FC<ChatLogRowProps> = ({ message, me, onToggleReaction, labels }) => {
   const { id, type = 'msg', time, nick, role, text, reactions } = message;
 
   if (type === 'divider') {
@@ -175,11 +186,15 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({ message, me, onToggleReaction, 
           sameNick(nick, me) ? NICK_COLOR.voice : NICK_COLOR[role ?? 'none'],
         )}
       >
-        {role && ROLE_GLYPH[role]}
+        {/* The glyph is read as "at" or "plus", so screen readers get the role's name instead. */}
+        {role && <span aria-hidden>{ROLE_GLYPH[role]}</span>}
         {nick}
+        {role && <span className="sr-only"> ({labels[role]})</span>}
       </span>
       <div className="flex min-w-0 flex-col gap-1">
         <span className="break-words text-pretty">
+          {/* The band and stripe only show it; this says it. */}
+          {mentionsMe && <span className="sr-only">{labels.mentionsYou}: </span>}
           {parts.map((part, i) =>
             i % 2 === 1 ? (
               <span key={i} className="font-semibold text-(--primary)">
@@ -196,7 +211,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({ message, me, onToggleReaction, 
             // `bind`, not a closure: a Server Action bound here can still cross
             // into the client component; a closure made on the server cannot.
             onToggle={onToggleReaction?.bind(null, id)}
-            aria-label={reactionsLabel}
+            aria-label={labels.reactions}
           />
         )}
       </div>

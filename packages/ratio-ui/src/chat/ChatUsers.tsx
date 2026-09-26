@@ -11,7 +11,7 @@ export interface ChatUser {
   nick: string;
   /** Channel role, shown as the `@` or `+` glyph before the nick. */
   role?: ChatRole;
-  /** Away users are collected in a line at the bottom rather than listed. */
+  /** Away users are collected in a line at the bottom, alphabetically, rather than listed. */
   away?: boolean;
   /** Your own row — tinted, and tagged with `labels.you`. */
   you?: boolean;
@@ -27,6 +27,8 @@ export interface ChatUsersLabels {
   you?: string;
   /** Tag on an operator's row. @default 'op' */
   op?: string;
+  /** Screen-reader name of the `+` role, which has no visible tag. @default 'voice' */
+  voice?: string;
 }
 
 /** @beta Prop shape may change before release. */
@@ -79,11 +81,12 @@ export const ChatUsers: React.FC<ChatUsersProps> = ({
   className,
 }) => {
   const online = users.filter(u => !u.away).sort(byRankThenName);
-  const away = users.filter(u => u.away);
+  const away = users.filter(u => u.away).sort((a, b) => a.nick.localeCompare(b.nick));
   const onlineHeading = labels?.online ? labels.online(online.length) : (onlineLabel ?? `${online.length} online`);
   const awayHeading = labels?.away ? labels.away(away.length) : (awayLabel ?? `Away · ${away.length}`);
   const you = labels?.you ?? youLabel ?? 'you';
   const op = labels?.op ?? opLabel ?? 'op';
+  const voice = labels?.voice ?? 'voice';
 
   return (
     <div className={cn('flex h-full flex-col gap-0.5 overflow-auto p-4 text-[0.8125rem]', className)}>
@@ -103,7 +106,10 @@ export const ChatUsers: React.FC<ChatUsersProps> = ({
             >
               {user.role ? ROLE_GLYPH[user.role] : ''}
             </span>
-            <span className="min-w-0 truncate">{user.nick}</span>
+            <span className="min-w-0 truncate">
+              {user.nick}
+              {user.role === 'voice' && <span className="sr-only"> ({voice})</span>}
+            </span>
             {(user.you || user.role === 'op') && (
               <span className="ml-auto text-[10px] text-(--text-subtle)">
                 {user.you ? you : op}

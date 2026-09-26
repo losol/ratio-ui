@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { ChatLog, type ChatLogMessage } from './ChatLog';
 import { Button } from '../core/Button';
 
@@ -87,6 +88,40 @@ const volunteers: ChatLogMessage[] = [
  */
 export const Channel: Story = {
   args: { messages: volunteers, me: 'tor', 'aria-label': '#volunteers' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The band is visual only; screen readers get the note instead.
+    await expect(canvas.getAllByText('Mentions you:', { exact: false })).toHaveLength(1);
+    // Role glyphs are hidden, and the role is named instead of read as "at".
+    for (const glyph of canvas.getAllByText('@', { exact: true })) {
+      await expect(glyph.getAttribute('aria-hidden')).toBe('true');
+    }
+    await expect(canvas.getAllByText('(op)', { exact: false }).length).toBeGreaterThan(0);
+    await expect(canvas.getAllByText('(voice)', { exact: false }).length).toBeGreaterThan(0);
+  },
+};
+
+/**
+ * Mentions match the nick whatever its case or Unicode form, and only the
+ * whole nick: `@åsen` is someone else.
+ */
+export const MentionMatching: Story = {
+  args: {
+    me: 'åse',
+    'aria-label': '#mentions',
+    labels: { mentionsYou: 'Nevner deg' },
+    messages: [
+      { id: '1', time: '10:00', nick: 'tor', text: '@Åse, composed and capitalised' },
+      // "a" plus a combining ring: the same name, spelled decomposed.
+      { id: '2', time: '10:01', nick: 'tor', text: '@a\u030Ase, decomposed' },
+      { id: '3', time: '10:02', nick: 'tor', text: '@åsen is someone else' },
+      { id: '4', time: '10:03', nick: 'tor', text: 'åse without the @' },
+    ],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getAllByText('Nevner deg:', { exact: false })).toHaveLength(2);
+  },
 };
 
 /**
