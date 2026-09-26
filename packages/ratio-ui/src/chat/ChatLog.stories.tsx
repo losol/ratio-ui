@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { ChatLog, type ChatLogMessage } from './ChatLog';
 import { Button } from '../core/Button';
 
@@ -124,9 +124,20 @@ export const MentionMatching: Story = {
   },
 };
 
+/** Add your reaction, or take it back; a reaction nobody has left goes away. */
+const toggle = (reactions: ChatLogMessage['reactions'] = [], emoji: string) => {
+  const hit = reactions.find(r => r.emoji === emoji);
+  const next = hit
+    ? reactions.map(r => (r === hit ? { ...r, me: !r.me, count: r.count + (r.me ? -1 : 1) } : r))
+    : [...reactions, { emoji, count: 1, me: true }];
+  return next.filter(r => r.count > 0);
+};
+
 /**
- * Reactions sit under the message text. The log reports the message and the
- * emoji; the caller updates `reactions`, here in local state.
+ * Reactions sit under the message text. Hover a message, or tab to it, and a
+ * bar offers quick reactions and a picker with more. The log reports the
+ * message and the emoji either way; the caller updates `reactions`, here in
+ * local state.
  */
 export const Reactions: Story = {
   render: function ReactionsStory() {
@@ -134,16 +145,7 @@ export const Reactions: Story = {
 
     const toggleReaction = (messageId: string, emoji: string) =>
       setMessages(prev =>
-        prev.map(m =>
-          m.id !== messageId
-            ? m
-            : {
-                ...m,
-                reactions: m.reactions?.map(r =>
-                  r.emoji === emoji ? { ...r, me: !r.me, count: r.count + (r.me ? -1 : 1) } : r,
-                ),
-              },
-        ),
+        prev.map(m => (m.id !== messageId ? m : { ...m, reactions: toggle(m.reactions, emoji) })),
       );
 
     return (
@@ -154,6 +156,63 @@ export const Reactions: Story = {
         onToggleReaction={toggleReaction}
       />
     );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const bars = canvas.getAllByRole('toolbar', { name: 'React to message' });
+    const bar = within(bars[0]!);
+    // Driven by keyboard: synthetic hover doesn't set :hover, and keyboard
+    // focus is what shows the bar without a pointer.
+    const press = async (name: string) => {
+      bar.getByRole('button', { name }).focus();
+      await userEvent.keyboard('{Enter}');
+    };
+
+    await waitFor(() => expect(getComputedStyle(bars[0]!).opacity).toBe('0'));
+    bar.getByRole('button', { name: 'React with 👍' }).focus();
+    await waitFor(() => expect(getComputedStyle(bars[0]!).opacity).toBe('1'));
+
+    // A quick reaction on a message with none yet adds it.
+    await press('React with ❤️');
+    await expect(canvas.getByText('❤️ 1')).toBeInTheDocument();
+
+    // The picker offers more; picking one adds it too.
+    await press('More reactions');
+    const party = await body.findByRole('menuitem', { name: 'React with 🎉' });
+    party.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.getByText('🎉 1')).toBeInTheDocument();
+
+    // Picking one you already left takes it back.
+    await press('React with ❤️');
+    await expect(canvas.queryByText('❤️ 1')).toBeNull();
+  },
+};
+
+/** Without `onToggleReaction` the reactions are read-only, and there is no bar. */
+export const ReadOnly: Story = {
+  args: { messages: volunteers, me: 'tor', 'aria-label': '#volunteers' },
+  play: async ({ canvasElement }) => {
+    await expect(within(canvasElement).queryByRole('toolbar', { name: 'React to message' })).toBeNull();
+  },
+};
+
+/** The arrow keys move between the bar's buttons; Tab leaves the bar. */
+export const ReactionBarKeyboard: Story = {
+  args: {
+    messages: [{ id: 'k1', time: '10:00', nick: 'ingrid', text: 'Tab to me' }],
+    'aria-label': '#keyboard',
+    onToggleReaction: () => {},
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const bar = canvas.getByRole('toolbar', { name: 'React to message' });
+    within(bar).getByRole('button', { name: 'React with 👍' }).focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(within(bar).getByRole('button', { name: 'React with ❤️' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}{ArrowRight}');
+    await expect(within(bar).getByRole('button', { name: 'More reactions' })).toHaveFocus();
   },
 };
 
