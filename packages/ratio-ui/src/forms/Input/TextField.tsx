@@ -28,7 +28,9 @@ interface ExtendedInputProps extends InputFieldProps {
   /** Built-in text. Each entry falls back to English. */
   labels?: TextFieldLabels;
   multiline?: boolean;
+  /** Visible rows of the textarea (`multiline`). @default 3 */
   rows?: number;
+  /** Visible columns of the textarea (`multiline`). */
   cols?: number;
   /**
    * Show a copy-to-clipboard button in the field's trailing slot. Copies the
@@ -140,6 +142,7 @@ export function TextField({
     <textarea
       ref={assignRef as React.Ref<HTMLTextAreaElement>}
       rows={rows ?? 3}
+      cols={cols}
       {...commonProps}
     />
   ) : (
@@ -183,7 +186,7 @@ export function TextField({
     return content;
   }
 
-  return <div className={formStyles.inputWrapper}>{content}</div>;
+  return <div className={noMargin ? undefined : formStyles.inputWrapper}>{content}</div>;
 }
 
 TextField.displayName = 'TextField';

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useMemo, useState } from 'react';
 import type { Key, Selection } from 'react-aria-components';
 import { ListBox, ListBoxItem } from './ListBox';

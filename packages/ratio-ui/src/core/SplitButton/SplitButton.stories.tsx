@@ -138,7 +138,6 @@ export const AllVariants = () => {
     </div>
   );
 };
-AllVariants.storyName = 'All Variants';
 
 export const AllSizes = () => {
   const sizes: SplitButtonProps['size'][] = ['sm', 'md', 'lg'];
@@ -165,4 +164,3 @@ export const AllSizes = () => {
     </div>
   );
 };
-AllSizes.storyName = 'All Sizes';

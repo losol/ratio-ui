@@ -36,7 +36,6 @@ type LinkStory = StoryFn<LinkProps>;
 const Template: LinkStory = (args) => <Link {...args} />;
 
 export const Playground = Template.bind({});
-Playground.storyName = 'Playground';
 
 export const Default = Template.bind({});
 Default.args = {
@@ -152,7 +151,6 @@ export const AllVariants = () => {
     </div>
   );
 };
-AllVariants.storyName = 'All Variants';
 
 // Tests
 let clickSpy: ReturnType<typeof fn>;

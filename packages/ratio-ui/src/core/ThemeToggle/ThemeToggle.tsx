@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import { useState, useEffect } from 'react';
 import { Button } from '../Button';
 import { Sun, Moon } from '../../icons';
+import { useIsClient } from '../../hooks/useIsClient';
 
 export interface ThemeToggleProps {
   /** Current theme value */
@@ -52,7 +52,7 @@ export const ThemeToggle = ({
   ariaLabel,
   labels,
 }: ThemeToggleProps) => {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   const isDark = theme === 'dark';
   const explicitName = ariaLabelAttr ?? ariaLabel;
   // Until the theme is known there is no honest action to name.
@@ -62,10 +62,6 @@ export const ThemeToggle = ({
       : isDark
         ? (labels?.switchToLight ?? 'Switch to light mode')
         : (labels?.switchToDark ?? 'Switch to dark mode');
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleToggle = () => {
     onThemeChange(isDark ? 'light' : 'dark');

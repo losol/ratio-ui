@@ -2,13 +2,13 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import { FC, ReactNode } from 'react';
+import type { ComponentProps, FC, FormEventHandler, ReactNode } from 'react';
 import { cn } from '../../utils/cn';
 
 interface FormProps  {
-  action?: any;
+  action?: ComponentProps<'form'>['action'];
   children: ReactNode;
-  onSubmit?: (data: any) => void;
+  onSubmit?: FormEventHandler<HTMLFormElement>;
   /** Extra classes, merged on top of the defaults. */
   className?: string;
   /** Drop the default classes and style from scratch with `className`. */

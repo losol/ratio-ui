@@ -1,8 +1,8 @@
 // ErrorPage.stories.tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { ErrorPage, type ErrorPageProps } from './ErrorPage';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { ErrorPage } from './ErrorPage';
 
-/** See: {@link ErrorPageProps} */
+/** See: {@link ErrorPage} props */
 const meta: Meta<typeof ErrorPage> = {
   title: 'Pages/ErrorPage',
   component: ErrorPage,
