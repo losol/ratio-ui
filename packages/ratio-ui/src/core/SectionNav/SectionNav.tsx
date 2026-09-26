@@ -58,7 +58,7 @@ export interface SectionNavProps extends Omit<React.ComponentPropsWithoutRef<'na
  * resize — so `top` is all you pass, in whatever unit the navbar is sized.
  *
  * Give targets a `scroll-margin-top` (`--scroll-margin-top` from
- * `global.css`, or `scroll-mt-*`) so anchor jumps land below both rows.
+ * `ratio-ui.css`, or `scroll-mt-*`) so anchor jumps land below both rows.
  * Name the landmark: a page with a site navbar has two `<nav>`s, and
  * screen readers list them by name.
  *

@@ -10,7 +10,7 @@ export type HeadingSize = 'sm' | 'md' | 'lg';
 
 // Compact editorial scale: serif at medium weight, tight tracking, margins
 // zeroed so the surrounding layout owns spacing (unlike the prose scale in
-// global.css, where headings carry their own margins).
+// ratio-ui.css, where headings carry their own margins).
 const sizeClasses: Record<HeadingSize, string> = {
   sm: 'text-xl',
   md: 'text-2xl',
@@ -23,7 +23,7 @@ export interface HeadingProps
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   /**
    * Visual scale, decoupled from the semantic level. Unset (default) keeps
-   * the document prose scale from `global.css` (h1 6xl … h3 2xl). Set it in
+   * the document prose scale from `ratio-ui.css` (h1 6xl … h3 2xl). Set it in
    * composed UI — cards, panels, detail-page shells — for a compact serif
    * heading with no margins: `sm` xl, `md` 2xl, `lg` 4xl.
    */
@@ -39,7 +39,7 @@ export interface HeadingProps
  * Text color follows `--text` from the design tokens, which is theme-aware
  * by default. To force a tone for content rendered on a colored container,
  * wrap with `<div className="surface-dark">` (or `surface-light`) — see
- * `Surface tone overrides` in `global.css`.
+ * `Surface tone overrides` in `components.css`.
  */
 const HeadingRoot = ({
   as: HeadingComponent = 'h1',

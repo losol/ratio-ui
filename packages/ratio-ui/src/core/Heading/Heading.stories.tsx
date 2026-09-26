@@ -50,7 +50,7 @@ export const Level6 = () =>
 
 /**
  * `size` decouples the visual scale from the semantic level. Without it,
- * headings follow the document prose scale from `global.css`; with it they
+ * headings follow the document prose scale from `ratio-ui.css`; with it they
  * use a compact serif scale with margins zeroed, for composed UI where the
  * layout owns spacing — cards, panels, detail-page headers.
  */

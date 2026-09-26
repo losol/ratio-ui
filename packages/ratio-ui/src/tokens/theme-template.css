@@ -121,8 +121,8 @@
 /*
  * FOUC NOTE
  * ---------
- * ratio-ui's global.css hides <html> (opacity:0) until any data-theme is
- * set, then reveals it. Set data-theme as early as possible — a blocking
- * inline <script> in <head> before first paint — or the page renders
- * blank/white until your theme attribute lands.
+ * The page paints with the default light theme until your data-theme
+ * attribute lands. Set it before first paint — a blocking inline <script>
+ * in <head> — or opt into the flash guard in ratio-ui.css by adding
+ * data-theme-loading to <html> (see docs/css-exports.md).
  */

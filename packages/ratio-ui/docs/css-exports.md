@@ -22,8 +22,6 @@ import '@eventuras/ratio-ui/ratio-ui.css';
 - You want ratio-ui to control the entire page design
 - You're okay with global body and typography styles
 
-`@eventuras/ratio-ui/global.css` is the same stylesheet under its older name.
-
 ## 2. Component-Only Styling (`components.css`)
 
 Import this to use ratio-ui components without global page takeover:

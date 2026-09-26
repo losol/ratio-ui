@@ -1,6 +1,5 @@
 <script>
-  // global.css hides <html> with opacity:0 until a data-theme attribute is set
-  // (FOUC prevention). Storybook docs pages don't run the ModeDecorator, so
-  // without this script the Introduction page and other MDX docs render blank.
+  // Storybook docs pages don't run the ModeDecorator, so this gives the
+  // Introduction page and other MDX docs the same starting theme as stories.
   document.documentElement.setAttribute('data-theme', 'dark');
 </script>

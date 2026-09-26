@@ -84,7 +84,6 @@
     },
     "./ratio-ui.css": "./dist/ratio-ui.css",
     "./components.css": "./dist/components.css",
-    "./global.css": "./dist/ratio-ui.css",
     "./fonts.css": "./src/fonts.css",
     "./themes/*.css": "./src/themes/*.css"
   },
@@ -97,8 +96,6 @@
   ],
   "files": [
     "dist",
-    "src/global.css",
-    "src/components.css",
     "src/tokens",
     "src/fonts",
     "src/fonts.css",

@@ -16,7 +16,7 @@ export type DialogSize = 'sm' | 'md' | 'lg' | 'xl';
 
 // Tailwind max-w utilities (28 / 32 / 42 / 56 rem). All four class
 // names are safelisted via `@source inline(...)` in
-// libs/ratio-ui/src/global.css because the lookup is dynamic — keep
+// src/components.css because the lookup is dynamic — keep
 // that list in sync if you add sizes here.
 const sizeClasses: Record<DialogSize, string> = {
   sm: 'max-w-md',
