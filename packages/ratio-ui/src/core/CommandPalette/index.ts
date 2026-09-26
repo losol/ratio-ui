@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { CommandPalette } from './CommandPalette';
-export type { CommandPaletteProps, CommandPaletteItem } from './CommandPalette';
+export type { CommandPaletteLabels, CommandPaletteProps, CommandPaletteItem } from './CommandPalette';

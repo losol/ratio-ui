@@ -1,3 +1,4 @@
+import { expect, within } from 'storybook/test';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CopyButton } from './CopyButton';
 
@@ -7,10 +8,10 @@ const meta: Meta<typeof CopyButton> = {
   tags: ['autodocs'],
   argTypes: {
     value: { control: 'text' },
-    withLabel: { control: 'boolean' },
+    showLabel: { control: 'boolean' },
     iconSize: { control: 'number' },
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
-    ariaLabel: { control: 'text' },
+    'aria-label': { control: 'text' },
   },
 };
 
@@ -21,7 +22,10 @@ type Story = StoryObj<typeof CopyButton>;
 export const Default: Story = {
   args: {
     value: 'demo_api_key_1234567890abcdef',
-    ariaLabel: 'Copy API key',
+    'aria-label': 'Copy API key',
+  },
+  play: async ({ canvasElement }) => {
+    await expect(within(canvasElement).getByRole('button', { name: 'Copy API key' })).toBeInTheDocument();
   },
 };
 
@@ -29,6 +33,6 @@ export const Default: Story = {
 export const WithLabel: Story = {
   args: {
     value: 'https://example.com/share/abc123',
-    withLabel: true,
+    showLabel: true,
   },
 }; 

@@ -142,7 +142,9 @@ export interface NavbarToggleProps {
    * `'menu'`, so a single pair needs no wiring.
    */
   controls?: string;
-  /** Accessible name. `aria-expanded` carries the open/closed state. */
+  /** Accessible name. `aria-expanded` carries the open/closed state. @default 'Menu' */
+  'aria-label'?: string;
+  /** @deprecated Use the native `aria-label`. Still honoured until the next major. */
   ariaLabel?: string;
   /** Custom icon(s); default is a burger that morphs into an X when open. */
   children?: ReactNode;
@@ -290,7 +292,8 @@ export function NavbarMotif({ children, entry = false, className }: Readonly<Nav
  */
 export function NavbarToggle({
   controls = 'menu',
-  ariaLabel = 'Menu',
+  'aria-label': ariaLabelAttr,
+  ariaLabel,
   children,
   className,
 }: Readonly<NavbarToggleProps>) {
@@ -299,7 +302,7 @@ export function NavbarToggle({
   return (
     <ActionButton
       round
-      ariaLabel={ariaLabel}
+      aria-label={ariaLabelAttr ?? ariaLabel ?? 'Menu'}
       aria-expanded={expanded}
       // Only reference the panel while it exists — Collapse unmounts when
       // closed, and aria-controls must not point at a missing id.

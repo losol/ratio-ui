@@ -17,6 +17,12 @@ import { cn } from '../../utils/cn';
 export type AnnouncementTone = Status | 'ink';
 export type AnnouncementVariant = 'row' | 'banner';
 
+/** Built-in text of `Announcement`. Each entry falls back to English. */
+export interface AnnouncementLabels {
+  /** Name of the dismiss button. @default 'Dismiss' */
+  dismiss?: string;
+}
+
 export interface AnnouncementProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Colour and weight of the message. `info` for news and deadlines,
@@ -45,8 +51,10 @@ export interface AnnouncementProps extends React.HTMLAttributes<HTMLDivElement> 
    * is not the reader's to close.
    */
   onDismiss?: () => void;
-  /** Accessible name of the dismiss button. @default 'Dismiss' */
+  /** Accessible name of the dismiss button. @deprecated Use `labels.dismiss`. Still honoured until the next major. */
   dismissLabel?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: AnnouncementLabels;
   /**
    * Name of the region landmark, in plain words for the tone — "Notice",
    * "Announcement". Pass `role="status"` as well only when the band is
@@ -155,7 +163,8 @@ const AnnouncementRoot: React.FC<AnnouncementProps> = ({
   variant = 'row',
   fluid = false,
   onDismiss,
-  dismissLabel = 'Dismiss',
+  dismissLabel,
+  labels,
   'aria-label': ariaLabel = 'Announcement',
   className,
   children,
@@ -187,7 +196,7 @@ const AnnouncementRoot: React.FC<AnnouncementProps> = ({
         <ActionButton
           round
           variant="ghost"
-          ariaLabel={dismissLabel}
+          aria-label={labels?.dismiss ?? dismissLabel ?? 'Dismiss'}
           onPress={onDismiss}
           className={cn(
             // Trailing edge — after the Action pill when there is one, else

@@ -4,6 +4,7 @@
 
 export { Announcement } from './Announcement';
 export type {
+  AnnouncementLabels,
   AnnouncementProps,
   AnnouncementSlotProps,
   AnnouncementTitleProps,

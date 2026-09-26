@@ -183,11 +183,23 @@ export type MenuButtonProps = {
   testId?: string;
 };
 
+/** Built-in text of `Menu.ThemeToggle`. Each entry falls back to English. */
+export interface MenuThemeToggleLabels {
+  /** Shown while dark, to switch to light. @default 'Light theme' */
+  light?: string;
+  /** Shown while light, to switch to dark. @default 'Dark theme' */
+  dark?: string;
+}
+
 export type MenuThemeToggleProps = {
   theme?: 'light' | 'dark' | null;
   onThemeChange: (theme: 'light' | 'dark') => void;
+  /** @deprecated Use `labels.light`. Still honoured until the next major. */
   lightLabel?: string;
+  /** @deprecated Use `labels.dark`. Still honoured until the next major. */
   darkLabel?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: MenuThemeToggleLabels;
 };
 
 const Menu = ({ children, placement = 'bottom end', isOpen, defaultOpen, onOpenChange, maxHeight }: MenuProps) => {
@@ -339,9 +351,12 @@ const MenuButton = (props: MenuButtonProps & MenuItemProps) => {
 const MenuThemeToggle = ({
   theme,
   onThemeChange,
-  lightLabel = 'Light theme',
-  darkLabel = 'Dark theme',
+  lightLabel,
+  darkLabel,
+  labels,
 }: MenuThemeToggleProps) => {
+  const light = labels?.light ?? lightLabel ?? 'Light theme';
+  const dark = labels?.dark ?? darkLabel ?? 'Dark theme';
   const isDark = theme === 'dark';
   const id = useId();
   const { register, unregister } = useContext(MenuActionsContext);
@@ -360,7 +375,7 @@ const MenuThemeToggle = ({
     <MenuItem id={id} className={styles.menuItem}>
       <span className="flex items-center gap-2">
         {isDark ? <Sun className="w-5 h-5" aria-hidden="true" /> : <Moon className="w-5 h-5" aria-hidden="true" />}
-        {isDark ? lightLabel : darkLabel}
+        {isDark ? light : dark}
       </span>
     </MenuItem>
   );

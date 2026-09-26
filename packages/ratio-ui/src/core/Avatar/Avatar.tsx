@@ -40,6 +40,8 @@ export interface AvatarProps {
    * provided. Use this when neither `name` nor visible content carries
    * a meaningful label.
    */
+  'aria-label'?: string;
+  /** @deprecated Use the native `aria-label`. Still honoured until the next major. */
   ariaLabel?: string;
   className?: string;
   testId?: string;
@@ -83,12 +85,13 @@ export const Avatar: FC<AvatarProps> = ({
   name,
   initials,
   size = 'md',
+  'aria-label': ariaLabelAttr,
   ariaLabel,
   className,
   testId,
 }) => {
   const initialsText = initials ?? deriveInitials(name);
-  const wrapperLabel = ariaLabel ?? name;
+  const wrapperLabel = ariaLabelAttr ?? ariaLabel ?? name;
   // role="img" requires a name. When the avatar has no accessible
   // label and no visible text, leave the role off so axe doesn't flag
   // an unlabelled image role; the empty span is then ignored by AT.

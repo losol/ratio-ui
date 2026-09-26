@@ -91,7 +91,7 @@ export const Basic: Story = {
           </div>
         )}
         onItemSelected={c => console.log('Selected:', c)}
-        emptyState="No countries found"
+        labels={{ empty: 'No countries found' }}
       />
     </div>
   ),
@@ -120,7 +120,7 @@ export const WithMinChars: Story = {
           </div>
         )}
         onItemSelected={u => console.log('Selected:', u)}
-        emptyState="No users found"
+        labels={{ empty: 'No users found' }}
       />
     </div>
   ),
@@ -166,7 +166,7 @@ export const RichRendering: Story = {
           </div>
         )}
         onItemSelected={u => console.log('Selected:', u)}
-        emptyState="No team members found"
+        labels={{ empty: 'No team members found' }}
       />
     </div>
   ),

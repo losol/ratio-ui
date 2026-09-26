@@ -31,6 +31,10 @@ export interface FileUploadRejection {
 export interface FileUploadLabels {
   /** Name of the drop zone when there is no `label`. @default 'File upload drop zone' */
   dropZone?: string;
+  /** Primary text inside the drop zone. @default 'Drag files here' */
+  dropHint?: string;
+  /** Text of the browse button. @default 'Browse files' */
+  browse?: string;
 }
 
 export interface FileUploadProps {
@@ -60,10 +64,11 @@ export interface FileUploadProps {
   isDisabled?: boolean;
   label?: string;
   description?: string;
-  /** Primary text inside the drop zone. */
+  /** Primary text inside the drop zone. @deprecated Use `labels.dropHint`. Still honoured until the next major. */
   dropzoneLabel?: React.ReactNode;
   /** Built-in text. Each entry falls back to English. */
   labels?: FileUploadLabels;
+  /** Text of the browse button. @deprecated Use `labels.browse`. Still honoured until the next major. */
   buttonLabel?: string;
   className?: string;
   testId?: string;
@@ -236,8 +241,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   isDisabled,
   label,
   description,
-  dropzoneLabel = 'Drag files here',
-  buttonLabel = 'Browse files',
+  dropzoneLabel,
+  buttonLabel,
   className,
   testId,
   labels,
@@ -291,7 +296,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       >
         <CloudUpload className={styles.dropzone.icon} aria-hidden="true" />
         <Text slot="label" className="text-sm">
-          {dropzoneLabel}
+          {labels?.dropHint ?? dropzoneLabel ?? 'Drag files here'}
         </Text>
         <FileTrigger
           acceptedFileTypes={accept}
@@ -303,7 +308,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         >
           <Button className={styles.button} isDisabled={isDisabled}>
             <CloudUpload className="h-4 w-4" aria-hidden="true" />
-            {buttonLabel}
+            {labels?.browse ?? buttonLabel ?? 'Browse files'}
           </Button>
         </FileTrigger>
       </DropZone>

@@ -122,7 +122,7 @@ const expander = column.display({
       <ActionButton
         variant="ghost"
         size="sm"
-        ariaLabel={`${row.getIsExpanded() ? 'Hide' : 'Show'} copies of ${row.original.title}`}
+        aria-label={`${row.getIsExpanded() ? 'Hide' : 'Show'} copies of ${row.original.title}`}
         onPress={row.getToggleExpandedHandler()}
       >
         <ChevronRight

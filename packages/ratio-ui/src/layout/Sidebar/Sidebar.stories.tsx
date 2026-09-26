@@ -129,7 +129,7 @@ export const AdminSidebar: Story = {
             >
               {!collapsed && <LiveIndicator status="live">Catalogue in sync</LiveIndicator>}
               <ActionButton
-                ariaLabel={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                 onClick={() => setCollapsed((c) => !c)}
               >
                 {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
@@ -161,7 +161,7 @@ export const ConsoleShell: Story = {
       <div className="flex h-[520px] flex-col overflow-hidden">
         <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border-1 px-3">
           <ActionButton
-            ariaLabel={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-pressed={collapsed}
             onClick={() => setCollapsed((c) => !c)}
           >
@@ -204,7 +204,7 @@ export const MobileDrawer: Story = {
     const [open, setOpen] = useState(false);
     return (
       <div className="p-6">
-        <ActionButton ariaLabel="Open menu" onClick={() => setOpen(true)}>
+        <ActionButton aria-label="Open menu" onClick={() => setOpen(true)}>
           <MenuIcon size={18} />
         </ActionButton>
         <Drawer isOpen={open} onClose={() => setOpen(false)}>

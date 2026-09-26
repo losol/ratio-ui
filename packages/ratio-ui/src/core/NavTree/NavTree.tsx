@@ -532,7 +532,7 @@ function NavTreeRow({
             variant="ghost"
             size="sm"
             round
-            ariaLabel={node.closeLabel ?? labels?.close ?? 'Close'}
+            aria-label={node.closeLabel ?? labels?.close ?? 'Close'}
             onPress={node.onClose}
           >
             <X size={14} />

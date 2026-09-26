@@ -27,6 +27,12 @@ export type PanelVariant = 'alert' | 'callout' | 'notice';
 
 export type PanelSize = 'sm' | 'md' | 'lg';
 
+/** Built-in text of `Panel`. Each entry falls back to English. */
+export interface PanelLabels {
+  /** Name of the dismiss button. @default 'Dismiss' */
+  dismiss?: string;
+}
+
 export interface PanelProps extends SpacingProps {
   children?: ReactNode;
   /** Colour of the signal. @default 'neutral' */
@@ -55,8 +61,10 @@ export interface PanelProps extends SpacingProps {
   dismissible?: boolean;
   /** Called when the dismiss button is pressed. */
   onDismiss?: () => void;
-  /** Accessible name of the dismiss button. @default 'Dismiss' */
+  /** Accessible name of the dismiss button. @deprecated Use `labels.dismiss`. Still honoured until the next major. */
   dismissLabel?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: PanelLabels;
   /** Replace the body with a skeleton and set `aria-busy`. */
   loading?: boolean;
   /** Render the root as a link with a hover surface. Excludes `collapsible`. */
@@ -207,7 +215,8 @@ const PanelRoot: React.FC<PanelProps> = ({
   onToggle,
   dismissible = false,
   onDismiss,
-  dismissLabel = 'Dismiss',
+  dismissLabel,
+  labels,
   loading = false,
   href,
   as,
@@ -291,7 +300,7 @@ const PanelRoot: React.FC<PanelProps> = ({
         <ActionButton
           round
           variant="ghost"
-          ariaLabel={dismissLabel}
+          aria-label={labels?.dismiss ?? dismissLabel ?? 'Dismiss'}
           onPress={onDismiss}
           className={cn(
             'absolute top-1.5 right-1.5',
