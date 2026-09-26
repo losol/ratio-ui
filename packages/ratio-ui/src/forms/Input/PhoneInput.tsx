@@ -87,6 +87,8 @@ export interface PhoneInputLabels {
   numberPlaceholder?: string;
   /** Error shown when the number has the wrong number of digits. */
   invalidLength?: (error: PhoneLengthError) => string;
+  /** Shown when no country matches the typed filter. @default 'No countries found' */
+  noCountries?: string;
 }
 
 // Basic phone validation rules
@@ -353,11 +355,11 @@ export function PhoneInput({
               {filteredCountries.length === 0 && (
                 <ListBoxItem
                   id="no-results"
-                  textValue="No countries found"
+                  textValue={labels?.noCountries ?? 'No countries found'}
                   className={`px-3 py-2 ${textStyles.emptyStateText}`}
                   isDisabled
                 >
-                  No countries found
+                  {labels?.noCountries ?? 'No countries found'}
                 </ListBoxItem>
               )}
             </ListBox>

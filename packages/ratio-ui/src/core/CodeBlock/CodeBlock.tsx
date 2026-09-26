@@ -36,6 +36,26 @@ const SEVERITY_LABEL: Record<NonNullable<CodeAnnotation['severity']>, string> = 
   success: 'Success',
 };
 
+/** Built-in text of `CodeBlock`. Each entry falls back to English. */
+export interface CodeBlockLabels {
+  /** Name of the copy button. @default 'Copy code' */
+  copyCode?: string;
+  /** Visible text of the copy button. @default 'Copy' */
+  copy?: string;
+  /** Visible text after copying. @default 'Copied' */
+  copied?: string;
+  /** Name of the word-wrap toggle. @default 'Toggle word wrap' */
+  toggleWrap?: string;
+  /** Name of the download button. @default 'Download' */
+  download?: string;
+  /** The show-more button, given the number of hidden lines. @default (n) => `Show ${n} more lines` */
+  showMoreLines?: (hiddenLines: number) => string;
+  /** Line count shown on a collapsed block. @default (n) => `${n} lines` */
+  lineCount?: (lines: number) => string;
+  /** Annotation severity names. @default Error / Warning / Info / Success */
+  severity?: Partial<Record<NonNullable<CodeAnnotation['severity']>, string>>;
+}
+
 export interface CodeBlockProps {
   /** The code to display. Shown raw, whitespace preserved. Source of truth for copy/download/line count. */
   code: string;
@@ -82,6 +102,8 @@ export interface CodeBlockProps {
   wrap?: boolean;
   startCollapsed?: boolean;
   className?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: CodeBlockLabels;
 }
 
 const MIME_BY_LANGUAGE: Record<string, string> = {
@@ -143,7 +165,18 @@ export function CodeBlock({
   wrap = false,
   startCollapsed = false,
   className,
+  labels,
 }: CodeBlockProps): React.ReactElement {
+  const {
+    copyCode = 'Copy code',
+    copy: copyText = 'Copy',
+    copied: copiedText = 'Copied',
+    toggleWrap = 'Toggle word wrap',
+    download: downloadLabel = 'Download',
+    showMoreLines = (n: number) => `Show ${n} more lines`,
+    lineCount: lineCountLabel = (n: number) => `${n} lines`,
+  } = labels ?? {};
+  const severityLabel = { ...SEVERITY_LABEL, ...labels?.severity };
   const [collapsed, setCollapsed] = useState(startCollapsed);
   const [wrapped, setWrapped] = useState(wrap);
   const [expanded, setExpanded] = useState(false);
@@ -198,7 +231,7 @@ export function CodeBlock({
     >
       {showWrap && (
         <ActionButton
-          ariaLabel="Toggle word wrap"
+          aria-label={toggleWrap}
           aria-pressed={wrapped}
           className="enabled:active:scale-100"
           onClick={() => setWrapped((w) => !w)}
@@ -208,7 +241,7 @@ export function CodeBlock({
       )}
       {showDownload && (
         <ActionButton
-          ariaLabel="Download"
+          aria-label={downloadLabel}
           className="enabled:active:scale-100"
           onClick={download}
         >
@@ -217,13 +250,13 @@ export function CodeBlock({
       )}
       {showCopy && (
         <ActionButton
-          ariaLabel="Copy code"
+          aria-label={copyCode}
           data-copied={copied || undefined}
           className="codeblock__copy enabled:active:scale-100"
           onClick={() => copy(code)}
         >
           {copied ? <Check {...ICON} /> : <Copy {...ICON} />}
-          <span>{copied ? 'Copied' : 'Copy'}</span>
+          <span>{copied ? copiedText : copyText}</span>
         </ActionButton>
       )}
     </div>
@@ -237,7 +270,7 @@ export function CodeBlock({
       {showCollapse && <ChevronDown {...ICON} className="codeblock__chevron" aria-hidden />}
       {!languageSelector && <span className="codeblock__badge">{language}</span>}
       {filename && <span className="codeblock__filename">{filename}</span>}
-      {collapsed && <span className="codeblock__count">· {lineCount} lines</span>}
+      {collapsed && <span className="codeblock__count">· {lineCountLabel(lineCount)}</span>}
     </>
   );
 
@@ -305,7 +338,7 @@ export function CodeBlock({
                       >
                         <div className="codeblock__annotation-meta">
                           <span className="codeblock__annotation-severity">
-                            {SEVERITY_LABEL[severity]}
+                            {severityLabel[severity]}
                           </span>
                           {note.code && (
                             <span className="codeblock__annotation-code">{note.code}</span>
@@ -328,7 +361,7 @@ export function CodeBlock({
 
       {!collapsed && clipped && (
         <button type="button" className="codeblock__more" onClick={() => setExpanded(true)}>
-          Show {lineCount - maxLines} more lines
+          {showMoreLines(lineCount - maxLines)}
         </button>
       )}
     </div>

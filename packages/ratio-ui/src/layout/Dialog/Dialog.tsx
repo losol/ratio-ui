@@ -41,10 +41,18 @@ export interface DialogProps {
   isDismissable?: boolean;
   /** When true, Escape no longer closes the dialog. Defaults to false. */
   isKeyboardDismissDisabled?: boolean;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: DialogLabels;
+}
+
+/** Built-in text of `Dialog`. Each entry falls back to English. */
+export interface DialogLabels {
+  /** Name of the header's close button. @default 'Close dialog' */
+  close?: string;
 }
 
 // Lets Header render the close button in the header row, same as Drawer.
-const DialogContext = createContext<{ onClose?: () => void }>({});
+const DialogContext = createContext<{ onClose?: () => void; closeLabel?: string }>({});
 
 // True inside a Header, so Heading drops its standalone padding there.
 const HeaderScopeContext = createContext(false);
@@ -58,9 +66,11 @@ const DialogRoot = ({
   role = 'dialog',
   isDismissable = true,
   isKeyboardDismissDisabled = false,
+  labels,
 }: Readonly<DialogProps>) => {
   const panelWidth = sizeClasses[size ?? 'md'];
-  const context = useMemo(() => ({ onClose }), [onClose]);
+  const closeLabel = labels?.close;
+  const context = useMemo(() => ({ onClose, closeLabel }), [onClose, closeLabel]);
 
   return (
     <ModalOverlay
@@ -110,7 +120,7 @@ interface DialogSlotProps {
  * the same way `Drawer.Header` does it.
  */
 function DialogHeader({ children, className }: Readonly<DialogSlotProps>) {
-  const { onClose } = useContext(DialogContext);
+  const { onClose, closeLabel } = useContext(DialogContext);
   return (
     <header
       className={cn('flex shrink-0 items-start gap-3 px-5 pt-4 pb-3.5 md:px-6 md:pt-5', className)}
@@ -118,7 +128,7 @@ function DialogHeader({ children, className }: Readonly<DialogSlotProps>) {
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <HeaderScopeContext.Provider value>{children}</HeaderScopeContext.Provider>
       </div>
-      {onClose && <OverlayCloseButton onPress={onClose} label="Close dialog" />}
+      {onClose && <OverlayCloseButton onPress={onClose} label={closeLabel ?? 'Close dialog'} />}
     </header>
   );
 }

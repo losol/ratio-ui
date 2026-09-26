@@ -7,11 +7,19 @@
 import { useEffect, useState } from 'react';
 import { Mail } from '../../icons';
 
+/** Built-in text of `ObfuscatedEmail`. Each entry falls back to English. */
+export interface ObfuscatedEmailLabels {
+  /** Shown until the address is decoded on the client. @default 'Email loading...' */
+  loading?: string;
+}
+
 export interface ObfuscatedEmailProps {
   email: string;
   className?: string;
   linkClassName?: string;
   subject?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: ObfuscatedEmailLabels;
 }
 
 /**
@@ -30,7 +38,8 @@ export const ObfuscatedEmail = ({
   email,
   className = '',
   linkClassName = 'hover:underline',
-  subject
+  subject,
+  labels,
 }: ObfuscatedEmailProps) => {
   const [decodedEmail, setDecodedEmail] = useState<string>('');
   const [mounted, setMounted] = useState(false);
@@ -53,7 +62,7 @@ export const ObfuscatedEmail = ({
       <span className={className}>
         <span className="inline-flex items-center gap-1">
           <Mail className="h-4 w-4" aria-hidden="true" />
-          <span className="text-(--text-subtle)">Email loading...</span>
+          <span className="text-(--text-subtle)">{labels?.loading ?? 'Email loading...'}</span>
         </span>
       </span>
     );

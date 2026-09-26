@@ -10,6 +10,14 @@ import { cn } from '../../utils/cn';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { CopyStateIcon } from '../CopyStateIcon';
 
+/** Built-in text of `CopyButton`. Each entry falls back to English. */
+export interface CopyButtonLabels {
+  /** Visible text with `withLabel`. @default 'Copy' */
+  copy?: string;
+  /** Visible text after copying. @default 'Copied' */
+  copied?: string;
+}
+
 export interface CopyButtonProps {
   /** Text copied to the clipboard when pressed. */
   value: string;
@@ -21,6 +29,8 @@ export interface CopyButtonProps {
   size?: ActionButtonSize;
   /** Accessible name + tooltip. Defaults to "Copy to clipboard". */
   ariaLabel?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: CopyButtonLabels;
   /** Fired with the value after a successful copy. */
   onCopy?: (value: string) => void;
   className?: string;
@@ -61,6 +71,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   onCopy,
   className,
   testId,
+  labels,
 }) => {
   const { copied, copy } = useCopyToClipboard({ onCopy });
 
@@ -79,7 +90,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       <CopyStateIcon copied={copied} size={iconSize} />
       {withLabel && (
         <span className={cn('text-xs font-semibold', copied && 'text-(--primary)')}>
-          {copied ? 'Copied' : 'Copy'}
+          {copied ? (labels?.copied ?? 'Copied') : (labels?.copy ?? 'Copy')}
         </span>
       )}
     </ActionButton>

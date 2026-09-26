@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { ObfuscatedEmail } from './ObfuscatedEmail';
-export type { ObfuscatedEmailProps } from './ObfuscatedEmail';
+export type { ObfuscatedEmailLabels, ObfuscatedEmailProps } from './ObfuscatedEmail';

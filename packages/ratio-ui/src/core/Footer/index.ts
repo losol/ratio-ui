@@ -10,6 +10,7 @@ export type {
   FooterBrandProps,
   FooterLinkColumnProps,
   FooterLinkProps,
+  FooterPublisherLabels,
   FooterPublisherProps,
   FooterNewsletterProps,
   FooterSocialProps,

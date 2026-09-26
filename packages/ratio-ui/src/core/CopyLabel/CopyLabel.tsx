@@ -25,6 +25,18 @@ export interface CopyLabelProps {
   className?: string;
   /** Callback fired when value is successfully copied */
   onCopy?: (value: string) => void;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: CopyLabelLabels;
+}
+
+/** Built-in text of `CopyLabel`. Each entry falls back to English. */
+export interface CopyLabelLabels {
+  /** Name of the copy button, given the label. @default (label) => `Copy ${label} to clipboard` */
+  copyValue?: (label: string) => string;
+  /** Tooltip of the copy button. @default 'Copy to clipboard' */
+  tooltip?: string;
+  /** Shown after copying. @default 'Copied' */
+  copied?: string;
 }
 
 // Token-driven focus ring, matching ActionButton / ToggleButtonGroup.
@@ -54,8 +66,14 @@ export const CopyLabel: React.FC<CopyLabelProps> = ({
   mono = false,
   className,
   onCopy,
+  labels,
 }) => {
   const { copied, copy } = useCopyToClipboard({ onCopy });
+  const {
+    copyValue = (name: string) => `Copy ${name} to clipboard`,
+    tooltip = 'Copy to clipboard',
+    copied: copiedText = 'Copied',
+  } = labels ?? {};
 
   if (variant === 'inline') {
     return (
@@ -72,8 +90,8 @@ export const CopyLabel: React.FC<CopyLabelProps> = ({
         <button
           type="button"
           onClick={() => copy(value)}
-          aria-label={`Copy ${label} to clipboard`}
-          title="Copy to clipboard"
+          aria-label={copyValue(label)}
+          title={tooltip}
           className={cn(
             'inline-flex items-center gap-2 min-w-0',
             '-mx-2 -my-1 px-2 py-1',
@@ -98,7 +116,7 @@ export const CopyLabel: React.FC<CopyLabelProps> = ({
           </span>
           {copied && (
             <Text as="span" size="xs" weight="semibold" color="primary" className="shrink-0">
-              Copied
+              {copiedText}
             </Text>
           )}
         </button>
@@ -115,8 +133,8 @@ export const CopyLabel: React.FC<CopyLabelProps> = ({
       <button
         type="button"
         onClick={() => copy(value)}
-        aria-label={`Copy ${label} to clipboard`}
-        title="Copy to clipboard"
+        aria-label={copyValue(label)}
+        title={tooltip}
         className={cn(
           'flex items-center gap-3 w-full',
           'px-3.5 py-3 box-border',

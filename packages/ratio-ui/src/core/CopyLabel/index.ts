@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { CopyLabel } from './CopyLabel';
-export type { CopyLabelProps, CopyLabelVariant } from './CopyLabel';
+export type { CopyLabelLabels, CopyLabelProps, CopyLabelVariant } from './CopyLabel';

@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import { ChevronRight, X } from '../../icons';
 import { ActionButton } from '../ActionButton';
 import { cn } from '../../utils/cn';
@@ -189,7 +189,25 @@ export interface NavTreeProps {
   /** Accessible label for the nav element. */
   'aria-label'?: string;
   className?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: NavTreeLabels;
 }
+
+/** Built-in text of `NavTree`. Each entry falls back to English. */
+export interface NavTreeLabels {
+  /** Name of a collapsed branch's chevron, given the item's title when it is text. @default (title) => title ? `Expand ${title}` : 'Expand' */
+  expand?: (title?: string) => string;
+  /** Name of an expanded branch's chevron. @default (title) => title ? `Collapse ${title}` : 'Collapse' */
+  collapse?: (title?: string) => string;
+  /** Name of a context row's close button, unless the item sets `closeLabel`. @default 'Close' */
+  close?: string;
+}
+
+const defaultExpand = (title?: string) => (title ? `Expand ${title}` : 'Expand');
+const defaultCollapse = (title?: string) => (title ? `Collapse ${title}` : 'Collapse');
+
+// Rows render recursively, so their built-in text travels by context.
+const NavTreeLabelsContext = createContext<NavTreeLabels | undefined>(undefined);
 
 // Row chrome shared by links and toggle rows. The active row is tinted with
 // the primary-100/900 pair (the same tint recipe as ToggleButton/Menu).
@@ -246,6 +264,7 @@ export function NavTree({
   LinkComponent,
   'aria-label': ariaLabel = 'Navigation',
   className,
+  labels,
 }: Readonly<NavTreeProps>) {
   const resolvedGroups = groups ?? (items ? [{ items }] : []);
 
@@ -351,35 +370,37 @@ export function NavTree({
   }
 
   return (
-    <nav aria-label={ariaLabel} className={cn('text-[14.5px]', className)}>
-      {resolvedGroups.map((group, index) => (
-        // Index is always part of the key: two groups may share a label.
-        <div key={`${group.label ?? 'group'}-${index}`} className={index > 0 ? 'mt-6' : undefined}>
-          {group.label &&
-            (iconOnly ? (
-              // In the rail, a hairline stands in for the group label.
-              index > 0 && <div aria-hidden className="mx-2 mb-2 h-px bg-border-1" />
-            ) : (
-              <div className={GROUP_LABEL}>{group.label}</div>
-            ))}
-          <ul className="space-y-0.5">
-            {group.items.map((node, i) => (
-              <NavTreeRow
-                key={nodeKey(node, i)}
-                node={node}
-                branchKey={branchKey(node, `g${index}`, i)}
-                current={current}
-                onAction={onAction}
-                iconOnly={iconOnly}
-                expansion={expansion}
-                LinkComponent={LinkComponent}
-                depth={0}
-              />
-            ))}
-          </ul>
-        </div>
-      ))}
-    </nav>
+    <NavTreeLabelsContext.Provider value={labels}>
+      <nav aria-label={ariaLabel} className={cn('text-[14.5px]', className)}>
+        {resolvedGroups.map((group, index) => (
+          // Index is always part of the key: two groups may share a label.
+          <div key={`${group.label ?? 'group'}-${index}`} className={index > 0 ? 'mt-6' : undefined}>
+            {group.label &&
+              (iconOnly ? (
+                // In the rail, a hairline stands in for the group label.
+                index > 0 && <div aria-hidden className="mx-2 mb-2 h-px bg-border-1" />
+              ) : (
+                <div className={GROUP_LABEL}>{group.label}</div>
+              ))}
+            <ul className="space-y-0.5">
+              {group.items.map((node, i) => (
+                <NavTreeRow
+                  key={nodeKey(node, i)}
+                  node={node}
+                  branchKey={branchKey(node, `g${index}`, i)}
+                  current={current}
+                  onAction={onAction}
+                  iconOnly={iconOnly}
+                  expansion={expansion}
+                  LinkComponent={LinkComponent}
+                  depth={0}
+                />
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </NavTreeLabelsContext.Provider>
   );
 }
 
@@ -482,6 +503,7 @@ function NavTreeRow({
   LinkComponent,
   depth,
 }: Readonly<NavTreeRowProps>) {
+  const labels = useContext(NavTreeLabelsContext);
   const paddingLeft = `${0.75 + depth * 0.75}rem`;
 
   // Arbitrary content slot (e.g. a group filter) — plain node, no row chrome.
@@ -510,7 +532,7 @@ function NavTreeRow({
             variant="ghost"
             size="sm"
             round
-            ariaLabel={node.closeLabel ?? 'Close'}
+            ariaLabel={node.closeLabel ?? labels?.close ?? 'Close'}
             onPress={node.onClose}
           >
             <X size={14} />
@@ -646,12 +668,8 @@ function NavTreeRow({
             aria-expanded={isOpen}
             aria-label={
               isOpen
-                ? titleText
-                  ? `Collapse ${titleText}`
-                  : 'Collapse'
-                : titleText
-                  ? `Expand ${titleText}`
-                  : 'Expand'
+                ? (labels?.collapse ?? defaultCollapse)(titleText)
+                : (labels?.expand ?? defaultExpand)(titleText)
             }
             className="rounded-md p-1.5 outline-none transition-colors hover:bg-card-hover focus-visible:ring-2 focus-visible:ring-(--focus-ring)"
           >

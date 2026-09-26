@@ -15,6 +15,16 @@ export interface ThemeToggleProps {
   className?: string;
   /** Optional aria-label for accessibility */
   ariaLabel?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: ThemeToggleLabels;
+}
+
+/** Built-in text of `ThemeToggle`. Each entry falls back to English. */
+export interface ThemeToggleLabels {
+  /** @default 'Switch to light mode' */
+  switchToLight?: string;
+  /** @default 'Switch to dark mode' */
+  switchToDark?: string;
 }
 
 /**
@@ -33,6 +43,7 @@ export const ThemeToggle = ({
   onThemeChange,
   className = '',
   ariaLabel = 'Toggle theme',
+  labels,
 }: ThemeToggleProps) => {
   const [mounted, setMounted] = useState(false);
   const isDark = theme === 'dark';
@@ -79,7 +90,9 @@ export const ThemeToggle = ({
         )}
       </span>
       <span className="sr-only" suppressHydrationWarning>
-        {isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        {isDark
+          ? (labels?.switchToLight ?? 'Switch to light mode')
+          : (labels?.switchToDark ?? 'Switch to dark mode')}
       </span>
     </Button>
   );

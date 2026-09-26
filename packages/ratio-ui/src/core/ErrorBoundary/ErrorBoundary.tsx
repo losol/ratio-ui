@@ -14,8 +14,20 @@ export type ErrorBoundaryFallback =
   | React.ReactNode
   | ((args: ErrorBoundaryRenderProps) => React.ReactNode);
 
+/** Built-in text of the default fallback. Each entry falls back to English. */
+export interface ErrorBoundaryLabels {
+  /** @default 'Something went wrong' */
+  title?: string;
+  /** @default "This part of the page couldn't be displayed." */
+  description?: string;
+  /** @default 'Try again' */
+  retry?: string;
+}
+
 export interface ErrorBoundaryProps {
   children: React.ReactNode;
+  /** Built-in text of the default fallback. Each entry falls back to English. */
+  labels?: ErrorBoundaryLabels;
   /** Fallback UI shown when a child throws. Pass a render fn to access `error` and `reset`. */
   fallback?: ErrorBoundaryFallback;
   /** Boundary resets when any value in this array changes (shallow compare). */
@@ -41,20 +53,26 @@ function changed(a: ReadonlyArray<unknown> = [], b: ReadonlyArray<unknown> = [])
  * implementation details or user data. Write a custom `fallback` if you need
  * to surface details (typically gated behind a dev flag).
  */
-function DefaultFallback({ reset }: Readonly<ErrorBoundaryRenderProps>) {
+function DefaultFallback({
+  reset,
+  labels,
+}: Readonly<ErrorBoundaryRenderProps & { labels?: ErrorBoundaryLabels }>) {
+  const {
+    title = 'Something went wrong',
+    description = "This part of the page couldn't be displayed.",
+    retry = 'Try again',
+  } = labels ?? {};
   return (
     <ErrorBlock type="generic" status="error">
-      <ErrorBlock.Title>Something went wrong</ErrorBlock.Title>
-      <ErrorBlock.Description>
-        This part of the page couldn't be displayed.
-      </ErrorBlock.Description>
+      <ErrorBlock.Title>{title}</ErrorBlock.Title>
+      <ErrorBlock.Description>{description}</ErrorBlock.Description>
       <ErrorBlock.Actions>
         <button
           type="button"
           onClick={reset}
           className="px-4 py-2 rounded bg-error-bg border border-error-border text-error-text hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error-border"
         >
-          Try again
+          {retry}
         </button>
       </ErrorBlock.Actions>
     </ErrorBlock>
@@ -112,6 +130,6 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     if (fallback !== undefined) {
       return fallback;
     }
-    return <DefaultFallback error={error} reset={this.reset} />;
+    return <DefaultFallback error={error} reset={this.reset} labels={this.props.labels} />;
   }
 }

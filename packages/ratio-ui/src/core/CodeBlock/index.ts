@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { CodeBlock } from './CodeBlock';
-export type { CodeBlockProps, CodeAnnotation } from './CodeBlock';
+export type { CodeBlockLabels, CodeBlockProps, CodeAnnotation } from './CodeBlock';

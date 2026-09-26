@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, within } from 'storybook/test';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Panel } from '../Panel';
 
@@ -111,4 +112,24 @@ export const OnErrorLogging: Story = {
       <Boom when={true} />
     </ErrorBoundary>
   ),
+};
+
+/** The default fallback's text comes from `labels`. */
+export const LocalizedFallback: Story = {
+  render: () => (
+    <ErrorBoundary
+      labels={{
+        title: 'Noe gikk galt',
+        description: 'Denne delen av siden kunne ikke vises.',
+        retry: 'Prøv igjen',
+      }}
+    >
+      <Boom when={true} />
+    </ErrorBoundary>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Noe gikk galt')).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Prøv igjen' })).toBeInTheDocument();
+  },
 };

@@ -14,9 +14,19 @@ import { InputDescription } from '../common/InputDescription';
 import { CopyButton } from '../../core/CopyButton';
 import { cn } from '../../utils/cn';
 
+/** Built-in text of `TextField`. Each entry falls back to English. */
+export interface TextFieldLabels {
+  /** Name of the copy button, given the field's label. @default (label) => label ? `Copy ${label}` : 'Copy to clipboard' */
+  copy?: (label?: string) => string;
+}
+
+const defaultCopyLabel = (label?: string) => (label ? `Copy ${label}` : 'Copy to clipboard');
+
 interface ExtendedInputProps extends InputFieldProps {
   /** Drop the input's default classes and style it from scratch with `className`. */
   unstyled?: boolean;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: TextFieldLabels;
   multiline?: boolean;
   rows?: number;
   cols?: number;
@@ -72,6 +82,7 @@ export function TextField({
   description,
   className,
   unstyled = false,
+  labels,
   errors,
   disabled,
   multiline = false,
@@ -151,7 +162,7 @@ export function TextField({
         <CopyButton
           value={String(copyValue)}
           size="sm"
-          ariaLabel={label ? `Copy ${label}` : 'Copy to clipboard'}
+          aria-label={(labels?.copy ?? defaultCopyLabel)(label)}
         />
       </span>
     </div>

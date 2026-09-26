@@ -4,6 +4,7 @@
 
 export { ErrorBoundary } from './ErrorBoundary';
 export type {
+  ErrorBoundaryLabels,
   ErrorBoundaryProps,
   ErrorBoundaryFallback,
   ErrorBoundaryRenderProps,
