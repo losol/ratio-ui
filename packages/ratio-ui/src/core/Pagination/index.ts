@@ -3,3 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Pagination } from './Pagination';
+export type { PaginationLabels, PaginationProps } from './Pagination';

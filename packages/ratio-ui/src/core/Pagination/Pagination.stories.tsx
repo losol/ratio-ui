@@ -1,6 +1,6 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { Pagination, type PaginationProps } from './Pagination';
-import { fn } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { useState } from 'react';
 
 const meta: Meta<typeof Pagination> = {
@@ -98,4 +98,32 @@ export const FewPages: PaginationStory = () => {
       onNextPageClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
     />
   );
+};
+
+/** `labels` translates the visible status and the screen-reader names. */
+export const Localized: PaginationStory = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 4;
+
+  return (
+    <Pagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPreviousPageClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+      onNextPageClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+      labels={{
+        navigation: 'Sidenavigasjon',
+        previous: 'Forrige side',
+        next: 'Neste side',
+        status: (current, total) => `Side ${current} av ${total}`,
+      }}
+    />
+  );
+};
+Localized.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  await expect(canvas.getByRole('navigation', { name: 'Sidenavigasjon' })).toBeInTheDocument();
+  await expect(canvas.getByRole('button', { name: 'Forrige side' })).toBeDisabled();
+  await userEvent.click(canvas.getByRole('button', { name: 'Neste side' }));
+  await expect(canvas.getByText('Side 2 av 4')).toBeInTheDocument();
 };
