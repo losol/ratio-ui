@@ -14,6 +14,7 @@ export type { SearchFieldProps } from './SearchField';
 export type { InputProps, InputFieldProps, FieldErrorMap } from './Input/InputProps';
 export { Input } from './Input/Input';
 export { TextField } from './Input/TextField';
+export type { TextFieldLabels } from './Input/TextField';
 export { RadioGroup } from './RadioGroup';
 export type { RadioGroupProps, RadioOption } from './RadioGroup';
 export { NumberField } from './NumberField';

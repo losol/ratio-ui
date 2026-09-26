@@ -27,6 +27,12 @@ export interface FileUploadRejection {
   reason: 'type' | 'size' | 'count';
 }
 
+/** Built-in text of `FileUpload`. Each entry falls back to English. */
+export interface FileUploadLabels {
+  /** Name of the drop zone when there is no `label`. @default 'File upload drop zone' */
+  dropZone?: string;
+}
+
 export interface FileUploadProps {
   /**
    * Tracked files (controlled). The app owns this list along with the actual
@@ -56,6 +62,8 @@ export interface FileUploadProps {
   description?: string;
   /** Primary text inside the drop zone. */
   dropzoneLabel?: React.ReactNode;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: FileUploadLabels;
   buttonLabel?: string;
   className?: string;
   testId?: string;
@@ -232,6 +240,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   buttonLabel = 'Browse files',
   className,
   testId,
+  labels,
 }) => {
   const acceptHint = useMemo(() => accept?.join(', '), [accept]);
 
@@ -268,7 +277,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
       <DropZone
         isDisabled={isDisabled}
-        aria-label={label ?? 'File upload drop zone'}
+        aria-label={label ?? labels?.dropZone ?? 'File upload drop zone'}
         className={({ isDropTarget }) =>
           cn(
             styles.dropzone.base,

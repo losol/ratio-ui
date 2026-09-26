@@ -3,6 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Dialog } from './Dialog';
-export type { DialogProps, DialogSize } from './Dialog';
+export type { DialogLabels, DialogProps, DialogSize } from './Dialog';
 export { AlertDialog } from './AlertDialog';
 export type { AlertDialogProps, AlertDialogVariant, AlertDialogAutoFocus } from './AlertDialog';

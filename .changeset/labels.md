@@ -9,14 +9,19 @@ entries fall back to English; a component's own accessible name is the native
 
 - `labels`: `Loading` (with a new `showLabel`), `TableOfContents` (its
   visible title, which now names the `<nav>` via `aria-labelledby`), `Lookup`,
-  `ToastRenderer`, `PhoneInput` (including the length error, as a function),
-  `Tree`, `ThreeColumnLayout`, `CartLineItem` and `OrderSummary`.
+  `SearchField`, `ToastRenderer`, `PhoneInput` (including the length error, as
+  a function), `Tree`, `NavTree`, `ThreeColumnLayout`, `Dialog`, `Drawer`,
+  `ErrorBoundary` (the default fallback), `Unauthorized`, `CodeBlock`,
+  `CopyButton`, `CopyLabel`, `TextField` (its copy button), `FileUpload`,
+  `ThemeToggle`, `ObfuscatedEmail`, `Footer` (the publisher's organisation
+  number), `CartLineItem` and `OrderSummary`.
 - `aria-label` with an English default: `Stepper`, `Schedule`, `Pagination`.
   `Pagination`'s `labels.navigation` is deprecated in favour of `aria-label`.
 
-**Visible change:** `CartLineItem` and `OrderSummary` shipped Norwegian text
-("Fjern", "Antall", "inkl. mva", "Ordresammendrag", "Subtotal (eks. mva)",
-"MVA"). They now default to English. To keep Norwegian:
+**Visible change:** `CartLineItem`, `OrderSummary` and the footer publisher
+block shipped Norwegian text ("Fjern", "Antall", "inkl. mva",
+"Ordresammendrag", "Subtotal (eks. mva)", "MVA", "Org.nr."). They now default
+to English. To keep Norwegian:
 
 ```tsx
 <CartLineItem
@@ -32,5 +37,9 @@ entries fall back to English; a component's own accessible name is the native
 <OrderSummary
   title="Ordresammendrag"
   labels={{ subtotalExVat: 'Subtotal (eks. mva)', vat: 'MVA', total: 'Total' }}
+/>
+<Footer.Publisher
+  publisher={publisher}
+  labels={{ organizationNumber: (n) => `Org.nr. ${n}` }}
 />
 ```

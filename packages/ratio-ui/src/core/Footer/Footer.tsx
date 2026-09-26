@@ -34,6 +34,8 @@ export interface FooterProps {
 export interface FooterClassicProps extends FooterProps {
   siteTitle?: string;
   publisher?: Publisher;
+  /** Built-in text of the publisher block. Each entry falls back to English. */
+  labels?: FooterPublisherLabels;
 }
 
 // ── Brand ──────────────────────────────────────────────────────────────────
@@ -119,19 +121,31 @@ const FooterLink: React.FC<FooterLinkProps> = ({
 
 // ── Publisher ────────────────────────────────────────────────────────────────
 
+/** Built-in text of the publisher block. Each entry falls back to English. */
+export interface FooterPublisherLabels {
+  /** The organisation number line. @default (number) => `Org. no. ${number}` */
+  organizationNumber?: (organizationNumber: string) => string;
+}
+
+const defaultOrganizationNumber = (n: string) => `Org. no. ${n}`;
+
 export interface FooterPublisherProps {
   publisher: Publisher;
   className?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: FooterPublisherLabels;
 }
 
-const FooterPublisher: React.FC<FooterPublisherProps> = ({ publisher, className }) => (
+const FooterPublisher: React.FC<FooterPublisherProps> = ({ publisher, className, labels }) => (
   <div className={cn('ratio-footer__publisher', className)}>
     <div className="ratio-footer__publisher-name">{publisher.name}</div>
     <p>{publisher.address}</p>
     <p>{publisher.phone}</p>
     {publisher.email ? <ObfuscatedEmail email={publisher.email} className="block" /> : null}
     {publisher.organizationNumber ? (
-      <div className="ratio-footer__publisher-org">Org.nr. {publisher.organizationNumber}</div>
+      <div className="ratio-footer__publisher-org">
+        {(labels?.organizationNumber ?? defaultOrganizationNumber)(publisher.organizationNumber)}
+      </div>
     ) : null}
   </div>
 );
@@ -266,6 +280,7 @@ const FooterClassic: React.FC<FooterClassicProps> = ({
   children,
   className,
   dark,
+  labels,
 }) => (
   <FooterRoot className={className} dark={dark}>
     <div className="md:flex md:justify-between">
@@ -278,7 +293,9 @@ const FooterClassic: React.FC<FooterClassicProps> = ({
               <p>{publisher.address}</p>
               <p>{publisher.phone}</p>
               {publisher.email && <ObfuscatedEmail email={publisher.email} className="block" />}
-              {publisher.organizationNumber && <p>Org.nr. {publisher.organizationNumber}</p>}
+              {publisher.organizationNumber && (
+                <p>{(labels?.organizationNumber ?? defaultOrganizationNumber)(publisher.organizationNumber)}</p>
+              )}
             </div>
           )}
         </div>

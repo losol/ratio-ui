@@ -28,6 +28,12 @@ const sizeClasses: Record<Exclude<DrawerSize, 'responsive'>, string> = {
   xl: 'max-w-4xl',
 };
 
+/** Built-in text of `Drawer`. Each entry falls back to English. */
+export interface DrawerLabels {
+  /** Name of the close button. @default 'Close drawer' */
+  close?: string;
+}
+
 export interface DrawerProps {
   isOpen: boolean;
   onClose?: () => void;
@@ -65,6 +71,8 @@ export interface DrawerProps {
    * the top sheet's back-link promises something underneath. @default 0
    */
   stackOffset?: number;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: DrawerLabels;
 }
 
 interface DrawerChildProps {
@@ -97,7 +105,7 @@ interface DrawerComponent extends React.FC<DrawerProps> {
 
 // Lets Header render the close button in the header row instead of the
 // Drawer absolutely positioning one over the content.
-const DrawerContext = createContext<{ onClose?: () => void }>({});
+const DrawerContext = createContext<{ onClose?: () => void; closeLabel?: string }>({});
 
 // Family easing token (shared with Dialog) — a fast launch that settles softly.
 const easing = 'ease-overlay motion-reduce:transition-none';
@@ -113,9 +121,11 @@ const Drawer: DrawerComponent = ({
   isKeyboardDismissDisabled = false,
   scrim = true,
   stackOffset = 0,
+  labels,
 }: DrawerProps) => {
   const isHorizontal = side === 'left' || side === 'right';
-  const context = useMemo(() => ({ onClose }), [onClose]);
+  const closeLabel = labels?.close ?? 'Close drawer';
+  const context = useMemo(() => ({ onClose, closeLabel }), [onClose, closeLabel]);
 
   // Drag-to-dismiss on the handle — sheets only, and only when the drawer is
   // dismissable at all. Escape/backdrop/close button stay the a11y paths.
@@ -222,7 +232,7 @@ const Drawer: DrawerComponent = ({
                 size="lg"
                 onPress={onClose}
                 className="absolute top-3 right-3 z-10"
-                ariaLabel="Close drawer"
+                aria-label={closeLabel}
               >
                 <X size={18} />
               </ActionButton>
@@ -240,7 +250,7 @@ const Drawer: DrawerComponent = ({
 const headingClass = 'm-0 text-2xl font-bold text-(--text)';
 
 const Header: React.FC<HeaderProps> = ({ as, children, className }) => {
-  const { onClose } = useContext(DrawerContext);
+  const { onClose, closeLabel } = useContext(DrawerContext);
 
   // When `as` is set, render the heading as a slotted RAC Heading so the
   // dialog gets its accessible name auto-wired via aria-labelledby.
@@ -259,7 +269,7 @@ const Header: React.FC<HeaderProps> = ({ as, children, className }) => {
       className={cn('flex shrink-0 items-start gap-3 px-5 pt-4 pb-3.5 md:px-6 md:pt-5', className)}
     >
       <div className="flex min-w-0 flex-1 flex-col gap-1">{content}</div>
-      {onClose && <OverlayCloseButton onPress={onClose} label="Close drawer" />}
+      {onClose && <OverlayCloseButton onPress={onClose} label={closeLabel ?? 'Close drawer'} />}
     </header>
   );
 };

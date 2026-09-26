@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, screen } from 'storybook/test';
 import { useState } from 'react';
 import { Dialog, DialogProps, DialogSize } from './Dialog';
 import { Button } from '../../core/Button';
@@ -193,4 +194,22 @@ const NonDismissableDemo = () => {
  */
 export const NonDismissable: Story = {
   render: () => <NonDismissableDemo />,
+};
+
+/** The header's close button is named by `labels.close`. */
+export const LocalizedClose: Story = {
+  render: () => (
+    <Dialog isOpen onClose={() => {}} labels={{ close: 'Lukk dialog' }}>
+      <Dialog.Header>
+        <Dialog.Heading>Lagre endringer?</Dialog.Heading>
+      </Dialog.Header>
+      <Dialog.Content>
+        <p>Endringene gjelder alle deltakere.</p>
+      </Dialog.Content>
+    </Dialog>
+  ),
+  play: async () => {
+    // The dialog renders in a portal, outside the canvas.
+    await expect(await screen.findByRole('button', { name: 'Lukk dialog' })).toBeInTheDocument();
+  },
 };

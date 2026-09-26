@@ -17,6 +17,12 @@ import { cn } from '../../utils/cn';
 
 export type SearchFieldSize = 'sm' | 'md' | 'lg';
 
+/** Built-in text of `SearchField`. Each entry falls back to English. */
+export interface SearchFieldLabels {
+  /** Name of the clear button. @default 'Clear search' */
+  clear?: string;
+}
+
 export interface SearchFieldProps {
   value?: string;
   onChange?: (value: string) => void;
@@ -43,6 +49,8 @@ export interface SearchFieldProps {
   'aria-label'?: string;
   className?: string;
   isDisabled?: boolean;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: SearchFieldLabels;
   /** Debounce delay in milliseconds for `onChange`. Default: 300ms */
   debounce?: number;
   testId?: string;
@@ -118,6 +126,7 @@ export const SearchField = React.forwardRef<HTMLDivElement, SearchFieldProps>(
       isDisabled,
       debounce = 300,
       testId,
+      labels,
     },
     ref
   ) => {
@@ -215,7 +224,7 @@ export const SearchField = React.forwardRef<HTMLDivElement, SearchFieldProps>(
               round
               size="sm"
               variant="ghost"
-              ariaLabel="Clear search"
+              aria-label={labels?.clear ?? 'Clear search'}
               className="border-0 text-(--text-muted)"
             >
               <X className="h-3.5 w-3.5" />

@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { CopyButton } from './CopyButton';
-export type { CopyButtonProps } from './CopyButton';
+export type { CopyButtonLabels, CopyButtonProps } from './CopyButton';

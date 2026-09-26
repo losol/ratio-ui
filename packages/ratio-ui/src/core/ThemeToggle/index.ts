@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { ThemeToggle } from './ThemeToggle';
-export type { ThemeToggleProps } from './ThemeToggle';
+export type { ThemeToggleLabels, ThemeToggleProps } from './ThemeToggle';

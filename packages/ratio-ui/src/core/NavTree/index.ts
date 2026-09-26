@@ -4,6 +4,7 @@
 
 export { NavTree } from './NavTree';
 export type {
+  NavTreeLabels,
   NavTreeProps,
   NavTreeItem,
   NavTreeLinkItem,

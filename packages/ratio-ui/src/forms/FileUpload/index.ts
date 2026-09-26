@@ -4,6 +4,7 @@
 
 export { FileUpload } from './FileUpload';
 export type {
+  FileUploadLabels,
   FileUploadProps,
   FileUploadItem,
   FileUploadStatus,
