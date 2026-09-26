@@ -13,7 +13,11 @@ export interface ThemeToggleProps {
   onThemeChange: (theme: 'light' | 'dark') => void;
   /** Optional className for custom styling */
   className?: string;
-  /** Accessible name of the toggle. @default 'Toggle theme' */
+  /**
+   * Accessible name of the toggle. Defaults to what pressing it does
+   * (`labels.switchToLight` / `labels.switchToDark`), or 'Toggle theme' before
+   * the theme is known on the client.
+   */
   'aria-label'?: string;
   /** @deprecated Use the native `aria-label`. Still honoured until the next major. */
   ariaLabel?: string;
@@ -48,9 +52,12 @@ export const ThemeToggle = ({
   ariaLabel,
   labels,
 }: ThemeToggleProps) => {
-  const name = ariaLabelAttr ?? ariaLabel ?? 'Toggle theme';
   const [mounted, setMounted] = useState(false);
   const isDark = theme === 'dark';
+  const explicitName = ariaLabelAttr ?? ariaLabel;
+  const actionName = isDark
+    ? (labels?.switchToLight ?? 'Switch to light mode')
+    : (labels?.switchToDark ?? 'Switch to dark mode');
 
   useEffect(() => {
     setMounted(true);
@@ -68,7 +75,7 @@ export const ThemeToggle = ({
         size="sm"
         onClick={handleToggle}
         className={className}
-        aria-label={name}
+        aria-label={explicitName ?? 'Toggle theme'}
         type="button"
       >
         <span className="w-5 h-5 block" />
@@ -82,7 +89,9 @@ export const ThemeToggle = ({
       size="sm"
       onClick={handleToggle}
       className={className}
-      aria-label={name}
+      // Named by what pressing it does. One name only: a hidden text beside an
+      // aria-label would never be read.
+      aria-label={explicitName ?? actionName}
       type="button"
       suppressHydrationWarning
     >
@@ -92,11 +101,6 @@ export const ThemeToggle = ({
         ) : (
           <Moon className="w-5 h-5" aria-hidden="true" />
         )}
-      </span>
-      <span className="sr-only" suppressHydrationWarning>
-        {isDark
-          ? (labels?.switchToLight ?? 'Switch to light mode')
-          : (labels?.switchToDark ?? 'Switch to dark mode')}
       </span>
     </Button>
   );

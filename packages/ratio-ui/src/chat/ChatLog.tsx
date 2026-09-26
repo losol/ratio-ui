@@ -28,6 +28,12 @@ export interface ChatLogMessage {
   reactions?: ChatReaction[];
 }
 
+/** Built-in text of `Chat.Log`. Each entry falls back to English. @beta */
+export interface ChatLogLabels {
+  /** Name of each message's reaction row. @default 'Reactions' */
+  reactions?: string;
+}
+
 /** @beta Prop shape may change before release. */
 export interface ChatLogProps {
   messages: ChatLogMessage[];
@@ -35,8 +41,10 @@ export interface ChatLogProps {
   me?: string;
   /** Called with the message and the emoji when you add or remove a reaction. */
   onToggleReaction?: (messageId: string, emoji: string) => void;
-  /** Accessible name for each message's reaction row, e.g. "Reactions". */
+  /** Accessible name for each message's reaction row. @deprecated Use `labels.reactions`. Still honoured until the next major. */
   reactionsLabel?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: ChatLogLabels;
   /** Accessible name, e.g. the channel. */
   'aria-label'?: string;
   className?: string;
@@ -75,9 +83,10 @@ const TIME = 'font-mono text-xs not-italic tabular-nums text-(--text-subtle)';
  * @beta This component is experimental — prop shape may change before release.
  */
 export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function ChatLog(
-  { messages, me, onToggleReaction, reactionsLabel, 'aria-label': ariaLabel, className, testId },
+  { messages, me, onToggleReaction, reactionsLabel, labels, 'aria-label': ariaLabel, className, testId },
   ref,
 ) {
+  const reactionsName = labels?.reactions ?? reactionsLabel ?? 'Reactions';
   return (
     <div
       ref={ref}
@@ -100,7 +109,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
           message={message}
           me={me}
           onToggleReaction={onToggleReaction}
-          reactionsLabel={reactionsLabel}
+          reactionsLabel={reactionsName}
         />
       ))}
     </div>

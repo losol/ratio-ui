@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { ChatLog } from './ChatLog';
-export type { ChatLogProps, ChatLogMessage, ChatRole } from './ChatLog';
+export type { ChatLogLabels, ChatLogProps, ChatLogMessage, ChatRole } from './ChatLog';
 export { ChatReactions } from './ChatReactions';
 export type { ChatReaction, ChatReactionsProps } from './ChatReactions';
 export { ChatPresenceDot } from './ChatPresenceDot';
@@ -19,4 +19,4 @@ export type {
   ChatRoomKind,
 } from './ChatChannelList';
 export { ChatUsers } from './ChatUsers';
-export type { ChatUser, ChatUsersProps } from './ChatUsers';
+export type { ChatUser, ChatUsersLabels, ChatUsersProps } from './ChatUsers';

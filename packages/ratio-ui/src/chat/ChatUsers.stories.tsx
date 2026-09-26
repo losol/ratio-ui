@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { ChatUsers } from './ChatUsers';
 
 const meta: Meta<typeof ChatUsers> = {
@@ -40,11 +41,27 @@ export const InAChannel: Story = {
   ),
   args: {
     users,
-    onlineLabel: '7 online',
-    awayLabel: 'Away · 2',
-    youLabel: 'you',
-    opLabel: 'op',
     'aria-label': 'People in #volunteers',
+  },
+};
+
+/** Norwegian through `labels`: the headings take the counts the component makes. */
+export const Localized: Story = {
+  render: InAChannel.render,
+  args: {
+    ...InAChannel.args,
+    labels: {
+      online: (n) => `${n} pålogget`,
+      away: (n) => `Borte · ${n}`,
+      you: 'deg',
+      op: 'op',
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('7 pålogget')).toBeInTheDocument();
+    await expect(canvas.getByText('Borte · 2')).toBeInTheDocument();
+    await expect(canvas.getByText('deg')).toBeInTheDocument();
   },
 };
 
@@ -54,7 +71,5 @@ export const AllPresent: Story = {
   args: {
     ...InAChannel.args,
     users: users.filter(u => !u.away),
-    onlineLabel: '7 online',
-    awayLabel: undefined,
   },
 };

@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ToggleButtonGroup } from '../core/ToggleButtonGroup';
 import { cn } from '../utils/cn';
 
@@ -21,13 +21,11 @@ export interface ChatReactionsProps {
   reactions: ChatReaction[];
   /** Called with the emoji whose reaction you add or remove. The caller updates `reactions`. */
   onToggle?: (emoji: string) => void;
-  /** Accessible name for the row, e.g. "Reactions". */
+  /** Accessible name for the row. @default 'Reactions' */
   'aria-label'?: string;
   className?: string;
 }
 
-// Once per page load: a log renders a row per message, and one hint is enough.
-let warnedUnlabelled = false;
 
 /**
  * Chat.Reactions — the emoji tally under a message. Each reaction is a tint
@@ -42,18 +40,9 @@ let warnedUnlabelled = false;
 export const ChatReactions: React.FC<ChatReactionsProps> = ({
   reactions,
   onToggle,
-  'aria-label': ariaLabel,
+  'aria-label': ariaLabel = 'Reactions',
   className,
 }) => {
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production' && !ariaLabel && !warnedUnlabelled) {
-      warnedUnlabelled = true;
-      console.warn(
-        '[ratio-ui] Chat.Reactions: pass `aria-label` (in Chat.Log: `reactionsLabel`), e.g. "Reactions", so screen readers can name each row.',
-      );
-    }
-  }, [ariaLabel]);
-
   return (
     <ToggleButtonGroup
       variant="tints"
