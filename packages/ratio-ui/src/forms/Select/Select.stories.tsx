@@ -196,3 +196,21 @@ export const Controlled: Story = {
     await expect(canvas.getByTestId('selected-field')).toHaveTextContent('Selected: epistemology');
   },
 };
+
+/**
+ * `className` adds to the default wrapper instead of replacing it: here a
+ * fixed width, while the label still sits above the trigger.
+ */
+export const CustomClassName: Story = {
+  args: {
+    label: 'Philosopher',
+    options: philosophers,
+    className: 'w-48',
+    testId: 'philosopher-select',
+  },
+  play: async ({ canvasElement }) => {
+    const wrapper = within(canvasElement).getByTestId('philosopher-select').parentElement!;
+    await expect(wrapper).toHaveClass('flex', 'flex-col', 'w-48');
+    await expect(wrapper).not.toHaveClass('w-full');
+  },
+};
