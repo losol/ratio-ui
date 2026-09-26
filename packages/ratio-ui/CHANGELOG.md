@@ -1,5 +1,23 @@
 # @eventuras/ratio-ui
 
+## 2.26.0
+
+### Minor Changes
+
+- f68c196: `Chat.Log` (beta) lets you add reactions to a message. With `onToggleReaction` set, hovering a message or giving it keyboard focus shows a bar with quick reactions (`quickReactions`) and a picker with more (`moreReactions`). Picking an emoji calls `onToggleReaction(messageId, emoji)`, the same callback the reactions under a message already use. The bar is also exported as `Chat.ReactionBar` for custom rows. New chat tokens: `--chat-row-hover-bg` and `--chat-popover-bg`.
+- 7c0abea: The named themes `bureau` and `ink` are now opt-in stylesheets and no longer part of `ratio-ui.css`, so pages that don't use them don't download them. If you use one of them, import it after the main stylesheet:
+  
+  ```css
+  @import '@eventuras/ratio-ui/ratio-ui.css';
+  @import '@eventuras/ratio-ui/themes/bureau.css';
+  @import '@eventuras/ratio-ui/themes/ink.css';
+  ```
+  
+  The built-in `light` and `dark` themes are unchanged and still part of `ratio-ui.css`.
+- d96d66c: - **Tree shaking:** `package.json` now declares `sideEffects` (only CSS files have side effects), so bundlers can drop the components you don't use. Importing one component from a barrel such as `@eventuras/ratio-ui/forms` no longer pulls in the whole barrel.
+  - **`components.css` works now:** `@eventuras/ratio-ui/components.css` was documented but never exported. It now ships: ratio-ui's styles without the page-level `html`, `body`, heading and paragraph styles, for apps that style their own page.
+  - **`global.css` export removed:** `@eventuras/ratio-ui/global.css` has pointed at a file that was never built since 1.0.0, so no import of it could have worked. Use `ratio-ui.css`, or `components.css` without the page-level styles.
+
 ## 2.25.0
 
 ### Minor Changes
