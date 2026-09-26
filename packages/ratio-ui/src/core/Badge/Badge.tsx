@@ -8,8 +8,12 @@ import { cn } from '../../utils/cn';
 
 export type BadgeVariant = 'filled' | 'subtle' | 'count';
 
-/** Brand tone, for badges that carry no status — same vocabulary as `Heading`. */
-export type BadgeTone = 'primary' | 'accent';
+/**
+ * Brand tone, for badges that carry no status — same vocabulary as `Heading`.
+ * `inherit` takes the surrounding text colour on a translucent tint of it, so
+ * a badge composed inside a button, tab or link matches its host.
+ */
+export type BadgeTone = 'primary' | 'accent' | 'inherit';
 
 export type BadgeProps = {
   children: React.ReactNode;
@@ -29,8 +33,9 @@ export type BadgeProps = {
   variant?: BadgeVariant;
   /**
    * Colour from the brand instead of `status`, for a badge that reports no
-   * state — an unread count is news, not a warning. Applies to `filled` and
-   * `count`.
+   * state — an unread count is news, not a warning. `inherit` follows the
+   * host's text colour, e.g. a count inside a `Button`. Applies to `filled`
+   * and `count`.
    * @beta
    */
   tone?: BadgeTone;
@@ -58,6 +63,7 @@ const subtleStatusClasses: Record<Status, string> = {
 const toneClasses: Record<BadgeTone, string> = {
   primary: 'bg-(--primary) text-(--text-on-primary)',
   accent: 'bg-(--accent) text-(--text-on-accent)',
+  inherit: 'bg-current/15',
 };
 
 export const Badge: React.FC<BadgeProps> = ({
@@ -81,7 +87,7 @@ export const Badge: React.FC<BadgeProps> = ({
     return (
       <span
         className={cn(
-          'inline-block rounded-full px-1.75 py-px text-center text-[11px] leading-4 font-bold tabular-nums',
+          'inline-block min-w-4.5 rounded-full px-1.75 py-px text-center align-middle text-[11px] leading-4 font-bold tabular-nums',
           variantClasses,
           className,
         )}

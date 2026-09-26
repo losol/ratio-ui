@@ -1,4 +1,8 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
+import { ShoppingCart } from '../../icons';
+import { ActionButton } from '../ActionButton';
+import { Button } from '../Button';
 import { Badge } from './Badge';
 
 const meta: Meta<typeof Badge> = {
@@ -16,7 +20,7 @@ const meta: Meta<typeof Badge> = {
     },
     tone: {
       control: 'inline-radio',
-      options: [undefined, 'primary', 'accent'],
+      options: [undefined, 'primary', 'accent', 'inherit'],
     },
     block: { control: 'boolean' },
   },
@@ -138,4 +142,32 @@ export const Count: Story = {
       <Badge variant="count" status="error">!</Badge>
     </div>
   ),
+};
+
+/**
+ * Composed inside a button: `tone="inherit"` takes the button's own text
+ * colour on a translucent tint, so it fits every variant. The count is part of
+ * the button's text ("Checkout 3"); an icon-only button named by `aria-label`
+ * should say the count there too.
+ */
+export const InButton: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <Button icon={<ShoppingCart size={16} />}>
+        Checkout <Badge variant="count" tone="inherit">3</Badge>
+      </Button>
+      <Button variant="secondary" icon={<ShoppingCart size={16} />}>
+        Checkout <Badge variant="count" tone="inherit">12</Badge>
+      </Button>
+      <ActionButton round size="lg" aria-label="Cart, 3 items">
+        <ShoppingCart size={18} />
+        <Badge variant="count" tone="inherit">3</Badge>
+      </ActionButton>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getAllByRole('button', { name: /Checkout 3|Checkout 12/ })).toHaveLength(2);
+    await expect(canvas.getByRole('button', { name: 'Cart, 3 items' })).toHaveTextContent('3');
+  },
 };
