@@ -84,7 +84,8 @@
     },
     "./ratio-ui.css": "./dist/ratio-ui.css",
     "./global.css": "./dist/global.css",
-    "./fonts.css": "./src/fonts.css"
+    "./fonts.css": "./src/fonts.css",
+    "./themes/*.css": "./src/themes/*.css"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -94,7 +95,8 @@
     "src/global.css",
     "src/tokens",
     "src/fonts",
-    "src/fonts.css"
+    "src/fonts.css",
+    "src/themes"
   ],
   "scripts": {
     "build": "tsc && vite build && node scripts/check-client-statics.mjs && node scripts/check-token-syntax.mjs",

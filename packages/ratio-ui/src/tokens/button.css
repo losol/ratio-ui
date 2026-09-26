@@ -10,7 +10,7 @@
  * to reskin every Button without touching the component; the defaults
  * here preserve the standard look (pill, no shadow, grow on press).
  *
- * See tokens/bureau.css for a worked override.
+ * See themes/bureau.css for a worked override.
  */
 :root {
   --button-radius: 9999px;                 /* pill */

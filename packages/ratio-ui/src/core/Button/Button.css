@@ -6,7 +6,7 @@
 
 /*
  * Button chrome rules — consume the --button-* tokens (defaults in
- * tokens/button.css, overridden per theme e.g. tokens/bureau.css) so a
+ * tokens/button.css, overridden per theme e.g. themes/bureau.css) so a
  * theme can reskin shape, shadow, and press feedback without touching
  * the component. Kept here (not in tokens/) because these are component
  * behavior, not theme knobs.

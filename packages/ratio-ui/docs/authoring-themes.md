@@ -3,13 +3,26 @@
 ratio-ui themes are plain CSS custom properties. To create your own palette
 (colors, rounding, fonts, …) you override a documented set of tokens under a
 `data-theme` selector — no build step, no API. This is the same mechanism the
-built-in `bureau` theme uses, so [`src/tokens/bureau.css`](../src/tokens/bureau.css)
+built-in `bureau` theme uses, so [`src/themes/bureau.css`](../src/themes/bureau.css)
 is a real worked example.
 
 A ready-to-edit starting point ships at
 [`src/tokens/theme-template.css`](../src/tokens/theme-template.css) — copy it,
-rename, and fill in. The built-in [`ink`](../src/tokens/ink.css) theme is a
+rename, and fill in. The built-in [`ink`](../src/themes/ink.css) theme is a
 second worked example: semantic tokens only, two arms, nothing else.
+
+## Loading a theme
+
+A theme is a stylesheet you import after ratio-ui's own. The built-in named
+themes are not part of `ratio-ui.css`; import the ones you use:
+
+```css
+@import '@eventuras/ratio-ui/ratio-ui.css';
+@import '@eventuras/ratio-ui/themes/bureau.css';
+@import '@eventuras/ratio-ui/themes/ink.css';
+```
+
+Your own theme loads the same way, from wherever it lives in your app.
 
 ## The two axes
 
