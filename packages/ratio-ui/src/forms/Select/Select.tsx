@@ -70,6 +70,10 @@ export interface SelectProps {
   /** @deprecated Use `isRequired`. */
   required?: boolean;
 
+  /**
+   * Extra classes for the wrapper, merged on top of the default layout (a
+   * later class wins a conflict, e.g. `w-48` over the default `w-full`).
+   */
   className?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
@@ -153,7 +157,7 @@ export const Select: React.FC<SelectProps> = ({
 
   return (
     <AriaSelect
-      className={className || styles.wrapper}
+      className={cn(styles.wrapper, className)}
       {...selectionProps}
       // Correct React Aria hook — the previous code passed `onChange`, which is
       // a DOM event on the wrapper and never fires for a Select.
