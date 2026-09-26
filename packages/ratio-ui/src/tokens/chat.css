@@ -32,6 +32,8 @@
   --chat-bubble-me-fg: var(--color-secondary-100);
   --chat-reaction-me-bg: var(--color-primary-100);
   --chat-reaction-me-border: var(--color-primary-300);
+  --chat-row-hover-bg: rgb(0 0 0 / 0.035);
+  --chat-popover-bg: var(--color-neutral-50);
 }
 
 :root[data-theme="dark"],
@@ -53,4 +55,6 @@
   --chat-bubble-me-fg: var(--color-primary-950);
   --chat-reaction-me-bg: var(--color-primary-900);
   --chat-reaction-me-border: var(--color-primary-700);
+  --chat-row-hover-bg: rgb(255 255 255 / 0.045);
+  --chat-popover-bg: var(--color-neutral-900);
 }

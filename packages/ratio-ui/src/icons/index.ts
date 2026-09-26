@@ -34,6 +34,7 @@ export {
   ChevronsRight,
   ArrowUpRight,
   MoreHorizontal,
+  SmilePlus,
 
   // Content
   FileText,
