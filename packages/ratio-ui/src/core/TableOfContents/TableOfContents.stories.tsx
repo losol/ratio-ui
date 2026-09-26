@@ -118,3 +118,17 @@ export const WithScrollSpy: Story = {
     await waitFor(() => expect(link('Further reading')).toHaveAttribute('aria-current', 'location'));
   },
 };
+
+/** The visible heading comes from `labels.title` and also names the navigation. */
+export const Localized: Story = {
+  args: {
+    headings: guideHeadings.slice(0, 3),
+    labels: { title: 'På denne siden' },
+  },
+  decorators: [railWidth],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('På denne siden')).toBeVisible();
+    await expect(canvas.getByRole('navigation', { name: 'På denne siden' })).toBeInTheDocument();
+  },
+};

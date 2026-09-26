@@ -15,6 +15,16 @@ export interface OrderSummaryData {
   currency: string;
 }
 
+/** Built-in text of `OrderSummary`. Each entry falls back to English. */
+export interface OrderSummaryLabels {
+  /** @default 'Subtotal (excl. VAT)' */
+  subtotalExVat?: string;
+  /** @default 'VAT' */
+  vat?: string;
+  /** @default 'Total' */
+  total?: string;
+}
+
 export interface OrderSummaryProps {
   /** Order summary data */
   summary: OrderSummaryData;
@@ -22,12 +32,14 @@ export interface OrderSummaryProps {
   locale: string;
   /** Format price function */
   formatPrice: (amount: number, currency: string, locale: string) => string;
-  /** Title for the summary card */
+  /** Title for the summary card. @default 'Order summary' */
   title?: string;
   /** Whether to show VAT breakdown */
   showVatBreakdown?: boolean;
   /** Children to render line items (for customization) */
   children?: React.ReactNode;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: OrderSummaryLabels;
 }
 
 /**
@@ -56,10 +68,13 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
   summary,
   locale,
   formatPrice,
-  title = 'Ordresammendrag',
+  title = 'Order summary',
   showVatBreakdown = false,
   children,
+  labels,
 }) => {
+  const { subtotalExVat = 'Subtotal (excl. VAT)', vat = 'VAT', total = 'Total' } = labels ?? {};
+
   return (
     <>
       <Heading as="h2" paddingBottom="sm">
@@ -78,18 +93,18 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
         {showVatBreakdown && (
           <>
             <div className="flex justify-between text-sm text-(--text-muted)">
-              <span>Subtotal (eks. mva)</span>
+              <span>{subtotalExVat}</span>
               <span>{formatPrice(summary.subtotalExVat, summary.currency, locale)}</span>
             </div>
             <div className="flex justify-between text-sm text-(--text-muted)">
-              <span>MVA</span>
+              <span>{vat}</span>
               <span>{formatPrice(summary.totalVat, summary.currency, locale)}</span>
             </div>
           </>
         )}
 
         <div className="flex justify-between items-center pt-2 border-t border-border-1">
-          <span className="text-lg font-semibold text-(--text)">Total</span>
+          <span className="text-lg font-semibold text-(--text)">{total}</span>
           <span className="text-2xl font-bold text-(--text)">
             {formatPrice(summary.totalIncVat, summary.currency, locale)}
           </span>

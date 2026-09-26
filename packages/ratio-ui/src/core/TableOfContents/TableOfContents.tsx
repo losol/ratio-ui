@@ -4,7 +4,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
 import { useActiveSection } from '../../hooks/useActiveSection';
 
 export interface TocHeading {
@@ -21,6 +21,13 @@ export interface TableOfContentsProps {
    */
   offset?: number;
   className?: string;
+  labels?: TableOfContentsLabels;
+}
+
+/** Built-in text of `TableOfContents`. Each entry falls back to English. */
+export interface TableOfContentsLabels {
+  /** Visible heading, which also names the navigation. @default 'On this page' */
+  title?: string;
 }
 
 /**
@@ -30,7 +37,9 @@ export interface TableOfContentsProps {
  * has scrolled past the top of the viewport (or past `offset`), via
  * `useActiveSection` — and marks it `aria-current="location"`.
  */
-export function TableOfContents({ headings, offset = 0, className = '' }: Readonly<TableOfContentsProps>) {
+export function TableOfContents({ headings, offset = 0, className = '', labels }: Readonly<TableOfContentsProps>) {
+  const { title = 'On this page' } = labels ?? {};
+  const titleId = useId();
   const activeId = useActiveSection(
     headings.map((h) => h.id),
     { offset },
@@ -39,8 +48,8 @@ export function TableOfContents({ headings, offset = 0, className = '' }: Readon
   if (headings.length === 0) return null;
 
   return (
-    <nav aria-label="On this page" className={`text-sm ${className}`}>
-      <p className="mb-3 font-medium text-(--text)">On this page</p>
+    <nav aria-labelledby={titleId} className={`text-sm ${className}`}>
+      <p id={titleId} className="mb-3 font-medium text-(--text)">{title}</p>
       <ul className="space-y-2">
         {headings.map((heading) => (
           <li key={heading.id}>

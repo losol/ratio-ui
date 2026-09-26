@@ -23,6 +23,8 @@ export type StepperProps = {
   variant?: StepperVariant;
   orientation?: StepperOrientation;
   className?: string;
+  /** Accessible name of the navigation landmark. @default 'Progress' */
+  'aria-label'?: string;
 };
 
 const getStepStatusClasses = (status: StepStatus, variant: StepperVariant) => {
@@ -166,6 +168,7 @@ export const Stepper: React.FC<StepperProps> = ({
   variant = 'numbered',
   orientation = 'horizontal',
   className = '',
+  'aria-label': ariaLabel = 'Progress',
 }) => {
   // Automatically set status based on currentStep if not explicitly set
   const processedSteps = steps.map(step => {
@@ -180,7 +183,7 @@ export const Stepper: React.FC<StepperProps> = ({
   const containerClasses = `stepper ${orientation} ${className}`.trim();
 
   return (
-    <div className={containerClasses} role="navigation" aria-label="Progress">
+    <div className={containerClasses} role="navigation" aria-label={ariaLabel}>
       {orientation === 'horizontal' ? (
         <HorizontalStepper steps={processedSteps} variant={variant} />
       ) : (

@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { ThreeColumnLayout } from './ThreeColumnLayout';
-export type { ThreeColumnLayoutProps } from './ThreeColumnLayout';
+export type { ThreeColumnLayoutLabels, ThreeColumnLayoutProps } from './ThreeColumnLayout';

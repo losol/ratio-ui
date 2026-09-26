@@ -14,6 +14,22 @@ export interface CartLineItemData {
   currency: string;
 }
 
+/** Built-in text of `CartLineItem`. Each entry falls back to English. */
+export interface CartLineItemLabels {
+  /** VAT note after the unit price, given the formatted VAT amount. @default (vat) => `incl. VAT ${vat}` */
+  vatAmount?: (formattedVat: string) => string;
+  /** Note under the line total. @default 'incl. VAT' */
+  totalIncludesVat?: string;
+  /** Name of the quantity field. @default 'Quantity' */
+  quantity?: string;
+  /** Name of the decrement button. @default 'Decrease quantity' */
+  decreaseQuantity?: string;
+  /** Name of the increment button. @default 'Increase quantity' */
+  increaseQuantity?: string;
+  /** Text of the remove button. @default 'Remove' */
+  remove?: string;
+}
+
 export interface CartLineItemProps {
   /** Line item data */
   item: CartLineItemData;
@@ -29,6 +45,8 @@ export interface CartLineItemProps {
   onRemove?: (productId: string) => void;
   /** Test ID prefix */
   testIdPrefix?: string;
+  /** Built-in text. Each entry falls back to English. */
+  labels?: CartLineItemLabels;
   /** Quantity field component (optional for customization) */
   QuantityField?: React.ComponentType<{
     value: number;
@@ -70,7 +88,17 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
   onRemove,
   testIdPrefix = 'cart-item',
   QuantityField,
+  labels,
 }) => {
+  const {
+    vatAmount = (vat: string) => `incl. VAT ${vat}`,
+    totalIncludesVat = 'incl. VAT',
+    quantity = 'Quantity',
+    decreaseQuantity = 'Decrease quantity',
+    increaseQuantity = 'Increase quantity',
+    remove = 'Remove',
+  } = labels ?? {};
+
   return (
     <div className="flex items-start gap-4">
       <div className="flex-1 min-w-0">
@@ -79,7 +107,7 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
         </p>
         <p className="mt-1 text-xs text-(--text-subtle)">
           {item.quantity} x {formatPrice(item.pricePerUnitIncVat, item.currency, locale)}
-          {' '}(inkl mva {formatPrice(item.vatAmount, item.currency, locale)})
+          {' '}({vatAmount(formatPrice(item.vatAmount, item.currency, locale))})
         </p>
 
         {showQuantityControls && QuantityField && onQuantityChange && (
@@ -94,9 +122,9 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
                 }
                 onQuantityChange(item.productId, nextQuantity);
               }}
-              decrementAriaLabel="Reduser antall"
-              incrementAriaLabel="Øk antall"
-              aria-label="Antall"
+              decrementAriaLabel={decreaseQuantity}
+              incrementAriaLabel={increaseQuantity}
+              aria-label={quantity}
               testId={`${testIdPrefix}-quantity-${item.productId}`}
             />
           </div>
@@ -110,7 +138,7 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
             onClick={() => onRemove(item.productId)}
             className="text-sm text-error-text hover:opacity-80"
           >
-            Fjern
+            {remove}
           </button>
         )}
         <div className="text-right">
@@ -118,7 +146,7 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
             {formatPrice(item.lineTotalIncVat, item.currency, locale)}
           </p>
           <p className="text-xs text-(--text-subtle)">
-            inkl. mva
+            {totalIncludesVat}
           </p>
         </div>
       </div>

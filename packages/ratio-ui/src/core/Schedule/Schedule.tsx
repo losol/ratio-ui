@@ -41,10 +41,16 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({
 export interface ScheduleProps {
   children: React.ReactNode;
   className?: string;
+  /** Accessible name of the list. @default 'Schedule' */
+  'aria-label'?: string;
 }
 
-const Schedule: React.FC<ScheduleProps> = ({ children, className = '' }) => (
-  <ul className={`mb-8 list-none p-0 ${className}`} aria-label="Schedule">
+const Schedule: React.FC<ScheduleProps> = ({
+  children,
+  className = '',
+  'aria-label': ariaLabel = 'Schedule',
+}) => (
+  <ul className={`mb-8 list-none p-0 ${className}`} aria-label={ariaLabel}>
     {children}
   </ul>
 );

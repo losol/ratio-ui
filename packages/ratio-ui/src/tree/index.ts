@@ -3,6 +3,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Tree } from './Tree';
-export type { TreeProps, TreeNode, TreeNodeState } from './Tree';
+export type { TreeLabels, TreeProps, TreeNode, TreeNodeState } from './Tree';
 export { useSortableTree } from './useSortableTree';
 export type { UseSortableTreeOptions } from './useSortableTree';

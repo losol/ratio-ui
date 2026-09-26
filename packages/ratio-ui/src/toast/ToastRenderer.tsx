@@ -23,7 +23,17 @@ const statusClasses: Record<Status, string> = {
   error: 'bg-error text-white',
 };
 
-export const ToastRenderer: React.FC = () => {
+/** Built-in text of `ToastRenderer`. Each entry falls back to English. */
+export interface ToastRendererLabels {
+  /** Name of each toast's close button. @default 'Close' */
+  close?: string;
+}
+
+export interface ToastRendererProps {
+  labels?: ToastRendererLabels;
+}
+
+export const ToastRenderer: React.FC<ToastRendererProps> = ({ labels }) => {
   return (
     <ToastRegion
       queue={toastQueue}
@@ -49,7 +59,7 @@ export const ToastRenderer: React.FC = () => {
             </ToastContent>
             <Button
               slot="close"
-              aria-label="Close"
+              aria-label={labels?.close ?? 'Close'}
               className="flex flex-none items-center justify-center w-6 h-6 rounded-sm bg-transparent border-none text-white p-0 outline-none hover:bg-white/10 pressed:bg-white/15 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2 cursor-pointer"
             >
               ×

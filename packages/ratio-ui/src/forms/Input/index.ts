@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export {PhoneInput} from './PhoneInput';
-export type {PhoneInputProps} from './PhoneInput';
+export type { PhoneInputLabels, PhoneInputProps, PhoneLengthError } from './PhoneInput';

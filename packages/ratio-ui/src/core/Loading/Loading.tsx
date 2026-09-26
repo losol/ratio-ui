@@ -4,11 +4,25 @@
 
 import { Spinner } from "../Spinner/Spinner";
 
-export const Loading = () => {
+/** Built-in text of `Loading`. Each entry falls back to English. */
+export interface LoadingLabels {
+  /** The status announced (and shown with `showLabel`). @default 'Loading…' */
+  loading?: string;
+}
+
+export interface LoadingProps {
+  labels?: LoadingLabels;
+  /** Show the text next to the spinner instead of only announcing it. */
+  showLabel?: boolean;
+}
+
+export const Loading = ({ labels, showLabel = false }: LoadingProps) => {
+  const { loading = 'Loading…' } = labels ?? {};
+
   return (
-    <div role="status">
+    <div role="status" className={showLabel ? 'inline-flex items-center gap-2' : undefined}>
       <Spinner />
-      <span className="sr-only">Loading...</span>
+      <span className={showLabel ? 'text-sm text-(--text-muted)' : 'sr-only'}>{loading}</span>
     </div>
   );
 };

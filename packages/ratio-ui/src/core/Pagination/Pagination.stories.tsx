@@ -111,8 +111,8 @@ export const Localized: PaginationStory = () => {
       totalPages={totalPages}
       onPreviousPageClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
       onNextPageClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+      aria-label="Sidenavigasjon"
       labels={{
-        navigation: 'Sidenavigasjon',
         previous: 'Forrige side',
         next: 'Neste side',
         status: (current, total) => `Side ${current} av ${total}`,

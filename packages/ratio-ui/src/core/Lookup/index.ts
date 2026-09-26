@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Lookup } from './Lookup';
-export type { LookupProps } from './Lookup';
+export type { LookupLabels, LookupProps } from './Lookup';

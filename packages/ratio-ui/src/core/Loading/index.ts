@@ -3,3 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Loading } from './Loading';
+export type { LoadingLabels, LoadingProps } from './Loading';

@@ -18,6 +18,12 @@ import { ListBox, ListBoxItem, SearchField } from '../../forms/Autocomplete/Styl
 import { X } from '../../icons';
 import { Label } from '../../forms/common/Label';
 
+/** Built-in text of `Lookup`. Each entry falls back to English. */
+export interface LookupLabels {
+  /** Name of the clear button. @default 'Clear search' */
+  clear?: string;
+}
+
 export interface LookupProps<T> {
   /** Label shown above the input. */
   readonly label: string;
@@ -63,6 +69,8 @@ export interface LookupProps<T> {
    * a message derived from `minChars`.
    */
   readonly minCharsMessage?: string;
+  /** Built-in text. Each entry falls back to English. */
+  readonly labels?: LookupLabels;
   /** Extra class for the input. */
   readonly inputClassName?: string;
   /** Extra class for the list container. */
@@ -122,6 +130,7 @@ export function Lookup<T>({
   inputClassName,
   listClassName,
   inputId,
+  labels,
 }: LookupProps<T>) {
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 
@@ -223,7 +232,7 @@ export function Lookup<T>({
            * our local "just-selected" state.
            */}
           <Button
-            aria-label="Clear search"
+            aria-label={labels?.clear ?? 'Clear search'}
             onPress={clearInput}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-(--text-subtle) hover:text-(--text) focus:outline-none focus:ring-2 focus:ring-(--focus-ring) group-data-empty:hidden cursor-pointer"
           >

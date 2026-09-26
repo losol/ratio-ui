@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { PhoneInput } from './PhoneInput';
 
 const meta: Meta<typeof PhoneInput> = {
@@ -100,3 +101,28 @@ export const FailingValidation: Story = {
   },
 };
 
+
+/** `labels` translates the built-in names, placeholders and the length error. */
+export const Localized: Story = {
+  args: {
+    name: 'phone',
+    label: 'Telefonnummer',
+    labels: {
+      countryCode: 'Velg landkode',
+      countryPlaceholder: 'Velg land',
+      numberPlaceholder: 'Skriv telefonnummer',
+      invalidLength: ({ exact, min, max }) =>
+        exact !== undefined
+          ? `Nummeret må ha ${exact} sifre`
+          : `Nummeret må ha ${min}–${max} sifre`,
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('combobox', { name: 'Velg landkode' })).toBeInTheDocument();
+    const number = canvas.getByPlaceholderText('Skriv telefonnummer');
+    await userEvent.type(number, '123');
+    await userEvent.tab();
+    await expect(await canvas.findByText('Nummeret må ha 8 sifre')).toBeInTheDocument();
+  },
+};
