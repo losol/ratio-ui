@@ -202,7 +202,7 @@ const SignedInPageDemo: React.FC<{ title: string }> = ({ title }) => (
       <Navbar.Spacer />
       <Navbar.Actions>
         <Menu>
-          <Menu.Trigger className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border-1 bg-card py-1 pl-1 pr-2.5">
+          <Menu.Trigger unstyled className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border-1 bg-card py-1 pl-1 pr-2.5">
             <Avatar name="Ada Lovelace" size="sm" />
             <span className="text-sm font-semibold">Ada</span>
             <Menu.Chevron className="h-5 w-5" />

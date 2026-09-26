@@ -12,8 +12,11 @@ import { Label } from '../common/Label';
 import { InputError } from '../common/InputError';
 import { InputDescription } from '../common/InputDescription';
 import { CopyButton } from '../../core/CopyButton';
+import { cn } from '../../utils/cn';
 
 interface ExtendedInputProps extends InputFieldProps {
+  /** Drop the input's default classes and style it from scratch with `className`. */
+  unstyled?: boolean;
   multiline?: boolean;
   rows?: number;
   cols?: number;
@@ -68,6 +71,7 @@ export function TextField({
   label,
   description,
   className,
+  unstyled = false,
   errors,
   disabled,
   multiline = false,
@@ -82,15 +86,19 @@ export function TextField({
 }: ExtendedInputProps) {
   const hasError = errors?.[name];
 
-  let inputClassName = `${className ?? formStyles.defaultInputStyle} ${
-    hasError ? formStyles.inputErrorGlow : ''
-  } ${disabled ? 'cursor-not-allowed' : ''} ${
-    showCopyToClipboard ? 'pr-10' : ''
-  }`;
-
-  if (multiline) {
-    inputClassName = `${inputClassName} ${formStyles.textarea}`;
-  }
+  // `className` merges on top of the defaults (a later class wins a
+  // conflict); `unstyled` drops the default input style.
+  const inputClassName = cn(
+    !unstyled && formStyles.defaultInputStyle,
+    hasError && formStyles.inputErrorGlow,
+    // inputErrorGlow carries a 1px `border`; keep the default input's 2px
+    // width when it has one (cn keeps only the last border width).
+    hasError && !unstyled && 'border-2',
+    disabled && 'cursor-not-allowed',
+    showCopyToClipboard && 'pr-10',
+    multiline && formStyles.textarea,
+    className,
+  );
 
   const id = rest.id ?? name;
 

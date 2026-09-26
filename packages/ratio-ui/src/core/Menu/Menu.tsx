@@ -100,19 +100,22 @@ const MenuActionsContext = createContext<MenuActionsApi>({
 export type MenuTriggerProps = {
   children: ReactNode;
   /**
-   * Override the default pill-shaped primary button styling. Pass any
-   * Tailwind / utility classes to fully restyle the trigger (e.g. an
-   * avatar pill or icon-only button). When omitted, the default
-   * `--primary` rounded-full button is used.
+   * Extra classes, merged on top of the default pill-shaped primary button
+   * (a later class wins a conflict).
    */
   className?: string;
+  /**
+   * Drop the default pill styling to restyle the trigger from scratch with
+   * `className`, e.g. an avatar pill or an icon-only button.
+   */
+  unstyled?: boolean;
   testId?: string;
 };
 
-const MenuTrigger = ({ children, className, testId }: MenuTriggerProps) => (
+const MenuTrigger = ({ children, className, unstyled = false, testId }: MenuTriggerProps) => (
   <AriaButton
     data-testid={testId ?? 'logged-in-menu-button'}
-    className={className ?? styles.triggerDefault}
+    className={cn(!unstyled && styles.triggerDefault, className)}
   >
     {children}
   </AriaButton>

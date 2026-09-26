@@ -4,6 +4,7 @@
 
 import { Label as AriaLabel } from 'react-aria-components';
 import type { ComponentProps } from 'react';
+import { cn } from '../../utils/cn';
 
 /**
  * Shared field-label classes, driven by the `--label-*` tokens in
@@ -44,17 +45,23 @@ export const labelClassName =
  * ```
  *
  * @example
- * // Custom styling
+ * // Extra classes merge on top of the defaults; `unstyled` drops them
  * ```tsx
- * <Label className="text-lg text-blue-600">Custom Label</Label>
+ * <Label className="text-lg">Larger label</Label>
+ * <Label unstyled className="sr-only">Hidden label</Label>
  * ```
  */
-export function Label({ children, className, ...props }: ComponentProps<typeof AriaLabel>) {
+export type LabelProps = ComponentProps<typeof AriaLabel> & {
+  /** Drop the default classes and style from scratch with `className`. */
+  unstyled?: boolean;
+};
+
+export function Label({ children, className, unstyled = false, ...props }: LabelProps) {
   if (!children) return null;
 
   return (
     <AriaLabel
-      className={className ?? labelClassName}
+      className={cn(!unstyled && labelClassName, className)}
       {...props}
     >
       {children}

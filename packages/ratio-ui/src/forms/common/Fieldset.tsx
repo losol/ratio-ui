@@ -3,11 +3,16 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import React, { ReactNode } from 'react';
+import { cn } from '../../utils/cn';
 
 interface FieldsetProps {
   label?: string;
+  /** Extra classes for the fieldset, merged on top of the defaults. */
   className?: string;
+  /** Extra classes for the legend, merged on top of the defaults. */
   legendClassName?: string;
+  /** Drop the default classes of both fieldset and legend. */
+  unstyled?: boolean;
   children: ReactNode;
   disabled?: boolean;
 }
@@ -18,9 +23,9 @@ export const styles = {
 };
 
 export const Fieldset: React.FC<FieldsetProps> = props => (
-  <fieldset disabled={props.disabled} className={props.className ?? styles.fieldsetClassName}>
+  <fieldset disabled={props.disabled} className={cn(!props.unstyled && styles.fieldsetClassName, props.className)}>
     {props.label && (
-      <legend className={props.legendClassName ?? styles.legendClassName}>{props.label}</legend>
+      <legend className={cn(!props.unstyled && styles.legendClassName, props.legendClassName)}>{props.label}</legend>
     )}
     {props.children}
   </fieldset>
