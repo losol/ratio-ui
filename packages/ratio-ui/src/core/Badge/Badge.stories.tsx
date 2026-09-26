@@ -146,28 +146,41 @@ export const Count: Story = {
 
 /**
  * Composed inside a button: `tone="inherit"` takes the button's own text
- * colour on a translucent tint, so it fits every variant. The count is part of
- * the button's text ("Checkout 3"); an icon-only button named by `aria-label`
- * should say the count there too.
+ * colour on a translucent tint, so it fits every variant. Wrap the text in
+ * `Button.Label` so the badge becomes its own flex item, spaced like the icon.
+ * On a `block` button, `className="flex-1 text-start"` on the label pushes the
+ * count to the right edge.
+ *
+ * The count is part of the button's text ("Checkout 3"); an icon-only button
+ * named by `aria-label` should say the count there too.
  */
 export const InButton: Story = {
   render: () => (
-    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-      <Button icon={<ShoppingCart size={16} />}>
-        Checkout <Badge variant="count" tone="inherit">3</Badge>
-      </Button>
-      <Button variant="secondary" icon={<ShoppingCart size={16} />}>
-        Checkout <Badge variant="count" tone="inherit">12</Badge>
-      </Button>
-      <ActionButton round size="lg" aria-label="Cart, 3 items">
-        <ShoppingCart size={18} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '22rem' }}>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <Button icon={<ShoppingCart size={16} />}>
+          <Button.Label>Checkout</Button.Label>
+          <Badge variant="count" tone="inherit">3</Badge>
+        </Button>
+        <Button variant="secondary" icon={<ShoppingCart size={16} />}>
+          <Button.Label>Checkout</Button.Label>
+          <Badge variant="count" tone="inherit">12</Badge>
+        </Button>
+        <ActionButton round size="lg" aria-label="Cart, 3 items">
+          <ShoppingCart size={18} />
+          <Badge variant="count" tone="inherit">3</Badge>
+        </ActionButton>
+      </div>
+      <Button block icon={<ShoppingCart size={16} />}>
+        <Button.Label className="flex-1 text-start">Go to checkout</Button.Label>
         <Badge variant="count" tone="inherit">3</Badge>
-      </ActionButton>
+      </Button>
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getAllByRole('button', { name: /Checkout 3|Checkout 12/ })).toHaveLength(2);
+    await expect(canvas.getAllByRole('button', { name: /Checkout ?(3|12)/ })).toHaveLength(2);
     await expect(canvas.getByRole('button', { name: 'Cart, 3 items' })).toHaveTextContent('3');
+    await expect(canvas.getByRole('button', { name: /Go to checkout ?3/ })).toBeInTheDocument();
   },
 };
