@@ -100,7 +100,7 @@ const styles = {
   // muted + italic, below the selected value's `--text`.
   placeholder: 'text-(--text-muted) italic',
   popover:
-    'w-[--trigger-width] mt-1 rounded-lg bg-card border border-border-1 shadow-lg overflow-hidden',
+    'w-[--trigger-width] mt-1 rounded-lg bg-card border border-border-1 shadow-(--popover-shadow) overflow-hidden',
   listBox: 'max-h-60 overflow-auto p-1',
   itemBase:
     'flex items-center justify-between gap-2 cursor-pointer select-none text-(--text) outline-none transition-colors',

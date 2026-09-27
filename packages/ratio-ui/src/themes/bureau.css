@@ -87,6 +87,18 @@
      solid block. 2px offset matches the press-down distance, so the
      button covers the shadow cleanly when pressed. */
   --shadow-hard: 2px 2px 0 color-mix(in srgb, var(--text) 62%, transparent);
+  /* Larger steps for things that float further off the page. */
+  --shadow-hard-lg: 3px 3px 0 color-mix(in srgb, var(--text) 62%, transparent);
+  --shadow-hard-xl: 5px 5px 0 color-mix(in srgb, var(--text) 62%, transparent);
+
+  /* Floating surfaces — the hard shadow instead of soft drop shadows:
+     popovers and toasts one step up, the command palette, page overlay,
+     Dialog and Drawer further. */
+  --popover-shadow: var(--shadow-hard-lg);
+  --panel-shadow: var(--shadow-hard-xl);
+  --overlay-shadow: var(--shadow-hard-xl);
+  --chat-bar-shadow: var(--shadow-hard);
+  --chat-popover-shadow: var(--shadow-hard-lg);
 
   /* Button chrome — drive the generic --button-* knobs (see Button.css):
      square-ish corners, the hard shadow at rest, and a "press down"
@@ -102,8 +114,9 @@
   --card-shadow-sm: var(--shadow-hard);
   --card-shadow-md: var(--shadow-hard);
 
-  /* Tighter radii — no rounded-full in bureau. Every step Tailwind's
-     `rounded-*` reads is set, so no component keeps a soft corner. */
+  /* Tighter radii — every step Tailwind's `rounded-*` reads is set, so no
+     component keeps a soft corner. `rounded-full` is a fixed 9999px, not a
+     token, so dots, avatars and pills stay round. */
   --radius-xs: 2px;
   --radius-sm: 2px;
   --radius: 3px;
@@ -161,7 +174,7 @@
 
   --menu-popover-radius: var(--radius-lg);
   --menu-popover-border: var(--text);
-  --menu-popover-shadow: 3px 3px 0 color-mix(in srgb, var(--text) 62%, transparent);
+  --menu-popover-shadow: var(--shadow-hard-lg);
 }
 
 /* --------------------------------------------

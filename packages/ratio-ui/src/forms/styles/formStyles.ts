@@ -91,7 +91,7 @@ export const componentStyles = {
   comboBoxInputField: `${layoutStyles.widthFull} text-center px-2 py-2 bg-transparent ${textStyles.comboBoxInput}`,
 
   // Popover/dropdown
-  popover: `w-40 max-h-56 overflow-y-auto border border-border-1 rounded-lg bg-card shadow-lg ${layoutStyles.zIndex}`,
+  popover: `w-40 max-h-56 overflow-y-auto border border-border-1 rounded-lg bg-card shadow-(--popover-shadow) ${layoutStyles.zIndex}`,
 
   // List box item
   listBoxItem: `px-3 py-2 ${layoutStyles.flexStart} ${layoutStyles.gapMd} cursor-pointer ${interactionStyles.listBoxItemHover} ${interactionStyles.listBoxItemFocused} ${interactionStyles.listBoxItemSelected}`,

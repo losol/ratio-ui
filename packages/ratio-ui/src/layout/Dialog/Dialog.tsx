@@ -94,7 +94,7 @@ const DialogRoot = ({
           // Same shell as Drawer — surface, hairline, overlay radius/shadow —
           // anchored center instead of at an edge, sized by its content.
           'flex max-h-[84dvh] flex-col overflow-hidden bg-surface text-left align-middle text-(--text)',
-          'rounded-overlay border border-border-2 shadow-overlay',
+          'rounded-overlay border border-border-2 shadow-(--overlay-shadow)',
           // A dialog interrupts, so it arrives faster than a drawer: fade and
           // settle from a slight scale instead of sliding in from an edge.
           'transition-[opacity,scale] duration-[300ms] ease-overlay motion-reduce:transition-none',

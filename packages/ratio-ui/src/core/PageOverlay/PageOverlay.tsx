@@ -63,7 +63,7 @@ export function PageOverlay({
       aria-modal="true"
       aria-live="assertive"
     >
-      <div className="w-full max-w-2xl bg-card rounded-lg shadow-2xl p-6 sm:p-8">
+      <div className="w-full max-w-2xl bg-card rounded-lg shadow-(--panel-shadow) p-6 sm:p-8">
         {children}
       </div>
     </div>
