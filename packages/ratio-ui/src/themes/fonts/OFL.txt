@@ -1,18 +1,13 @@
-Archivo — Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
-Pixelify Sans — Copyright 2021 The Pixelify Sans Project Authors (https://github.com/eifetx/Pixelify-Sans)
-Space Mono — Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono)
-
-The WOFF2 files in this folder are the latin and latin-ext subsets
-published by Fontsource (https://fontsource.org).
-
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 
 The fonts redistributed in this directory are:
-- Source Serif 4 (https://github.com/adobe-fonts/source-serif)
-- Source Sans 3 (https://github.com/adobe-fonts/source-sans)
+- Archivo — Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
+- Pixelify Sans — Copyright 2021 The Pixelify Sans Project Authors (https://github.com/eifetx/Pixelify-Sans)
+- Space Mono — Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono)
 
-Variable TTF originals were converted to WOFF2 for web delivery; the
-license below applies to both the originals and the WOFF2 derivatives.
+The WOFF2 files are the latin and latin-ext subsets published by
+Fontsource (https://fontsource.org); the license below applies to both
+the originals and these WOFF2 derivatives.
 
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
