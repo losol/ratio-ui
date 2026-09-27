@@ -306,6 +306,17 @@
   --popover-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --panel-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   --overlay-shadow: var(--shadow-overlay);
+
+  /* Hover lift of interactive Card and Strip: a low-alpha primary glow.
+     The tile tier is for flat (shadowless) surfaces. */
+  --card-hover-shadow: 0 3px 10px color-mix(in oklch, var(--primary) 15%, transparent);
+  --card-hover-shadow-tile: 0 2px 6px color-mix(in oklch, var(--primary) 12%, transparent);
+  /* The elevated Navbar's floating-card shadow. */
+  --navbar-shadow: 0 12px 32px -18px rgb(20 30 60 / 0.3);
+  /* Raised bits inside controls: the Switch knob and a selected
+     ToggleButton (the strong tier is the filled `primary` variant). */
+  --control-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --control-shadow-strong: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 /* --------------------------------------------
@@ -382,6 +393,8 @@
   --error-bg: rgba(214, 69, 69, 0.18);
   --error-border: rgba(214, 69, 69, 0.3);
   --error-text: #ffb3b3;
+
+  --navbar-shadow: 0 14px 36px -18px rgb(0 0 0 / 0.55);
 }
 
 /* --------------------------------------------

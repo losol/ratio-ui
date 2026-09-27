@@ -78,7 +78,7 @@
   --border-1: #ddd6c5;
   --border-2: #20304d;           /* navy hairline-strong */
 
-  --focus-ring: rgba(32, 48, 77, 0.45);   /* navy @ ~45% */
+  --focus-ring: #20304d;         /* solid navy: a crisp ring, not a haze */
 
   /* Hard offset shadow — no blur. The bureau signature, reusable by any
      component (e.g. the future window-frame). Uses the ink color
@@ -99,6 +99,7 @@
   --overlay-shadow: var(--shadow-hard-xl);
   --chat-bar-shadow: var(--shadow-hard);
   --chat-popover-shadow: var(--shadow-hard-lg);
+  --navbar-shadow: var(--shadow-hard-lg);
 
   /* Button chrome — drive the generic --button-* knobs (see Button.css):
      square-ish corners, the hard shadow at rest, and a "press down"
@@ -113,6 +114,14 @@
   --card-shadow-xs: var(--shadow-hard);
   --card-shadow-sm: var(--shadow-hard);
   --card-shadow-md: var(--shadow-hard);
+  /* Interactive cards lift by growing the hard shadow, not by a glow. */
+  --card-hover-shadow: var(--shadow-hard-lg);
+  --card-hover-shadow-tile: var(--shadow-hard);
+
+  /* Inside controls: a 1px offset on the Switch knob, the full hard
+     shadow on a filled, selected ToggleButton. */
+  --control-shadow: 1px 1px 0 color-mix(in srgb, var(--text) 62%, transparent);
+  --control-shadow-strong: var(--shadow-hard);
 
   /* Tighter radii — every step Tailwind's `rounded-*` reads is set, so no
      component keeps a soft corner. Pills, dots, badges, avatars, switches
@@ -217,7 +226,7 @@
   --border-1: #2c2c22;           /* derived: subtle hairline */
   --border-2: #565341;           /* derived: visible step */
 
-  --focus-ring: rgba(108, 139, 255, 0.45);  /* primary blue @ ~45% */
+  --focus-ring: #6c8bff;         /* solid primary blue */
 
   /* Overlays flip to light ink on the dark field. */
   --overlay-ink: 240 231 210;
@@ -228,6 +237,8 @@
   --error-bg: rgba(255, 110, 82, 0.18);   /* derived */
   --error-border: rgba(255, 110, 82, 0.32); /* derived */
   --error-text: #ffb3a4;         /* derived */
+  /* The standard dark block sets its own navbar shadow; keep bureau's. */
+  --navbar-shadow: var(--shadow-hard-lg);
   /* --shadow-hard / --button-shadow inherit from the light block;
      var(--text) inside re-resolves to the dark ink (cream) automatically,
      so the hard shadow stays contrasty in dark mode. */

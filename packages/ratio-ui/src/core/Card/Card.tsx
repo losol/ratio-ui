@@ -92,7 +92,9 @@ export const Card: React.FC<CardProps> = ({
   // The smaller tile-tier glow when no shadow is present (flat editorial
   // mode); the bigger one for elevated cards.
   const hoverShadow =
-    effectiveShadow === 'none' ? 'hover:shadow-card-hover-tile' : 'hover:shadow-card-hover';
+    effectiveShadow === 'none'
+      ? 'hover:shadow-(--card-hover-shadow-tile)'
+      : 'hover:shadow-(--card-hover-shadow)';
   const transitionClasses = hoverEffect ? 'transition-all duration-200 ease-out' : '';
   const hoverClasses = hoverEffect
     ? `hover:bg-card-hover hover:border-(--primary) ${hoverShadow}`
