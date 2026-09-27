@@ -57,7 +57,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   } = labels;
 
   return (
-    <nav aria-label={ariaLabel ?? navigation ?? 'Pagination'} className="flex justify-center items-center py-5">
+    <nav aria-label={ariaLabel ?? navigation ?? 'Pagination'} className="flex items-center justify-center gap-3 py-5">
       <Button aria-label={previous} onClick={onPreviousPageClick} disabled={currentPage <= 1}>
         <ChevronsLeft />
       </Button>

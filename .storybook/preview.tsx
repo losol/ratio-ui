@@ -8,6 +8,7 @@ import { ModeDecorator } from './modeDecorator';
 import '../packages/ratio-ui/src/ratio-ui.css';
 // Named themes are opt-in imports; Storybook loads them all for the theme switcher.
 import '../packages/ratio-ui/src/themes/bureau.css';
+import '../packages/ratio-ui/src/themes/bureau-fonts.css';
 import '../packages/ratio-ui/src/themes/ink.css';
 
 const preview: Preview = {
