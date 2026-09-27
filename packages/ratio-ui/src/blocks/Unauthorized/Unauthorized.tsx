@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
+import { ShieldX } from '../../icons';
+
 /** Built-in text of `Unauthorized`. Each entry falls back to English. */
 export interface UnauthorizedLabels {
   /** @default 'Unauthorized' */
@@ -28,30 +30,15 @@ export function Unauthorized({ variant = 'large', labels }: Readonly<Unauthorize
   } = labels ?? {};
 
   return (
-    <div className={`text-center ${isSmall ? 'py-8' : 'py-20'} bg-error text-error-on`}>
-      <div className="inline-flex items-center justify-center p-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className={`${isSmall ? 'h-6 w-6' : 'h-8 w-8'} animate-bounce`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-          />
-        </svg>
-        <h1 className={`${isSmall ? 'text-2xl' : 'text-4xl'} font-extrabold ml-2`}>{title}</h1>
-      </div>
-      <p className={`${isSmall ? 'text-md' : 'text-lg'} mt-2`}>
+    <div
+      className={`flex flex-col items-center px-6 text-center ${isSmall ? 'py-8' : 'py-20'} bg-error text-error-on`}
+    >
+      <ShieldX aria-hidden className={isSmall ? 'h-6 w-6' : 'h-8 w-8'} />
+      <h1 className={`${isSmall ? 'text-2xl' : 'text-4xl'} m-0 mt-3 font-extrabold`}>{title}</h1>
+      <p className={`${isSmall ? 'text-base' : 'text-lg'} m-0 mt-2 max-w-prose text-balance`}>
         {message}
       </p>
-      {!isSmall && (
-        <p className="text-md my-6">{contactSupport}</p>
-      )}
+      {!isSmall && <p className="m-0 mt-6 max-w-prose text-base text-balance">{contactSupport}</p>}
     </div>
   );
 }
