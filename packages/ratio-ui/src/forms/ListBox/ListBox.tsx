@@ -18,7 +18,7 @@ export type ListBoxItemProps = ComponentProps<typeof AriaListBoxItem> & {
 };
 
 const listBoxDefault =
-  'mt-1 p-1 bg-card border border-border-1 rounded-lg shadow-lg max-h-60 overflow-auto';
+  'mt-1 p-1 bg-card border border-border-1 rounded-lg shadow-(--popover-shadow) max-h-60 overflow-auto';
 const listBoxItemDefault =
   'px-3 py-2 cursor-pointer outline-none rounded text-(--text) hover:bg-card-hover focus:bg-card-hover selected:bg-(--primary) selected:text-(--text-on-primary)';
 

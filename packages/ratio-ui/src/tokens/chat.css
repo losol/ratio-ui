@@ -34,6 +34,8 @@
   --chat-reaction-me-border: var(--color-primary-300);
   --chat-row-hover-bg: rgb(0 0 0 / 0.035);
   --chat-popover-bg: var(--color-neutral-50);
+  --chat-bar-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+  --chat-popover-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
 }
 
 :root[data-theme="dark"],

@@ -196,7 +196,7 @@ const Drawer: DrawerComponent = ({
           // Floating sheet: detached from the edge on all four sides, so the
           // panel reads as a layer above the page rather than a page split.
           'fixed flex flex-col overflow-hidden bg-surface',
-          'rounded-overlay border border-border-2 shadow-overlay',
+          'rounded-overlay border border-border-2 shadow-(--overlay-shadow)',
           'transition-[translate,transform] duration-[420ms]',
           easing,
           // Horizontal drawers: full height inside the inset. Width is either

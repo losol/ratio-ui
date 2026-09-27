@@ -259,7 +259,7 @@ export function CommandPalette({
             ref={dialogRef}
             aria-label={placeholder}
             aria-modal="true"
-            className="w-full max-w-lg rounded-xl bg-card shadow-2xl"
+            className="w-full max-w-lg rounded-xl bg-card shadow-(--panel-shadow)"
             role="dialog"
           >
             {/* Input */}

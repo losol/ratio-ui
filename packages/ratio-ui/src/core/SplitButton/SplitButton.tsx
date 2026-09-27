@@ -45,7 +45,7 @@ const menuItemStyles =
   'cursor-pointer flex w-full items-center gap-2 px-3 py-2 hover:bg-card-hover text-(--text) outline-none';
 
 const menuStyles =
-  'min-w-48 origin-top-right bg-card border border-border-1 shadow-lg rounded-lg overflow-hidden';
+  'min-w-48 origin-top-right bg-card border border-border-1 shadow-(--popover-shadow) rounded-lg overflow-hidden';
 
 export function SplitButton({
   children,

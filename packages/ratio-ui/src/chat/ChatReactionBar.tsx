@@ -34,7 +34,7 @@ export interface ChatReactionBarProps {
 }
 
 const POPOVER_SURFACE =
-  'border border-border-1 bg-(--chat-popover-bg) shadow-[0_2px_8px_rgb(0_0_0/0.08)]';
+  'border border-border-1 bg-(--chat-popover-bg)';
 
 const ICON_BUTTON = cn(
   'grid size-7 place-items-center rounded-full leading-none outline-none',
@@ -69,7 +69,11 @@ export const ChatReactionBar: React.FC<ChatReactionBarProps> = ({
     <Toolbar
       aria-label={label}
       data-open={pickerOpen || undefined}
-      className={cn('flex items-center gap-px rounded-full p-0.5', POPOVER_SURFACE, className)}
+      className={cn(
+        'flex items-center gap-px rounded-full p-0.5 shadow-(--chat-bar-shadow)',
+        POPOVER_SURFACE,
+        className,
+      )}
     >
       {quick.map(emoji => (
         <Button
@@ -94,7 +98,7 @@ export const ChatReactionBar: React.FC<ChatReactionBarProps> = ({
             <Popover
               placement="bottom end"
               offset={6}
-              className={cn('rounded-xl', POPOVER_SURFACE, 'shadow-[0_6px_20px_rgb(0_0_0/0.12)]')}
+              className={cn('rounded-xl shadow-(--chat-popover-shadow)', POPOVER_SURFACE)}
             >
               <Menu
                 aria-label={moreLabel}

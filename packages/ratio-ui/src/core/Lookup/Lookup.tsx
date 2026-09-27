@@ -246,7 +246,7 @@ export function Lookup<T>({
           unstyled
           className={
             listClassName ??
-            'mt-1 bg-card border border-border-1 rounded-lg shadow-lg max-h-60 overflow-auto outline-none'
+            'mt-1 bg-card border border-border-1 rounded-lg shadow-(--popover-shadow) max-h-60 overflow-auto outline-none'
           }
           selectionMode="single"
           onSelectionChange={handleSelectionChange}

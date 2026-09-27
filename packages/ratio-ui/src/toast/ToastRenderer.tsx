@@ -45,7 +45,7 @@ export const ToastRenderer: React.FC<ToastRendererProps> = ({ labels }) => {
           <Toast
             toast={toast}
             data-testid={`toast-${status}`}
-            className={`flex items-center gap-4 m-2 p-4 rounded-xs shadow-lg min-w-[230px] max-w-[400px] outline-none ${statusClasses[status]}`}
+            className={`flex items-center gap-4 m-2 p-4 rounded-xs shadow-(--popover-shadow) min-w-[230px] max-w-[400px] outline-none ${statusClasses[status]}`}
           >
             <ToastContent className="flex flex-col flex-1 min-w-0">
               <Text slot="title" className="font-semibold text-sm">
