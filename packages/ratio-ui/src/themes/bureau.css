@@ -32,6 +32,24 @@
 :root[data-theme="bureau"] .surface-light {
   color-scheme: light;
 
+  /* Primary scale — navy to blue, light to dark. Chrome that reaches for a
+     step directly (`bg-primary-900` pills, the Strip date block, steppers,
+     toggles, chat rows) would otherwise show the standard theme's teal
+     inside a bureau page. The steps are absolute, so this one ramp serves
+     both modes: 800 is the light arm's navy primary, 400 sits next to the
+     dark arm's blue. Hue 262–270, the span between those two. */
+  --color-primary-50: oklch(0.975 0.008 268);
+  --color-primary-100: oklch(0.945 0.022 268);
+  --color-primary-200: oklch(0.89 0.045 269);
+  --color-primary-300: oklch(0.81 0.085 270);
+  --color-primary-400: oklch(0.7 0.15 270);
+  --color-primary-500: oklch(0.6 0.16 270);
+  --color-primary-600: oklch(0.5 0.13 267);
+  --color-primary-700: oklch(0.4 0.09 264);
+  --color-primary-800: oklch(0.31 0.057 262);
+  --color-primary-900: oklch(0.245 0.045 262);
+  --color-primary-950: oklch(0.18 0.032 262);
+
   /* Brand */
   --primary: #20304d;            /* navy */
   --secondary: #d9d2bf;          /* derived: muted paper, a step down from surface */
