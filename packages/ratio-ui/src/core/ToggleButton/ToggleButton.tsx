@@ -56,13 +56,13 @@ const variantStyles = {
   default: {
     base: 'border-2 border-border-1 bg-card',
     hover: 'hover:border-(--primary) hover:bg-card-hover',
-    selected: 'border-(--primary) bg-primary-100 dark:bg-primary-800 shadow-sm',
+    selected: 'border-(--primary) bg-primary-100 dark:bg-primary-800 shadow-(--control-shadow)',
     pressed: 'pressed:scale-95',
   },
   primary: {
     base: 'border-2 border-border-1 bg-card',
     hover: 'hover:bg-card-hover',
-    selected: 'border-(--primary) bg-(--primary) text-(--text-on-primary) shadow-md',
+    selected: 'border-(--primary) bg-(--primary) text-(--text-on-primary) shadow-(--control-shadow-strong)',
     pressed: 'pressed:scale-95',
   },
   outline: {

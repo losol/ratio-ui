@@ -163,7 +163,7 @@ const StripRoot: React.FC<StripProps> = ({
   const bgClasses = color ? surfaceBgClasses[color] : 'bg-card';
 
   const transitionClasses = hoverEffect ? 'transition-all duration-200 ease-out' : '';
-  const hoverShadow = shadow === 'none' ? 'hover:shadow-card-hover-tile' : 'hover:shadow-card-hover';
+  const hoverShadow = shadow === 'none' ? 'hover:shadow-(--card-hover-shadow-tile)' : 'hover:shadow-(--card-hover-shadow)';
   const hoverClasses = hoverEffect
     ? cn('hover:border-(--primary) hover:-translate-y-px', hoverShadow)
     : '';

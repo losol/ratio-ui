@@ -58,7 +58,7 @@ const TRACK = [
 ].join(' ');
 
 const KNOB = [
-  'rounded-pill bg-(--text-subtle) shadow-sm transition-transform',
+  'rounded-pill bg-(--text-subtle) shadow-(--control-shadow) transition-transform',
   'group-data-[selected]:bg-(--text-on-primary)',
 ].join(' ');
 

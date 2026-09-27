@@ -423,7 +423,7 @@ export const NavbarRoot = ({
         // Elevation, never lines. Fluid bars stay flat (app header); centered
         // bars become a floating card from md (full-bleed below).
         elevated &&
-          'bg-card overflow-hidden shadow-[0_12px_32px_-18px_rgb(20_30_60/0.3)] dark:shadow-[0_14px_36px_-18px_rgb(0_0_0/0.55)]',
+          'bg-card overflow-hidden shadow-(--navbar-shadow)',
         elevated && !fluid && 'rounded-none md:rounded-xl',
         // With rows, the width constraint sits on the bar itself so the rows
         // (and their background tones) always span the full card.
