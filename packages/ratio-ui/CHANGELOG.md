@@ -1,5 +1,38 @@
 # @eventuras/ratio-ui
 
+## 2.27.0
+
+### Minor Changes
+
+- 9abd8c8: Bureau theme: new opt-in `@eventuras/ratio-ui/themes/bureau-fonts.css` ships self-hosted WOFF2 for Pixelify Sans, Archivo and Space Mono (latin and latin-ext, SIL OFL 1.1). Import it next to `themes/bureau.css` to get the theme's own type instead of the system fallbacks.
+  
+  Bureau also sets `--font-serif` to the pixel display face, so components that set display text with `font-serif` (Hero, Section, ValueTile, Avatar initials, the Menu header, DescriptionList facts) follow the theme.
+  
+  Pagination: adds space between the buttons and the page status.
+- ef25005: New runtime tokens so a theme can restyle the last soft shadows:
+  
+  - `--card-hover-shadow` / `--card-hover-shadow-tile`: the hover lift of interactive Card and Strip.
+  - `--navbar-shadow`: the elevated Navbar, light and dark.
+  - `--control-shadow` / `--control-shadow-strong`: the Switch knob and a selected ToggleButton.
+  
+  The standard theme keeps the same values as before. Bureau uses its hard offset shadow for all of them, and makes `--focus-ring` solid, so focus shows as a crisp line instead of a haze.
+- 398670a: Floating surfaces take their shadow from runtime tokens, so a theme can restyle them:
+  
+  - `--popover-shadow`: Select, ListBox, Lookup, SplitButton menu, form popovers, Toast
+  - `--panel-shadow`: CommandPalette, PageOverlay
+  - `--overlay-shadow`: Dialog, Drawer
+  - `--chat-bar-shadow`, `--chat-popover-shadow`: the chat reaction bar and its picker
+  
+  The defaults are the old shadows, so the standard theme looks the same. Bureau sets its hard offset shadow on all of them (new `--shadow-hard-lg` and `--shadow-hard-xl` steps), so dialogs, drawers, dropdowns and toasts match its buttons and cards.
+- 0b45bd5: A new `--radius-pill` token (`rounded-pill`, default `9999px`) replaces `rounded-full` on pills, dots, badges, avatars, switches, steppers, toggle groups, the chat reaction bar and the like, so a theme can square them off. The standard theme looks the same.
+  
+  Bureau now squares nearly everything: `--radius-pill` is 3px, and it also sets `--chip-radius` and `--action-button-radius`. SplitButton's outer frame follows `--button-radius`. Only spinners and decorative circles stay round.
+
+### Patch Changes
+
+- 8535bf9: Bureau theme: the primary colour scale (`--color-primary-50…950`) is now bureau's own navy-to-blue ramp. Components that use a scale step directly no longer show the standard theme's teal on a bureau page. That includes the Strip date block, the active Navbar and SectionNav pills, the highlighted chat row and the chat reaction chips.
+- 86645a6: Bureau theme: also sets `--radius-xs`, `--radius-md`, `--radius-2xl`, `--radius-3xl` and `--radius-overlay`. Before this, components that use `rounded-md` or `rounded-2xl` kept the standard theme's soft corners in bureau, and so did Dialog and Drawer panels. That includes Accordion, NavTree, Select, Toast and Announcement. They now get bureau's hard edge.
+
 ## 2.26.0
 
 ### Minor Changes
