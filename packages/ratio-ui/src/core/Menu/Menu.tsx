@@ -32,14 +32,10 @@ import { cn } from '../../utils/cn';
 
 const styles = {
   popover: cn(
-    'flex flex-col min-w-[280px] max-w-sm origin-top-right border border-border-1 rounded-xl overflow-hidden',
-    // Light-mode glow: multi-layer primary-tinted box-shadow gives the
-    // popover a soft editorial lift on the light surface.
-    'shadow-[0_1px_0_color-mix(in_oklch,var(--primary)_6%,transparent),0_12px_28px_color-mix(in_oklch,var(--primary)_18%,transparent),0_4px_8px_color-mix(in_oklch,var(--primary)_12%,transparent)]',
-    // Dark-mode shadow: primary-tinted shadows wash out on the dark
-    // surface, so the design uses a thin white top-highlight + black
-    // depth shadows for separation.
-    'dark:shadow-[0_1px_0_rgb(255_255_255/0.08),0_16px_36px_rgb(0_0_0/0.6),0_4px_12px_rgb(0_0_0/0.4)]',
+    'flex flex-col min-w-[280px] max-w-sm origin-top-right overflow-hidden',
+    // Shape and elevation come from the --menu-popover-* tokens (tokens/menu.css),
+    // so a theme can swap the glow for, say, a hard offset shadow.
+    'rounded-(--menu-popover-radius) border border-(--menu-popover-border) shadow-(--menu-popover-shadow)',
     // Pop-in / pop-out animation. React Aria Popover sets
     // `data-entering` / `data-exiting`; we transition opacity +
     // transform from a slightly-scaled, slightly-up state into the
@@ -73,15 +69,21 @@ const styles = {
   itemIconDanger: 'text-error group-hover:text-error',
   // T2 trigger: outline pill that fills with primary and glows when open;
   // the chevron cap rotates via `in-aria-expanded` (see MenuChevron).
+  // Colours, shape, shadow and press feedback come from the --menu-trigger-*
+  // tokens (tokens/menu.css), so a theme can restyle the trigger to match its
+  // buttons.
   triggerDefault: cn(
     'group inline-flex min-w-[150px] cursor-pointer items-center justify-between gap-3',
-    'rounded-full border-[1.5px] py-2 pl-4 pr-2.5 [font-size:var(--menu-font-size,14px)] font-semibold',
-    'border-primary-400 text-primary-700 dark:border-primary-500 dark:text-primary-300 bg-transparent',
-    'transition-all duration-200 active:scale-[0.96]',
-    'hover:bg-[color-mix(in_oklch,var(--color-primary-400)_14%,transparent)] hover:text-primary-800 dark:hover:text-primary-200',
+    'border-[1.5px] py-2 pl-4 pr-2.5 [font-size:var(--menu-font-size,14px)] font-semibold',
+    'rounded-(--menu-trigger-radius) border-(--menu-trigger-border) bg-(--menu-trigger-bg) text-(--menu-trigger-fg)',
+    'shadow-(--menu-trigger-shadow) transition-all duration-200',
+    'hover:bg-(--menu-trigger-hover-bg) hover:text-(--menu-trigger-hover-fg)',
+    // Native :active, not data-pressed: React Aria keeps data-pressed on the
+    // trigger while its menu is open, which would hold the press transform.
+    'active:[transform:var(--menu-trigger-transform-active)]',
     'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-(--focus-ring)',
-    'aria-expanded:bg-primary-300 aria-expanded:border-primary-300 aria-expanded:text-primary-950',
-    'aria-expanded:shadow-[0_0_0_4px_color-mix(in_oklch,var(--color-primary-400)_30%,transparent),0_4px_14px_-2px_color-mix(in_oklch,var(--color-primary-400)_55%,transparent)]',
+    'aria-expanded:border-(--menu-trigger-open-border) aria-expanded:bg-(--menu-trigger-open-bg) aria-expanded:text-(--menu-trigger-open-fg)',
+    'aria-expanded:shadow-(--menu-trigger-open-shadow) aria-expanded:[transform:var(--menu-trigger-open-transform)]',
   ),
   section: '',
   sectionLabel:
@@ -484,8 +486,8 @@ const MenuChevron = ({ className }: { className?: string }) => (
       // The "cap": a small circle that carries the chevron. It rotates and
       // brightens when the trigger it sits in is expanded (menu open).
       'flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
-      'bg-[color-mix(in_oklch,var(--color-primary-400)_22%,transparent)]',
-      'transition-all duration-300 in-aria-expanded:rotate-180 in-aria-expanded:bg-white/30',
+      'bg-(--menu-chevron-bg)',
+      'transition-all duration-300 in-aria-expanded:rotate-180 in-aria-expanded:bg-(--menu-chevron-open-bg)',
       className,
     )}
   >

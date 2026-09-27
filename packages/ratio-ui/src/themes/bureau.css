@@ -108,6 +108,39 @@
 }
 
 /* --------------------------------------------
+   bureau — menu chrome (both modes)
+   The user-menu trigger reads like a bureau button: ink border on the card,
+   square-ish corners and the hard shadow; open, it is stamped down into its
+   shadow and filled with the primary. The popover swaps its glow for the
+   same hard shadow. Every value resolves per mode through --text, --card
+   and --primary.
+   The second selector outranks the standard dark arm in tokens/menu.css,
+   so the order the stylesheets load in doesn't matter.
+   -------------------------------------------- */
+:root[data-theme="bureau"],
+:root[data-theme="bureau"][data-color-scheme] {
+  --menu-trigger-radius: var(--button-radius);
+  --menu-trigger-bg: var(--card);
+  --menu-trigger-fg: var(--text);
+  --menu-trigger-border: var(--text);
+  --menu-trigger-shadow: var(--shadow-hard);
+  --menu-trigger-hover-bg: var(--card-hover);
+  --menu-trigger-hover-fg: var(--text);
+  --menu-trigger-transform-active: translate(2px, 2px);
+  --menu-trigger-open-bg: var(--primary);
+  --menu-trigger-open-fg: var(--text-on-primary);
+  --menu-trigger-open-border: var(--text);
+  --menu-trigger-open-shadow: none;
+  --menu-trigger-open-transform: translate(2px, 2px);
+  --menu-chevron-bg: color-mix(in oklch, var(--text) 10%, transparent);
+  --menu-chevron-open-bg: color-mix(in oklch, var(--text-on-primary) 16%, transparent);
+
+  --menu-popover-radius: var(--radius-lg);
+  --menu-popover-border: var(--text);
+  --menu-popover-shadow: 3px 3px 0 color-mix(in srgb, var(--text) 62%, transparent);
+}
+
+/* --------------------------------------------
    bureau — dark (K4 .neo--dark) — also the `.surface-dark` context
    -------------------------------------------- */
 :root[data-theme="bureau"][data-color-scheme="dark"],

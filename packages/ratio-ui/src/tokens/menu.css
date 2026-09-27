@@ -14,4 +14,50 @@
 :root {
   --menu-font-size: 14px;
   --menu-font-weight: 400;
+
+  /* Trigger — the default outline pill. A theme restyles it here, the way
+     --button-* restyles Button (see themes/bureau.css). */
+  --menu-trigger-radius: 9999px;
+  --menu-trigger-bg: transparent;
+  --menu-trigger-fg: var(--color-primary-700);
+  --menu-trigger-border: var(--color-primary-400);
+  --menu-trigger-shadow: none;
+  --menu-trigger-hover-bg: color-mix(in oklch, var(--color-primary-400) 14%, transparent);
+  --menu-trigger-hover-fg: var(--color-primary-800);
+  --menu-trigger-transform-active: scale(0.96);
+  /* Open: fills and glows. */
+  --menu-trigger-open-bg: var(--color-primary-300);
+  --menu-trigger-open-fg: var(--color-primary-950);
+  --menu-trigger-open-border: var(--color-primary-300);
+  --menu-trigger-open-shadow:
+    0 0 0 4px color-mix(in oklch, var(--color-primary-400) 30%, transparent),
+    0 4px 14px -2px color-mix(in oklch, var(--color-primary-400) 55%, transparent);
+  --menu-trigger-open-transform: none;
+  /* The chevron's cap. */
+  --menu-chevron-bg: color-mix(in oklch, var(--color-primary-400) 22%, transparent);
+  --menu-chevron-open-bg: rgb(255 255 255 / 0.3);
+
+  /* Popover */
+  --menu-popover-radius: 0.75rem;
+  --menu-popover-border: var(--border-1);
+  /* A primary-tinted glow lifts it off the light surface. */
+  --menu-popover-shadow:
+    0 1px 0 color-mix(in oklch, var(--primary) 6%, transparent),
+    0 12px 28px color-mix(in oklch, var(--primary) 18%, transparent),
+    0 4px 8px color-mix(in oklch, var(--primary) 12%, transparent);
+}
+
+/* Dark mode — on any element, like the `dark:` variant these values
+   replace, so a nested dark scope still flips the trigger. */
+[data-theme="dark"],
+[data-color-scheme="dark"] {
+  --menu-trigger-fg: var(--color-primary-300);
+  --menu-trigger-border: var(--color-primary-500);
+  --menu-trigger-hover-fg: var(--color-primary-200);
+  /* Tinted glows wash out on a dark surface: a thin top highlight and black
+     depth instead. */
+  --menu-popover-shadow:
+    0 1px 0 rgb(255 255 255 / 0.08),
+    0 16px 36px rgb(0 0 0 / 0.6),
+    0 4px 12px rgb(0 0 0 / 0.4);
 }
