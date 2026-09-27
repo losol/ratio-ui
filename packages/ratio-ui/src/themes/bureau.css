@@ -132,8 +132,11 @@
   --action-button-radius: 3px;
 
   /* Fonts — family tokens only; consumer embeds the files
-     (see bureau-fonts.css, a later opt-in PR). */
+     (opt in with themes/bureau-fonts.css). */
   --font-display: "Pixelify Sans", ui-sans-serif, system-ui, sans-serif;
+  /* Components set their display text with `font-serif`; in bureau that
+     role is the pixel face, not a serif. */
+  --font-serif: "Pixelify Sans", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;  /* derived: body == sans */
   --font-mono: "Space Mono", ui-monospace, monospace;
