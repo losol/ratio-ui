@@ -28,7 +28,7 @@ export type StepperProps = {
 };
 
 const getStepStatusClasses = (status: StepStatus, variant: StepperVariant) => {
-  const baseClasses = 'flex items-center justify-center rounded-full transition-all duration-300';
+  const baseClasses = 'flex items-center justify-center rounded-pill transition-all duration-300';
 
   if (variant === 'dots') {
     const sizeClasses = 'w-3 h-3';

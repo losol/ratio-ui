@@ -174,7 +174,7 @@ export function ToggleButtonGroup({
         variant === 'segmented'
           ? // Recessed pill track: a low-opacity tint of the text color reads on
             // both light and dark surfaces without a dedicated token.
-            'inline-flex gap-1 p-0.75 rounded-full border border-border-1 bg-[color-mix(in_srgb,var(--text)_7%,transparent)]'
+            'inline-flex gap-1 p-0.75 rounded-pill border border-border-1 bg-[color-mix(in_srgb,var(--text)_7%,transparent)]'
           : // Chips carry their own outline, so the row is just layout — and it
             // wraps, since a filter set has no fixed length. Tints sit inside
             // content, so they pack a little tighter.

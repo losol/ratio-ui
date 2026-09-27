@@ -115,8 +115,9 @@
   --card-shadow-md: var(--shadow-hard);
 
   /* Tighter radii — every step Tailwind's `rounded-*` reads is set, so no
-     component keeps a soft corner. `rounded-full` is a fixed 9999px, not a
-     token, so dots, avatars and pills stay round. */
+     component keeps a soft corner. Pills, dots, badges, avatars, switches
+     and steppers square off too (`--radius-pill` and the chip / action-button
+     radii); only spinners and decorative circles keep `rounded-full`. */
   --radius-xs: 2px;
   --radius-sm: 2px;
   --radius: 3px;
@@ -126,6 +127,9 @@
   --radius-2xl: 4px;
   --radius-3xl: 4px;
   --radius-overlay: 4px;         /* Dialog and Drawer panels */
+  --radius-pill: 3px;
+  --chip-radius: 2px;
+  --action-button-radius: 3px;
 
   /* Fonts — family tokens only; consumer embeds the files
      (see bureau-fonts.css, a later opt-in PR). */

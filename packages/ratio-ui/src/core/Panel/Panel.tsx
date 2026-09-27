@@ -117,7 +117,7 @@ const ACCENT_CLASSES: Record<PanelAccent, string> = {
   // Stripe runs the full left edge, so the radius there is squared off.
   flush:
     "overflow-hidden rounded-l-none before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-(--panel-solid) before:content-['']",
-  pill: "before:absolute before:top-3 before:bottom-3 before:left-2 before:w-1 before:rounded-full before:bg-(--panel-solid) before:content-['']",
+  pill: "before:absolute before:top-3 before:bottom-3 before:left-2 before:w-1 before:rounded-pill before:bg-(--panel-solid) before:content-['']",
   top: "overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-(--panel-solid) before:content-['']",
   ring: 'border-2 border-(--panel-solid)',
   // Header carries the tint; the body falls back to the card surface.

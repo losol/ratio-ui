@@ -70,7 +70,7 @@ export function SplitButton({
   const disabledClasses = isDisabled ? 'opacity-75 cursor-not-allowed' : '';
 
   return (
-    <div className="inline-flex rounded-full overflow-hidden" data-testid={testId}>
+    <div className="inline-flex rounded-[var(--button-radius,9999px)] overflow-hidden" data-testid={testId}>
       {/* Primary action button */}
       <button
         type="button"

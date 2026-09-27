@@ -51,14 +51,14 @@ const labelSize = {
 // The track reads as a container that fills when on: card-toned when off,
 // primary when on. `group-data-*` targets the state RAC puts on the label.
 const TRACK = [
-  'relative inline-flex shrink-0 items-center rounded-full p-0.5',
+  'relative inline-flex shrink-0 items-center rounded-pill p-0.5',
   'border border-border-2 bg-card transition-colors',
   'group-data-[selected]:border-(--primary) group-data-[selected]:bg-(--primary)',
   'group-data-[focus-visible]:ring-2 group-data-[focus-visible]:ring-(--focus-ring)',
 ].join(' ');
 
 const KNOB = [
-  'rounded-full bg-(--text-subtle) shadow-sm transition-transform',
+  'rounded-pill bg-(--text-subtle) shadow-sm transition-transform',
   'group-data-[selected]:bg-(--text-on-primary)',
 ].join(' ');
 

@@ -172,7 +172,7 @@ const Dot: React.FC<DotProps> = ({ variant = 'solid', pulse, className }) => (
   <span
     aria-hidden="true"
     className={cn(
-      'size-2 rounded-full opacity-70 shrink-0',
+      'size-2 rounded-pill opacity-70 shrink-0',
       variant === 'outline' ? 'border-[1.5px] border-current' : 'bg-current',
       pulse && 'animate-[chip-dot-pulse_3s_ease-out_infinite] motion-reduce:animate-none',
       className,

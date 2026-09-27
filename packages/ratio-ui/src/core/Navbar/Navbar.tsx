@@ -231,7 +231,7 @@ export function NavbarLink({
         href={href}
         aria-current={ariaCurrent}
         className={cn(
-          'ratio-navbar__link inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium',
+          'ratio-navbar__link inline-flex items-center gap-2 rounded-pill px-3.5 py-2 text-sm font-medium',
           'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring)',
           current
             ? 'bg-primary-100 font-semibold text-(--text) dark:bg-primary-900 [.surface-dark_&]:bg-primary-900'

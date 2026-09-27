@@ -94,7 +94,7 @@ const Item: React.FC<TimelineItemProps> = ({
     >
       <span
         className={cn(
-          'absolute left-0 top-1 flex h-3 w-3 -translate-x-1/2 items-center justify-center rounded-full ring-4 ring-surface',
+          'absolute left-0 top-1 flex h-3 w-3 -translate-x-1/2 items-center justify-center rounded-pill ring-4 ring-surface',
           !icon &&
             (marker === 'ring'
               ? cn('border-2 bg-surface', ringStatusClasses[status])

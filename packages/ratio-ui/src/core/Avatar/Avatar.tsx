@@ -108,7 +108,7 @@ export const Avatar: FC<AvatarProps> = ({
   return (
     <span
       className={cn(
-        'relative inline-flex items-center justify-center rounded-full overflow-hidden shrink-0',
+        'relative inline-flex items-center justify-center rounded-pill overflow-hidden shrink-0',
         'text-(--text) font-serif italic font-medium tracking-tight',
         'bg-[radial-gradient(circle_at_30%_30%,color-mix(in_oklch,var(--primary)_25%,var(--surface)),color-mix(in_oklch,var(--primary)_12%,var(--surface)))]',
         'dark:bg-[radial-gradient(circle_at_30%_30%,color-mix(in_oklch,var(--primary)_10%,var(--surface)),color-mix(in_oklch,var(--primary)_4%,var(--surface)))]',
