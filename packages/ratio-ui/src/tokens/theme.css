@@ -305,7 +305,7 @@
      page overlay. Overlays: Dialog and Drawer. */
   --popover-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --panel-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  --overlay-shadow: 0 24px 60px rgb(20 14 8 / 0.38);
+  --overlay-shadow: var(--shadow-overlay);
 }
 
 /* --------------------------------------------
