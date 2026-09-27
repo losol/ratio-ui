@@ -66,7 +66,9 @@ export function SplitButton({
   const paddingClasses = sizeClasses.split(' ').filter(c => c.startsWith('px-') || c.startsWith('py-')).join(' ');
   const textClass = sizeClasses.split(' ').find(c => c.startsWith('text-')) ?? '';
 
-  const baseClasses = `${variantClasses} ${textClass}`.replace('rounded-full', '');
+  // Both halves keep the variant's --button-radius; only the seam between
+  // them is squared, so the pair reads as one button in every theme.
+  const baseClasses = `${variantClasses} ${textClass}`;
   const disabledClasses = isDisabled ? 'opacity-75 cursor-not-allowed' : '';
 
   return (
@@ -76,7 +78,7 @@ export function SplitButton({
         type="button"
         onClick={onClick}
         disabled={isDisabled}
-        className={`${baseClasses} ${paddingClasses} ${disabledClasses} rounded-l-full border-r-0 flex items-center gap-2`}
+        className={`${baseClasses} ${paddingClasses} ${disabledClasses} rounded-r-none border-r-0 flex items-center gap-2`}
       >
         {loading ? (
           <LoaderCircle className="h-4 w-4 animate-spin shrink-0" aria-hidden="true" />
@@ -90,7 +92,7 @@ export function SplitButton({
       <MenuTrigger>
         <AriaButton
           isDisabled={isDisabled}
-          className={`${baseClasses} px-2 ${disabledClasses} rounded-r-full border-l border-l-gray-400/30 flex items-center`}
+          className={`${baseClasses} px-2 ${disabledClasses} rounded-l-none border-l border-l-gray-400/30 flex items-center`}
         >
           <ChevronDown className="h-4 w-4" />
         </AriaButton>
