@@ -485,7 +485,7 @@ const MenuChevron = ({ className }: { className?: string }) => (
     className={cn(
       // The "cap": a small circle that carries the chevron. It rotates and
       // brightens when the trigger it sits in is expanded (menu open).
-      'flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
+      'flex h-6 w-6 shrink-0 items-center justify-center rounded-pill',
       'bg-(--menu-chevron-bg)',
       'transition-all duration-300 in-aria-expanded:rotate-180 in-aria-expanded:bg-(--menu-chevron-open-bg)',
       className,
@@ -555,7 +555,7 @@ MenuHeaderEmail.displayName = 'Menu.Header.Email';
 const MenuHeaderRole = ({ children, className }: MenuHeaderSlotProps) => (
   <span
     className={cn(
-      'self-start mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full',
+      'self-start mt-2 inline-flex items-center px-2.5 py-0.5 rounded-pill',
       'text-[10px] uppercase tracking-[0.06em] font-bold',
       'text-(--accent) border border-(--accent)',
       className,

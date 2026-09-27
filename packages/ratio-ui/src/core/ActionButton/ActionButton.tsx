@@ -149,7 +149,7 @@ export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(fun
         'inline-flex items-center justify-center gap-1.5 shrink-0',
         'text-sm leading-none whitespace-nowrap cursor-pointer',
         // Themable surface (overridable by any ancestor scope)
-        round ? 'rounded-full' : 'rounded-[var(--action-button-radius,6px)]',
+        round ? 'rounded-pill' : 'rounded-[var(--action-button-radius,6px)]',
         'bg-(--action-button-bg) text-(--action-button-fg) border border-(--action-button-border)',
         // Interactions — `:active` for plain clicks, `data-pressed` for RAC's
         // unified press state (keyboard/touch).

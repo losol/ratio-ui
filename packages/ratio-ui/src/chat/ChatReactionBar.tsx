@@ -37,7 +37,7 @@ const POPOVER_SURFACE =
   'border border-border-1 bg-(--chat-popover-bg)';
 
 const ICON_BUTTON = cn(
-  'grid size-7 place-items-center rounded-full leading-none outline-none',
+  'grid size-7 place-items-center rounded-pill leading-none outline-none',
   'transition-[background-color,transform] duration-200 ease-out',
   'data-[hovered]:bg-(--chat-row-hover-bg) data-[focus-visible]:ring-2 data-[focus-visible]:ring-(--focus-ring)',
 );
@@ -70,7 +70,7 @@ export const ChatReactionBar: React.FC<ChatReactionBarProps> = ({
       aria-label={label}
       data-open={pickerOpen || undefined}
       className={cn(
-        'flex items-center gap-px rounded-full p-0.5 shadow-(--chat-bar-shadow)',
+        'flex items-center gap-px rounded-pill p-0.5 shadow-(--chat-bar-shadow)',
         POPOVER_SURFACE,
         className,
       )}

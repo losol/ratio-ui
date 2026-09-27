@@ -116,8 +116,8 @@ const styles = {
     ].join(' '),
   },
   progress: {
-    track: 'mt-1 h-1 w-full overflow-hidden rounded-full bg-card-hover',
-    bar: 'h-full rounded-full bg-(--primary) transition-[width] duration-200',
+    track: 'mt-1 h-1 w-full overflow-hidden rounded-pill bg-card-hover',
+    bar: 'h-full rounded-pill bg-(--primary) transition-[width] duration-200',
   },
 };
 

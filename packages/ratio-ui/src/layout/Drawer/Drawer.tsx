@@ -152,7 +152,7 @@ const Drawer: DrawerComponent = ({
         )}
         {...(canDrag ? dragHandlers : {})}
       >
-        <div className="h-1 w-10 rounded-full bg-border-2" />
+        <div className="h-1 w-10 rounded-pill bg-border-2" />
       </div>
     </div>
   ) : null;

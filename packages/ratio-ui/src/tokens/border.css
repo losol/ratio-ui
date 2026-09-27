@@ -12,4 +12,8 @@
   --radius-xl: 1rem;
   /* Floating-layer family (Drawer, Dialog): the corner of a detached panel. */
   --radius-overlay: 1.25rem;
+  /* Pills, dots, badges and round controls (`rounded-pill`). Fully round by
+     default; a theme can square them off (bureau does). Spinners and
+     decorative circles keep `rounded-full`. */
+  --radius-pill: 9999px;
 }

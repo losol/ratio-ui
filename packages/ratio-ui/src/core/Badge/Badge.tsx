@@ -88,7 +88,7 @@ export const Badge: React.FC<BadgeProps> = ({
     return (
       <span
         className={cn(
-          'inline-block min-w-4.5 rounded-full px-1.75 py-px text-center align-middle text-[11px] leading-4 font-bold tabular-nums',
+          'inline-block min-w-4.5 rounded-pill px-1.75 py-px text-center align-middle text-[11px] leading-4 font-bold tabular-nums',
           variantClasses,
           className,
         )}
@@ -103,7 +103,7 @@ export const Badge: React.FC<BadgeProps> = ({
     variantClasses,
     'leading-none',
     isSubtle
-      ? 'font-mono text-[10px] uppercase tracking-wider font-bold rounded-full'
+      ? 'font-mono text-[10px] uppercase tracking-wider font-bold rounded-pill'
       : 'text-xs rounded',
   );
 

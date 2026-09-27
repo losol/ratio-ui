@@ -109,7 +109,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
         {...props}
         className={({ isSelected, isHovered, isFocusVisible, isDisabled }) =>
           cn(
-            'inline-flex items-center justify-center rounded-full font-semibold',
+            'inline-flex items-center justify-center rounded-pill font-semibold',
             'cursor-pointer whitespace-nowrap outline-none transition-colors duration-150',
             PILL_SIZE[size],
             // A chip or a tint stands alone, so its own outline is what makes it
