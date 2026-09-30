@@ -44,7 +44,8 @@ const renderers: MarkdownRenderers = {
   inlineCode: ({ children }) => <code>{children}</code>,
   codeBlock: ({ code, language }) => <pre data-language={language}>{code}</pre>,
   divider: () => <hr />,
-  // Optional: image, strong, em — plain-HTML defaults otherwise.
+  // Optional: image, strong, em and the table slots (table, tableHead,
+  // tableBody, tableRow, tableHeadCell, tableCell) — plain-HTML defaults otherwise.
 };
 
 <MarkdownEngine renderers={renderers} markdown="Hello **world**!" />

@@ -307,4 +307,19 @@ describe('MarkdownContent', () => {
       expect(container.querySelector('code')?.textContent).toContain('code');
     });
   });
+  it('renders GFM tables as the ratio-ui Table, keeping column alignment', () => {
+    const { container } = render(
+      <MarkdownContent markdown={'| A | B |\n|:--|--:|\n| 1 | 2 |'} />
+    );
+    const table = container.querySelector('table');
+    // Table wraps the element in its horizontal-scroll container.
+    expect(table?.parentElement?.className).toContain('overflow-x-auto');
+    expect(table?.className).toContain('border-collapse');
+    const [left, right] = container.querySelectorAll<HTMLElement>('thead th');
+    expect(left.className).toContain('font-semibold');
+    expect(right.style.textAlign).toBe('right');
+    const cells = container.querySelectorAll<HTMLElement>('tbody td');
+    expect([...cells].map(c => c.style.textAlign)).toEqual(['left', 'right']);
+    expect(container.querySelector('tbody tr')?.className).toContain('border-b');
+  });
 })

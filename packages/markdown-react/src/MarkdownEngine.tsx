@@ -116,6 +116,21 @@ const DefaultStrong: NonNullable<MarkdownRenderers['strong']> = (props) => <stro
 
 const DefaultEm: NonNullable<MarkdownRenderers['em']> = (props) => <em {...props} />;
 
+const DefaultTable: NonNullable<MarkdownRenderers['table']> = (props) => <table {...props} />;
+const DefaultTableHead: NonNullable<MarkdownRenderers['tableHead']> = (props) => (
+  <thead {...props} />
+);
+const DefaultTableBody: NonNullable<MarkdownRenderers['tableBody']> = (props) => (
+  <tbody {...props} />
+);
+const DefaultTableRow: NonNullable<MarkdownRenderers['tableRow']> = (props) => <tr {...props} />;
+const DefaultTableHeadCell: NonNullable<MarkdownRenderers['tableHeadCell']> = (props) => (
+  <th {...props} />
+);
+const DefaultTableCell: NonNullable<MarkdownRenderers['tableCell']> = (props) => (
+  <td {...props} />
+);
+
 /**
  * The design-system-agnostic markdown renderer: parsing, GFM, sanitization,
  * URL policy, and fence extraction — with every visible element delegated to
@@ -150,6 +165,12 @@ export const MarkdownEngine = ({
     image: ImageSlot = DefaultImage,
     strong: StrongSlot = DefaultStrong,
     em: EmSlot = DefaultEm,
+    table: TableSlot = DefaultTable,
+    tableHead: TableHeadSlot = DefaultTableHead,
+    tableBody: TableBodySlot = DefaultTableBody,
+    tableRow: TableRowSlot = DefaultTableRow,
+    tableHeadCell: TableHeadCellSlot = DefaultTableHeadCell,
+    tableCell: TableCellSlot = DefaultTableCell,
   } = renderers;
 
   // Strip HTML tags if requested (useful for legacy content with HTML-wrapped markdown)
@@ -289,6 +310,13 @@ export const MarkdownEngine = ({
     hr: ({ node, className }) => <DividerSlot className={className} />,
     strong: ({ node, ...props }) => <StrongSlot {...props} />,
     em: ({ node, ...props }) => <EmSlot {...props} />,
+    // GFM tables. Cells carry their column alignment as `style.textAlign`.
+    table: ({ node, ...props }) => <TableSlot {...props} />,
+    thead: ({ node, ...props }) => <TableHeadSlot {...props} />,
+    tbody: ({ node, ...props }) => <TableBodySlot {...props} />,
+    tr: ({ node, ...props }) => <TableRowSlot {...props} />,
+    th: ({ node, ...props }) => <TableHeadCellSlot {...props} />,
+    td: ({ node, ...props }) => <TableCellSlot {...props} />,
   };
 
   const finalComponents: any = customComponents

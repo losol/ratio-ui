@@ -67,6 +67,27 @@ export const WithSyntaxHighlighting: Story = {
 };
 
 /**
+ * GFM tables render as the ratio-ui `Table`, and column alignment
+ * (`:--`, `:-:`, `--:`) carries through to the cells.
+ */
+export const Table: Story = {
+  args: {
+    markdown: [
+      '## Review schedule',
+      '',
+      'Each successful recall doubles the interval:',
+      '',
+      '| Review | Interval | Due after |',
+      '|:--|:-:|--:|',
+      '| First | 1 day | 1 day |',
+      '| Second | 2 days | 3 days |',
+      '| Third | 4 days | 7 days |',
+      '| Fourth | **8 days** | 15 days |',
+    ].join('\n'),
+  },
+};
+
+/**
  * Unknown or missing fence languages degrade gracefully: the block renders as
  * plain code, never crashes. Here `mermaid` has no loaded grammar and the
  * bare fence has no language at all.

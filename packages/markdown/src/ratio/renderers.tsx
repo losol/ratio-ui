@@ -6,6 +6,7 @@ import { CodeBlock } from '@eventuras/ratio-ui/core/CodeBlock';
 import { Blockquote } from '@eventuras/ratio-ui/core/Blockquote';
 import { InlineCode } from '@eventuras/ratio-ui/core/InlineCode';
 import { Divider } from '@eventuras/ratio-ui/core/Divider';
+import { Table } from '@eventuras/ratio-ui/core/Table';
 import type { MarkdownRenderers } from '@eventuras/markdown-react';
 
 /**
@@ -55,4 +56,18 @@ export const ratioRenderers: MarkdownRenderers = {
   divider: ({ className }) => <Divider className={className} />,
   strong: (props) => <strong className="font-bold" {...props} />,
   em: (props) => <em className="italic" {...props} />,
+  // GFM tables. Column alignment arrives as `style.textAlign` on the cells and
+  // is forwarded with the rest of the attributes.
+  table: ({ children, className, ...props }) => (
+    <Table className={['mb-4', className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </Table>
+  ),
+  tableHead: ({ children, ...props }) => <Table.Header {...props}>{children}</Table.Header>,
+  tableBody: ({ children, ...props }) => <Table.Body {...props}>{children}</Table.Body>,
+  tableRow: ({ children, ...props }) => <Table.Row {...props}>{children}</Table.Row>,
+  tableHeadCell: ({ children, ...props }) => (
+    <Table.HeadCell {...props}>{children}</Table.HeadCell>
+  ),
+  tableCell: ({ children, ...props }) => <Table.Cell {...props}>{children}</Table.Cell>,
 };
