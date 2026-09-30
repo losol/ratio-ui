@@ -41,6 +41,34 @@ import { MarkdownContent } from '@eventuras/markdown';
 />
 ```
 
+## Alerts
+
+GitHub alerts render as a Ratio UI `Panel` with the type's icon and title — no
+setup needed:
+
+```markdown
+> [!NOTE]
+> Useful information that users should know, even when skimming content.
+
+> [!TIP]
+> Helpful advice for doing things better or more easily.
+```
+
+`NOTE`, `TIP`, `IMPORTANT`, `WARNING` and `CAUTION` are supported. Translate
+the titles with `labels`, or keep alerts as plain blockquotes with
+`callouts={false}`:
+
+```tsx
+<MarkdownContent
+  markdown={md}
+  labels={{ callouts: { note: 'Merk', tip: 'Tips', important: 'Viktig', warning: 'Advarsel', caution: 'Forsiktig' } }}
+/>
+```
+
+A `callout` entry in `customComponents` replaces the panel. For another
+markdown setup, `remarkCallout`, `calloutSanitizeSchema` and
+`createCalloutComponents(labels)` are exported to wire it up yourself.
+
 ## Syntax highlighting (opt-in)
 
 Fenced code blocks render as Ratio UI's `CodeBlock`, un-highlighted, by
@@ -118,4 +146,6 @@ Without this prop, external links will be rendered as plain text.
 - `remarkPlugins?: any[]` - Additional remark plugins, run after `remark-gfm`
 - `rehypePlugins?: any[]` - Additional rehype plugins, run before sanitization; pass `rehype-raw` here to allow raw HTML
 - `sanitizeSchemaExtension?: SanitizeSchemaExtension` - Extra tags/attributes to allow through sanitization
+- `callouts?: boolean` - Render GitHub alerts (`> [!NOTE]` …) as panels (default: `true`)
+- `labels?: { callouts?: CalloutLabels }` - Titles of the alerts, each falling back to English
 - `codeBlock?: ComponentType<MarkdownCodeBlockProps>` - Component rendering fenced code blocks, e.g. `@eventuras/ratio-ui-shiki`'s CodeBlock for syntax highlighting (default: un-highlighted Ratio UI `CodeBlock`)

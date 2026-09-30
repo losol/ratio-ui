@@ -61,7 +61,7 @@
     "vitest": "4.1.11"
   },
   "peerDependencies": {
-    "@eventuras/ratio-ui": "^2.15.0",
+    "@eventuras/ratio-ui": "^2.28.0",
     "react": ">=18 <20",
     "react-dom": ">=18 <20"
   },
