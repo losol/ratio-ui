@@ -88,6 +88,32 @@ export const Table: Story = {
 };
 
 /**
+ * GitHub alerts render as a `Panel` with the type's icon and title — no
+ * setup needed. Titles translate through `labels.callouts`; pass
+ * `callouts={false}` to keep them as plain blockquotes.
+ */
+export const Alerts: Story = {
+  args: {
+    markdown: [
+      '> [!NOTE]',
+      '> Useful information that users should know, even when skimming content.',
+      '',
+      '> [!TIP]',
+      '> Helpful advice for doing things better or more easily.',
+      '',
+      '> [!IMPORTANT]',
+      '> Key information users need to know to achieve their goal.',
+      '',
+      '> [!WARNING]',
+      '> Urgent info that needs immediate user attention to avoid problems.',
+      '',
+      '> [!CAUTION]',
+      '> Advises about risks or negative outcomes of certain actions.',
+    ].join('\n'),
+  },
+};
+
+/**
  * Unknown or missing fence languages degrade gracefully: the block renders as
  * plain code, never crashes. Here `mermaid` has no loaded grammar and the
  * bare fence has no language at all.

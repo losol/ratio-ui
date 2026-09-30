@@ -79,6 +79,9 @@ export {
   AlertCircle,
   AlertTriangle,
   Info,
+  Lightbulb,
+  MessageSquareWarning,
+  OctagonAlert,
   ShieldX,
 
   // Theme

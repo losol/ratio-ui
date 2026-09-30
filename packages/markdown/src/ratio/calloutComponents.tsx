@@ -1,40 +1,87 @@
 import React from 'react';
-import { Panel } from '@eventuras/ratio-ui/core/Panel';
-import type { Status } from '@eventuras/ratio-ui/tokens';
+import { Panel, type PanelStatus } from '@eventuras/ratio-ui/core/Panel';
+import {
+  AlertTriangle,
+  Info,
+  Lightbulb,
+  MessageSquareWarning,
+  OctagonAlert,
+} from '@eventuras/ratio-ui/icons';
 
-const DEFAULT_CONFIG = { status: 'info' as Status, icon: 'ℹ️', label: 'Note' };
+/** Titles of the five GitHub alert types. Each falls back to English. */
+export interface CalloutLabels {
+  /** @default 'Note' */
+  note?: string;
+  /** @default 'Tip' */
+  tip?: string;
+  /** @default 'Important' */
+  important?: string;
+  /** @default 'Warning' */
+  warning?: string;
+  /** @default 'Caution' */
+  caution?: string;
+}
 
-const CALLOUT_MAP: Record<string, { status: Status; icon: string; label: string }> = {
-  NOTE: DEFAULT_CONFIG,
-  TIP: { status: 'success', icon: '💡', label: 'Tip' },
-  IMPORTANT: { status: 'info', icon: '❗', label: 'Important' },
-  WARNING: { status: 'warning', icon: '⚠️', label: 'Warning' },
-  CAUTION: { status: 'error', icon: '🔴', label: 'Caution' },
+type CalloutKey = keyof CalloutLabels;
+
+const CALLOUTS: Record<
+  CalloutKey,
+  { status: PanelStatus; Icon: React.ComponentType; label: string; className?: string }
+> = {
+  note: { status: 'info', Icon: Info, label: 'Note' },
+  tip: { status: 'success', Icon: Lightbulb, label: 'Tip' },
+  // No status token fits "important", so it takes the primary colour to
+  // stand apart from NOTE.
+  important: {
+    status: 'neutral',
+    Icon: MessageSquareWarning,
+    label: 'Important',
+    className: '[--panel-solid:var(--primary)] [--panel-text:var(--primary)]',
+  },
+  warning: { status: 'warning', Icon: AlertTriangle, label: 'Warning' },
+  caution: { status: 'error', Icon: OctagonAlert, label: 'Caution' },
+};
+
+const toKey = (type: string | undefined): CalloutKey => {
+  const key = type?.toLowerCase();
+  return key && key in CALLOUTS ? (key as CalloutKey) : 'note';
 };
 
 /**
- * react-markdown component override for `callout` elements
- * produced by remarkCallout. Uses the ratio-ui Panel component.
+ * Component overrides for the `callout` elements `remarkCallout` produces
+ * from GitHub alerts (`> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`,
+ * `> [!WARNING]`, `> [!CAUTION]`), rendered as a ratio-ui `Panel` with the
+ * type's icon and title. `MarkdownContent` uses these by default; call this
+ * directly to render callouts with another markdown setup.
  */
-export const calloutComponents = {
+export const createCalloutComponents = (labels: CalloutLabels = {}) => ({
   callout: ({
     children,
-    ...props
+    'data-callout-type': type,
   }: {
     children?: React.ReactNode;
     'data-callout-type'?: string;
   }) => {
-    const calloutType = props['data-callout-type'] ?? 'NOTE';
-    const config = CALLOUT_MAP[calloutType] ?? DEFAULT_CONFIG;
-
+    const key = toKey(type);
+    const { status, Icon, label, className } = CALLOUTS[key];
     return (
-      <Panel variant="callout" status={config.status}>
-        <p className="font-semibold mb-1">
-          <span className="mr-1">{config.icon}</span>
-          {config.label}
-        </p>
-        <div>{children}</div>
+      // Static content, not a live update: no status/alert role.
+      <Panel
+        status={status}
+        accent="flush"
+        surface="transparent"
+        role={null}
+        marginBottom="md"
+        className={className}
+      >
+        <Panel.Header icon={<Icon />} className="pb-1.5">
+          <Panel.Title className="text-(--panel-text)">{labels[key] ?? label}</Panel.Title>
+        </Panel.Header>
+        <Panel.Body className="[&>:first-child]:mt-0 [&>:last-child]:mb-0 [&>:last-child]:pb-0">{children}</Panel.Body>
       </Panel>
     );
   },
-};
+});
+
+/** The callout overrides with English titles. */
+export const calloutComponents = createCalloutComponents();

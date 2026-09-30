@@ -232,6 +232,59 @@ describe('MarkdownContent', () => {
       expect(container.querySelector('callout')).toBeNull();
       expect(container.querySelector('blockquote')).not.toBeNull();
     });
+
+    const ALL_ALERTS = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
+      .map(type => `> [!${type}]\n> Body of ${type.toLowerCase()}.`)
+      .join('\n\n');
+
+    it('renders GitHub alerts by default, each with its icon and title', () => {
+      const { container } = render(<MarkdownContent markdown={ALL_ALERTS} />);
+      expect(container.querySelector('blockquote')).toBeNull();
+      const panels = container.querySelectorAll('[data-status]');
+      expect([...panels].map(p => p.getAttribute('data-status'))).toEqual([
+        'info',
+        'success',
+        'neutral',
+        'warning',
+        'error',
+      ]);
+      for (const [i, title] of ['Note', 'Tip', 'Important', 'Warning', 'Caution'].entries()) {
+        const panel = panels[i]!;
+        expect(panel.textContent).toContain(title);
+        expect(panel.querySelector('svg')).not.toBeNull();
+        // Static content: not announced as a live region.
+        expect(panel.getAttribute('role')).toBeNull();
+      }
+      expect(panels[4]!.textContent).toContain('Body of caution.');
+    });
+
+    it('translates the titles through labels.callouts', () => {
+      const { container } = render(
+        <MarkdownContent
+          markdown={'> [!TIP]\n> Øv litt hver dag.'}
+          labels={{ callouts: { tip: 'Tips' } }}
+        />
+      );
+      expect(container.textContent).toContain('Tips');
+      expect(container.textContent).not.toContain('Tip Øv');
+    });
+
+    it('keeps alerts as plain blockquotes with callouts={false}', () => {
+      const { container } = render(
+        <MarkdownContent markdown={'> [!NOTE]\n> Plain.'} callouts={false} />
+      );
+      expect(container.querySelector('blockquote')?.textContent).toContain('[!NOTE]');
+    });
+
+    it("lets the caller's callout override win", () => {
+      const Custom = ({ children }: { children?: React.ReactNode }) => (
+        <aside data-testid="custom-callout">{children}</aside>
+      );
+      render(
+        <MarkdownContent markdown={'> [!NOTE]\n> Mine.'} customComponents={{ callout: Custom }} />
+      );
+      expect(screen.getByTestId('custom-callout').textContent).toContain('Mine.');
+    });
   });
 
   describe('sanitize schema merging', () => {
@@ -316,8 +369,8 @@ describe('MarkdownContent', () => {
     expect(table?.parentElement?.className).toContain('overflow-x-auto');
     expect(table?.className).toContain('border-collapse');
     const [left, right] = container.querySelectorAll<HTMLElement>('thead th');
-    expect(left.className).toContain('font-semibold');
-    expect(right.style.textAlign).toBe('right');
+    expect(left?.className).toContain('font-semibold');
+    expect(right?.style.textAlign).toBe('right');
     const cells = container.querySelectorAll<HTMLElement>('tbody td');
     expect([...cells].map(c => c.style.textAlign)).toEqual(['left', 'right']);
     expect(container.querySelector('tbody tr')?.className).toContain('border-b');
