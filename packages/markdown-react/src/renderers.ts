@@ -63,4 +63,19 @@ export type MarkdownRenderers = {
   image?: React.ComponentType<{ src?: string; alt?: string } & MarkdownRendererAttributes>;
   strong?: React.ComponentType<{ children?: React.ReactNode } & MarkdownRendererAttributes>;
   em?: React.ComponentType<{ children?: React.ReactNode } & MarkdownRendererAttributes>;
+  /**
+   * GFM tables. Each slot defaults to the plain element (`<table>`,
+   * `<thead>`, …). Column alignment (`:--`, `:-:`, `--:`) arrives as
+   * `style.textAlign` on the cells, so spread the attributes you receive.
+   */
+  table?: React.ComponentType<{ children?: React.ReactNode } & MarkdownRendererAttributes>;
+  tableHead?: React.ComponentType<{ children?: React.ReactNode } & MarkdownRendererAttributes>;
+  tableBody?: React.ComponentType<{ children?: React.ReactNode } & MarkdownRendererAttributes>;
+  tableRow?: React.ComponentType<{ children?: React.ReactNode } & MarkdownRendererAttributes>;
+  /** A header cell (`<th>`). */
+  tableHeadCell?: React.ComponentType<
+    { children?: React.ReactNode } & MarkdownRendererAttributes
+  >;
+  /** A body cell (`<td>`). */
+  tableCell?: React.ComponentType<{ children?: React.ReactNode } & MarkdownRendererAttributes>;
 };

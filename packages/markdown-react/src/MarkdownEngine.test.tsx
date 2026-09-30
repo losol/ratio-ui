@@ -122,4 +122,40 @@ describe('MarkdownEngine', () => {
     expect(container.querySelector('strong')?.textContent).toContain('b');
     expect(container.querySelector('em')?.textContent).toContain('c');
   });
+
+  const TABLE_MD = '| Left | Center | Right |\n|:--|:-:|--:|\n| 1 | **2** | 3 |';
+
+  it('renders GFM tables as plain elements when the table slots are omitted', () => {
+    const { container } = render(engine({ markdown: TABLE_MD }));
+    expect(container.querySelectorAll('table thead tr th')).toHaveLength(3);
+    expect(container.querySelectorAll('table tbody tr td')).toHaveLength(3);
+    expect(container.querySelector('td strong')?.textContent).toBe('2');
+  });
+
+  it('routes GFM tables through the table slots with column alignment', () => {
+    const tagged =
+      (name: string, Tag: 'table' | 'thead' | 'tbody' | 'tr' | 'th' | 'td') =>
+      (props: React.HTMLAttributes<HTMLElement>) => <Tag data-slot={name} {...props} />;
+    const { container } = render(
+      <MarkdownEngine
+        markdown={TABLE_MD}
+        renderers={{
+          ...renderers,
+          table: tagged('table', 'table'),
+          tableHead: tagged('tableHead', 'thead'),
+          tableBody: tagged('tableBody', 'tbody'),
+          tableRow: tagged('tableRow', 'tr'),
+          tableHeadCell: tagged('tableHeadCell', 'th'),
+          tableCell: tagged('tableCell', 'td'),
+        }}
+      />
+    );
+    for (const slot of ['table', 'tableHead', 'tableBody', 'tableRow']) {
+      expect(container.querySelector(`[data-slot="${slot}"]`)).not.toBeNull();
+    }
+    const heads = container.querySelectorAll<HTMLElement>('th[data-slot="tableHeadCell"]');
+    const cells = container.querySelectorAll<HTMLElement>('td[data-slot="tableCell"]');
+    expect([...heads].map(h => h.style.textAlign)).toEqual(['left', 'center', 'right']);
+    expect([...cells].map(c => c.style.textAlign)).toEqual(['left', 'center', 'right']);
+  });
 });
