@@ -4,6 +4,7 @@
 
 export { ChatLog } from './ChatLog';
 export type { ChatLogLabels, ChatLogProps, ChatLogMessage, ChatRole } from './ChatLog';
+export type { ChatLinkPreview } from './ChatLinkPreview';
 export { ChatReactionBar } from './ChatReactionBar';
 export type { ChatReactionBarProps } from './ChatReactionBar';
 export { ChatReactions } from './ChatReactions';

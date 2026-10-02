@@ -6,6 +6,8 @@ import React from 'react';
 import { cn } from '../utils/cn';
 import { ChatReactions, type ChatReaction } from './ChatReactions';
 import { ChatReactionBar } from './ChatReactionBar';
+import { ChatLinkPreviewCard, hasPreviewContent, type ChatLinkPreview } from './ChatLinkPreview';
+import { segmentChatText, type ChatTextSegment } from './chatText';
 
 /**
  * Channel role, shown as a glyph before the nick: `@` op, `+` voice.
@@ -23,8 +25,13 @@ export interface ChatLogMessage {
   /** Author of a `msg` or an `action`. */
   nick?: string;
   role?: ChatRole;
-  /** The message; `@nick` mentions are highlighted. A divider's label. */
+  /**
+   * The message; `@nick` mentions are highlighted and http(s) URLs become
+   * links. A divider's label.
+   */
   text: string;
+  /** A card for a link in the message, shown under the text. */
+  preview?: ChatLinkPreview;
   /** Emoji reactions, shown under a `msg`. */
   reactions?: ChatReaction[];
 }
@@ -45,6 +52,8 @@ export interface ChatLogLabels {
   moreReactions?: string;
   /** Name of each emoji button in the bar and the picker. @default (emoji) => `React with ${emoji}` */
   reactWith?: (emoji: string) => string;
+  /** Screen-reader note on every link, which opens in a new tab. @default 'opens in a new tab' */
+  opensInNewTab?: string;
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😄'];
@@ -84,17 +93,46 @@ const NICK_COLOR: Record<ChatRole | 'none', string> = {
   none: 'text-(--chat-nick)',
 };
 
-// Letters in any script, combining marks included, so `@åse` is a mention
-// whether the å arrives composed or decomposed. The capture group makes
-// `split` keep the mentions, at every odd index.
-const MENTION = /(@[\p{L}\p{M}\p{N}_-]+)/u;
-
 // Normalised and locale-independent: a nick is an identifier, and the
 // viewer's locale (Turkish dotless i) must not change who is mentioned.
 const sameNick = (a?: string, b?: string) =>
   !!a && !!b && a.normalize().toLowerCase() === b.normalize().toLowerCase();
 
 const TIME = 'font-mono text-xs not-italic tabular-nums text-(--text-subtle)';
+
+/** Message text with its mentions highlighted and its links clickable. */
+const ChatText: React.FC<{ segments: ChatTextSegment[]; opensInNewTab: string }> = ({
+  segments,
+  opensInNewTab,
+}) =>
+  segments.map((segment, i) => {
+    if (segment.kind === 'mention') {
+      return (
+        <span key={i} className="font-semibold text-(--primary)">
+          {segment.value}
+        </span>
+      );
+    }
+    if (segment.kind === 'link') {
+      return (
+        <a
+          key={i}
+          href={segment.value}
+          target="_blank"
+          rel="noopener noreferrer ugc"
+          // Breaks anywhere, so a long URL never widens the log.
+          className={cn(
+            'wrap-anywhere rounded-xs text-(--primary) underline decoration-1 underline-offset-2',
+            'hover:decoration-2 focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none',
+          )}
+        >
+          {segment.value}
+          <span className="sr-only"> ({opensInNewTab})</span>
+        </a>
+      );
+    }
+    return segment.value;
+  });
 
 /**
  * Chat.Log — the dense, one-line-per-message log for channels: time, nick
@@ -130,6 +168,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     reactionBar: labels?.reactionBar ?? 'React to message',
     moreReactions: labels?.moreReactions ?? 'More reactions',
     reactWith: labels?.reactWith ?? (emoji => `React with ${emoji}`),
+    opensInNewTab: labels?.opensInNewTab ?? 'opens in a new tab',
   };
   return (
     <div
@@ -140,7 +179,10 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
       tabIndex={0}
       data-testid={testId}
       className={cn(
-        '[--chat-log-px:1.375rem]',
+        // The text column starts after the time and nick columns and two
+        // gaps; a preview card uses the inset to span the row when the log
+        // is narrow.
+        '@container/log [--chat-log-px:1.375rem] [--chat-text-inset:calc(44px+88px+1.5rem)]',
         'flex min-h-0 flex-1 flex-col gap-px overflow-y-auto px-(--chat-log-px) py-3',
         'text-[0.875rem] leading-normal text-(--text)',
         'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none focus-visible:ring-inset',
@@ -177,7 +219,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
   moreReactions,
   labels,
 }) => {
-  const { id, type = 'msg', time, nick, role, text, reactions } = message;
+  const { id, type = 'msg', time, nick, role, text, preview, reactions } = message;
 
   if (type === 'divider') {
     return (
@@ -204,13 +246,23 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
         )}
       >
         <span className={TIME}>{time}</span>
-        <span>{type === 'event' ? `— ${text}` : ['*', nick, text].filter(Boolean).join(' ')}</span>
+        {type === 'event' ? (
+          <span>— {text}</span>
+        ) : (
+          <span>
+            {['*', nick].filter(Boolean).join(' ')}{' '}
+            <ChatText
+              segments={segmentChatText(text, { mentions: false })}
+              opensInNewTab={labels.opensInNewTab}
+            />
+          </span>
+        )}
       </div>
     );
   }
 
-  const parts = text.split(MENTION);
-  const mentionsMe = parts.some((part, i) => i % 2 === 1 && sameNick(part.slice(1), me));
+  const segments = segmentChatText(text);
+  const mentionsMe = segments.some(s => s.kind === 'mention' && sameNick(s.value.slice(1), me));
 
   return (
     <div
@@ -261,16 +313,11 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
         <span className="break-words text-pretty">
           {/* The band and stripe only show it; this says it. */}
           {mentionsMe && <span className="sr-only">{labels.mentionsYou}: </span>}
-          {parts.map((part, i) =>
-            i % 2 === 1 ? (
-              <span key={i} className="font-semibold text-(--primary)">
-                {part}
-              </span>
-            ) : (
-              part
-            ),
-          )}
+          <ChatText segments={segments} opensInNewTab={labels.opensInNewTab} />
         </span>
+        {preview && hasPreviewContent(preview) && (
+          <ChatLinkPreviewCard preview={preview} opensInNewTab={labels.opensInNewTab} />
+        )}
         {reactions && reactions.length > 0 && (
           <ChatReactions
             reactions={reactions}
