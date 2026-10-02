@@ -16,7 +16,11 @@ export interface ChatLinkPreview {
   description?: string;
   /** Shown as the card's small label; the URL's host when absent. */
   siteName?: string;
-  /** Already an http(s) URL the browser can load. */
+  /**
+   * Already an http(s) URL the browser can load. The card shows it as a
+   * fixed square thumbnail, so `width` and `height` are the source image's
+   * dimensions for the caller's own use; the card does not read them.
+   */
   image?: { src: string; width?: number; height?: number };
 }
 
@@ -61,8 +65,8 @@ export const ChatLinkPreviewCard: React.FC<ChatLinkPreviewCardProps> = ({
       aria-labelledby={`${nameId} ${noteId}`}
       className={cn(
         'flex max-w-[30rem] gap-3 rounded-md border border-border-1 bg-(--chat-bubble-bg) p-2.5',
-        // In a narrow log the card leaves the text column and spans the row.
-        '@max-lg/log:-ml-(--chat-text-inset) @max-lg/log:w-[calc(100%+var(--chat-text-inset))] @max-lg/log:max-w-none',
+        // In a narrow log the text column is the row, so the card spans it.
+        '@max-lg/log:max-w-none',
         'text-(--text) no-underline transition-colors hover:border-border-2 hover:bg-(--chat-row-hover-bg)',
         'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none',
         className,
