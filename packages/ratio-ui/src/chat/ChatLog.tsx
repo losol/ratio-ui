@@ -179,10 +179,9 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
       tabIndex={0}
       data-testid={testId}
       className={cn(
-        // The text column starts after the time and nick columns and two
-        // gaps; a preview card uses the inset to span the row when the log
-        // is narrow.
-        '@container/log [--chat-log-px:1.375rem] [--chat-text-inset:calc(44px+88px+1.5rem)]',
+        // A container, so rows can stack when the log itself is narrow (a
+        // phone, or a side panel), whatever the viewport.
+        '@container/log [--chat-log-px:1.375rem]',
         'flex min-h-0 flex-1 flex-col gap-px overflow-y-auto px-(--chat-log-px) py-3',
         'text-[0.875rem] leading-normal text-(--text)',
         'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none focus-visible:ring-inset',
@@ -271,6 +270,8 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
         // 3px stripe comes out of the padding, keeping every row aligned.
         'group/row relative -mx-(--chat-log-px) grid grid-cols-[44px_88px_minmax(0,1fr)] items-baseline gap-x-3',
         'border-l-3 py-0.5 pr-(--chat-log-px) pl-[calc(var(--chat-log-px)-3px)] transition-colors duration-100',
+        // Narrow: nick and time on one line, the text on its own below.
+        '@max-lg/log:grid-cols-[auto_minmax(0,1fr)] @max-lg/log:gap-x-2 @max-lg/log:gap-y-0.5 @max-lg/log:py-1.5',
         mentionsMe
           ? 'border-(--accent) bg-(--chat-mention-bg)'
           : 'border-transparent hover:bg-(--chat-row-hover-bg) has-[[data-focus-visible]]:bg-(--chat-row-hover-bg)',
@@ -297,10 +298,11 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
           )}
         />
       )}
-      <span className={TIME}>{time}</span>
+      <span className={cn(TIME, '@max-lg/log:col-start-2 @max-lg/log:row-start-1')}>{time}</span>
       <span
         className={cn(
           'truncate text-right font-semibold',
+          '@max-lg/log:col-start-1 @max-lg/log:row-start-1 @max-lg/log:max-w-[60cqw] @max-lg/log:text-left',
           sameNick(nick, me) ? NICK_COLOR.voice : NICK_COLOR[role ?? 'none'],
         )}
       >
@@ -309,7 +311,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
         {nick}
         {role && <span className="sr-only"> ({labels[role]})</span>}
       </span>
-      <div className="flex min-w-0 flex-col gap-1">
+      <div className="flex min-w-0 flex-col gap-1 @max-lg/log:col-span-2 @max-lg/log:row-start-2">
         <span className="break-words text-pretty">
           {/* The band and stripe only show it; this says it. */}
           {mentionsMe && <span className="sr-only">{labels.mentionsYou}: </span>}

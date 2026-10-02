@@ -267,10 +267,34 @@ export const LinkPreviewLongText: Story = {
   },
 };
 
-/** On a narrow screen the card spans the whole row. */
+/** In a narrow log the card spans the whole row, under the stacked header. */
 export const LinkPreviewNarrow: Story = {
   args: { messages: linkPreviews, me: 'tor', 'aria-label': '#previews' },
-  decorators: [Story => <div className="w-[360px]"><Story /></div>],
+  decorators: [Story => <div className="flex h-full w-[360px] flex-col"><Story /></div>],
+};
+
+/**
+ * Below 32rem of log width (a phone, or a side panel — the log measures
+ * itself, not the viewport) each message stacks: nick and time on one line,
+ * the text on its own below, over the full width. Events, actions and
+ * dividers keep their single line.
+ */
+export const Narrow: Story = {
+  args: { messages: volunteers, me: 'tor', 'aria-label': '#volunteers' },
+  decorators: [Story => <div className="flex h-full w-[360px] flex-col"><Story /></div>],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const text = canvas.getByText('Morning all — badge printing starts at 10 in the foyer.');
+    const row = text.closest('.group\\/row')!;
+    const [time, nick] = row.querySelectorAll(':scope > span');
+    // Nick first on the header line, the time beside it; the text below, at the row's left edge.
+    await expect(nick!.getBoundingClientRect().left).toBeLessThan(time!.getBoundingClientRect().left);
+    // Same line: the two boxes overlap vertically (their fonts differ in size).
+    await expect(time!.getBoundingClientRect().top).toBeLessThan(nick!.getBoundingClientRect().bottom);
+    await expect(time!.getBoundingClientRect().bottom).toBeGreaterThan(nick!.getBoundingClientRect().top);
+    await expect(text.getBoundingClientRect().top).toBeGreaterThan(nick!.getBoundingClientRect().bottom - 1);
+    await expect(Math.round(text.getBoundingClientRect().left)).toBe(Math.round(nick!.getBoundingClientRect().left));
+  },
 };
 
 /** The card reads on a dark surface too, with the same tokens. */
