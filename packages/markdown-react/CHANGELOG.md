@@ -1,5 +1,13 @@
 # @eventuras/markdown-react
 
+## 0.2.0
+
+### Minor Changes
+
+- 0b7b1d7: GFM tables get renderer slots. `MarkdownRenderers` gains optional `table`, `tableHead`, `tableBody`, `tableRow`, `tableHeadCell` and `tableCell` slots. Each falls back to the plain element, so existing renderer sets keep working. Column alignment (`:--`, `:-:`, `--:`) reaches the cells as `style.textAlign`.
+  
+  `ratioRenderers` maps them to the ratio-ui `Table`, `Table.Header`, `Table.Body`, `Table.Row`, `Table.HeadCell` and `Table.Cell`, so markdown tables in `MarkdownContent` are styled, scroll horizontally when wide, and keep their alignment. Before this they fell through as unstyled `<table>` elements.
+
 ## 0.1.0
 
 ### Minor Changes
