@@ -1,5 +1,28 @@
 # @eventuras/ratio-ui
 
+## 2.28.0
+
+### Minor Changes
+
+- f23cc89: Chat.Log: links and link previews.
+  
+  - http(s) URLs in `msg` and `action` rows are now links that open in a new tab (`rel="noopener noreferrer ugc"`), with a screen-reader note from the new `labels.opensInNewTab`. Sentence punctuation stays outside the link, a parenthesis that opens inside the URL stays in it, a `@nick` inside a URL is not a mention, and long URLs break anywhere so they never widen the log. Other schemes and bare `www.` hosts stay plain text.
+  - A `@` in the middle of a word (`desk@example.org`) is no longer a mention.
+  - New `ChatLogMessage.preview` (`ChatLinkPreview`, exported from `@eventuras/ratio-ui/chat`): a card under the text with site name (or the URL's host), title, description and a fixed-size square thumbnail. The whole card is one link, named by the title. It spans the row when the log is narrow. The log never fetches previews; the caller passes them. Messages without `preview` look exactly as before.
+- eaa4249: GitHub alerts work out of the box. `MarkdownContent` now renders `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]` and `> [!CAUTION]` as a `Panel` with the type's icon and title, in the GitHub style: a coloured stripe on the left and a coloured title. Before this they needed three props (`remarkPlugins`, `sanitizeSchemaExtension`, `customComponents`) and otherwise showed as a quote starting with a literal `[!NOTE]`.
+  
+  - New `callouts` prop (default `true`). `callouts={false}` keeps alerts as plain blockquotes.
+  - New `labels.callouts` translates the five titles, which fall back to English.
+  - Lucide icons (Info, Lightbulb, MessageSquareWarning, AlertTriangle, OctagonAlert) replace the emoji. `IMPORTANT` takes the primary colour, so it no longer looks like `NOTE`.
+  - The panels are no longer live regions. A `CAUTION` in static content used to be announced as `role="alert"`.
+  - `createCalloutComponents(labels)` is exported for custom setups. `calloutComponents` still works, and passing the three props yourself is harmless.
+  - `@eventuras/ratio-ui` exports the `Lightbulb`, `MessageSquareWarning` and `OctagonAlert` icons. The `@eventuras/markdown` peer range moves to `^2.28.0` for them.
+
+### Patch Changes
+
+- 5d062ce: Chat.Log: a narrow log stacks each message. Below 32rem of log width (a phone, or a side panel; the log measures itself, not the viewport) the nick and time share one line and the text, reactions and link preview take the full width below. Wider logs keep the column layout. Events, actions and dividers are unchanged. The `ChatLinkPreview.image` doc now says `width` and `height` are the source image's dimensions; the card shows a fixed square thumbnail and does not read them.
+- ccc1b7a: Unauthorized: the icon now sits above the title instead of beside it, so the title is truly centred. The bouncing plus sign is replaced by a still shield icon. The paragraphs get a readable max width, side padding and balanced line breaks, and `text-md`, which isn't a Tailwind class, is replaced by `text-base`.
+
 ## 2.27.0
 
 ### Minor Changes

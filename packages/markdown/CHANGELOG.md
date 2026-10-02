@@ -1,5 +1,26 @@
 # @eventuras/markdown
 
+## 0.16.0
+
+### Minor Changes
+
+- eaa4249: GitHub alerts work out of the box. `MarkdownContent` now renders `> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]` and `> [!CAUTION]` as a `Panel` with the type's icon and title, in the GitHub style: a coloured stripe on the left and a coloured title. Before this they needed three props (`remarkPlugins`, `sanitizeSchemaExtension`, `customComponents`) and otherwise showed as a quote starting with a literal `[!NOTE]`.
+  
+  - New `callouts` prop (default `true`). `callouts={false}` keeps alerts as plain blockquotes.
+  - New `labels.callouts` translates the five titles, which fall back to English.
+  - Lucide icons (Info, Lightbulb, MessageSquareWarning, AlertTriangle, OctagonAlert) replace the emoji. `IMPORTANT` takes the primary colour, so it no longer looks like `NOTE`.
+  - The panels are no longer live regions. A `CAUTION` in static content used to be announced as `role="alert"`.
+  - `createCalloutComponents(labels)` is exported for custom setups. `calloutComponents` still works, and passing the three props yourself is harmless.
+  - `@eventuras/ratio-ui` exports the `Lightbulb`, `MessageSquareWarning` and `OctagonAlert` icons. The `@eventuras/markdown` peer range moves to `^2.28.0` for them.
+- 0b7b1d7: GFM tables get renderer slots. `MarkdownRenderers` gains optional `table`, `tableHead`, `tableBody`, `tableRow`, `tableHeadCell` and `tableCell` slots. Each falls back to the plain element, so existing renderer sets keep working. Column alignment (`:--`, `:-:`, `--:`) reaches the cells as `style.textAlign`.
+  
+  `ratioRenderers` maps them to the ratio-ui `Table`, `Table.Header`, `Table.Body`, `Table.Row`, `Table.HeadCell` and `Table.Cell`, so markdown tables in `MarkdownContent` are styled, scroll horizontally when wide, and keep their alignment. Before this they fell through as unstyled `<table>` elements.
+
+### Patch Changes
+
+- Updated dependencies [0b7b1d7]
+  - @eventuras/markdown-react@0.2.0
+
 ## 0.15.1
 
 ### Patch Changes
