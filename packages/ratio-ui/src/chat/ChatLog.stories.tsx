@@ -124,6 +124,161 @@ export const MentionMatching: Story = {
   },
 };
 
+/**
+ * http(s) URLs in messages and `/me` actions are links that open in a new
+ * tab. Sentence punctuation stays outside the link, a parenthesis that opens
+ * inside the URL stays in it, and a `@nick` inside a URL is not a mention.
+ * Other schemes and bare `www.` hosts stay plain text.
+ */
+export const Links: Story = {
+  args: {
+    me: 'tor',
+    'aria-label': '#links',
+    messages: [
+      { id: '1', time: '10:00', nick: 'ingrid', role: 'op', text: 'Slides are up at https://example.org/talks/2026/keynote.' },
+      { id: '2', time: '10:01', nick: 'aisha', text: 'Background reading: https://en.wikipedia.org/wiki/Mercury_(planet), then the planning page (https://example.org/plan).' },
+      { id: '3', time: '10:02', nick: 'tor', text: 'Mind the schedule, @aisha — https://example.org/@aisha/schedule is yours, not a mention.' },
+      { id: '4', time: '10:03', nick: 'marcus', text: 'Not links: www.example.org, javascript:alert(1) and mailto:desk@example.org.' },
+      { id: '5', time: '10:04', nick: 'sofie', text: 'Also «https://example.org/room-2.04»! Breaks anywhere: https://example.org/a-very-long-path/that-keeps-going/and-going/with-no-spaces-in-it-at-all/until-the-row-would-overflow' },
+      { id: 'a1', type: 'action', time: '10:05', nick: 'marcus', text: 'posts https://example.org/photos?day=2' },
+      { id: 'e1', type: 'event', time: '10:06', text: 'ingrid set the topic to https://example.org/topic' },
+    ],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const hrefs = canvas.getAllByRole('link').map(a => a.getAttribute('href'));
+    await expect(hrefs).toEqual([
+      'https://example.org/talks/2026/keynote',
+      'https://en.wikipedia.org/wiki/Mercury_(planet)',
+      'https://example.org/plan',
+      'https://example.org/@aisha/schedule',
+      'https://example.org/room-2.04',
+      'https://example.org/a-very-long-path/that-keeps-going/and-going/with-no-spaces-in-it-at-all/until-the-row-would-overflow',
+      'https://example.org/photos?day=2',
+    ]);
+    for (const link of canvas.getAllByRole('link')) {
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', 'noopener noreferrer ugc');
+      await expect(link).toHaveAccessibleName(/opens in a new tab/);
+    }
+    // The URL's `@aisha` is part of the link; the one before it is the mention.
+    await expect(canvas.getAllByText('@aisha', { exact: true })).toHaveLength(1);
+    // An address is not a mention either.
+    await expect(canvas.queryByText('@example', { exact: true })).toBeNull();
+    // Event rows stay plain.
+    await expect(canvas.getByText(/set the topic to https:/).querySelector('a')).toBeNull();
+    // A long URL never widens the log.
+    await expect(canvasElement.scrollWidth).toBe(canvasElement.clientWidth);
+  },
+};
+
+// A neutral thumbnail, so the stories load nothing from the network.
+const thumbnail = (hue: number) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="hsl(${hue} 40% 55%)"/><circle cx="24" cy="26" r="9" fill="hsl(${hue} 40% 80%)"/><path d="M4 56l18-20 12 14 10-8 16 14z" fill="hsl(${hue} 40% 35%)"/></svg>`,
+  )}`;
+
+const linkPreviews: ChatLogMessage[] = [
+  {
+    id: 'p1',
+    time: '11:02',
+    nick: 'ingrid',
+    role: 'op',
+    text: 'The venue map is up: https://example.org/venue/map',
+    preview: {
+      url: 'https://example.org/venue/map',
+      siteName: 'Example Venue',
+      title: 'Map of the conference centre',
+      description: 'Halls, rooms, coffee and the quiet corners — on one page.',
+      image: { src: thumbnail(210), width: 64, height: 64 },
+    },
+  },
+  {
+    id: 'p2',
+    time: '11:04',
+    nick: 'aisha',
+    role: 'voice',
+    text: 'And the volunteer handbook https://example.org/handbook',
+    preview: {
+      url: 'https://example.org/handbook',
+      title: 'Volunteer handbook',
+      description: 'Shifts, badges, who to call.',
+    },
+    reactions: [{ emoji: '🙏', count: 2 }],
+  },
+  {
+    id: 'p3',
+    time: '11:05',
+    nick: 'tor',
+    role: 'op',
+    text: 'Nothing to preview here: https://example.org/empty',
+    preview: { url: 'https://example.org/empty' },
+  },
+];
+
+/**
+ * `preview` puts a card under the text: site name (or the host), title and
+ * description, with a square thumbnail when there is an image. The whole
+ * card is one link, named by the title. A preview with neither title nor
+ * description is not shown.
+ */
+export const LinkPreview: Story = {
+  args: { messages: linkPreviews, me: 'tor', 'aria-label': '#previews' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const map = canvas.getByRole('link', { name: 'Map of the conference centre opens in a new tab' });
+    await expect(map).toHaveAttribute('href', 'https://example.org/venue/map');
+    await expect(map).toHaveAttribute('rel', 'noopener noreferrer ugc');
+    const img = map.querySelector('img')!;
+    await expect(img).toHaveAttribute('alt', '');
+    await expect(img).toHaveAttribute('loading', 'lazy');
+    // The host stands in for a missing site name.
+    const handbook = canvas.getByRole('link', { name: 'Volunteer handbook opens in a new tab' });
+    await expect(handbook).toHaveTextContent('example.org');
+    await expect(handbook.querySelector('img')).toBeNull();
+    // Three text links and two cards: the empty preview draws nothing.
+    await expect(canvas.getAllByRole('link')).toHaveLength(5);
+  },
+};
+
+/** Long titles and descriptions clamp to two lines each; the card never grows past them. */
+export const LinkPreviewLongText: Story = {
+  args: {
+    me: 'tor',
+    'aria-label': '#previews',
+    messages: [
+      {
+        id: 'l1',
+        time: '11:10',
+        nick: 'sofie',
+        role: 'op',
+        text: 'Worth a read before Thursday https://example.org/articles/long-form',
+        preview: {
+          url: 'https://example.org/articles/long-form',
+          siteName: 'Example Journal',
+          title:
+            'A very long title that goes on about the history of knowledge sharing in learned societies, the circulation of letters and the slow birth of the public lecture',
+          description:
+            'The description is longer still. It summarises the article in several sentences, mentions the author, the issue and the date, and keeps going well past the point where a card has room for it, so the card cuts it off after two lines.',
+          image: { src: thumbnail(30) },
+        },
+      },
+    ],
+  },
+};
+
+/** On a narrow screen the card spans the whole row. */
+export const LinkPreviewNarrow: Story = {
+  args: { messages: linkPreviews, me: 'tor', 'aria-label': '#previews' },
+  decorators: [Story => <div className="w-[360px]"><Story /></div>],
+};
+
+/** The card reads on a dark surface too, with the same tokens. */
+export const LinkPreviewDark: Story = {
+  args: { messages: linkPreviews, me: 'tor', 'aria-label': '#previews' },
+  decorators: [Story => <div className="surface-dark flex flex-1 flex-col bg-surface"><Story /></div>],
+};
+
 /** Add your reaction, or take it back; a reaction nobody has left goes away. */
 const toggle = (reactions: ChatLogMessage['reactions'] = [], emoji: string) => {
   const hit = reactions.find(r => r.emoji === emoji);
