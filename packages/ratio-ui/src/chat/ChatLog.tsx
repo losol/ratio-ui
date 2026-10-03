@@ -5,6 +5,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef } from 'react';
+import type { NavTreeProps } from '../core/NavTree';
 import { cn } from '../utils/cn';
 import { ChatReactions, type ChatReaction } from './ChatReactions';
 import { ChatReactionBar } from './ChatReactionBar';
@@ -90,7 +91,9 @@ export interface ChatLogProps {
    * view back.
    */
   highlightedId?: string;
-  /** Renders the time link on messages with an `href`, e.g. a router's Link. @default 'a' */
+  /** Routing link component for messages with `href`, e.g. Next's `Link`. @default 'a' */
+  LinkComponent?: NavTreeProps['LinkComponent'];
+  /** Renders the time link on messages with an `href`. @deprecated Use `LinkComponent`. Removed in 3.0. */
   linkAs?: React.ElementType;
   /**
    * Adds "Copy link" to the bar on messages with an `href`. The caller
@@ -142,7 +145,8 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     quickReactions = QUICK_REACTIONS,
     moreReactions = MORE_REACTIONS,
     highlightedId,
-    linkAs = 'a',
+    LinkComponent,
+    linkAs,
     onCopyLink,
     reactionsLabel,
     labels,
@@ -179,6 +183,8 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
       behavior: reduced ? 'auto' : 'smooth',
     });
   }, [highlightedId, messages]);
+
+  const linkTag = (LinkComponent ?? linkAs ?? 'a') as React.ElementType;
 
   const rowLabels: Required<ChatLogLabels> = {
     reactions: labels?.reactions ?? reactionsLabel ?? 'Reactions',
@@ -217,7 +223,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
           me={me}
           onToggleReaction={onToggleReaction}
           onCopyLink={onCopyLink}
-          linkAs={linkAs}
+          linkTag={linkTag}
           highlighted={message.id === highlightedId}
           quickReactions={quickReactions}
           moreReactions={moreReactions}
@@ -233,15 +239,17 @@ type ChatLogRowProps = {
   message: ChatLogMessage;
   labels: Required<ChatLogLabels>;
   highlighted: boolean;
+  /** Resolved from `LinkComponent`, the deprecated `linkAs`, or `'a'`. */
+  linkTag: React.ElementType;
 } & Pick<ChatLogProps, 'me' | 'onToggleReaction' | 'onCopyLink'> &
-  Required<Pick<ChatLogProps, 'quickReactions' | 'moreReactions' | 'linkAs'>>;
+  Required<Pick<ChatLogProps, 'quickReactions' | 'moreReactions'>>;
 
 const ChatLogRow: React.FC<ChatLogRowProps> = ({
   message,
   me,
   onToggleReaction,
   onCopyLink,
-  linkAs: LinkAs,
+  linkTag: LinkTag,
   highlighted,
   quickReactions,
   moreReactions,
@@ -340,7 +348,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
       )}
       {href ? (
         // The usual chat permalink: in-app, same tab, through the router's Link.
-        <LinkAs
+        <LinkTag
           href={href}
           aria-label={labels.messageLink(nick ?? '', time ?? '')}
           className={cn(
@@ -350,7 +358,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
           )}
         >
           {time}
-        </LinkAs>
+        </LinkTag>
       ) : (
         <span className={timeClass}>{time}</span>
       )}

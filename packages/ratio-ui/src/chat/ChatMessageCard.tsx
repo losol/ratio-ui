@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import React from 'react';
+import type { NavTreeProps } from '../core/NavTree';
 import { cn } from '../utils/cn';
 import type { ChatLogMessage } from './ChatLog';
 import { ChatLinkPreviewCard, hasPreviewContent } from './ChatLinkPreview';
@@ -32,7 +33,9 @@ export interface ChatMessageCardProps {
   room?: string;
   /** Link to the message in its room. */
   roomHref?: string;
-  /** Renders the room link, e.g. a router's Link. @default 'a' */
+  /** Routing link component for `roomHref`, e.g. Next's `Link`. @default 'a' */
+  LinkComponent?: NavTreeProps['LinkComponent'];
+  /** Renders the room link. @deprecated Use `LinkComponent`. Removed in 3.0. */
   linkAs?: React.ElementType;
   /** Built-in text. Each entry falls back to English. */
   labels?: ChatMessageCardLabels;
@@ -57,13 +60,15 @@ export const ChatMessageCard: React.FC<ChatMessageCardProps> = ({
   dateTime,
   room,
   roomHref,
-  linkAs: LinkAs = 'a',
+  LinkComponent,
+  linkAs,
   labels,
   removed = false,
   className,
   testId,
 }) => {
   const { id, nick, text, preview, reactions } = message;
+  const LinkTag = (LinkComponent ?? linkAs ?? 'a') as React.ElementType;
   const l: Required<ChatMessageCardLabels> = {
     seeInRoom: labels?.seeInRoom ?? 'See in the room',
     removed: labels?.removed ?? 'This message was removed.',
@@ -107,7 +112,7 @@ export const ChatMessageCard: React.FC<ChatMessageCardProps> = ({
         <ChatReactions reactions={reactions} aria-label={l.reactions} />
       )}
       {roomHref && (
-        <LinkAs
+        <LinkTag
           href={roomHref}
           className={cn(
             'self-start rounded-xs text-sm font-medium text-(--primary) no-underline underline-offset-2',
@@ -115,7 +120,7 @@ export const ChatMessageCard: React.FC<ChatMessageCardProps> = ({
           )}
         >
           {l.seeInRoom} <span aria-hidden>→</span>
-        </LinkAs>
+        </LinkTag>
       )}
     </article>
   );
