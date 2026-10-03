@@ -2,12 +2,15 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import React from 'react';
+'use client';
+
+import React, { useCallback, useEffect, useRef } from 'react';
 import { cn } from '../utils/cn';
 import { ChatReactions, type ChatReaction } from './ChatReactions';
 import { ChatReactionBar } from './ChatReactionBar';
 import { ChatLinkPreviewCard, hasPreviewContent, type ChatLinkPreview } from './ChatLinkPreview';
-import { segmentChatText, type ChatTextSegment } from './chatText';
+import { ChatText } from './ChatText';
+import { segmentChatText } from './chatText';
 
 /**
  * Channel role, shown as a glyph before the nick: `@` op, `+` voice.
@@ -32,6 +35,8 @@ export interface ChatLogMessage {
   text: string;
   /** A card for a link in the message, shown under the text. */
   preview?: ChatLinkPreview;
+  /** The message's own address; the time becomes a link to it. */
+  href?: string;
   /** Emoji reactions, shown under a `msg`. */
   reactions?: ChatReaction[];
 }
@@ -54,6 +59,10 @@ export interface ChatLogLabels {
   reactWith?: (emoji: string) => string;
   /** Screen-reader note on every link, which opens in a new tab. @default 'opens in a new tab' */
   opensInNewTab?: string;
+  /** Name of the time link on a message with an `href`. @default (nick, time) => `Message from ${nick} at ${time}` */
+  messageLink?: (nick: string, time: string) => string;
+  /** Name of the "Copy link" button in the bar. @default 'Copy link' */
+  copyLink?: string;
 }
 
 const QUICK_REACTIONS = ['👍', '❤️', '😄'];
@@ -75,6 +84,20 @@ export interface ChatLogProps {
   quickReactions?: string[];
   /** Reactions in the bar's picker. Pass `[]` to leave the picker out. @default twelve common emoji */
   moreReactions?: string[];
+  /**
+   * The message to point at: its row is highlighted and, once it is in the
+   * log, scrolled into view — once per id, so later messages don't pull the
+   * view back.
+   */
+  highlightedId?: string;
+  /** Renders the time link on messages with an `href`, e.g. a router's Link. @default 'a' */
+  linkAs?: React.ElementType;
+  /**
+   * Adds "Copy link" to the bar on messages with an `href`. The caller
+   * copies, since it knows the absolute URL. The bar shows for this alone,
+   * so a read-only log gets just that button.
+   */
+  onCopyLink?: (message: ChatLogMessage) => void;
   /** Accessible name for each message's reaction row. @deprecated Use `labels.reactions`. Still honoured until the next major. */
   reactionsLabel?: string;
   /** Built-in text. Each entry falls back to English. */
@@ -100,40 +123,6 @@ const sameNick = (a?: string, b?: string) =>
 
 const TIME = 'font-mono text-xs not-italic tabular-nums text-(--text-subtle)';
 
-/** Message text with its mentions highlighted and its links clickable. */
-const ChatText: React.FC<{ segments: ChatTextSegment[]; opensInNewTab: string }> = ({
-  segments,
-  opensInNewTab,
-}) =>
-  segments.map((segment, i) => {
-    if (segment.kind === 'mention') {
-      return (
-        <span key={i} className="font-semibold text-(--primary)">
-          {segment.value}
-        </span>
-      );
-    }
-    if (segment.kind === 'link') {
-      return (
-        <a
-          key={i}
-          href={segment.value}
-          target="_blank"
-          rel="noopener noreferrer ugc"
-          // Breaks anywhere, so a long URL never widens the log.
-          className={cn(
-            'wrap-anywhere rounded-xs text-(--primary) underline decoration-1 underline-offset-2',
-            'hover:decoration-2 focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none',
-          )}
-        >
-          {segment.value}
-          <span className="sr-only"> ({opensInNewTab})</span>
-        </a>
-      );
-    }
-    return segment.value;
-  });
-
 /**
  * Chat.Log — the dense, one-line-per-message log for channels: time, nick
  * with its role glyph, text. Join/part and topic changes are `event` rows,
@@ -152,6 +141,9 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     onToggleReaction,
     quickReactions = QUICK_REACTIONS,
     moreReactions = MORE_REACTIONS,
+    highlightedId,
+    linkAs = 'a',
+    onCopyLink,
     reactionsLabel,
     labels,
     'aria-label': ariaLabel,
@@ -160,6 +152,34 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
   },
   ref,
 ) {
+  const logRef = useRef<HTMLDivElement | null>(null);
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      logRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
+
+  // Scrolls the highlighted row to the middle of the log, inside the log's
+  // own scroll box. Once per id: a row that arrives with later history still
+  // gets its scroll, but messages posted after that leave the view alone.
+  const scrolledTo = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const log = logRef.current;
+    if (!log || !highlightedId || scrolledTo.current === highlightedId) return;
+    const row = log.querySelector<HTMLElement>(`[data-message-id="${CSS.escape(highlightedId)}"]`);
+    if (!row) return;
+    scrolledTo.current = highlightedId;
+    const rowTop = row.getBoundingClientRect().top - log.getBoundingClientRect().top + log.scrollTop;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    log.scrollTo({
+      top: rowTop - (log.clientHeight - row.offsetHeight) / 2,
+      behavior: reduced ? 'auto' : 'smooth',
+    });
+  }, [highlightedId, messages]);
+
   const rowLabels: Required<ChatLogLabels> = {
     reactions: labels?.reactions ?? reactionsLabel ?? 'Reactions',
     mentionsYou: labels?.mentionsYou ?? 'Mentions you',
@@ -169,10 +189,12 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     moreReactions: labels?.moreReactions ?? 'More reactions',
     reactWith: labels?.reactWith ?? (emoji => `React with ${emoji}`),
     opensInNewTab: labels?.opensInNewTab ?? 'opens in a new tab',
+    messageLink: labels?.messageLink ?? ((nick, time) => `Message from ${nick} at ${time}`),
+    copyLink: labels?.copyLink ?? 'Copy link',
   };
   return (
     <div
-      ref={ref}
+      ref={setRefs}
       role="log"
       aria-label={ariaLabel}
       // Scrollable, so it has to be reachable by keyboard.
@@ -181,7 +203,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
       className={cn(
         // A container, so rows can stack when the log itself is narrow (a
         // phone, or a side panel), whatever the viewport.
-        '@container/log [--chat-log-px:1.375rem]',
+        '@container/chat [--chat-log-px:1.375rem]',
         'flex min-h-0 flex-1 flex-col gap-px overflow-y-auto px-(--chat-log-px) py-3',
         'text-[0.875rem] leading-normal text-(--text)',
         'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none focus-visible:ring-inset',
@@ -194,6 +216,9 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
           message={message}
           me={me}
           onToggleReaction={onToggleReaction}
+          onCopyLink={onCopyLink}
+          linkAs={linkAs}
+          highlighted={message.id === highlightedId}
           quickReactions={quickReactions}
           moreReactions={moreReactions}
           labels={rowLabels}
@@ -204,25 +229,30 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
 });
 ChatLog.displayName = 'Chat.Log';
 
-type ChatLogRowProps = { message: ChatLogMessage; labels: Required<ChatLogLabels> } & Pick<
-  ChatLogProps,
-  'me' | 'onToggleReaction'
-> &
-  Required<Pick<ChatLogProps, 'quickReactions' | 'moreReactions'>>;
+type ChatLogRowProps = {
+  message: ChatLogMessage;
+  labels: Required<ChatLogLabels>;
+  highlighted: boolean;
+} & Pick<ChatLogProps, 'me' | 'onToggleReaction' | 'onCopyLink'> &
+  Required<Pick<ChatLogProps, 'quickReactions' | 'moreReactions' | 'linkAs'>>;
 
 const ChatLogRow: React.FC<ChatLogRowProps> = ({
   message,
   me,
   onToggleReaction,
+  onCopyLink,
+  linkAs: LinkAs,
+  highlighted,
   quickReactions,
   moreReactions,
   labels,
 }) => {
-  const { id, type = 'msg', time, nick, role, text, preview, reactions } = message;
+  const { id, type = 'msg', time, nick, role, text, preview, reactions, href } = message;
 
   if (type === 'divider') {
     return (
       <div
+        data-message-id={id}
         className={cn(
           'mt-1.5 mb-2.5 flex items-center gap-3 text-[11px] font-semibold tracking-[0.1em] uppercase text-(--text-subtle)',
           "before:flex-1 before:border-t before:border-dashed before:border-border-2 before:content-['']",
@@ -239,6 +269,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
   if (type === 'event' || type === 'action') {
     return (
       <div
+        data-message-id={id}
         className={cn(
           'grid grid-cols-[44px_minmax(0,1fr)] items-baseline gap-x-3 italic',
           type === 'event' ? 'text-(--text-subtle)' : 'text-(--text-muted)',
@@ -262,29 +293,38 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
 
   const segments = segmentChatText(text);
   const mentionsMe = segments.some(s => s.kind === 'mention' && sameNick(s.value.slice(1), me));
+  const copyLink = onCopyLink && href ? () => onCopyLink(message) : undefined;
+  const timeClass = cn(TIME, '@max-lg/chat:col-start-2 @max-lg/chat:row-start-1');
 
   return (
     <div
+      data-message-id={id}
+      aria-current={highlighted || undefined}
       className={cn(
         // Bleeds to the log's edges so a mention band runs full width; the
         // 3px stripe comes out of the padding, keeping every row aligned.
         'group/row relative -mx-(--chat-log-px) grid grid-cols-[44px_88px_minmax(0,1fr)] items-baseline gap-x-3',
         'border-l-3 py-0.5 pr-(--chat-log-px) pl-[calc(var(--chat-log-px)-3px)] transition-colors duration-100',
         // Narrow: nick and time on one line, the text on its own below.
-        '@max-lg/log:grid-cols-[auto_minmax(0,1fr)] @max-lg/log:gap-x-2 @max-lg/log:gap-y-0.5 @max-lg/log:py-1.5',
-        mentionsMe
-          ? 'border-(--accent) bg-(--chat-mention-bg)'
-          : 'border-transparent hover:bg-(--chat-row-hover-bg) has-[[data-focus-visible]]:bg-(--chat-row-hover-bg)',
+        '@max-lg/chat:grid-cols-[auto_minmax(0,1fr)] @max-lg/chat:gap-x-2 @max-lg/chat:gap-y-0.5 @max-lg/chat:py-1.5',
+        // The pointed-at message outranks a mention band.
+        highlighted
+          ? 'border-(--primary) bg-(--chat-active-bg)'
+          : mentionsMe
+            ? 'border-(--accent) bg-(--chat-mention-bg)'
+            : 'border-transparent hover:bg-(--chat-row-hover-bg) has-[[data-focus-visible]]:bg-(--chat-row-hover-bg)',
       )}
     >
-      {onToggleReaction && (
+      {(onToggleReaction || copyLink) && (
         <ChatReactionBar
-          quick={quickReactions}
-          more={moreReactions}
-          onReact={onToggleReaction.bind(null, id)}
+          quick={onToggleReaction ? quickReactions : []}
+          more={onToggleReaction ? moreReactions : []}
+          onReact={onToggleReaction ? onToggleReaction.bind(null, id) : () => {}}
           label={labels.reactionBar}
           moreLabel={labels.moreReactions}
           reactWith={labels.reactWith}
+          onCopyLink={copyLink}
+          copyLinkLabel={labels.copyLink}
           // In the DOM from the start, so keyboard users reach it. Shown on
           // hover, on keyboard focus in the row (not after a click, or it
           // would stay up once the pointer leaves), and while its picker is open.
@@ -298,11 +338,26 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
           )}
         />
       )}
-      <span className={cn(TIME, '@max-lg/log:col-start-2 @max-lg/log:row-start-1')}>{time}</span>
+      {href ? (
+        // The usual chat permalink: in-app, same tab, through the router's Link.
+        <LinkAs
+          href={href}
+          aria-label={labels.messageLink(nick ?? '', time ?? '')}
+          className={cn(
+            timeClass,
+            'rounded-xs no-underline hover:text-(--text-muted) hover:underline',
+            'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none',
+          )}
+        >
+          {time}
+        </LinkAs>
+      ) : (
+        <span className={timeClass}>{time}</span>
+      )}
       <span
         className={cn(
           'truncate text-right font-semibold',
-          '@max-lg/log:col-start-1 @max-lg/log:row-start-1 @max-lg/log:max-w-[60cqw] @max-lg/log:text-left',
+          '@max-lg/chat:col-start-1 @max-lg/chat:row-start-1 @max-lg/chat:max-w-[60cqw] @max-lg/chat:text-left',
           sameNick(nick, me) ? NICK_COLOR.voice : NICK_COLOR[role ?? 'none'],
         )}
       >
@@ -311,7 +366,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
         {nick}
         {role && <span className="sr-only"> ({labels[role]})</span>}
       </span>
-      <div className="flex min-w-0 flex-col gap-1 @max-lg/log:col-span-2 @max-lg/log:row-start-2">
+      <div className="flex min-w-0 flex-col gap-1 @max-lg/chat:col-span-2 @max-lg/chat:row-start-2">
         <span className="break-words text-pretty">
           {/* The band and stripe only show it; this says it. */}
           {mentionsMe && <span className="sr-only">{labels.mentionsYou}: </span>}

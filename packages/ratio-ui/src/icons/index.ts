@@ -26,6 +26,7 @@ export {
   Search,
 
   // Navigation
+  Link,
   ChevronDown,
   ChevronUp,
   ChevronLeft,

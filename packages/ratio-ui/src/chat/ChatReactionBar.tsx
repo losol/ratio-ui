@@ -13,7 +13,7 @@ import {
   Popover,
   Toolbar,
 } from 'react-aria-components';
-import { SmilePlus } from '../icons';
+import { Link, SmilePlus } from '../icons';
 import { cn } from '../utils/cn';
 
 /** @beta Prop shape may change before release. */
@@ -30,6 +30,10 @@ export interface ChatReactionBarProps {
   moreLabel: string;
   /** Name of each emoji button. */
   reactWith: (emoji: string) => string;
+  /** Adds a "Copy link" button; the caller copies. */
+  onCopyLink?: () => void;
+  /** Name of the copy button. */
+  copyLinkLabel?: string;
   className?: string;
 }
 
@@ -59,6 +63,8 @@ export const ChatReactionBar: React.FC<ChatReactionBarProps> = ({
   label,
   moreLabel,
   reactWith,
+  onCopyLink,
+  copyLinkLabel,
   className,
 }) => {
   // The picker renders in a portal, so the row loses hover and focus while it
@@ -123,6 +129,20 @@ export const ChatReactionBar: React.FC<ChatReactionBarProps> = ({
               </Menu>
             </Popover>
           </MenuTrigger>
+        </>
+      )}
+      {onCopyLink && (
+        <>
+          {(quick.length > 0 || more.length > 0) && (
+            <span aria-hidden className="mx-0.5 h-4 w-px bg-border-1" />
+          )}
+          <Button
+            aria-label={copyLinkLabel}
+            onPress={onCopyLink}
+            className={cn(ICON_BUTTON, 'text-(--text-muted) data-[hovered]:text-(--text)')}
+          >
+            <Link size={15} aria-hidden />
+          </Button>
         </>
       )}
     </Toolbar>
