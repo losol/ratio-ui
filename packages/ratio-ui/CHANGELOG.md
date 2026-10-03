@@ -1,5 +1,46 @@
 # @eventuras/ratio-ui
 
+## 2.30.0
+
+### Minor Changes
+
+- f14bb68: Chat: `Chat.Log` and `Chat.MessageCard` take `LinkComponent`, the name every other
+  linking component uses.
+  
+  - New `LinkComponent` on both, typed as `NavTreeProps['LinkComponent']` — the same prop
+    `Chat.ChannelList`, `NavTree`, `Navbar` and `Breadcrumbs` already take. `Chat.Log`
+    renders the time link on messages with an `href` through it; `Chat.MessageCard` renders
+    the `roomHref` link.
+  - `linkAs` is deprecated on both and still honoured, so nothing breaks. `LinkComponent`
+    wins when both are passed. Removed in 3.0.
+- 19aafce: `Chat.Log`: a tap can open a message's bar, so touch reaches it at all.
+  
+  The bar over a message shows on hover and on keyboard focus. A phone has neither, so its
+  quick reactions, the picker and "Copy link" were unreachable there — verified on an
+  emulated iPhone, where tapping a message changed nothing.
+  
+  - New `activeId`: the message whose bar is open.
+  - New `onActivate`: called with the message a tap landed on, or `undefined` when the tap
+    closed it or missed. Both are controlled, as `highlightedId` is — the log keeps no state
+    of its own, so the caller decides what is open.
+  - Without `onActivate` the log does not listen for taps at all, so nothing changes for
+    callers that don't want it.
+  - Taps that land on a link or a button pass through untouched, so the text's own URLs and
+    the time's permalink still work, and the bar's own buttons stay pressable. A gesture
+    that drifts more than 10px is a scroll, not a tap. Driven by `pointerType`, not a media
+    query, so a touch on a hybrid laptop behaves like one on a phone.
+  - The open row carries `data-active`.
+
+### Patch Changes
+
+- 72445d9: Chat: rename the internal `chatText.ts` to `chatTextSegments.ts`.
+  
+  It differed from the `ChatText.tsx` component only in casing, so on a case-insensitive
+  filesystem `./ChatText` and `./chatText` resolved to the same module: `tsc` reported the
+  collision and the chat stories failed to import `ChatText` at all. Neither module is part
+  of the public API — nothing is exported from `@eventuras/ratio-ui/chat` under either name,
+  so this changes no public surface.
+
 ## 2.29.0
 
 ### Minor Changes
