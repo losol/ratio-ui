@@ -1,0 +1,53 @@
+name: Ratio UI Core Publish
+
+on:
+  push:
+    tags:
+      - '@eventuras/ratio-ui-core@*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., @eventuras/ratio-ui-core@0.1.0)'
+        required: true
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Resolve ref
+        id: ref
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "ref=$INPUT_TAG" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=$GITHUB_REF" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.ref.outputs.ref }}
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --filter @eventuras/ratio-ui-core... --frozen-lockfile --ignore-scripts
+
+      - name: Build package
+        run: pnpm --filter @eventuras/ratio-ui-core... build
+
+      - name: Publish to npm
+        run: pnpm --filter @eventuras/ratio-ui-core publish --access public --provenance --no-git-checks

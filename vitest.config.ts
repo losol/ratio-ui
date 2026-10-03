@@ -18,6 +18,7 @@ export default defineConfig({
       './packages/markdown',
       './packages/markdown-react',
       './packages/markdown-core',
+      './packages/ratio-ui-core',
 
       // Browser-backed Storybook tests, see note above.
       {
