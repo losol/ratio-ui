@@ -316,7 +316,7 @@ const withHref = (m: ChatLogMessage): ChatLogMessage =>
 
 /**
  * With `href` the time is a link to the message — the usual chat permalink,
- * in-app and in the same tab, rendered through `linkAs` so a router can
+ * in-app and in the same tab, rendered through `LinkComponent` so a router can
  * navigate without a reload. With `onCopyLink` the bar gets a "Copy link"
  * button on those messages; the caller copies, since it knows the absolute
  * URL. A message without `href` keeps a plain time and no copy button.
@@ -329,7 +329,7 @@ export const MessageLinks: Story = {
     ],
     me: 'tor',
     'aria-label': '#volunteers',
-    linkAs: RouterLink,
+    LinkComponent: RouterLink,
     onToggleReaction: fn(),
     onCopyLink: fn(),
   },
