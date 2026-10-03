@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { ChatLog, type ChatLogMessage } from './ChatLog';
 import { Button } from '../core/Button';
 
@@ -301,6 +301,136 @@ export const Narrow: Story = {
 export const LinkPreviewDark: Story = {
   args: { messages: linkPreviews, me: 'tor', 'aria-label': '#previews' },
   decorators: [Story => <div className="surface-dark flex flex-1 flex-col bg-surface"><Story /></div>],
+};
+
+/** A router's Link stands in for `a`: same props, and it tags what it renders. */
+const RouterLink = ({ href, children, ...rest }: ComponentProps<'a'>) => (
+  <a href={href} data-router {...rest}>
+    {children}
+  </a>
+);
+
+/** Every message gets its own address; events and dividers have none. */
+const withHref = (m: ChatLogMessage): ChatLogMessage =>
+  m.type && m.type !== 'msg' ? m : { ...m, href: `#/rooms/volunteers/${m.id}` };
+
+/**
+ * With `href` the time is a link to the message — the usual chat permalink,
+ * in-app and in the same tab, rendered through `linkAs` so a router can
+ * navigate without a reload. With `onCopyLink` the bar gets a "Copy link"
+ * button on those messages; the caller copies, since it knows the absolute
+ * URL. A message without `href` keeps a plain time and no copy button.
+ */
+export const MessageLinks: Story = {
+  args: {
+    messages: [
+      ...volunteers.map(withHref),
+      { id: 'nolink', time: '10:06', nick: 'ingrid', role: 'op', text: 'This one has no address.' },
+    ],
+    me: 'tor',
+    'aria-label': '#volunteers',
+    linkAs: RouterLink,
+    onToggleReaction: fn(),
+    onCopyLink: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const link = canvas.getByRole('link', { name: 'Message from ingrid at 09:42' });
+    await expect(link).toHaveAttribute('href', '#/rooms/volunteers/m1');
+    await expect(link).toHaveAttribute('data-router');
+    await expect(link.getAttribute('target')).toBeNull();
+    // Without an address the time is plain text.
+    const plain = canvas.getByText('This one has no address.').closest('.group\\/row')!;
+    await expect(plain.querySelector('a')).toBeNull();
+    // "Copy link" sits in the bar, only on messages with an address.
+    const bars = canvas.getAllByRole('toolbar', { name: 'React to message' });
+    const copy = within(bars[0]!).getByRole('button', { name: 'Copy link' });
+    copy.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onCopyLink).toHaveBeenCalledWith(expect.objectContaining({ id: 'm1' }));
+    await expect(within(bars.at(-1)!).queryByRole('button', { name: 'Copy link' })).toBeNull();
+  },
+};
+
+/** A read-only log with `onCopyLink` still gets a bar, with just that button. */
+export const ReadOnlyCopyLink: Story = {
+  args: { messages: volunteers.map(withHref), me: 'tor', 'aria-label': '#volunteers', onCopyLink: fn() },
+  play: async ({ canvasElement }) => {
+    const bar = within(canvasElement).getAllByRole('toolbar', { name: 'React to message' })[0]!;
+    await expect(within(bar).getAllByRole('button')).toHaveLength(1);
+    await expect(within(bar).getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
+  },
+};
+
+const older: ChatLogMessage[] = Array.from({ length: 40 }, (_, i) => ({
+  id: `old${i}`,
+  time: `08:${String(i).padStart(2, '0')}`,
+  nick: ['ingrid', 'aisha', 'tor', 'marcus'][i % 4]!,
+  text: `Earlier message #${i + 1}`,
+}));
+
+/**
+ * `highlightedId` points at one message: its row gets a tinted band and
+ * `aria-current`, and the log scrolls it to the middle of its own scroll
+ * box. If the row isn't there yet — history still loading — the scroll
+ * happens when it arrives, once; messages posted afterwards leave the view
+ * where it is.
+ */
+export const Highlighted: Story = {
+  render: function HighlightedStory() {
+    const [messages, setMessages] = useState(volunteers);
+    const loadOlder = () => setMessages(prev => [...older, ...prev]);
+    const post = () =>
+      setMessages(prev => [
+        ...prev,
+        { id: `n${prev.length}`, time: '10:07', nick: 'marcus', text: `Update #${prev.length}` },
+      ]);
+    return (
+      <>
+        <ChatLog messages={messages} me="tor" aria-label="#volunteers" highlightedId="old20" testId="log" />
+        <div className="flex gap-2 border-t border-border-1 p-3">
+          <Button size="sm" variant="outline" onPress={loadOlder}>
+            Load older messages
+          </Button>
+          <Button size="sm" variant="outline" onPress={post}>
+            Post a message
+          </Button>
+        </div>
+      </>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const log = canvas.getByTestId('log');
+    // Keyboard-driven, like the other stories: a pointer click would switch
+    // the page's focus modality and hide the reaction bar in later tests.
+    const press = async (name: string) => {
+      canvas.getByRole('button', { name }).focus();
+      await userEvent.keyboard('{Enter}');
+    };
+    // Not loaded yet: nothing is current, nothing scrolls.
+    await expect(log.querySelector('[aria-current]')).toBeNull();
+    await press('Load older messages');
+    const row = (await canvas.findByText('Earlier message #21')).closest('[aria-current="true"]');
+    await expect(row).not.toBeNull();
+    // Scrolled to the middle of the log, inside the log.
+    await waitFor(() => {
+      const r = row!.getBoundingClientRect();
+      const l = log.getBoundingClientRect();
+      expect(Math.abs((r.top + r.bottom) / 2 - (l.top + l.bottom) / 2)).toBeLessThan(r.height);
+    });
+    // Let the smooth scroll finish before measuring.
+    await waitFor(async () => {
+      const before = log.scrollTop;
+      await new Promise(r => setTimeout(r, 150));
+      expect(log.scrollTop).toBe(before);
+    });
+    const scrollTop = log.scrollTop;
+    // A message posted later doesn't pull the view back.
+    await press('Post a message');
+    await canvas.findByText(/Update #/);
+    await expect(Math.abs(log.scrollTop - scrollTop)).toBeLessThan(2);
+  },
 };
 
 /** Add your reaction, or take it back; a reaction nobody has left goes away. */

@@ -66,7 +66,7 @@ export const ChatLinkPreviewCard: React.FC<ChatLinkPreviewCardProps> = ({
       className={cn(
         'flex max-w-[30rem] gap-3 rounded-md border border-border-1 bg-(--chat-bubble-bg) p-2.5',
         // In a narrow log the text column is the row, so the card spans it.
-        '@max-lg/log:max-w-none',
+        '@max-lg/chat:max-w-none',
         'text-(--text) no-underline transition-colors hover:border-border-2 hover:bg-(--chat-row-hover-bg)',
         'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none',
         className,
