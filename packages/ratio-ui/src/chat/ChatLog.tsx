@@ -10,7 +10,7 @@ import { ChatReactions, type ChatReaction } from './ChatReactions';
 import { ChatReactionBar } from './ChatReactionBar';
 import { ChatLinkPreviewCard, hasPreviewContent, type ChatLinkPreview } from './ChatLinkPreview';
 import { ChatText } from './ChatText';
-import { segmentChatText } from './chatText';
+import { segmentChatText } from './chatTextSegments';
 
 /**
  * Channel role, shown as a glyph before the nick: `@` op, `+` voice.

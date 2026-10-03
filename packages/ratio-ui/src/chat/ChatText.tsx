@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { cn } from '../utils/cn';
-import type { ChatTextSegment } from './chatText';
+import type { ChatTextSegment } from './chatTextSegments';
 
 type ChatTextProps = {
   segments: ChatTextSegment[];
