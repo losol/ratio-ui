@@ -1,0 +1,115 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
+/** A colour as authored: hex, `rgb()`/`rgba()`, or `oklch()`. */
+export type ColorString = string;
+
+/**
+ * A colour taken from another token of the same mode, at an alpha — what
+ * the CSS writes as `color-mix(in srgb, var(--text) 62%, transparent)`.
+ * A reference, not a value, so it follows the token it points at: the hard
+ * shadow is "the ink at 62%" in light and in dark alike.
+ */
+export interface Mix {
+  ref: ColorKey;
+  alpha: number;
+  /** The space the CSS mixes in. Mixing with transparent only scales alpha, so the resolved colour is the same in any. */
+  space: 'srgb' | 'oklch';
+}
+
+export type ColorSpec = ColorString | Mix;
+
+/** An offset shadow in parts, so each renderer draws it its own way. */
+export interface Shadow {
+  x: number;
+  y: number;
+  blur: number;
+  color: ColorSpec;
+}
+
+/** The colours of one mode. Keys are the CSS token names in camelCase: `--text-muted` is `textMuted`. */
+export interface ThemeMode {
+  primary: ColorSpec;
+  secondary: ColorSpec;
+  accent: ColorSpec;
+  text: ColorSpec;
+  textMuted: ColorSpec;
+  textSubtle: ColorSpec;
+  textOnPrimary: ColorSpec;
+  textOnSecondary: ColorSpec;
+  textOnAccent: ColorSpec;
+  surface: ColorSpec;
+  surfaceGlass: ColorSpec;
+  card: ColorSpec;
+  cardHover: ColorSpec;
+  border1: ColorSpec;
+  border2: ColorSpec;
+  focusRing: ColorSpec;
+  errorSolid: ColorSpec;
+  errorOnSolid: ColorSpec;
+  errorBg: ColorSpec;
+  errorBorder: ColorSpec;
+  errorText: ColorSpec;
+  shadowHard: Shadow;
+  shadowHardLg: Shadow;
+  shadowHardXl: Shadow;
+}
+
+export type ShadowKey = 'shadowHard' | 'shadowHardLg' | 'shadowHardXl';
+/** The keys of a mode that hold a colour — what a `Mix` may point at. */
+export type ColorKey = Exclude<keyof ThemeMode, ShadowKey>;
+
+/** Rounding in px, one scale for every corner. */
+export interface Radius {
+  xs: number;
+  sm: number;
+  md: number;
+  lg: number;
+  xl: number;
+  pill: number;
+  overlay: number;
+}
+
+/** Font families by role. Names only — each renderer loads the files. */
+export interface Font {
+  display: string;
+  body: string;
+  mono: string;
+}
+
+export type ScaleStep = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950;
+/** An eleven-step colour scale, as authored. */
+export type Scale = Record<ScaleStep, ColorString>;
+
+export interface Theme {
+  name: string;
+  light: ThemeMode;
+  dark: ThemeMode;
+  radius: Radius;
+  font: Font;
+  scale: { primary: Scale };
+}
+
+/** What a theme file writes: `dark` overlays `light`, as the CSS cascades. */
+export interface ThemeInput extends Omit<Theme, 'dark'> {
+  dark: Partial<ThemeMode>;
+}
+
+/** A colour taken from `ref` in the same mode, at `alpha`. */
+export const mix = (ref: ColorKey, alpha: number, space: Mix['space'] = 'srgb'): Mix => ({
+  ref,
+  alpha,
+  space,
+});
+
+/** Fills `dark` from `light`, so a theme writes only what changes. */
+export function defineTheme(input: ThemeInput): Theme {
+  return { ...input, dark: { ...input.light, ...input.dark } };
+}
+
+export const isMix = (value: unknown): value is Mix =>
+  typeof value === 'object' && value !== null && 'ref' in value;
+
+export const isShadow = (value: unknown): value is Shadow =>
+  typeof value === 'object' && value !== null && 'blur' in value;
