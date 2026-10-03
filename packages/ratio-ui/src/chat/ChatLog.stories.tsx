@@ -303,6 +303,16 @@ export const LinkPreviewDark: Story = {
   decorators: [Story => <div className="surface-dark flex flex-1 flex-col bg-surface"><Story /></div>],
 };
 
+const tap = async (el: Element, { drift = 0 } = {}) => {
+  const { left, top } = el.getBoundingClientRect();
+  const [x, y] = [left + 2, top + 2];
+  const opts = { pointerType: 'touch', bubbles: true, composed: true };
+  el.dispatchEvent(new PointerEvent('pointerdown', { ...opts, clientX: x, clientY: y }));
+  el.dispatchEvent(
+    new PointerEvent('pointerup', { ...opts, clientX: x + drift, clientY: y }),
+  );
+};
+
 /** A router's Link stands in for `a`: same props, and it tags what it renders. */
 const RouterLink = ({ href, children, ...rest }: ComponentProps<'a'>) => (
   <a href={href} data-router {...rest}>
@@ -359,6 +369,74 @@ export const ReadOnlyCopyLink: Story = {
     const bar = within(canvasElement).getAllByRole('toolbar', { name: 'React to message' })[0]!;
     await expect(within(bar).getAllByRole('button')).toHaveLength(1);
     await expect(within(bar).getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
+  },
+};
+
+/**
+ * On touch there is no hover, so the bar over a message would never show and
+ * its reactions and "Copy link" would be out of reach on a phone. A tap
+ * reports the message it landed on through `onActivate`, and the caller
+ * decides what is open by passing `activeId` back — the log keeps no state,
+ * so this is the caller's to own, as `highlightedId` is.
+ *
+ * A tap on another message moves the bar, the same message again puts it
+ * away, and taps on a link — the text's own URLs, or the time — are left
+ * alone. A scroll is not a tap.
+ */
+export const TapToReveal: Story = {
+  render: function TapToRevealStory(args) {
+    const [activeId, setActiveId] = useState<string | undefined>(undefined);
+    return <ChatLog {...args} activeId={activeId} onActivate={setActiveId} />;
+  },
+  args: {
+    messages: volunteers.map(withHref),
+    me: 'tor',
+    'aria-label': '#volunteers',
+    LinkComponent: RouterLink,
+    onToggleReaction: fn(),
+    onCopyLink: fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const row = canvasElement.querySelector<HTMLElement>('[data-message-id="m1"]')!;
+    const other = canvasElement.querySelector<HTMLElement>('[data-message-id="m2"]')!;
+    const text = () => within(row).getByText(/badge printing/);
+    const otherText = () => within(other).getByText(/extra lanyards/);
+
+    // A finger, not a mouse: hover never happens, so the row starts closed.
+    await expect(row).not.toHaveAttribute('data-active');
+
+    await tap(text());
+    await waitFor(() => expect(row).toHaveAttribute('data-active'));
+
+    // The same message again puts the bar away.
+    await tap(text());
+    await waitFor(() => expect(row).not.toHaveAttribute('data-active'));
+
+    // Another message moves it rather than opening a second bar.
+    await tap(text());
+    await waitFor(() => expect(row).toHaveAttribute('data-active'));
+    await tap(otherText());
+    await waitFor(() => expect(other).toHaveAttribute('data-active'));
+    await expect(row).not.toHaveAttribute('data-active');
+
+    // A tap that drifts is a scroll, and leaves the bar where it is.
+    await tap(text(), { drift: 40 });
+    await expect(other).toHaveAttribute('data-active');
+
+    // The time keeps its own tap, so the permalink still opens.
+    await tap(canvas.getByRole('link', { name: 'Message from ingrid at 09:42' }));
+    await expect(other).toHaveAttribute('data-active');
+  },
+};
+
+/** Without `onActivate` the log ignores taps, exactly as it did before. */
+export const TapIgnoredWithoutHandler: Story = {
+  args: { messages: volunteers.map(withHref), me: 'tor', 'aria-label': '#volunteers', onToggleReaction: fn() },
+  play: async ({ canvasElement }) => {
+    const row = canvasElement.querySelector<HTMLElement>('[data-message-id="m1"]')!;
+    await tap(within(row).getByText(/badge printing/));
+    await expect(row).not.toHaveAttribute('data-active');
   },
 };
 
@@ -484,18 +562,18 @@ export const Reactions: Story = {
 
     // A quick reaction on a message with none yet adds it.
     await press('React with ❤️');
-    await expect(canvas.getByText('❤️ 1')).toBeInTheDocument();
+    await waitFor(() => expect(canvas.getByText('❤️ 1')).toBeInTheDocument());
 
     // The picker offers more; picking one adds it too.
     await press('More reactions');
     const party = await body.findByRole('menuitem', { name: 'React with 🎉' });
     party.focus();
     await userEvent.keyboard('{Enter}');
-    await expect(canvas.getByText('🎉 1')).toBeInTheDocument();
+    await waitFor(() => expect(canvas.getByText('🎉 1')).toBeInTheDocument());
 
     // Picking one you already left takes it back.
     await press('React with ❤️');
-    await expect(canvas.queryByText('❤️ 1')).toBeNull();
+    await waitFor(() => expect(canvas.queryByText('❤️ 1')).toBeNull());
   },
 };
 
