@@ -93,6 +93,18 @@ export interface ChatLogProps {
   highlightedId?: string;
   /** Routing link component for messages with `href`, e.g. Next's `Link`. @default 'a' */
   LinkComponent?: NavTreeProps['LinkComponent'];
+  /**
+   * The message whose bar is open. Touch has no hover, so without this the
+   * bar is unreachable on a phone. Controlled: pair it with `onActivate`,
+   * which the log calls on a tap — the log holds no state of its own.
+   */
+  activeId?: string;
+  /**
+   * Called with the message a tap opened, or `undefined` when the tap closed
+   * it or landed outside a message. Taps on a link or a button are left
+   * alone. Without it the log ignores taps entirely.
+   */
+  onActivate?: (messageId: string | undefined) => void;
   /** Renders the time link on messages with an `href`. @deprecated Use `LinkComponent`. Removed in 3.0. */
   linkAs?: React.ElementType;
   /**
@@ -126,6 +138,9 @@ const sameNick = (a?: string, b?: string) =>
 
 const TIME = 'font-mono text-xs not-italic tabular-nums text-(--text-subtle)';
 
+// Past this much drift a touch gesture was a scroll, not a tap on a row.
+const TAP_SLOP = 10;
+
 /**
  * Chat.Log — the dense, one-line-per-message log for channels: time, nick
  * with its role glyph, text. Join/part and topic changes are `event` rows,
@@ -145,6 +160,8 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     quickReactions = QUICK_REACTIONS,
     moreReactions = MORE_REACTIONS,
     highlightedId,
+    activeId,
+    onActivate,
     LinkComponent,
     linkAs,
     onCopyLink,
@@ -184,6 +201,32 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     });
   }, [highlightedId, messages]);
 
+  // Touch has no hover, so the bar over a message would never show: its
+  // reactions and "Copy link" would be unreachable on a phone. A tap reports
+  // the message it landed on and the caller decides, the same way it decides
+  // `highlightedId` — the log keeps no state. Pointer type, not a media
+  // query: a tap on a hybrid laptop should work like one on a phone.
+  // Only the gesture itself is tracked, and only between down and up.
+  const tapStart = useRef<{ x: number; y: number } | null>(null);
+
+  const onPointerDown = (event: React.PointerEvent) => {
+    tapStart.current =
+      event.pointerType === 'touch' ? { x: event.clientX, y: event.clientY } : null;
+  };
+
+  const onPointerUp = (event: React.PointerEvent) => {
+    const start = tapStart.current;
+    tapStart.current = null;
+    if (!onActivate || event.pointerType !== 'touch' || !start) return;
+    // A scroll ends in a pointerup too, so only a gesture that stayed put counts.
+    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > TAP_SLOP) return;
+    const target = event.target as HTMLElement;
+    // The text's own links, the time, and the bar's buttons keep their taps.
+    if (target.closest('a, button')) return;
+    const id = target.closest<HTMLElement>('[data-message-id]')?.dataset.messageId;
+    onActivate(id && id !== activeId ? id : undefined);
+  };
+
   const linkTag = (LinkComponent ?? linkAs ?? 'a') as React.ElementType;
 
   const rowLabels: Required<ChatLogLabels> = {
@@ -203,6 +246,8 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
       ref={setRefs}
       role="log"
       aria-label={ariaLabel}
+      onPointerDown={onActivate ? onPointerDown : undefined}
+      onPointerUp={onActivate ? onPointerUp : undefined}
       // Scrollable, so it has to be reachable by keyboard.
       tabIndex={0}
       data-testid={testId}
@@ -224,6 +269,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
           onToggleReaction={onToggleReaction}
           onCopyLink={onCopyLink}
           linkTag={linkTag}
+          active={message.id === activeId}
           highlighted={message.id === highlightedId}
           quickReactions={quickReactions}
           moreReactions={moreReactions}
@@ -239,6 +285,8 @@ type ChatLogRowProps = {
   message: ChatLogMessage;
   labels: Required<ChatLogLabels>;
   highlighted: boolean;
+  /** Its bar is open, which is how touch reaches a bar with no hover. */
+  active: boolean;
   /** Resolved from `LinkComponent`, the deprecated `linkAs`, or `'a'`. */
   linkTag: React.ElementType;
 } & Pick<ChatLogProps, 'me' | 'onToggleReaction' | 'onCopyLink'> &
@@ -251,6 +299,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
   onCopyLink,
   linkTag: LinkTag,
   highlighted,
+  active,
   quickReactions,
   moreReactions,
   labels,
@@ -307,6 +356,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
   return (
     <div
       data-message-id={id}
+      data-active={active || undefined}
       aria-current={highlighted || undefined}
       className={cn(
         // Bleeds to the log's edges so a mention band runs full width; the
@@ -342,6 +392,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
             'pointer-events-none opacity-0 transition-opacity duration-100',
             'group-hover/row:pointer-events-auto group-hover/row:opacity-100',
             'group-has-[[data-focus-visible]]/row:pointer-events-auto group-has-[[data-focus-visible]]/row:opacity-100',
+            'group-data-active/row:pointer-events-auto group-data-active/row:opacity-100',
             'data-[open]:pointer-events-auto data-[open]:opacity-100',
           )}
         />
