@@ -8,7 +8,7 @@ import type { ChatLogMessage } from './ChatLog';
 import { ChatLinkPreviewCard, hasPreviewContent } from './ChatLinkPreview';
 import { ChatReactions } from './ChatReactions';
 import { ChatText } from './ChatText';
-import { segmentChatText } from './chatText';
+import { segmentChatText } from './chatTextSegments';
 
 /** Built-in text of `Chat.MessageCard`. Each entry falls back to English. @beta */
 export interface ChatMessageCardLabels {
