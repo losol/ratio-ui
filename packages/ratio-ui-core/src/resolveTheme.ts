@@ -3,11 +3,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { formatColor, parseColor, type Rgba } from './color';
+import { fontSize, space, type FluidSize, type FontSizeStep, type SpaceStep } from './scale';
 import {
   isMix,
   isShadow,
   type ColorKey,
   type ColorSpec,
+  type Components,
   type Font,
   type Radius,
   type Scale,
@@ -36,7 +38,20 @@ export interface ResolvedTheme {
   radius: Radius;
   font: Font;
   scale: { primary: Record<ScaleStep, string> };
+  /** Font sizes in points, at the small end of the web's fluid range — a phone's. */
+  fontSize: Record<FontSizeStep, number>;
+  /** Spacing in points, at the small end of the web's fluid range. */
+  space: Record<SpaceStep, number>;
+  components: Components;
 }
+
+/** Points per rem, as the web's root size. */
+const REM = 16;
+
+const atSmallEnd = <K extends string>(sizes: Record<K, FluidSize>) =>
+  Object.fromEntries(
+    (Object.entries(sizes) as [K, FluidSize][]).map(([step, [min]]) => [step, Math.round(min * REM * 100) / 100]),
+  ) as Record<K, number>;
 
 function resolveRgba(spec: ColorSpec, mode: ThemeMode, seen: ColorKey[] = []): Rgba {
   if (typeof spec === 'string') return parseColor(spec);
@@ -65,8 +80,10 @@ const resolveScale = (scale: Scale) =>
 
 /**
  * The theme as a renderer without a CSS engine reads it: colours as sRGB
- * hex or rgba, references followed inside their own mode, radius in
- * points, fonts by family. The authored theme is untouched.
+ * hex or rgba, references followed inside their own mode, radius, font
+ * sizes and spacing in points, fonts by family. Component tokens keep
+ * naming shadows, so a renderer reads them from the mode it draws in.
+ * The authored theme is untouched.
  */
 export function resolveTheme(theme: Theme): ResolvedTheme {
   return {
@@ -76,5 +93,8 @@ export function resolveTheme(theme: Theme): ResolvedTheme {
     radius: { ...theme.radius },
     font: { ...theme.font },
     scale: { primary: resolveScale(theme.scale.primary) },
+    fontSize: atSmallEnd(fontSize),
+    space: atSmallEnd(space),
+    components: structuredClone(theme.components),
   };
 }

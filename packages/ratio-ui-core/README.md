@@ -37,6 +37,8 @@ const theme = resolveTheme(bureau);
 theme.light.shadowHard.color;  // 'rgba(32, 36, 44, 0.62)'   — the navy ink
 theme.dark.shadowHard.color;   // 'rgba(240, 231, 210, 0.62)' — the cream ink
 theme.scale.primary[800];      // '#20304d' — step 800 is the light arm's navy
+theme.space.m;                 // 21 — points
+theme.components.button.shadow; // 'shadowHard' — read it from the mode you draw in
 ```
 
 `toCssValue` writes any value the way the web's CSS does
@@ -45,10 +47,14 @@ theme generator.
 
 ## What is here, and what is not
 
-- **Themes** in `themes/`: Bureau today, semantic tokens and the primary
-  scale. Component tokens (`--button-*`, `--menu-*`) stay in the CSS until
-  a renderer needs them. Ink and the standard theme follow by the same
-  mechanism.
+- **Themes** in `themes/`: Bureau today — semantic tokens with all four
+  status families, the primary scale, and the button and card tokens
+  (`theme.components`). The rest of the component tokens (`--menu-*`,
+  `--chat-*`) stay in the CSS until a renderer needs them. Ink and the
+  standard theme follow by the same mechanism.
+- **Shared scales**: `fontSize` and `space`, the web's fluid sizes as the
+  two ends of their `clamp()`. `resolveTheme()` gives them in points at
+  the small end, a phone's.
 - **The schema**: `defineTheme`, `mix`, `Theme` and friends.
 - **Colour maths**: `parseColor`, `oklchToRgba`, `formatColor`. Out-of-gamut
   OKLCH is clipped, not gamut-mapped as CSS does — a step at the edge of

@@ -51,6 +51,21 @@ export interface ThemeMode {
   errorBg: ColorSpec;
   errorBorder: ColorSpec;
   errorText: ColorSpec;
+  successSolid: ColorSpec;
+  successOnSolid: ColorSpec;
+  successBg: ColorSpec;
+  successBorder: ColorSpec;
+  successText: ColorSpec;
+  infoSolid: ColorSpec;
+  infoOnSolid: ColorSpec;
+  infoBg: ColorSpec;
+  infoBorder: ColorSpec;
+  infoText: ColorSpec;
+  warningSolid: ColorSpec;
+  warningOnSolid: ColorSpec;
+  warningBg: ColorSpec;
+  warningBorder: ColorSpec;
+  warningText: ColorSpec;
   shadowHard: Shadow;
   shadowHardLg: Shadow;
   shadowHardXl: Shadow;
@@ -78,6 +93,29 @@ export interface Font {
   mono: string;
 }
 
+/**
+ * How components wear the theme — the CSS's `--button-*` and `--card-*`.
+ * Shadows name a shadow of the mode, so each mode inks its own; `null` is
+ * no shadow.
+ */
+export interface Components {
+  button: {
+    /** A step of `radius`. */
+    radius: keyof Radius;
+    shadow: ShadowKey | null;
+    /** The shadow while pressed. */
+    pressedShadow: ShadowKey | null;
+    /** How far a pressed button moves, in px — Bureau presses into its shadow. */
+    pressedOffset: { x: number; y: number };
+  };
+  card: {
+    /** The resting shadow of each elevation tier. */
+    shadow: Record<'xs' | 'sm' | 'md', ShadowKey | null>;
+    /** The lift of an interactive card on hover, or on press where there is no hover. */
+    hoverShadow: ShadowKey | null;
+  };
+}
+
 export type ScaleStep = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950;
 /** An eleven-step colour scale, as authored. */
 export type Scale = Record<ScaleStep, ColorString>;
@@ -89,6 +127,7 @@ export interface Theme {
   radius: Radius;
   font: Font;
   scale: { primary: Scale };
+  components: Components;
 }
 
 /** What a theme file writes: `dark` overlays `light`, as the CSS cascades. */
