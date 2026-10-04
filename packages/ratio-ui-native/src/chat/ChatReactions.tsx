@@ -7,7 +7,6 @@ import { Pressable, View } from 'react-native';
 import type { ChatReaction } from '@eventuras/ratio-ui-core/chat';
 import { useTheme } from '../RatioProvider';
 import { Text } from '../Text';
-import { chatColors } from './chatColors';
 
 /** @beta Prop shape may change before release. */
 export interface ChatReactionsProps {
@@ -34,7 +33,6 @@ export const ChatReactions: React.FC<ChatReactionsProps> = ({
   reactionLabel = ({ emoji, count }) => `${emoji} ${count}`,
 }) => {
   const theme = useTheme();
-  const chat = chatColors(theme);
   return (
     <View role="group" aria-label={ariaLabel} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
       {reactions.map(reaction => {
@@ -46,8 +44,8 @@ export const ChatReactions: React.FC<ChatReactionsProps> = ({
           paddingVertical: 2,
           borderWidth: 1,
           borderRadius: theme.radius.pill,
-          borderColor: reaction.me ? chat.reactionMeBorder : theme.colors.border1,
-          backgroundColor: reaction.me ? chat.reactionMeBg : theme.colors.card,
+          borderColor: reaction.me ? theme.colors.chatReactionMeBorder : theme.colors.border1,
+          backgroundColor: reaction.me ? theme.colors.chatReactionMeBg : theme.colors.card,
         };
         const label = (
           <Text size="xs" weight="semibold">

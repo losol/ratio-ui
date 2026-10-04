@@ -43,6 +43,24 @@ const light: ThemeMode = {
   warningBg: '#fff6de',
   warningBorder: '#ffe0a3',
   warningText: '#8a4b05',
+  chatSidebarBg: '#fbf9f3',
+  chatActiveBg: '#e6eaf7',
+  chatActiveFg: '#1b2433',
+  chatMentionBg: '#fdf3d8',
+  chatNick: '#404040',
+  chatNickOp: '#3a4a66',
+  chatNickVoice: '#7a5a14',
+  chatAvatarBg: '#3a4a66',
+  chatAvatarFg: '#fbf9f3',
+  chatAvatarAltBg: '#f6e2a9',
+  chatAvatarAltFg: '#3d2c08',
+  chatBubbleBg: mix('card', 1),
+  chatBubbleMeBg: '#3a4a66',
+  chatBubbleMeFg: '#fbf9f3',
+  chatReactionMeBg: '#e6eaf7',
+  chatReactionMeBorder: '#b7c1e6',
+  chatRowHoverBg: 'rgb(0 0 0 / 0.035)',
+  chatPopoverBg: '#fafafa',
   shadowHard: { x: 2, y: 2, blur: 0, color: mix('text', 0.62) },
   shadowHardLg: { x: 3, y: 3, blur: 0, color: mix('text', 0.62) },
   shadowHardXl: { x: 5, y: 5, blur: 0, color: mix('text', 0.62) },
@@ -59,10 +77,15 @@ const theme = defineTheme({
       50: 'oklch(1 0 0)', 100: '#111', 200: '#222', 300: '#333', 400: '#444', 500: '#555',
       600: '#666', 700: '#777', 800: '#888', 900: '#999', 950: 'oklch(0 0 0)',
     },
+    accent: {
+      50: '#fff', 100: '#eee', 200: '#ddd', 300: '#ccc', 400: '#bbb', 500: '#aaa',
+      600: '#999', 700: '#888', 800: '#777', 900: '#666', 950: '#555',
+    },
   },
   components: {
     button: { radius: 'md', shadow: 'shadowHard', pressedShadow: null, pressedOffset: { x: 2, y: 2 } },
     card: { shadow: { xs: null, sm: 'shadowHard', md: 'shadowHardLg' }, hoverShadow: 'shadowHardLg' },
+    chat: { barShadow: 'shadowHard', popoverShadow: 'shadowHardLg' },
   },
 });
 
@@ -91,6 +114,7 @@ describe('resolveTheme', () => {
     expect(resolved.scale.primary[50]).toBe('#ffffff');
     expect(resolved.scale.primary[950]).toBe('#000000');
     expect(resolved.scale.primary[500]).toBe('#555555');
+    expect(resolved.scale.accent[700]).toBe('#888888');
   });
 
   it('passes radius and fonts through', () => {

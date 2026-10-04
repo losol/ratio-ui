@@ -37,7 +37,7 @@ export interface ResolvedTheme {
   dark: ResolvedMode;
   radius: Radius;
   font: Font;
-  scale: { primary: Record<ScaleStep, string> };
+  scale: { primary: Record<ScaleStep, string>; accent: Record<ScaleStep, string> };
   /** Font sizes in points, at the small end of the web's fluid range — a phone's. */
   fontSize: Record<FontSizeStep, number>;
   /** Spacing in points, at the small end of the web's fluid range. */
@@ -92,7 +92,7 @@ export function resolveTheme(theme: Theme): ResolvedTheme {
     dark: resolveMode(theme.dark),
     radius: { ...theme.radius },
     font: { ...theme.font },
-    scale: { primary: resolveScale(theme.scale.primary) },
+    scale: { primary: resolveScale(theme.scale.primary), accent: resolveScale(theme.scale.accent) },
     fontSize: atSmallEnd(fontSize),
     space: atSmallEnd(space),
     components: structuredClone(theme.components),
