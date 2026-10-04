@@ -66,6 +66,31 @@ export interface ThemeMode {
   warningBg: ColorSpec;
   warningBorder: ColorSpec;
   warningText: ColorSpec;
+  /**
+   * The chat's colours, the web's `--chat-*`.
+   * @beta Named and valued as the chat components are; may change before release.
+   */
+  chatSidebarBg: ColorSpec;
+  /** The pointed-at message, and the active room in a list. */
+  chatActiveBg: ColorSpec;
+  chatActiveFg: ColorSpec;
+  /** The band behind a message that mentions you; its edge is `accent`. */
+  chatMentionBg: ColorSpec;
+  chatNick: ColorSpec;
+  chatNickOp: ColorSpec;
+  chatNickVoice: ColorSpec;
+  chatAvatarBg: ColorSpec;
+  chatAvatarFg: ColorSpec;
+  chatAvatarAltBg: ColorSpec;
+  chatAvatarAltFg: ColorSpec;
+  chatBubbleBg: ColorSpec;
+  chatBubbleMeBg: ColorSpec;
+  chatBubbleMeFg: ColorSpec;
+  /** A reaction of your own. */
+  chatReactionMeBg: ColorSpec;
+  chatReactionMeBorder: ColorSpec;
+  chatRowHoverBg: ColorSpec;
+  chatPopoverBg: ColorSpec;
   shadowHard: Shadow;
   shadowHardLg: Shadow;
   shadowHardXl: Shadow;
@@ -94,7 +119,8 @@ export interface Font {
 }
 
 /**
- * How components wear the theme — the CSS's `--button-*` and `--card-*`.
+ * How components wear the theme — the CSS's `--button-*`, `--card-*` and
+ * the chat's shadows.
  * Shadows name a shadow of the mode, so each mode inks its own; `null` is
  * no shadow.
  * @beta Grows as renderers need more components; may change before release.
@@ -115,6 +141,12 @@ export interface Components {
     /** The lift of an interactive card on hover, or on press where there is no hover. */
     hoverShadow: ShadowKey | null;
   };
+  chat: {
+    /** Under the composer and the room's bar. */
+    barShadow: ShadowKey | null;
+    /** Under the reaction picker and other popovers. */
+    popoverShadow: ShadowKey | null;
+  };
 }
 
 export type ScaleStep = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950;
@@ -127,7 +159,8 @@ export interface Theme {
   dark: ThemeMode;
   radius: Radius;
   font: Font;
-  scale: { primary: Scale };
+  /** `accent` is @beta: added for the chat's tokens; may change before release. */
+  scale: { primary: Scale; accent: Scale };
   components: Components;
 }
 

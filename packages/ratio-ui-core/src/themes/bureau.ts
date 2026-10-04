@@ -2,19 +2,57 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import { defineTheme, mix } from '../theme';
+import { defineTheme, mix, type Scale } from '../theme';
 
 // The hard offset shadow, Bureau's signature: the ink at reduced alpha, so
 // it contrasts both the paper and the element without reading as a solid
 // block. A reference, so in dark mode it re-resolves to the cream ink.
 const ink = mix('text', 0.62);
 
+// Navy to blue, light to dark. Absolute steps serving both modes: 800 is
+// the light arm's navy, 400 sits next to the dark arm's blue.
+const primary: Scale = {
+  50: 'oklch(0.975 0.008 268)',
+  100: 'oklch(0.945 0.022 268)',
+  200: 'oklch(0.89 0.045 269)',
+  300: 'oklch(0.81 0.085 270)',
+  400: 'oklch(0.7 0.15 270)',
+  500: 'oklch(0.6 0.16 270)',
+  600: 'oklch(0.5 0.13 267)',
+  700: 'oklch(0.4 0.09 264)',
+  800: 'oklch(0.31 0.057 262)',
+  900: 'oklch(0.245 0.045 262)',
+  950: 'oklch(0.18 0.032 262)',
+};
+
+// The standard theme's amber, which the CSS cascades into Bureau.
+const accent: Scale = {
+  50: 'oklch(0.988 0.012 92)',
+  100: 'oklch(0.965 0.04 90)',
+  200: 'oklch(0.928 0.075 88)',
+  300: 'oklch(0.88 0.105 88)',
+  400: 'oklch(0.815 0.125 85)',
+  500: 'oklch(0.745 0.13 82)',
+  600: 'oklch(0.64 0.125 80)',
+  700: 'oklch(0.52 0.105 78)',
+  800: 'oklch(0.405 0.085 76)',
+  900: 'oklch(0.295 0.06 75)',
+  950: 'oklch(0.18 0.038 74)',
+};
+
+// Steps of the standard theme's warm-grey and neutral scales the chat reads.
+const secondary100 = 'oklch(0.985 0.004 88)';
+const secondary400 = 'oklch(0.88 0.025 82)';
+const neutral50 = 'oklch(0.9851 0.0001 263.3)';
+const neutral700 = 'oklch(0.3715 0 263.3)';
+const neutral900 = 'oklch(0.2046 0 263.3)';
+
 /**
  * Bureau — "moderne retro", paper and navy. Values as in
  * `ratio-ui/src/themes/bureau.css`, which stays the web's source until the
  * generator lands; `bureau.test.ts` holds the two to each other.
- * Semantic tokens, the primary scale, and the button and card tokens a
- * native renderer needs; the rest of the component tokens stay in the CSS
+ * Semantic tokens, the chat's colours, the primary and accent scales, and
+ * the button, card and chat-shadow tokens a native renderer needs; the rest of the component tokens stay in the CSS
  * until a renderer needs them.
  */
 export const bureau = defineTheme({
@@ -73,6 +111,27 @@ export const bureau = defineTheme({
     warningBg: '#fff6de',
     warningBorder: '#ffe0a3',
     warningText: '#8a4b05',
+
+    // The chat's colours are the standard theme's (tokens/chat.css), read
+    // through Bureau's scales.
+    chatSidebarBg: secondary100,
+    chatActiveBg: primary[100],
+    chatActiveFg: primary[900],
+    chatMentionBg: accent[100],
+    chatNick: neutral700,
+    chatNickOp: primary[700],
+    chatNickVoice: accent[700],
+    chatAvatarBg: primary[700],
+    chatAvatarFg: secondary100,
+    chatAvatarAltBg: accent[200],
+    chatAvatarAltFg: accent[900],
+    chatBubbleBg: '#fffdf7', // the card
+    chatBubbleMeBg: primary[700],
+    chatBubbleMeFg: secondary100,
+    chatReactionMeBg: primary[100],
+    chatReactionMeBorder: primary[300],
+    chatRowHoverBg: 'rgb(0 0 0 / 0.035)',
+    chatPopoverBg: neutral50,
   },
 
   dark: {
@@ -114,6 +173,23 @@ export const bureau = defineTheme({
     warningBg: 'rgba(217, 119, 6, 0.18)',
     warningBorder: 'rgba(217, 119, 6, 0.3)',
     warningText: '#ffd18a',
+
+    chatSidebarBg: '#20231b', // the card
+    chatActiveBg: primary[900],
+    chatActiveFg: secondary100,
+    chatMentionBg: 'oklch(0.26 0.05 75)',
+    chatNick: secondary400,
+    chatNickOp: primary[300],
+    chatNickVoice: accent[300],
+    chatAvatarBg: primary[400],
+    chatAvatarFg: primary[950],
+    chatBubbleBg: '#20231b', // the card
+    chatBubbleMeBg: primary[400],
+    chatBubbleMeFg: primary[950],
+    chatReactionMeBg: primary[900],
+    chatReactionMeBorder: primary[700],
+    chatRowHoverBg: 'rgb(255 255 255 / 0.045)',
+    chatPopoverBg: neutral900,
     // Shadows inherit: the same `ink` reference, now the cream text.
   },
 
@@ -123,23 +199,7 @@ export const bureau = defineTheme({
   // Families only; the web embeds woff2, native loads TTF.
   font: { display: 'Pixelify Sans', body: 'Archivo', mono: 'Space Mono' },
 
-  scale: {
-    // Navy to blue, light to dark. Absolute steps serving both modes: 800
-    // is the light arm's navy, 400 sits next to the dark arm's blue.
-    primary: {
-      50: 'oklch(0.975 0.008 268)',
-      100: 'oklch(0.945 0.022 268)',
-      200: 'oklch(0.89 0.045 269)',
-      300: 'oklch(0.81 0.085 270)',
-      400: 'oklch(0.7 0.15 270)',
-      500: 'oklch(0.6 0.16 270)',
-      600: 'oklch(0.5 0.13 267)',
-      700: 'oklch(0.4 0.09 264)',
-      800: 'oklch(0.31 0.057 262)',
-      900: 'oklch(0.245 0.045 262)',
-      950: 'oklch(0.18 0.032 262)',
-    },
-  },
+  scale: { primary, accent },
 
   components: {
     // The hard shadow at rest; a press moves the button into it, and the
@@ -154,5 +214,6 @@ export const bureau = defineTheme({
       shadow: { xs: 'shadowHard', sm: 'shadowHard', md: 'shadowHard' },
       hoverShadow: 'shadowHardLg',
     },
+    chat: { barShadow: 'shadowHard', popoverShadow: 'shadowHardLg' },
   },
 });

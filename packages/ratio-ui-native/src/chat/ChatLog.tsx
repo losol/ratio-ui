@@ -17,7 +17,6 @@ import { Text } from '../Text';
 import { ChatLinkPreviewCard } from './ChatLinkPreviewCard';
 import { ChatReactions } from './ChatReactions';
 import { ChatText } from './ChatText';
-import { chatColors } from './chatColors';
 
 /** Built-in text of `ChatLog`. Each entry falls back to English. @beta */
 export interface ChatLogLabels {
@@ -120,11 +119,11 @@ const PX = 16;
 
 const ChatLogRow: React.FC<ChatLogRowProps> = ({ message, me, onToggleReaction, onOpenLink, labels }) => {
   const theme = useTheme();
-  const chat = chatColors(theme);
+  const { colors } = theme;
   const { id, type = 'msg', time, nick, role, text, preview, reactions } = message;
 
   if (type === 'divider') {
-    const rule = { flex: 1, height: 1, backgroundColor: theme.colors.border2, opacity: 0.5 };
+    const rule = { flex: 1, height: 1, backgroundColor: colors.border2, opacity: 0.5 };
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: PX, marginVertical: 8 }}>
         <View style={rule} />
@@ -160,7 +159,13 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({ message, me, onToggleReaction, 
   const segments = segmentChatText(text);
   const mentionsMe = mentionsNick(segments, me);
   const isMe = sameNick(nick, me);
-  const nickColor = isMe ? chat.nickVoice : role === 'op' ? chat.nickOp : role === 'voice' ? chat.nickVoice : chat.nick;
+  const nickColor = isMe
+    ? colors.chatNickVoice
+    : role === 'op'
+      ? colors.chatNickOp
+      : role === 'voice'
+        ? colors.chatNickVoice
+        : colors.chatNick;
   // The glyph would be read as "at" or "plus", so the header speaks the role's name.
   const spoken = [
     role ? `${nick} (${labels[role]})` : nick,
@@ -179,8 +184,8 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({ message, me, onToggleReaction, 
         // The band's 3px edge comes out of the padding, so every row aligns.
         paddingLeft: PX - 3,
         borderLeftWidth: 3,
-        borderLeftColor: mentionsMe ? chat.mentionEdge : 'transparent',
-        backgroundColor: mentionsMe ? chat.mentionBg : 'transparent',
+        borderLeftColor: mentionsMe ? colors.accent : 'transparent',
+        backgroundColor: mentionsMe ? colors.chatMentionBg : 'transparent',
       }}
     >
       <View accessible aria-label={spoken} style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>

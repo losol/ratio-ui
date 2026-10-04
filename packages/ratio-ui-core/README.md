@@ -51,9 +51,10 @@ theme generator.
 ## What is here, and what is not
 
 - **Themes** in `themes/`: Bureau today — semantic tokens with all four
-  status families, the primary scale, and the button and card tokens
-  (`theme.components`). The rest of the component tokens (`--menu-*`,
-  `--chat-*`) stay in the CSS until a renderer needs them. Ink and the
+  status families, the chat's colours (`chatNick`, `chatMentionBg`, …;
+  beta), the primary and accent scales, and the button, card and chat
+  shadow tokens (`theme.components`). The rest of the component tokens
+  (`--menu-*` and the like) stay in the CSS until a renderer needs them. Ink and the
   standard theme follow by the same mechanism.
 - **Shared scales**: `fontSize` and `space`, the web's fluid sizes as the
   two ends of their `clamp()`. `resolveTheme()` gives them in points at
@@ -63,7 +64,7 @@ theme generator.
   the rules every renderer reads it by — `segmentChatText` for links and
   mentions, `sameNick`/`mentionsNick`, and `hostOf`/`previewLabel`/
   `hasPreviewContent` for link previews. The web's `Chat.Log` uses them
-  today; the native chat log will.
+  and `ChatLog` in `@eventuras/ratio-ui-native` both use them.
 - **The schema**: `defineTheme`, `mix`, `Theme` and friends.
 - **Colour maths**: `parseColor`, `oklchToRgba`, `formatColor`. Out-of-gamut
   OKLCH is clipped, not gamut-mapped as CSS does — a step at the edge of

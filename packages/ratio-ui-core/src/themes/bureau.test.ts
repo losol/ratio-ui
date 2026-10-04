@@ -29,18 +29,26 @@ const blocks = (css: string, selectorHas: string): Block => {
 
 const bureauCss = read('themes/bureau.css');
 const standardCss = read('tokens/theme.css');
-// What Bureau leaves out, the standard theme's semantic blocks give it: the
-// CSS cascades them into every theme. `var()`s there point at its palette.
+const chatCss = read('tokens/chat.css');
+// What Bureau leaves out, the standard theme's semantic blocks and the chat
+// tokens give it: the CSS cascades them into every theme.
 const palette = blocks(standardCss, '@theme');
-const unvar = (value: string | undefined) =>
-  value?.replace(/^var\(--([\w-]+)\)$/, (_, name: string) => palette[name] ?? value);
-const standardLight = blocks(standardCss, '.surface-light');
-const standardDark = blocks(standardCss, '.surface-dark');
+const standardLight = { ...blocks(standardCss, '.surface-light'), ...blocks(chatCss, '.surface-light') };
+const standardDark = { ...blocks(standardCss, '.surface-dark'), ...blocks(chatCss, '.surface-dark') };
 
 const lightCss = blocks(bureauCss, '.surface-light');
 const darkCss = blocks(bureauCss, '.surface-dark');
-const light = (name: string) => lightCss[name] ?? unvar(standardLight[name]);
-const dark = (name: string) => darkCss[name] ?? lightCss[name] ?? unvar(standardDark[name] ?? standardLight[name]);
+
+// A `var()` there resolves where it lands: a scale step is Bureau's own
+// (its primary) before the standard palette's, and a semantic alias such
+// as `var(--card)` is Bureau's value in the same mode.
+const unvar = (value: string | undefined, mode: (name: string) => string | undefined) =>
+  value?.replace(/^var\(--([\w-]+)\)$/, (_, name: string) =>
+    name.startsWith('color-') ? (lightCss[name] ?? palette[name] ?? value) : (mode(name) ?? value),
+  );
+const light = (name: string): string | undefined => lightCss[name] ?? unvar(standardLight[name], light);
+const dark = (name: string): string | undefined =>
+  darkCss[name] ?? lightCss[name] ?? unvar(standardDark[name] ?? standardLight[name], dark);
 
 const modeKeys = Object.keys(bureau.light) as (keyof ThemeMode)[];
 
@@ -66,8 +74,13 @@ describe('bureau matches ratio-ui/src/themes/bureau.css', () => {
     expect(bureau.scale.primary[step]).toBe(lightCss[`color-primary-${step}`]);
   });
 
+  // Bureau inherits the standard accent scale.
+  it.each(Object.keys(bureau.scale.accent).map(Number) as ScaleStep[])('--color-accent-%s', step => {
+    expect(bureau.scale.accent[step]).toBe(lightCss[`color-accent-${step}`] ?? palette[`color-accent-${step}`]);
+  });
+
   const shadowVar = (key: ShadowKey | null) => (key ? `var(--${cssName(key)})` : 'none');
-  const { button, card } = bureau.components;
+  const { button, card, chat } = bureau.components;
 
   it('--button-*', () => {
     // `--button-radius` names `--radius`, Bureau's md step.
@@ -86,6 +99,11 @@ describe('bureau matches ratio-ui/src/themes/bureau.css', () => {
 
   it('--card-hover-shadow', () => {
     expect(lightCss['card-hover-shadow']).toBe(shadowVar(card.hoverShadow));
+  });
+
+  it('--chat-bar-shadow and --chat-popover-shadow', () => {
+    expect(lightCss['chat-bar-shadow']).toBe(shadowVar(chat.barShadow));
+    expect(lightCss['chat-popover-shadow']).toBe(shadowVar(chat.popoverShadow));
   });
 });
 
