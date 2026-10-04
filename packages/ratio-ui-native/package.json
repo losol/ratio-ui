@@ -1,0 +1,64 @@
+{
+  "name": "@eventuras/ratio-ui-native",
+  "version": "0.0.0",
+  "description": "Ratio UI for React Native: the design system's components for Expo and React Native apps, drawn from @eventuras/ratio-ui-core's theme data.",
+  "keywords": [
+    "react-native",
+    "expo",
+    "design-system",
+    "ratio-ui"
+  ],
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/ratio-ui-native#readme",
+  "bugs": {
+    "url": "https://github.com/losol/ratio-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/losol/ratio-ui.git",
+    "directory": "packages/ratio-ui-native"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "pnpm run clean && vite build && node scripts/check-imports.mjs",
+    "check:imports": "node scripts/check-imports.mjs",
+    "clean": "rm -rf dist",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@eventuras/ratio-ui-core": "workspace:^"
+  },
+  "devDependencies": {
+    "@eventuras/eslint-config": "^1.0.4",
+    "@eventuras/typescript-config": "^1.0.0",
+    "@eventuras/vite-config": "^0.3.1",
+    "@types/react": "^19.3.0",
+    "react": "^19.2.3",
+    "react-native": "0.86.3",
+    "typescript": "6.0.3",
+    "vite": "8.3.0"
+  },
+  "peerDependencies": {
+    "react": ">=19.2 <20",
+    "react-native": ">=0.86"
+  },
+  "engines": {
+    "node": ">=22.0.0 <25.0.0"
+  }
+}

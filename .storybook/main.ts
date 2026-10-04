@@ -74,6 +74,8 @@ const config: StorybookConfig = {
     const srcAliases = [
       'ratio-ui',
       'ratio-ui-shiki',
+      'ratio-ui-core',
+      'ratio-ui-native',
       'markdown-core',
       'markdown-react',
     ].flatMap((pkg) => {
@@ -83,7 +85,10 @@ const config: StorybookConfig = {
         { find: new RegExp(`^@eventuras/${pkg}/(.*)$`), replacement: join(src, '$1') },
       ];
     });
-    resolve.alias = [...existing, ...srcAliases];
+    // ratio-ui-native's stories run on the web through react-native-web,
+    // the same way Expo's web target does.
+    const reactNativeWeb = [{ find: /^react-native$/, replacement: 'react-native-web' }];
+    resolve.alias = [...existing, ...srcAliases, ...reactNativeWeb];
     return viteConfig;
   },
 };
