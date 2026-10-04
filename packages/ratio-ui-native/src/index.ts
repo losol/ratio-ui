@@ -19,3 +19,16 @@ export {
 } from './Text';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button';
 export { Card, type CardProps, type CardElevation } from './Card';
+export {
+  ChatLog,
+  type ChatLogLabels,
+  type ChatLogProps,
+} from './chat/ChatLog';
+export { ChatReactions, type ChatReactionsProps } from './chat/ChatReactions';
+// The message's shape is core's, shared with the web; re-exported for convenience.
+export type {
+  ChatLinkPreview,
+  ChatLogMessage,
+  ChatReaction,
+  ChatRole,
+} from '@eventuras/ratio-ui-core/chat';

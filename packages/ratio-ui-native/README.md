@@ -5,9 +5,9 @@ from the theme data in [`@eventuras/ratio-ui-core`](../ratio-ui-core). An app
 looks like its web sibling — Bureau's paper and navy, the hard shadows, the
 pixel display face — without installing the web renderer.
 
-**Beta.** Built for Expo SDK 57 (React Native 0.86, React 19.2). The first
-components are `Text`, `Heading`, `Button` and `Card`; more follow as apps
-need them.
+**Beta.** Built for Expo SDK 57 (React Native 0.86, React 19.2). The
+components are `Text`, `Heading`, `Button`, `Card` and `ChatLog`; more
+follow as apps need them. Every component and prop may still change.
 
 ## Installation
 
@@ -41,6 +41,28 @@ export default function App() {
 components use Bureau in the device's mode. `useTheme()` gives a component
 of your own the same values: `colors`, `radius`, `space`, `fontSize`,
 `font`, `components`, and `shadow(key)` as a `boxShadow` string.
+
+## Chat
+
+`ChatLog` takes the same `ChatLogMessage[]` as the web's `Chat.Log`, and
+reads links and mentions with the same rules from
+`@eventuras/ratio-ui-core/chat`, so a message looks alike in the app and on
+the web:
+
+```tsx
+<ChatLog
+  messages={messages}
+  me="tor"
+  onToggleReaction={(id, emoji) => toggle(id, emoji)}
+  onOpenLink={url => router.push(url)} // default: Linking.openURL
+/>
+```
+
+Each row puts the nick and time above the text, as a narrow web log does,
+with a mention band, link previews and reactions. It is a `FlatList` and
+does not scroll itself; the ref is the list, so the app decides when to
+follow new messages. Not yet in native: the reaction picker, a highlighted
+message and message links.
 
 ## Fonts
 
