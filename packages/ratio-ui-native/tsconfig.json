@@ -1,0 +1,10 @@
+{
+  "extends": "@eventuras/typescript-config/react-library.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src"],
+  // Story scaffolding stays out of the published types; the stories that
+  // import it still typecheck it.
+  "exclude": ["node_modules", "dist", "src/storyFrame.tsx"]
+}

@@ -12,6 +12,7 @@ maintained in [origo](https://github.com/losol/origo).
 | `@eventuras/ratio-ui`         | [`packages/ratio-ui`](packages/ratio-ui)               | Core React components, layout primitives, forms, design tokens, CSS, and Storybook. |
 | `@eventuras/ratio-ui-next`    | [`packages/ratio-ui-next`](packages/ratio-ui-next)     | Next.js wrappers for Ratio UI `Image` and `Link`.                                   |
 | `@eventuras/ratio-ui-core`    | [`packages/ratio-ui-core`](packages/ratio-ui-core)     | The design system as data: theme values and the token vocabulary. No React, no CSS. |
+| `@eventuras/ratio-ui-native`  | [`packages/ratio-ui-native`](packages/ratio-ui-native) | Ratio UI for React Native and Expo: Text, Button and Card from the core theme data. |
 
 ## Requirements
 
