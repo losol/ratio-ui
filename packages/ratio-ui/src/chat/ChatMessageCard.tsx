@@ -6,10 +6,10 @@ import React from 'react';
 import type { NavTreeProps } from '../core/NavTree';
 import { cn } from '../utils/cn';
 import type { ChatLogMessage } from './ChatLog';
-import { ChatLinkPreviewCard, hasPreviewContent } from './ChatLinkPreview';
+import { hasPreviewContent, segmentChatText } from '@eventuras/ratio-ui-core/chat';
+import { ChatLinkPreviewCard } from './ChatLinkPreview';
 import { ChatReactions } from './ChatReactions';
 import { ChatText } from './ChatText';
-import { segmentChatText } from './chatTextSegments';
 
 /** Built-in text of `Chat.MessageCard`. Each entry falls back to English. @beta */
 export interface ChatMessageCardLabels {

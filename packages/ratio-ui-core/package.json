@@ -1,7 +1,7 @@
 {
   "name": "@eventuras/ratio-ui-core",
   "version": "0.0.0",
-  "description": "The design system as data \u2014 theme values, the token vocabulary, and the pure rules every renderer of Ratio UI must agree on. No React, no DOM, no CSS.",
+  "description": "The design system as data — theme values, the token vocabulary, and the pure rules every renderer of Ratio UI must agree on. No React, no DOM, no CSS.",
   "keywords": [
     "design-tokens",
     "theme",
@@ -23,6 +23,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./chat": {
+      "types": "./dist/chat/index.d.ts",
+      "import": "./dist/chat/index.js"
     },
     "./themes/*": {
       "types": "./dist/themes/*.d.ts",

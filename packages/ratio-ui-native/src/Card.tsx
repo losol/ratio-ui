@@ -25,6 +25,7 @@ interface CardOwnProps {
   style?: StyleProp<ViewStyle>;
 }
 
+/** @beta Prop shape may change before release. */
 export type CardProps = CardOwnProps &
   (
     | ({ onPress?: undefined } & Omit<ViewProps, 'style' | 'children'>)
@@ -35,6 +36,8 @@ export type CardProps = CardOwnProps &
  * A card on the theme's card surface, with its border, corner and shadow.
  * With `onPress` it is one pressable target and lifts while pressed — the
  * web card's hover lift, where touch has no hover.
+ *
+ * @beta This component is experimental — prop shape may change before release.
  */
 export const Card: React.FC<CardProps> = ({
   children,

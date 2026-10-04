@@ -16,6 +16,7 @@ import { Text } from './Text';
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
+/** @beta Prop shape may change before release. */
 export interface ButtonProps extends Omit<PressableProps, 'children' | 'style'> {
   /** The label. A string is set in the button's text style. */
   children: React.ReactNode;
@@ -52,6 +53,8 @@ const surface = (variant: ButtonVariant, { colors }: RatioTheme) => {
  * A button in the theme's shape: its radius and resting shadow, and its
  * press — Bureau moves the button into its hard shadow, so it sinks into
  * the page. The text variant stays flat.
+ *
+ * @beta This component is experimental — prop shape may change before release.
  */
 export const Button: React.FC<ButtonProps> = ({
   children,

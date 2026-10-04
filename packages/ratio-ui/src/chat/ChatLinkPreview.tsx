@@ -3,38 +3,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import React, { useId } from 'react';
+import { previewLabel, type ChatLinkPreview } from '@eventuras/ratio-ui-core/chat';
 import { cn } from '../utils/cn';
 
-/**
- * A card for a link in a message. The caller fetches it; the log only shows
- * it. @beta Prop shape may change before release.
- */
-export interface ChatLinkPreview {
-  /** The link the card opens. */
-  url: string;
-  title?: string;
-  description?: string;
-  /** Shown as the card's small label; the URL's host when absent. */
-  siteName?: string;
-  /**
-   * Already an http(s) URL the browser can load. The card shows it as a
-   * fixed square thumbnail, so `width` and `height` are the source image's
-   * dimensions for the caller's own use; the card does not read them.
-   */
-  image?: { src: string; width?: number; height?: number };
-}
-
-const hostOf = (url: string): string => {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return url;
-  }
-};
-
-/** A preview is only worth a card when it has something to say. */
-export const hasPreviewContent = (preview: ChatLinkPreview): boolean =>
-  !!preview.title || !!preview.description;
+// The preview's shape and its rules (the host label, when a card is worth
+// showing) come from ratio-ui-core, shared with the native renderer.
+export type { ChatLinkPreview };
 
 type ChatLinkPreviewCardProps = {
   preview: ChatLinkPreview;
@@ -53,7 +27,7 @@ export const ChatLinkPreviewCard: React.FC<ChatLinkPreviewCardProps> = ({
   className,
 }) => {
   const id = useId();
-  const { url, title, description, siteName, image } = preview;
+  const { url, title, description, image } = preview;
   const nameId = `${id}-${title ? 'title' : 'description'}`;
   const noteId = `${id}-note`;
 
@@ -87,7 +61,7 @@ export const ChatLinkPreviewCard: React.FC<ChatLinkPreviewCardProps> = ({
       )}
       <span className="flex min-w-0 flex-1 flex-col gap-0.5 self-center">
         <span className="truncate text-[11px] font-semibold tracking-[0.06em] uppercase text-(--text-subtle)">
-          {siteName || hostOf(url)}
+          {previewLabel(preview)}
         </span>
         {title && (
           <span id={`${id}-title`} className="line-clamp-2 font-semibold leading-snug">

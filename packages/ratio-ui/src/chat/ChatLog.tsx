@@ -7,40 +7,22 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import type { NavTreeProps } from '../core/NavTree';
 import { cn } from '../utils/cn';
-import { ChatReactions, type ChatReaction } from './ChatReactions';
+import {
+  hasPreviewContent,
+  mentionsNick,
+  sameNick,
+  segmentChatText,
+  type ChatLogMessage,
+  type ChatRole,
+} from '@eventuras/ratio-ui-core/chat';
+import { ChatReactions } from './ChatReactions';
 import { ChatReactionBar } from './ChatReactionBar';
-import { ChatLinkPreviewCard, hasPreviewContent, type ChatLinkPreview } from './ChatLinkPreview';
+import { ChatLinkPreviewCard } from './ChatLinkPreview';
 import { ChatText } from './ChatText';
-import { segmentChatText } from './chatTextSegments';
 
-/**
- * Channel role, shown as a glyph before the nick: `@` op, `+` voice.
- * @beta Prop shape may change before release.
- */
-export type ChatRole = 'op' | 'voice';
-
-/** @beta Prop shape may change before release. */
-export interface ChatLogMessage {
-  id: string;
-  /** Row kind. @default 'msg' */
-  type?: 'msg' | 'event' | 'action' | 'divider';
-  /** Display time, formatted by the caller, e.g. `'09:42'`. */
-  time?: string;
-  /** Author of a `msg` or an `action`. */
-  nick?: string;
-  role?: ChatRole;
-  /**
-   * The message; `@nick` mentions are highlighted and http(s) URLs become
-   * links. A divider's label.
-   */
-  text: string;
-  /** A card for a link in the message, shown under the text. */
-  preview?: ChatLinkPreview;
-  /** The message's own address; the time becomes a link to it. */
-  href?: string;
-  /** Emoji reactions, shown under a `msg`. */
-  reactions?: ChatReaction[];
-}
+// The message's shape and the rules for reading it live in ratio-ui-core,
+// shared with the native renderer; re-exported so `ratio-ui/chat` keeps them.
+export type { ChatLogMessage, ChatRole };
 
 /** Built-in text of `Chat.Log`. Each entry falls back to English. @beta */
 export interface ChatLogLabels {
@@ -130,11 +112,6 @@ const NICK_COLOR: Record<ChatRole | 'none', string> = {
   voice: 'text-(--chat-nick-voice)',
   none: 'text-(--chat-nick)',
 };
-
-// Normalised and locale-independent: a nick is an identifier, and the
-// viewer's locale (Turkish dotless i) must not change who is mentioned.
-const sameNick = (a?: string, b?: string) =>
-  !!a && !!b && a.normalize().toLowerCase() === b.normalize().toLowerCase();
 
 const TIME = 'font-mono text-xs not-italic tabular-nums text-(--text-subtle)';
 
@@ -349,7 +326,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
   }
 
   const segments = segmentChatText(text);
-  const mentionsMe = segments.some(s => s.kind === 'mention' && sameNick(s.value.slice(1), me));
+  const mentionsMe = mentionsNick(segments, me);
   const copyLink = onCopyLink && href ? () => onCopyLink(message) : undefined;
   const timeClass = cn(TIME, '@max-lg/chat:col-start-2 @max-lg/chat:row-start-1');
 
