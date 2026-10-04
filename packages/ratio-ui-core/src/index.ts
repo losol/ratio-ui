@@ -10,6 +10,7 @@ export {
   type ColorKey,
   type ColorSpec,
   type ColorString,
+  type Components,
   type Font,
   type Mix,
   type Radius,
@@ -27,6 +28,13 @@ export {
   type ResolvedShadow,
   type ResolvedTheme,
 } from './resolveTheme';
+export {
+  fontSize,
+  space,
+  type FluidSize,
+  type FontSizeStep,
+  type SpaceStep,
+} from './scale';
 export { parseColor, formatColor, oklchToRgba, type Rgba } from './color';
 export { toCssValue } from './toCssValue';
 export { cssName } from './cssName';

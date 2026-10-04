@@ -13,8 +13,9 @@ const ink = mix('text', 0.62);
  * Bureau — "moderne retro", paper and navy. Values as in
  * `ratio-ui/src/themes/bureau.css`, which stays the web's source until the
  * generator lands; `bureau.test.ts` holds the two to each other.
- * Semantic tokens and the primary scale only — component tokens stay in
- * the CSS until a renderer needs them.
+ * Semantic tokens, the primary scale, and the button and card tokens a
+ * native renderer needs; the rest of the component tokens stay in the CSS
+ * until a renderer needs them.
  */
 export const bureau = defineTheme({
   name: 'bureau',
@@ -53,6 +54,25 @@ export const bureau = defineTheme({
     errorBg: '#f7e6e3',
     errorBorder: '#e3b3ac',
     errorText: '#8a241c',
+
+    // Success, info and warning are the standard theme's, which the CSS
+    // cascades into Bureau; written out here until the standard theme has
+    // its own file to inherit from.
+    successSolid: '#2e9a62',
+    successOnSolid: 'oklch(0.9851 0.0001 263.3)',
+    successBg: '#eaf7f0',
+    successBorder: '#bfe8d2',
+    successText: '#1f6b46',
+    infoSolid: '#2f7fa0',
+    infoOnSolid: 'oklch(0.9851 0.0001 263.3)',
+    infoBg: '#eaf4fa',
+    infoBorder: '#c6e3f1',
+    infoText: '#225e77',
+    warningSolid: '#d97706',
+    warningOnSolid: '#1a1405',
+    warningBg: '#fff6de',
+    warningBorder: '#ffe0a3',
+    warningText: '#8a4b05',
   },
 
   dark: {
@@ -83,6 +103,17 @@ export const bureau = defineTheme({
     errorBg: 'rgba(255, 110, 82, 0.18)',
     errorBorder: 'rgba(255, 110, 82, 0.32)',
     errorText: '#ffb3a4',
+
+    // The standard dark tints; the solids carry over from light.
+    successBg: 'rgba(46, 154, 98, 0.16)',
+    successBorder: 'rgba(46, 154, 98, 0.28)',
+    successText: '#a7e7c6',
+    infoBg: 'rgba(47, 127, 160, 0.16)',
+    infoBorder: 'rgba(47, 127, 160, 0.28)',
+    infoText: '#a7d9ee',
+    warningBg: 'rgba(217, 119, 6, 0.18)',
+    warningBorder: 'rgba(217, 119, 6, 0.3)',
+    warningText: '#ffd18a',
     // Shadows inherit: the same `ink` reference, now the cream text.
   },
 
@@ -107,6 +138,21 @@ export const bureau = defineTheme({
       800: 'oklch(0.31 0.057 262)',
       900: 'oklch(0.245 0.045 262)',
       950: 'oklch(0.18 0.032 262)',
+    },
+  },
+
+  components: {
+    // The hard shadow at rest; a press moves the button into it, and the
+    // shadow goes, so the button seems to sink into the page.
+    button: {
+      radius: 'md',
+      shadow: 'shadowHard',
+      pressedShadow: null,
+      pressedOffset: { x: 2, y: 2 },
+    },
+    card: {
+      shadow: { xs: 'shadowHard', sm: 'shadowHard', md: 'shadowHard' },
+      hoverShadow: 'shadowHardLg',
     },
   },
 });

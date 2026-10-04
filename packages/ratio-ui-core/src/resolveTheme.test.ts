@@ -28,6 +28,21 @@ const light: ThemeMode = {
   errorBg: '#f7e6e3',
   errorBorder: '#e3b3ac',
   errorText: '#8a241c',
+  successSolid: '#2e9a62',
+  successOnSolid: '#fafafa',
+  successBg: '#eaf7f0',
+  successBorder: '#bfe8d2',
+  successText: '#1f6b46',
+  infoSolid: '#2f7fa0',
+  infoOnSolid: '#fafafa',
+  infoBg: '#eaf4fa',
+  infoBorder: '#c6e3f1',
+  infoText: '#225e77',
+  warningSolid: '#d97706',
+  warningOnSolid: '#1a1405',
+  warningBg: '#fff6de',
+  warningBorder: '#ffe0a3',
+  warningText: '#8a4b05',
   shadowHard: { x: 2, y: 2, blur: 0, color: mix('text', 0.62) },
   shadowHardLg: { x: 3, y: 3, blur: 0, color: mix('text', 0.62) },
   shadowHardXl: { x: 5, y: 5, blur: 0, color: mix('text', 0.62) },
@@ -44,6 +59,10 @@ const theme = defineTheme({
       50: 'oklch(1 0 0)', 100: '#111', 200: '#222', 300: '#333', 400: '#444', 500: '#555',
       600: '#666', 700: '#777', 800: '#888', 900: '#999', 950: 'oklch(0 0 0)',
     },
+  },
+  components: {
+    button: { radius: 'md', shadow: 'shadowHard', pressedShadow: null, pressedOffset: { x: 2, y: 2 } },
+    card: { shadow: { xs: null, sm: 'shadowHard', md: 'shadowHardLg' }, hoverShadow: 'shadowHardLg' },
   },
 });
 
@@ -77,6 +96,20 @@ describe('resolveTheme', () => {
   it('passes radius and fonts through', () => {
     expect(resolved.radius.md).toBe(3);
     expect(resolved.font.display).toBe('Pixelify Sans');
+  });
+
+  it('gives font sizes and spacing in points, at the small end of the fluid range', () => {
+    expect(resolved.fontSize.base).toBe(16);
+    expect(resolved.fontSize.sm).toBe(14.08);
+    expect(resolved.space.s).toBe(14);
+    expect(resolved.space.m).toBe(21);
+  });
+
+  it('keeps component tokens naming shadows, and copies them', () => {
+    expect(resolved.components.button.shadow).toBe('shadowHard');
+    expect(resolved.components.card.shadow.xs).toBeNull();
+    resolved.components.button.pressedOffset.x = 9;
+    expect(theme.components.button.pressedOffset.x).toBe(2);
   });
 
   it('does not touch the authored theme', () => {

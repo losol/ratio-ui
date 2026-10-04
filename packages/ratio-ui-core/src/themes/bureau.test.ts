@@ -7,38 +7,51 @@ import { readFileSync } from 'node:fs';
 import { cssName } from '../cssName';
 import { resolveTheme } from '../resolveTheme';
 import { toCssValue } from '../toCssValue';
-import type { ScaleStep, ThemeMode } from '../theme';
+import { fontSize, space, type FluidSize } from '../scale';
+import type { ScaleStep, ShadowKey, ThemeMode } from '../theme';
 import { bureau } from './bureau';
 
 // The web's Bureau stays hand-written until the generator lands. This holds
 // the data to it: every value here must write back to the CSS as it stands.
-// Not the other way round — component tokens stay CSS-only for now.
-const css = readFileSync(new URL('../../../ratio-ui/src/themes/bureau.css', import.meta.url), 'utf8');
+// Not the other way round — most component tokens stay CSS-only for now.
+const read = (path: string) =>
+  readFileSync(new URL(`../../../ratio-ui/src/${path}`, import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
 
 type Block = Record<string, string>;
-const blocks = (selectorHas: string): Block => {
+const blocks = (css: string, selectorHas: string): Block => {
   const out: Block = {};
-  const stripped = css.replace(/\/\*[\s\S]*?\*\//g, '');
-  for (const [, selector, body] of stripped.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+  for (const [, selector, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     if (!selector!.includes(selectorHas)) continue;
     for (const [, name, value] of body!.matchAll(/--([\w-]+)\s*:\s*([^;]+);/g)) out[name!] = value!.trim();
   }
   return out;
 };
-const lightCss = blocks('.surface-light');
-const darkCss = blocks('.surface-dark');
+
+const bureauCss = read('themes/bureau.css');
+const standardCss = read('tokens/theme.css');
+// What Bureau leaves out, the standard theme's semantic blocks give it: the
+// CSS cascades them into every theme. `var()`s there point at its palette.
+const palette = blocks(standardCss, '@theme');
+const unvar = (value: string | undefined) =>
+  value?.replace(/^var\(--([\w-]+)\)$/, (_, name: string) => palette[name] ?? value);
+const standardLight = blocks(standardCss, '.surface-light');
+const standardDark = blocks(standardCss, '.surface-dark');
+
+const lightCss = blocks(bureauCss, '.surface-light');
+const darkCss = blocks(bureauCss, '.surface-dark');
+const light = (name: string) => lightCss[name] ?? unvar(standardLight[name]);
+const dark = (name: string) => darkCss[name] ?? lightCss[name] ?? unvar(standardDark[name] ?? standardLight[name]);
 
 const modeKeys = Object.keys(bureau.light) as (keyof ThemeMode)[];
 
 describe('bureau matches ratio-ui/src/themes/bureau.css', () => {
   it.each(modeKeys)('light --%s', key => {
-    expect(toCssValue(bureau.light[key])).toBe(lightCss[cssName(key)]);
+    expect(toCssValue(bureau.light[key])).toBe(light(cssName(key)));
   });
 
   // What the dark block leaves out cascades from light, as `defineTheme` does.
   it.each(modeKeys)('dark --%s', key => {
-    const name = cssName(key);
-    expect(toCssValue(bureau.dark[key])).toBe(darkCss[name] ?? lightCss[name]);
+    expect(toCssValue(bureau.dark[key])).toBe(dark(cssName(key)));
   });
 
   it.each(Object.keys(bureau.radius) as (keyof typeof bureau.radius)[])('--radius-%s', step => {
@@ -51,6 +64,46 @@ describe('bureau matches ratio-ui/src/themes/bureau.css', () => {
 
   it.each(Object.keys(bureau.scale.primary).map(Number) as ScaleStep[])('--color-primary-%s', step => {
     expect(bureau.scale.primary[step]).toBe(lightCss[`color-primary-${step}`]);
+  });
+
+  const shadowVar = (key: ShadowKey | null) => (key ? `var(--${cssName(key)})` : 'none');
+  const { button, card } = bureau.components;
+
+  it('--button-*', () => {
+    // `--button-radius` names `--radius`, Bureau's md step.
+    expect(lightCss['button-radius']).toBe('var(--radius)');
+    expect(toCssValue(bureau.radius[button.radius])).toBe(lightCss['radius']);
+    expect(lightCss['button-shadow']).toBe(shadowVar(button.shadow));
+    expect(lightCss['button-shadow-active']).toBe(shadowVar(button.pressedShadow));
+    expect(lightCss['button-transform-active']).toBe(
+      `translate(${toCssValue(button.pressedOffset.x)}, ${toCssValue(button.pressedOffset.y)})`,
+    );
+  });
+
+  it.each(['xs', 'sm', 'md'] as const)('--card-shadow-%s', tier => {
+    expect(lightCss[`card-shadow-${tier}`]).toBe(shadowVar(card.shadow[tier]));
+  });
+
+  it('--card-hover-shadow', () => {
+    expect(lightCss['card-hover-shadow']).toBe(shadowVar(card.hoverShadow));
+  });
+});
+
+// The scales are shared by every theme, so they are held to the base tokens.
+describe('the shared scales match ratio-ui/src/tokens', () => {
+  const ends = (clamp: string | undefined): FluidSize => {
+    const [, min, max] = /^clamp\(([\d.]+)rem,.*,\s*([\d.]+)rem\)$/.exec(clamp ?? '') ?? [];
+    return [Number(min), Number(max)];
+  };
+  const typography = blocks(read('tokens/typography.css'), '@theme');
+  const spacing = blocks(read('tokens/spacing.css'), '@theme');
+
+  it.each(Object.keys(fontSize) as (keyof typeof fontSize)[])('--font-size-%s', step => {
+    expect(ends(typography[`font-size-${step}`])).toEqual(fontSize[step]);
+  });
+
+  it.each(Object.keys(space) as (keyof typeof space)[])('--space-%s', step => {
+    expect(ends(spacing[`space-${step}`])).toEqual(space[step]);
   });
 });
 
