@@ -97,6 +97,7 @@ export interface Font {
  * How components wear the theme — the CSS's `--button-*` and `--card-*`.
  * Shadows name a shadow of the mode, so each mode inks its own; `null` is
  * no shadow.
+ * @beta Grows as renderers need more components; may change before release.
  */
 export interface Components {
   button: {

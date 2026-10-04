@@ -6,15 +6,11 @@
 
 import React from 'react';
 import { ToggleButtonGroup } from '../core/ToggleButtonGroup';
+import type { ChatReaction } from '@eventuras/ratio-ui-core/chat';
 import { cn } from '../utils/cn';
 
-/** @beta Prop shape may change before release. */
-export interface ChatReaction {
-  emoji: string;
-  count: number;
-  /** You are among the people who reacted. */
-  me?: boolean;
-}
+// The reaction's shape is ratio-ui-core's, shared with the native renderer.
+export type { ChatReaction };
 
 /** @beta Prop shape may change before release. */
 export interface ChatReactionsProps {

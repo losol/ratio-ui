@@ -11,6 +11,7 @@ export type FluidSize = readonly [min: number, max: number];
 /**
  * The type scale, shared by every theme — `--font-size-*` in
  * `ratio-ui/src/tokens/typography.css`.
+ * @beta May change before release.
  */
 export const fontSize = {
   xs: [0.75, 0.81],
@@ -29,6 +30,7 @@ export const fontSize = {
  * The space scale, shared by every theme — `--space-*` in
  * `ratio-ui/src/tokens/spacing.css`. Single steps only; the web's
  * `--space-s-m` pairs are fluid ranges a fixed layout has no use for.
+ * @beta May change before release.
  */
 export const space = {
   '3xs': [0.25, 0.25],

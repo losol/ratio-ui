@@ -10,6 +10,7 @@ import { useTheme } from './RatioProvider';
 /** How loud the text is: the theme's text, muted or subtle colour. */
 export type TextTone = 'default' | 'muted' | 'subtle';
 
+/** @beta Prop shape may change before release. */
 export interface TextProps extends RNTextProps {
   /** A step of the type scale. @default 'base' */
   size?: FontSizeStep;
@@ -30,7 +31,11 @@ const WEIGHT: Record<NonNullable<TextProps['weight']>, TextStyle['fontWeight']> 
 
 const TONE = { default: 'text', muted: 'textMuted', subtle: 'textSubtle' } as const;
 
-/** Body text in the theme's font, size and colour. */
+/**
+ * Body text in the theme's font, size and colour.
+ *
+ * @beta This component is experimental — prop shape may change before release.
+ */
 export const Text: React.FC<TextProps> = ({
   size = 'base',
   tone = 'default',
@@ -60,6 +65,7 @@ export const Text: React.FC<TextProps> = ({
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
+/** @beta Prop shape may change before release. */
 export interface HeadingProps extends Omit<TextProps, 'family' | 'size'> {
   /** The heading's level, for screen readers and the default size. @default 2 */
   level?: HeadingLevel;
@@ -77,7 +83,11 @@ const HEADING_SIZE: Record<HeadingLevel, FontSizeStep> = {
   6: 'base',
 };
 
-/** A heading in the theme's display font, announced as one with its level. */
+/**
+ * A heading in the theme's display font, announced as one with its level.
+ *
+ * @beta This component is experimental — prop shape may change before release.
+ */
 export const Heading: React.FC<HeadingProps> = ({ level = 2, size, weight = 'bold', style, ...rest }) => {
   const theme = useTheme();
   const fontSize = theme.fontSize[size ?? HEADING_SIZE[level]];

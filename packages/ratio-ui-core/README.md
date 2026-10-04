@@ -5,6 +5,9 @@ family. **No React, no DOM, no CSS.** Theme values, the token vocabulary, and
 the pure rules every renderer must agree on. A build guard fails on any
 import of `react`, `react-native` or a `@eventuras/ratio-ui*` package.
 
+**Beta.** The schema, the values and the `chat` rules may still change;
+pin a version.
+
 The web renderer is [`@eventuras/ratio-ui`](../ratio-ui); it will generate its
 theme CSS from this package. A React Native renderer reads it directly.
 
@@ -55,6 +58,12 @@ theme generator.
 - **Shared scales**: `fontSize` and `space`, the web's fluid sizes as the
   two ends of their `clamp()`. `resolveTheme()` gives them in points at
   the small end, a phone's.
+- **Chat** in `@eventuras/ratio-ui-core/chat` (beta): the message's shape
+  (`ChatLogMessage`, `ChatReaction`, `ChatLinkPreview`, `ChatRole`) and
+  the rules every renderer reads it by — `segmentChatText` for links and
+  mentions, `sameNick`/`mentionsNick`, and `hostOf`/`previewLabel`/
+  `hasPreviewContent` for link previews. The web's `Chat.Log` uses them
+  today; the native chat log will.
 - **The schema**: `defineTheme`, `mix`, `Theme` and friends.
 - **Colour maths**: `parseColor`, `oklchToRgba`, `formatColor`. Out-of-gamut
   OKLCH is clipped, not gamut-mapped as CSS does — a step at the edge of

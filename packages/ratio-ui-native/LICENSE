@@ -1,7 +1,7 @@
-Ratio UI Core — the design system as data
+Ratio UI for React Native — the design system's components for React Native and Expo
 Copyright (c) 2026 Losol AS.
 
-@eventuras/ratio-ui-core is licensed under the Mozilla Public License, Version 2.0 (MPL-2.0).
+@eventuras/ratio-ui-native is licensed under the Mozilla Public License, Version 2.0 (MPL-2.0).
 The full license text is reproduced below and is also available at
 https://mozilla.org/MPL/2.0/.
 

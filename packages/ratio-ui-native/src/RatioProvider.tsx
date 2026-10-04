@@ -15,7 +15,7 @@ import { bureau } from '@eventuras/ratio-ui-core/themes/bureau';
 
 export type ColorScheme = 'light' | 'dark';
 
-/** The theme as a component reads it: one mode's colours, and the rest of the theme. */
+/** The theme as a component reads it: one mode's colours, and the rest of the theme. @beta */
 export interface RatioTheme extends Omit<ResolvedTheme, 'light' | 'dark'> {
   scheme: ColorScheme;
   /** The colours of the mode in use. */
@@ -47,6 +47,7 @@ const RatioContext = createContext<RatioTheme | null>(null);
 // Bureau is the default theme, resolved once for every app that sets none.
 const defaultResolved = resolveTheme(bureau);
 
+/** @beta Prop shape may change before release. */
 export interface RatioProviderProps {
   /** The theme, as `@eventuras/ratio-ui-core` authors it. @default bureau */
   theme?: Theme;
@@ -58,6 +59,8 @@ export interface RatioProviderProps {
 /**
  * Puts a theme in reach of every Ratio component below it, in the device's
  * light or dark mode unless `colorScheme` says otherwise.
+ *
+ * @beta This component is experimental — prop shape may change before release.
  */
 export const RatioProvider: React.FC<RatioProviderProps> = ({ theme, colorScheme, children }) => {
   const system = useColorScheme();
@@ -71,6 +74,8 @@ export const RatioProvider: React.FC<RatioProviderProps> = ({ theme, colorScheme
  * The theme in use. Without a `RatioProvider` above, Bureau in the device's
  * mode — so a component works on its own, and a provider is only needed to
  * choose.
+ *
+ * @beta The shape of the theme it returns may change before release.
  */
 export function useTheme(): RatioTheme {
   const fromProvider = useContext(RatioContext);

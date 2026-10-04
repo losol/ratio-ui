@@ -259,6 +259,9 @@ importers:
 
   packages/ratio-ui:
     dependencies:
+      '@eventuras/ratio-ui-core':
+        specifier: workspace:^
+        version: link:../ratio-ui-core
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

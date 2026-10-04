@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { cn } from '../utils/cn';
-import type { ChatTextSegment } from './chatTextSegments';
+import type { ChatTextSegment } from '@eventuras/ratio-ui-core/chat';
 
 type ChatTextProps = {
   segments: ChatTextSegment[];
