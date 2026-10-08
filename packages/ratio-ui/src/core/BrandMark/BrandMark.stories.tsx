@@ -62,7 +62,7 @@ export const Row: Story = {
 export const WithoutALogo: Story = {
   render: () => (
     <BrandMark>
-      <BrandMark.Logo src="" alt="" />
+      <BrandMark.Logo src="" />
       <BrandMark.Name>Ratio</BrandMark.Name>
       <BrandMark.Subtitle>Design system</BrandMark.Subtitle>
     </BrandMark>
@@ -99,7 +99,8 @@ export const OnABand: Story = {
 export const Stacked: Story = {
   render: () => (
     <BrandMark layout="stacked" size="lg">
-      <BrandMark.Logo src={LOGO_SRC} alt="" />
+      {/* No alt: decorative, as the name beside it says who it is. */}
+      <BrandMark.Logo src={LOGO_SRC} />
       <BrandMark.Name>Fjordby services</BrandMark.Name>
       <BrandMark.Subtitle>Fjordby municipality</BrandMark.Subtitle>
     </BrandMark>
@@ -107,5 +108,7 @@ export const Stacked: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText('Fjordby services')).toBeInTheDocument();
+    // Without alt the logo is decorative: an empty alt, skipped by screen readers.
+    await expect(canvasElement.querySelector('img')).toHaveAttribute('alt', '');
   },
 };

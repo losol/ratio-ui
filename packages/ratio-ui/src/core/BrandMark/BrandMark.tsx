@@ -32,8 +32,13 @@ export type BrandMarkLogoProps = { className?: string } & (
   | {
       /** The logo image. */
       src: string;
-      /** Alt text for the image; `""` when the name beside it already says who it is. */
-      alt: string;
+      /**
+       * Alt text for the image. Defaults to `""`: decorative, skipped by
+       * screen readers (WCAG H67) — right when the name beside it already
+       * says who it is. Give it text when the logo carries meaning the name
+       * doesn't.
+       */
+      alt?: string;
       children?: never;
     }
   | {
@@ -90,7 +95,7 @@ BrandMarkTagline.displayName = 'BrandMark.Tagline';
  * @example
  * ```tsx
  * <BrandMark as="a" href="/">
- *   <BrandMark.Logo src="/logo.svg" alt="" />
+ *   <BrandMark.Logo src="/logo.svg" />
  *   <BrandMark.Name>Ratio</BrandMark.Name>
  *   <BrandMark.Subtitle>Design system</BrandMark.Subtitle>
  * </BrandMark>
