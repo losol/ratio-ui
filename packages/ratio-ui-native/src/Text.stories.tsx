@@ -45,8 +45,8 @@ export const Default: Story = {
     const [h1] = canvas.getAllByRole('heading', { level: 1, name: 'Spaced repetition' });
     await expect(h1).toBeInTheDocument();
     await expect(canvas.getAllByRole('heading', { level: 3 })).toHaveLength(2);
-    // The display face is Bureau's pixel font.
-    await expect(getComputedStyle(h1!).fontFamily).toContain('Pixelify Sans');
+    // The display face is Bureau's grotesk.
+    await expect(getComputedStyle(h1!).fontFamily).toContain('Fira Sans');
   },
 };
 

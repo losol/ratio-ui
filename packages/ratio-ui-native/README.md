@@ -72,14 +72,13 @@ The theme names its families; the app loads the files. For Bureau:
 import { useFonts } from 'expo-font';
 
 const [loaded] = useFonts({
-  'Pixelify Sans': require('./assets/fonts/PixelifySans-Regular.ttf'),
-  Archivo: require('./assets/fonts/Archivo-Regular.ttf'),
+  'Fira Sans': require('./assets/fonts/FiraSans-Regular.ttf'),
   'Space Mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
 });
 ```
 
-The keys must match `theme.font` — `'Pixelify Sans'`, `'Archivo'` and
-`'Space Mono'`. All three are on Google Fonts under the SIL OFL.
+The keys must match `theme.font` — `'Fira Sans'` (display and body) and
+`'Space Mono'`. Both are on Google Fonts under the SIL OFL.
 
 ## Shadows
 
