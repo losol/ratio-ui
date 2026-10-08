@@ -46,27 +46,6 @@
   width: auto;
 }
 
-/* No logo yet: a dashed outline of where it goes, labelled. */
-.ratio-brand-mark__placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  aspect-ratio: 6 / 7;
-  border: 2px dashed currentColor;
-  border-radius: 3px;
-  font-family: var(--font-body);
-  font-size: calc(var(--brand-mark-logo-height) * 0.2);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-/* A heraldic shield: square shoulders, a rounded point. */
-.ratio-brand-mark__placeholder[data-shape='shield'] {
-  border-radius: 3px 3px 50% 50% / 3px 3px 42% 42%;
-}
-
 /* ── Text ──────────────────────────────────────────────────────────────── */
 .ratio-brand-mark__name {
   font-family: var(--font-display);

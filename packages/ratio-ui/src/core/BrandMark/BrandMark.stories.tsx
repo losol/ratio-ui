@@ -24,6 +24,14 @@ const Logo = () => (
   </svg>
 );
 
+// Drawn in currentColor, so it takes the band's ink.
+const BandLogo = () => (
+  <svg viewBox="0 0 48 56" role="img" aria-label="Fjordby">
+    <path d="M2 2h44v26c0 14-10 22-22 26C12 50 2 42 2 28Z" fill="none" stroke="currentColor" strokeWidth="3" />
+    <path d="M10 34l8-10 6 7 5-5 9 8" fill="none" stroke="currentColor" strokeWidth="3" />
+  </svg>
+);
+
 // The same logo as an image file, for the `src` form.
 const LOGO_SRC =
   'data:image/svg+xml,' +
@@ -48,29 +56,20 @@ export const Row: Story = {
 };
 
 /**
- * No logo file yet: the slot shows a dashed outline of where it goes. A
- * coat of arms takes `shape="shield"`.
+ * No logo: leave `BrandMark.Logo` out and the text stands alone. There is no
+ * placeholder — an empty `src` renders nothing, not a broken image.
  */
-export const Placeholder: Story = {
+export const WithoutALogo: Story = {
   render: () => (
-    <div className="flex flex-col gap-6">
-      <BrandMark>
-        <BrandMark.Logo placeholder="Logo" />
-        <BrandMark.Name>Ratio</BrandMark.Name>
-        <BrandMark.Subtitle>Design system</BrandMark.Subtitle>
-      </BrandMark>
-      <BrandMark>
-        <BrandMark.Logo placeholder="Arms" shape="shield" />
-        <BrandMark.Name>Fjordby services</BrandMark.Name>
-        <BrandMark.Subtitle>Fjordby municipality</BrandMark.Subtitle>
-      </BrandMark>
-    </div>
+    <BrandMark>
+      <BrandMark.Logo src="" alt="" />
+      <BrandMark.Name>Ratio</BrandMark.Name>
+      <BrandMark.Subtitle>Design system</BrandMark.Subtitle>
+    </BrandMark>
   ),
   play: async ({ canvasElement }) => {
-    // The placeholder is decoration: the name beside it says who it is.
-    const placeholders = canvasElement.querySelectorAll('.ratio-brand-mark__placeholder');
-    await expect(placeholders).toHaveLength(2);
-    placeholders.forEach(p => expect(p).toHaveAttribute('aria-hidden', 'true'));
+    await expect(canvasElement.querySelector('.ratio-brand-mark__logo')).toBeNull();
+    await expect(canvasElement.querySelector('img')).toBeNull();
   },
 };
 
@@ -82,7 +81,9 @@ export const OnABand: Story = {
   render: () => (
     <div className="bg-(--primary) p-8 text-(--text-on-primary)">
       <BrandMark size="lg">
-        <BrandMark.Logo placeholder="Arms" shape="shield" />
+        <BrandMark.Logo>
+          <BandLogo />
+        </BrandMark.Logo>
         <BrandMark.Name>
           FJORDBY
           <br />

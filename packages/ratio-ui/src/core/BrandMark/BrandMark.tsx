@@ -24,19 +24,25 @@ export interface BrandMarkProps extends React.HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export interface BrandMarkLogoProps {
-  /** The logo image. Without `src` or `children`, a placeholder shows where it goes. */
-  src?: string;
-  /** Alt text for `src`. Empty when the name beside it already says who it is. */
-  alt?: string;
-  /** A logo of your own instead of `src`: an inline SVG, an `<Image>`, a picture. */
-  children?: ReactNode;
-  /** Text inside the placeholder, e.g. "Logo". Only shown without `src` and `children`. */
-  placeholder?: ReactNode;
-  /** Outline of the placeholder: a plain box, or a heraldic shield for a coat of arms. */
-  shape?: 'box' | 'shield';
-  className?: string;
-}
+/**
+ * The logo: an image by `src`, or a logo element of your own as children —
+ * one or the other, and never empty. There is no default logo.
+ */
+export type BrandMarkLogoProps = { className?: string } & (
+  | {
+      /** The logo image. */
+      src: string;
+      /** Alt text for the image; `""` when the name beside it already says who it is. */
+      alt: string;
+      children?: never;
+    }
+  | {
+      /** A logo of your own: an inline SVG, an `<Image>`, a picture. */
+      children: ReactNode;
+      src?: never;
+      alt?: never;
+    }
+);
 
 export interface BrandMarkTextProps {
   children?: ReactNode;
@@ -44,21 +50,15 @@ export interface BrandMarkTextProps {
 }
 
 /**
- * The logo slot. Takes an image by `src`, any logo element as children,
- * or neither — then a dashed placeholder stands in until the file exists.
+ * The logo slot: an image by `src`, or any logo element as children. Given
+ * neither — an empty `src` — it renders nothing rather than a broken image;
+ * there is no placeholder or default logo.
  */
-const BrandMarkLogo = ({ src, alt = '', children, placeholder, shape = 'box', className }: BrandMarkLogoProps) => (
-  <span className={cn('ratio-brand-mark__logo', className)}>
-    {children ??
-      (src ? (
-        <img src={src} alt={alt} />
-      ) : (
-        <span className="ratio-brand-mark__placeholder" data-shape={shape} aria-hidden="true">
-          {placeholder}
-        </span>
-      ))}
-  </span>
-);
+const BrandMarkLogo = ({ src, alt, children, className }: BrandMarkLogoProps) => {
+  const logo = children ?? (src?.trim() ? <img src={src} alt={alt ?? ''} /> : null);
+  if (logo === null || logo === undefined) return null;
+  return <span className={cn('ratio-brand-mark__logo', className)}>{logo}</span>;
+};
 BrandMarkLogo.displayName = 'BrandMark.Logo';
 
 /** The name: the organisation, product or site. Display face, bold. */
@@ -80,8 +80,8 @@ const BrandMarkTagline = ({ children, className }: BrandMarkTextProps) => (
 BrandMarkTagline.displayName = 'BrandMark.Tagline';
 
 /**
- * A brand mark composed of parts: a logo slot and the text beside it — a
- * name, a subtitle, a tagline, each optional. The text parts are grouped
+ * A brand mark composed of parts: a logo and the text beside it — a name, a
+ * subtitle, a tagline, each optional, the logo too. The text parts are grouped
  * in a column next to the logo (or under it, `layout="stacked"`). Colour is
  * inherited, so the mark works on a navbar, a card or a coloured band.
  *
@@ -90,7 +90,7 @@ BrandMarkTagline.displayName = 'BrandMark.Tagline';
  * @example
  * ```tsx
  * <BrandMark as="a" href="/">
- *   <BrandMark.Logo src="/logo.svg" />
+ *   <BrandMark.Logo src="/logo.svg" alt="" />
  *   <BrandMark.Name>Ratio</BrandMark.Name>
  *   <BrandMark.Subtitle>Design system</BrandMark.Subtitle>
  * </BrandMark>
