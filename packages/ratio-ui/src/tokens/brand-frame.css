@@ -9,10 +9,9 @@
  * colour round the page and round what should stand out, the way a poster
  * is framed. It is a choice, not a default: `data-brand-frame="on"` on
  * <html> frames the page (ratio-ui.css, on <body>) and every
- * `<Card brandFrame>` and `<Panel brandFrame>` (Card.css, Panel.css); on
- * another ancestor, only the cards and panels inside it. Off, those are an
- * ordinary card and panel, so the same markup serves a reader who turned
- * the frame off.
+ * `<Card brandFrame>` (Card.css); on another ancestor, only the cards
+ * inside it. Off, a card is an ordinary card, so the same markup serves a
+ * reader who turned the frame off.
  *
  * Override per theme or scope to reskin the frame without touching the
  * components.
@@ -23,12 +22,11 @@
   --brand-frame-page-color: var(--brand-frame-color);
   --brand-frame-page-width: 12px;
   --brand-frame-card-width: 8px;
-  --brand-frame-panel-width: 4px;
 }
 
 /* Dark: a wide band of brand colour round a dark page is a lot of colour,
-   so the page frame steps back into the surface. Cards and panels keep the
-   brand colour. Both dark arms, as for every shared token (see theme.css). */
+   so the page frame steps back into the surface. Cards keep the brand
+   colour. Both dark arms, as for every shared token (see theme.css). */
 :root[data-theme="dark"],
 :root[data-color-scheme="dark"] {
   --brand-frame-page-color: color-mix(in oklch, var(--brand-frame-color) 25%, var(--surface));

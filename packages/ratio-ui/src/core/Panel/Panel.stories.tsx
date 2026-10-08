@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import { useState } from 'react';
 import { Panel } from './Panel';
 import { Button } from '../Button';
-import { Switch } from '../../forms/Switch';
 import { DescriptionList } from '../DescriptionList';
 import { Stack } from '../../layout/Stack/Stack';
 import { AlertTriangle, Info, MapPin } from '../../icons';
@@ -338,43 +337,5 @@ export const DismissLabelPrecedence: Story = {
     await expect(canvas.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
     await expect(canvas.getByRole('button', { name: 'Skjul (gammel prop)' })).toBeInTheDocument();
     await expect(canvas.getByRole('button', { name: 'Skjul' })).toBeInTheDocument();
-  },
-};
-
-/**
- * `brandFrame`: a notice framed in the brand colour when the brand frame is
- * on (`data-brand-frame="on"` on `<html>` or, as here, a wrapper) — thinner
- * than a framed card. Off, it is an ordinary panel.
- */
-export const BrandFrame: Story = {
-  render: function Render() {
-    const [on, setOn] = useState(true);
-    return (
-      <Stack gap="sm">
-        <Switch isSelected={on} onChange={setOn}>
-          Brand frame
-        </Switch>
-        <div data-brand-frame={on ? 'on' : 'off'}>
-          <Panel brandFrame surface="card">
-            <Panel.Header>
-              <Panel.Title>Get notifications?</Panel.Title>
-              <Panel.Description>When someone writes to you.</Panel.Description>
-            </Panel.Header>
-            <Panel.Footer>
-              <Button size="sm" variant="primary">
-                Turn on
-              </Button>
-            </Panel.Footer>
-          </Panel>
-        </div>
-      </Stack>
-    );
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const panel = canvasElement.querySelector('.ratio-panel--brand-frame')!;
-    await expect(getComputedStyle(panel).borderTopWidth).toBe('4px');
-    await userEvent.click(canvas.getByRole('switch'));
-    await expect(getComputedStyle(panel).borderTopWidth).not.toBe('4px');
   },
 };

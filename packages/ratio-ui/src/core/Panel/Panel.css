@@ -28,13 +28,3 @@
     animation: none;
   }
 }
-
-/*
- * Brand frame (`brandFrame`) — drawn only when the frame is on
- * (tokens/brand-frame.css); the frame replaces the edge. Off, the panel
- * keeps its own.
- */
-[data-brand-frame='on'] .ratio-panel--brand-frame {
-  border: var(--brand-frame-panel-width) solid var(--brand-frame-color);
-  box-shadow: none;
-}

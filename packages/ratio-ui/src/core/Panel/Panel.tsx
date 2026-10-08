@@ -67,12 +67,6 @@ export interface PanelProps extends SpacingProps {
   labels?: PanelLabels;
   /** Replace the body with a skeleton and set `aria-busy`. */
   loading?: boolean;
-  /**
-   * Frame the panel in the brand colour (`--brand-frame-*` tokens) when the
-   * brand frame is on — `data-brand-frame="on"` on `<html>` or an ancestor.
-   * Off, it is an ordinary panel. For a notice that should stand out.
-   */
-  brandFrame?: boolean;
   /** Render the root as a link with a hover surface. Excludes `collapsible`. */
   href?: string;
   /** Rendered element when neither `href` nor `collapsible` applies. @default 'section' */
@@ -224,7 +218,6 @@ const PanelRoot: React.FC<PanelProps> = ({
   dismissLabel,
   labels,
   loading = false,
-  brandFrame = false,
   href,
   as,
   role,
@@ -296,7 +289,6 @@ const PanelRoot: React.FC<PanelProps> = ({
     ACCENT_CLASSES[resolvedAccent],
     href && 'block no-underline text-inherit transition-colors hover:bg-card-hover hover:border-border-2',
     dismissible && CHROME_TOKENS,
-    brandFrame && 'ratio-panel--brand-frame',
     buildSpacingClasses(spacingProps),
     className,
   );
