@@ -1,0 +1,96 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Brand mark — a logo next to (or above) a name, a subtitle and a tagline.
+ * Colour is inherited throughout, so the mark reads on a card, a navbar or
+ * a coloured footer band alike.
+ */
+.ratio-brand-mark {
+  --brand-mark-logo-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  color: inherit;
+}
+.ratio-brand-mark[data-size='lg'] {
+  --brand-mark-logo-height: 56px;
+}
+.ratio-brand-mark[data-layout='stacked'] {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.ratio-brand-mark__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* ── Logo ──────────────────────────────────────────────────────────────── */
+.ratio-brand-mark__logo {
+  display: flex;
+  flex: none;
+  height: var(--brand-mark-logo-height);
+}
+.ratio-brand-mark__logo > img,
+.ratio-brand-mark__logo > svg {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+
+/* No logo yet: a dashed outline of where it goes, labelled. */
+.ratio-brand-mark__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  aspect-ratio: 6 / 7;
+  border: 2px dashed currentColor;
+  border-radius: 3px;
+  font-family: var(--font-body);
+  font-size: calc(var(--brand-mark-logo-height) * 0.2);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+/* A heraldic shield: square shoulders, a rounded point. */
+.ratio-brand-mark__placeholder[data-shape='shield'] {
+  border-radius: 3px 3px 50% 50% / 3px 3px 42% 42%;
+}
+
+/* ── Text ──────────────────────────────────────────────────────────────── */
+.ratio-brand-mark__name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.ratio-brand-mark[data-size='lg'] .ratio-brand-mark__name {
+  font-size: 22px;
+  line-height: 1.05;
+}
+.ratio-brand-mark__subtitle {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.ratio-brand-mark__tagline {
+  margin-top: 2px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}

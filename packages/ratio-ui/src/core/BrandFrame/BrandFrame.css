@@ -1,0 +1,34 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Brand frame rules — consume the --brand-frame-* tokens (defaults in
+ * tokens/brand-frame.css, overridden per theme e.g. themes/bureau.css).
+ * Off by default; `data-brand-frame="on"` on an ancestor, or on the frame
+ * itself, draws the frame in the brand colour.
+ *
+ * Off, the page frame draws nothing, and a panel or notice keeps the
+ * theme's ordinary edge.
+ */
+.ratio-brand-frame {
+  border: var(--brand-frame-off-width) solid var(--brand-frame-off-color);
+  box-shadow: var(--brand-frame-off-shadow);
+}
+.ratio-brand-frame[data-variant='page'] {
+  border: 0 solid var(--brand-frame-page-color);
+  box-shadow: none;
+}
+
+:is([data-brand-frame='on'] .ratio-brand-frame, .ratio-brand-frame[data-brand-frame='on']) {
+  border: var(--brand-frame-panel-width) solid var(--brand-frame-color);
+  box-shadow: none;
+}
+:is([data-brand-frame='on'] .ratio-brand-frame, .ratio-brand-frame[data-brand-frame='on'])[data-variant='notice'] {
+  border-width: var(--brand-frame-notice-width);
+}
+:is([data-brand-frame='on'] .ratio-brand-frame, .ratio-brand-frame[data-brand-frame='on'])[data-variant='page'] {
+  border: var(--brand-frame-page-width) solid var(--brand-frame-page-color);
+}
