@@ -5,37 +5,30 @@
  */
 
 /*
- * Brand frame tokens — consumed by `core/BrandFrame` (the
- * `.ratio-brand-frame` rules in core/BrandFrame/BrandFrame.css).
- *
- * The brand frame is a thick border in the brand colour round the page and
- * round the panels that should stand out, the way a poster is framed. It is
- * a choice, not a default: set `data-brand-frame="on"` on <html> (or on any
- * ancestor) to draw it. Without it, a framed panel keeps the ordinary edge
- * below, so the same markup works with the frame on and off — a setting
- * the reader can flip.
+ * Brand frame tokens. The brand frame is a thick border in the brand
+ * colour round the page and round what should stand out, the way a poster
+ * is framed. It is a choice, not a default: `data-brand-frame="on"` on
+ * <html> frames the page (ratio-ui.css, on <body>) and every
+ * `<Card brandFrame>` and `<Panel brandFrame>` (Card.css, Panel.css); on
+ * another ancestor, only the cards and panels inside it. Off, those are an
+ * ordinary card and panel, so the same markup serves a reader who turned
+ * the frame off.
  *
  * Override per theme or scope to reskin the frame without touching the
- * component.
+ * components.
  */
 :root {
-  /* The frame, when on. */
   --brand-frame-color: var(--primary);
   /* The page frame is the largest surface of brand colour on the page. */
   --brand-frame-page-color: var(--brand-frame-color);
   --brand-frame-page-width: 12px;
-  --brand-frame-panel-width: 8px;
-  --brand-frame-notice-width: 4px;
-
-  /* The edge a framed panel keeps when the frame is off. */
-  --brand-frame-off-color: var(--border-1);
-  --brand-frame-off-width: 1px;
-  --brand-frame-off-shadow: none;
+  --brand-frame-card-width: 8px;
+  --brand-frame-panel-width: 4px;
 }
 
 /* Dark: a wide band of brand colour round a dark page is a lot of colour,
-   so the page frame steps back into the surface. Panels keep the brand
-   colour. Both dark arms, as for every shared token (see theme.css). */
+   so the page frame steps back into the surface. Cards and panels keep the
+   brand colour. Both dark arms, as for every shared token (see theme.css). */
 :root[data-theme="dark"],
 :root[data-color-scheme="dark"] {
   --brand-frame-page-color: color-mix(in oklch, var(--brand-frame-color) 25%, var(--surface));

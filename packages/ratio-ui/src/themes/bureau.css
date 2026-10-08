@@ -125,12 +125,6 @@
   --control-shadow: 1px 1px 0 color-mix(in srgb, var(--text) 62%, transparent);
   --control-shadow-strong: var(--shadow-hard);
 
-  /* Brand frame (core/BrandFrame) — off, a framed panel keeps Bureau's
-     own edge: the ink at 2px and the hard shadow. On, the teal frame. */
-  --brand-frame-off-color: var(--text);
-  --brand-frame-off-width: 2px;
-  --brand-frame-off-shadow: var(--shadow-hard);
-
   /* Tighter radii — every step Tailwind's `rounded-*` reads is set, so no
      component keeps a soft corner. Pills, dots, badges, avatars, switches
      and steppers square off too (`--radius-pill` and the chip / action-button

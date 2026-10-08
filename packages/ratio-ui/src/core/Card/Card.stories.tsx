@@ -1,8 +1,10 @@
 
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { Card } from './Card';
+import { Switch } from '../../forms/Switch';
 import { Image } from '../Image';
 import { Box } from '../../layout/Box';
 import { Heading } from '../Heading';
@@ -19,6 +21,7 @@ const meta: Meta<typeof Card> = {
     padding: { control: 'select', options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'] },
     gap: { control: 'select', options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'] },
     hoverEffect: { control: 'boolean' },
+    brandFrame: { control: 'boolean' },
     color: {
       control: 'select',
       options: [undefined, 'neutral', 'primary', 'secondary', 'accent', 'success', 'warning', 'error', 'info'],
@@ -311,5 +314,42 @@ export const CustomPaddingAndMargin: Story = {
         <p>Card with custom padding and margin.</p>
       </Box>
     ),
+  },
+};
+
+/**
+ * `brandFrame`: the card that should stand out gets a thick frame in the
+ * brand colour — when the brand frame is on, `data-brand-frame="on"` on
+ * `<html>` (which frames the page too) or, as here, on a wrapper. Off, it is
+ * an ordinary card, so the frame can be the reader's setting.
+ */
+export const BrandFrame: Story = {
+  render: function Render() {
+    const [on, setOn] = useState(true);
+    return (
+      <div className="flex flex-col gap-4">
+        <Switch isSelected={on} onChange={setOn}>
+          Brand frame
+        </Switch>
+        <div data-brand-frame={on ? 'on' : 'off'} className="grid gap-5 md:grid-cols-[2fr_1fr]">
+          <Card brandFrame>
+            <Heading as="h3">Good morning</Heading>
+            <p>The card that should stand out.</p>
+          </Card>
+          <Card>
+            <Heading as="h3">Seen today</Heading>
+            <p>An ordinary card.</p>
+          </Card>
+        </div>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const framed = canvas.getByText('The card that should stand out.').closest('.ratio-card')!;
+    const width = () => getComputedStyle(framed).borderTopWidth;
+    await expect(width()).toBe('8px');
+    await userEvent.click(canvas.getByRole('switch'));
+    await expect(width()).not.toBe('8px');
   },
 };

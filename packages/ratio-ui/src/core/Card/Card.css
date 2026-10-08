@@ -27,3 +27,13 @@
 .ratio-card.card-shadow-xs { box-shadow: var(--card-shadow-xs, 0 1px 2px 0 #0000000d); }
 .ratio-card.card-shadow-sm { box-shadow: var(--card-shadow-sm, 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a); }
 .ratio-card.card-shadow-md { box-shadow: var(--card-shadow-md, 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a); }
+
+/*
+ * Brand frame (`brandFrame`) — drawn only when the frame is on
+ * (tokens/brand-frame.css); the frame replaces the edge and the shadow.
+ * Off, the card keeps its own.
+ */
+[data-brand-frame='on'] .ratio-card.ratio-card--brand-frame {
+  border: var(--brand-frame-card-width) solid var(--brand-frame-color);
+  box-shadow: none;
+}

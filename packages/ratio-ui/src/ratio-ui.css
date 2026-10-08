@@ -43,6 +43,14 @@
     @apply grow;
   }
 
+  /* Brand frame round the page — opt-in with data-brand-frame="on" on
+     <html> (tokens/brand-frame.css). The body carries it, so it wraps
+     everything from the navbar to the footer. */
+  html[data-brand-frame="on"] body {
+    min-height: 100vh;
+    border: var(--brand-frame-page-width) solid var(--brand-frame-page-color);
+  }
+
   /* Anchor targets clear sticky chrome. Every element with an id is a
      potential `#id` scroll target; set `--scroll-margin-top` once on the
      page (the height of the sticky header, in `--spacing` units so it
