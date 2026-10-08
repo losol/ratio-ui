@@ -10,9 +10,18 @@
  * the previous Tailwind shadow-xs/sm/md exactly, so the standard theme
  * is unchanged. Override per theme to reskin card elevation (e.g. bureau
  * swaps these for its hard offset shadow).
+ *
+ * The featured card (`<Card featured>`) — the one that should stand out —
+ * takes its edge from the --card-featured-* tokens: a frame in the primary
+ * colour. Override per theme, or per page to let a reader turn the frame
+ * down.
  */
 :root {
   --card-shadow-xs: 0 1px 2px 0 #0000000d;
   --card-shadow-sm: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
   --card-shadow-md: 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a;
+
+  --card-featured-border-width: 2px;
+  --card-featured-border-color: var(--primary);
+  --card-featured-shadow: var(--card-shadow-xs);
 }

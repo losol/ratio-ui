@@ -119,6 +119,10 @@
   /* Interactive cards lift by growing the hard shadow, not by a glow. */
   --card-hover-shadow: var(--shadow-hard-lg);
   --card-hover-shadow-tile: var(--shadow-hard);
+  /* A featured card is framed like a poster: a thick primary border, no
+     shadow. */
+  --card-featured-border-width: 8px;
+  --card-featured-shadow: none;
 
   /* Inside controls: a 1px offset on the Switch knob, the full hard
      shadow on a filled, selected ToggleButton. */

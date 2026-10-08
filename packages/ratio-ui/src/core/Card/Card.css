@@ -29,11 +29,11 @@
 .ratio-card.card-shadow-md { box-shadow: var(--card-shadow-md, 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a); }
 
 /*
- * Brand frame (`brandFrame`) — drawn only when the frame is on
- * (tokens/brand-frame.css); the frame replaces the edge and the shadow.
- * Off, the card keeps its own.
+ * Featured (`featured`) — the card that should stand out. Its edge and
+ * shadow come from the --card-featured-* tokens (tokens/card.css). After
+ * the shadow tiers, so it replaces them.
  */
-[data-brand-frame='on'] .ratio-card.ratio-card--brand-frame {
-  border: var(--brand-frame-card-width) solid var(--brand-frame-color);
-  box-shadow: none;
+.ratio-card.ratio-card--featured {
+  border: var(--card-featured-border-width) solid var(--card-featured-border-color);
+  box-shadow: var(--card-featured-shadow);
 }

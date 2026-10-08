@@ -52,11 +52,11 @@ export interface CardProps extends SpacingProps, BorderProps {
    */
   hoverEffect?: boolean;
   /**
-   * Frame the card in the brand colour (`--brand-frame-*` tokens) when the
-   * brand frame is on — `data-brand-frame="on"` on `<html>` or an ancestor.
-   * Off, it is an ordinary card. For the card that should stand out.
+   * The card that should stand out on the page. Its edge comes from the
+   * `--card-featured-*` tokens: a frame in the primary colour, thick in
+   * Bureau. Use for one card in a view, not for every card.
    */
-  brandFrame?: boolean;
+  featured?: boolean;
   backgroundImageUrl?: string;
   testId?: string;
 }
@@ -75,7 +75,7 @@ export const Card: React.FC<CardProps> = ({
   transparent = false,
   shadow,
   hoverEffect = false,
-  brandFrame = false,
+  featured = false,
   gap = 'sm',
   color,
   accent,
@@ -140,7 +140,7 @@ export const Card: React.FC<CardProps> = ({
         borderClasses,
         SHADOW_CLASSES[effectiveShadow],
         accent && 'border-l-4',
-        brandFrame && 'ratio-card--brand-frame',
+        featured && 'ratio-card--featured',
         transitionClasses,
         hoverClasses,
         spacingClasses,
