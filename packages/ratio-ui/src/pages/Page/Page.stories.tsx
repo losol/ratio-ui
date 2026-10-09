@@ -12,11 +12,12 @@ import { Navbar } from '../../core/Navbar';
 import { Avatar } from '../../core/Avatar';
 import { Menu } from '../../core/Menu';
 import { SectionNav } from '../../core/SectionNav';
+import { AppShell } from '../../layout/AppShell';
 import { Container } from '../../layout/Container';
 import { Section } from '../../layout/Section/Section';
 
 const PageDemo: React.FC<{ title: string }> = ({ title }) => (
-  <div className="min-h-screen flex flex-col">
+  <AppShell>
     <Navbar sticky>
       <Navbar.Brand>
         <a href="#/" className="text-lg tracking-tight whitespace-nowrap no-underline">
@@ -30,7 +31,7 @@ const PageDemo: React.FC<{ title: string }> = ({ title }) => (
       </Navbar.Content>
     </Navbar>
 
-    <main className="flex-1">
+    <AppShell.Main>
       <Hero>
         <Hero.Main>
           <Hero.Eyebrow>Knowledge platform · Sentence case is the norm</Hero.Eyebrow>
@@ -122,7 +123,7 @@ const PageDemo: React.FC<{ title: string }> = ({ title }) => (
           <Button variant="primary" size="lg">View on GitHub</Button>
         </Container>
       </Section>
-    </main>
+    </AppShell.Main>
 
     <Footer.Classic siteTitle={title}>
       <List>
@@ -131,7 +132,7 @@ const PageDemo: React.FC<{ title: string }> = ({ title }) => (
         <List.Item className="mb-2"><a href="#/privacy">Privacy</a></List.Item>
       </List>
     </Footer.Classic>
-  </div>
+  </AppShell>
 );
 
 const meta = {
@@ -192,7 +193,7 @@ const programme = [
 ];
 
 const SignedInPageDemo: React.FC<{ title: string }> = ({ title }) => (
-  <div className="min-h-screen flex flex-col">
+  <AppShell>
     <Navbar glass aria-label="Site" className="flex h-14 items-center">
       <Navbar.Brand>
         <a href="#/" className="text-lg tracking-tight whitespace-nowrap no-underline">
@@ -228,7 +229,7 @@ const SignedInPageDemo: React.FC<{ title: string }> = ({ title }) => (
       items={programme.map(({ id, title: label }) => ({ id, title: label }))}
     />
 
-    <main className="flex-1" style={{ '--scroll-margin-top': 'calc(var(--spacing) * 12)' } as React.CSSProperties}>
+    <AppShell.Main style={{ '--scroll-margin-top': 'calc(var(--spacing) * 12)' } as React.CSSProperties}>
       <Container className="py-10">
         <Heading.Group>
           <Heading.Eyebrow>Autumn series</Heading.Eyebrow>
@@ -243,7 +244,7 @@ const SignedInPageDemo: React.FC<{ title: string }> = ({ title }) => (
           </section>
         ))}
       </Container>
-    </main>
+    </AppShell.Main>
 
     <Footer.Classic siteTitle={title}>
       <List>
@@ -251,7 +252,7 @@ const SignedInPageDemo: React.FC<{ title: string }> = ({ title }) => (
         <List.Item className="mb-2"><a href="#/programme">Programme</a></List.Item>
       </List>
     </Footer.Classic>
-  </div>
+  </AppShell>
 );
 
 /**

@@ -1,0 +1,28 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * App shell tokens — consumed by `layout/AppShell` (the
+ * `.ratio-app-shell` rules in layout/AppShell/AppShell.css).
+ *
+ * `<AppShell frame>` draws a frame in the primary colour round the whole
+ * page, the way a poster is framed. Override per theme, or per page — set
+ * the width to 0 to let a reader turn the frame off without changing the
+ * markup.
+ */
+:root {
+  --app-shell-frame-color: var(--primary);
+  /* Fluid: 6px on a phone, 12px from a 1000px wide window. */
+  --app-shell-frame-width: clamp(6px, 1.2vw, 12px);
+}
+
+/* Dark: a wide band of brand colour round a dark page is a lot of colour,
+   so the frame steps back into the surface. Both dark arms, as for every
+   shared token (see theme.css). */
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"] {
+  --app-shell-frame-color: color-mix(in oklch, var(--primary) 25%, var(--surface));
+}

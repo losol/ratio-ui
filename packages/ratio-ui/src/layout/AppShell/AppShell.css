@@ -1,0 +1,25 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * App shell — the column every page sits in: header, main, footer. At
+ * least the height of the window, the main content grows, so the footer
+ * stays at the bottom of a short page. With `frame`, the --app-shell-frame-*
+ * tokens draw a frame round it (tokens/app-shell.css).
+ */
+.ratio-app-shell {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.ratio-app-shell[data-frame] {
+  border: var(--app-shell-frame-width) solid var(--app-shell-frame-color);
+}
+.ratio-app-shell__main {
+  flex: 1 0 auto;
+}
