@@ -3,5 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { AppShell } from './AppShell';
-export type { AppShellLabels, AppShellMainProps, AppShellProps } from './AppShell';
-export type { AppShellHeaderProps } from './AppShellHeader';
+export type { AppShellHeaderProps, AppShellLabels, AppShellMainProps, AppShellProps } from './AppShell';

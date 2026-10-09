@@ -4,10 +4,9 @@
 
 import type { CSSProperties } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import { Footer } from '../../core/Footer';
 import { Navbar } from '../../core/Navbar';
-import { Sidebar } from '../Sidebar';
 import { AppShell } from './AppShell';
 
 const meta = {
@@ -94,43 +93,25 @@ export const SkipLinkLabelAndTarget: Story = {
 };
 
 /**
- * `AppShell.Header sticky`: the header stays at the top, measures itself
- * and publishes its height as `--app-shell-header-offset` and
- * `--scroll-margin-top` on the shell. Anchor jumps land below it, and a
- * `Sidebar` sticks under it with no `top` passed.
+ * `AppShell.Header sticky`: the header stays at the top while the page
+ * scrolls. Pin the header, not the `Navbar` inside it. Anchor targets and
+ * sticky rails below it take its height themselves (`--scroll-margin-top`,
+ * `top`), as without the shell.
  */
 export const StickyHeader: Story = {
   render: () => (
     <AppShell>
       <Header sticky />
-      <div className="flex">
-        <Sidebar aria-label="Sections" width={200}>
-          <nav className="flex flex-col gap-2 p-4">
-            <a href="#first">First</a>
-            <a href="#second">Second</a>
-          </nav>
-        </Sidebar>
-        <AppShell.Main className="p-8">
-          <h2 id="first" className="mt-0">
-            First
-          </h2>
-          <p style={{ minHeight: '120vh' }}>A long section.</p>
-          <h2 id="second">Second</h2>
-          <p style={{ minHeight: '120vh' }}>Another long section.</p>
-        </AppShell.Main>
-      </div>
+      <AppShell.Main className="p-8">
+        <p style={{ minHeight: '150vh' }}>A long page.</p>
+      </AppShell.Main>
       <Bottom />
     </AppShell>
   ),
   play: async ({ canvasElement }) => {
-    const shell = canvasElement.querySelector<HTMLElement>('.ratio-app-shell')!;
     const header = canvasElement.querySelector('header')!;
-    const height = header.getBoundingClientRect().height;
-    await waitFor(() => expect(parseFloat(shell.style.getPropertyValue('--app-shell-header-offset'))).toBeCloseTo(height, 1));
-    // Anchor targets clear it, and the sidebar sticks below it. Computed
-    // lengths come back rounded, so compare as numbers.
-    await expect(parseFloat(getComputedStyle(canvasElement.querySelector('#second')!).scrollMarginTop)).toBeCloseTo(height, 1);
-    await expect(parseFloat(getComputedStyle(canvasElement.querySelector('aside')!).top)).toBeCloseTo(height, 1);
+    await expect(getComputedStyle(header).position).toBe('sticky');
+    await expect(getComputedStyle(header).top).toBe('0px');
   },
 };
 

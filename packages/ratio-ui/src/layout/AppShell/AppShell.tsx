@@ -2,14 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-// No 'use client' here: the root and Main are server-safe, and the statics
-// are attached in this module, onto a plain function. `AppShell.Header` is
-// the client part, in its own module (see core/Navbar/index.tsx for why).
-
 import React, { ReactNode } from 'react';
 import { SkipLink } from '../../core/SkipLink';
 import { cn } from '../../utils/cn';
-import { AppShellHeader } from './AppShellHeader';
 import './AppShell.css';
 
 /** Built-in text of `AppShell`. Each entry falls back to English. */
@@ -40,6 +35,17 @@ export interface AppShellProps extends React.HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
+export interface AppShellHeaderProps extends React.HTMLAttributes<HTMLElement> {
+  children?: ReactNode;
+  /**
+   * Pin the header to the top of the window. Pin the header, not the
+   * `Navbar` inside it. Anchor targets and sticky rails below it still take
+   * its height themselves (`--scroll-margin-top`, `top`).
+   */
+  sticky?: boolean;
+  className?: string;
+}
+
 export interface AppShellMainProps extends React.HTMLAttributes<HTMLElement> {
   children?: ReactNode;
   /** Element to render. Defaults to `main`. */
@@ -48,6 +54,17 @@ export interface AppShellMainProps extends React.HTMLAttributes<HTMLElement> {
   id?: string;
   className?: string;
 }
+
+/**
+ * The page's header — a `<header>`, the banner landmark — round the
+ * `Navbar` and anything else at the top of every page.
+ */
+const AppShellHeader = ({ sticky = false, className, children, ...rest }: AppShellHeaderProps) => (
+  <header data-sticky={sticky || undefined} className={cn('ratio-app-shell__header', className)} {...rest}>
+    {children}
+  </header>
+);
+AppShellHeader.displayName = 'AppShell.Header';
 
 /**
  * The main content: grows to fill the shell, so the footer stays at the
@@ -66,11 +83,9 @@ AppShellMain.displayName = 'AppShell.Main';
  * of a short page. Put it inside `<body>` — the framework owns `<html>` and
  * `<body>`.
  *
- * What it wires so no page has to remember:
- * - the landmarks: `<header>` (banner), `<main>`, and the `Footer`'s `<footer>`;
- * - a `SkipLink` first, to `AppShell.Main`;
- * - with `AppShell.Header sticky`, the header's height for anchor jumps,
- *   `Sidebar` and `AsideLayout.Aside` (`--app-shell-header-offset`).
+ * What it wires so no page has to remember: the landmarks — `<header>`
+ * (banner), `<main>`, and the `Footer`'s `<footer>` — and a `SkipLink`
+ * first, to `AppShell.Main`.
  *
  * `frame` draws a frame in the primary colour round it all.
  *
