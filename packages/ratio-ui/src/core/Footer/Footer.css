@@ -10,6 +10,53 @@
  * scope, so blocks stay legible on the deep surface.
  */
 
+/* ── Surface ───────────────────────────────────────────────────────────── */
+/* A coloured footer (surface="primary|secondary|accent") is a local token
+   scope: the band's fill and ink from the --footer-*-bg/fg tokens, and the
+   text tones and borders re-derived from that ink, so every block inside
+   stays legible without per-block styling. Muted and subtle are mixed only
+   a little toward the fill: a brand fill leaves less contrast to spend. */
+.ratio-footer[data-surface='primary'] {
+  --footer-bg: var(--footer-primary-bg);
+  --footer-fg: var(--footer-primary-fg);
+}
+.ratio-footer[data-surface='secondary'] {
+  --footer-bg: var(--footer-secondary-bg);
+  --footer-fg: var(--footer-secondary-fg);
+}
+.ratio-footer[data-surface='accent'] {
+  --footer-bg: var(--footer-accent-bg);
+  --footer-fg: var(--footer-accent-fg);
+}
+.ratio-footer:is([data-surface='primary'], [data-surface='secondary'], [data-surface='accent']) {
+  background: var(--footer-bg);
+  color: var(--footer-fg);
+  --text: var(--footer-fg);
+  --text-muted: color-mix(in oklab, var(--footer-fg) 94%, var(--footer-bg));
+  --text-subtle: color-mix(in oklab, var(--footer-fg) 91%, var(--footer-bg));
+  --border-1: color-mix(in oklab, var(--footer-fg) 35%, var(--footer-bg));
+  --border-2: color-mix(in oklab, var(--footer-fg) 55%, var(--footer-bg));
+  --focus-ring: var(--footer-fg);
+}
+/* Links in the brand colour would vanish on a brand fill: ink instead. */
+.ratio-footer:is([data-surface='primary'], [data-surface='secondary'], [data-surface='accent']) .ratio-footer__publisher a {
+  color: var(--text);
+  border-bottom-color: color-mix(in oklab, var(--text) 40%, transparent);
+}
+.ratio-footer:is([data-surface='primary'], [data-surface='secondary'], [data-surface='accent']) .ratio-footer__social-item:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+/* A tag is a solid stamp on a band; on the accent band, the band's ink. */
+.ratio-footer:is([data-surface='primary'], [data-surface='secondary']) .ratio-footer__tag {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+.ratio-footer[data-surface='accent'] .ratio-footer__tag {
+  background: var(--footer-fg);
+  color: var(--footer-bg);
+}
+
 /* ── Brand ─────────────────────────────────────────────────────────────── */
 .ratio-footer__brand-row {
   display: flex;

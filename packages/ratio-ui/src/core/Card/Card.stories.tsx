@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { Card } from './Card';
 import { Image } from '../Image';
 import { Box } from '../../layout/Box';
@@ -19,6 +20,7 @@ const meta: Meta<typeof Card> = {
     padding: { control: 'select', options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'] },
     gap: { control: 'select', options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'] },
     hoverEffect: { control: 'boolean' },
+    featured: { control: 'boolean' },
     color: {
       control: 'select',
       options: [undefined, 'neutral', 'primary', 'secondary', 'accent', 'success', 'warning', 'error', 'info'],
@@ -311,5 +313,32 @@ export const CustomPaddingAndMargin: Story = {
         <p>Card with custom padding and margin.</p>
       </Box>
     ),
+  },
+};
+
+/**
+ * `featured`: the card that should stand out. Its edge comes from the
+ * `--card-featured-*` tokens — a 2px primary frame in the standard theme, a
+ * thick poster frame in Bureau. An app can turn the frame down for a reader
+ * by overriding the tokens on the page.
+ */
+export const Featured: Story = {
+  render: () => (
+    <div className="grid gap-5 md:grid-cols-[2fr_1fr]">
+      <Card featured>
+        <Heading as="h3">Good morning</Heading>
+        <p>The card that should stand out.</p>
+      </Card>
+      <Card>
+        <Heading as="h3">Seen today</Heading>
+        <p>An ordinary card.</p>
+      </Card>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const featured = canvas.getByText('The card that should stand out.').closest('.ratio-card')!;
+    const token = getComputedStyle(featured).getPropertyValue('--card-featured-border-width').trim();
+    await expect(getComputedStyle(featured).borderTopWidth).toBe(token);
   },
 };

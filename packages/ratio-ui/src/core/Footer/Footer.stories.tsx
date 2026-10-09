@@ -1,7 +1,7 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { AtSign, MessageCircle, Rss } from 'lucide-react';
 
-import { Footer, Publisher } from './Footer';
+import { Footer, Publisher, type FooterSurface } from './Footer';
 import { Button } from '../Button';
 
 const meta: Meta<typeof Footer> = {
@@ -149,11 +149,11 @@ export const Editorial: FooterStory = () => (
 );
 
 /**
- * The same layout with `dark` — a deep surface, and a local dark token scope so
+ * The same layout with `surface="dark"` — a deep surface, and a local dark token scope so
  * every block stays legible without any per-block dark styling.
  */
 export const EditorialDark: FooterStory = () => (
-  <Footer dark>
+  <Footer surface="dark">
     <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr 1.2fr', gap: 40 }}>
       <Footer.Brand
         logo={<Logo />}
@@ -187,6 +187,37 @@ export const EditorialDark: FooterStory = () => (
       <a href="#">Accessibility</a>
     </Footer.BottomBar>
   </Footer>
+);
+
+const SURFACES: FooterSurface[] = ['default', 'transparent', 'primary', 'secondary', 'accent', 'dark'];
+
+/**
+ * `surface` picks the fill. On `primary`, `secondary` and `accent` the
+ * footer is a band in that colour: text, muted and subtle tones and the
+ * borders are re-derived from the band's ink, links take the ink, and a tag
+ * becomes a solid stamp. In dark mode the primary and accent bands step back
+ * into the surface — flip the theme to see it. `dark` is a deep block
+ * whatever the page theme.
+ */
+export const Surfaces: FooterStory = () => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    {SURFACES.map(surface => (
+      <Footer key={surface} surface={surface}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 40 }}>
+          <Footer.Brand name={`surface="${surface}"`} mission="A place for careful reading." />
+          <Footer.LinkColumn title="Services">
+            <Footer.Link href="#">My page</Footer.Link>
+            <Footer.Link tag="Soon">Cases and applications</Footer.Link>
+          </Footer.LinkColumn>
+          <Footer.Publisher publisher={samplePublisher} />
+        </div>
+        <Footer.BottomBar copyright="© 2026 Meridian">
+          <a href="#">Privacy</a>
+          <a href="#">English</a>
+        </Footer.BottomBar>
+      </Footer>
+    ))}
+  </div>
 );
 
 /**

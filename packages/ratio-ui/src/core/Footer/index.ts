@@ -6,6 +6,7 @@ export { Footer } from './Footer';
 export type {
   Publisher,
   FooterProps,
+  FooterSurface,
   FooterClassicProps,
   FooterBrandProps,
   FooterLinkColumnProps,

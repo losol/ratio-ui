@@ -5,7 +5,8 @@
  */
 
 /*
- * bureau theme — "moderne retro" / retro-bureaucratic palette.
+ * bureau theme — "moderne retro" / retro-bureaucratic palette: paper,
+ * teal and ink, hard offset shadows, one grotesk (Fira Sans).
  *
  * Plugs into the existing data-theme mechanism: [data-theme="bureau"]
  * overrides the semantic var() tokens globally, so existing components
@@ -32,26 +33,27 @@
 :root[data-theme="bureau"] .surface-light {
   color-scheme: light;
 
-  /* Primary scale — navy to blue, light to dark. Chrome that reaches for a
-     step directly (`bg-primary-900` pills, the Strip date block, steppers,
-     toggles, chat rows) would otherwise show the standard theme's teal
-     inside a bureau page. The steps are absolute, so this one ramp serves
-     both modes: 800 is the light arm's navy primary, 400 sits next to the
-     dark arm's blue. Hue 262–270, the span between those two. */
-  --color-primary-50: oklch(0.975 0.008 268);
-  --color-primary-100: oklch(0.945 0.022 268);
-  --color-primary-200: oklch(0.89 0.045 269);
-  --color-primary-300: oklch(0.81 0.085 270);
-  --color-primary-400: oklch(0.7 0.15 270);
-  --color-primary-500: oklch(0.6 0.16 270);
-  --color-primary-600: oklch(0.5 0.13 267);
-  --color-primary-700: oklch(0.4 0.09 264);
-  --color-primary-800: oklch(0.31 0.057 262);
-  --color-primary-900: oklch(0.245 0.045 262);
-  --color-primary-950: oklch(0.18 0.032 262);
+  /* Primary scale — teal, light to dark. Chrome that reaches for a step
+     directly (`bg-primary-900` pills, the Strip date block, steppers,
+     toggles, chat rows) would otherwise show the standard theme's
+     Linseed inside a bureau page. The steps are absolute, so this one
+     ramp serves both modes: 700 is the light arm's primary, 400 sits
+     next to the dark arm's muted teal. Hue 207–218, the span between. */
+  --color-primary-50: oklch(0.975 0.01 210);
+  --color-primary-100: oklch(0.945 0.024 210);
+  --color-primary-200: oklch(0.89 0.045 211);
+  --color-primary-300: oklch(0.81 0.068 210);
+  --color-primary-400: oklch(0.7 0.085 208);
+  --color-primary-500: oklch(0.62 0.095 212);
+  --color-primary-600: oklch(0.55 0.097 215);
+  --color-primary-700: oklch(0.483 0.086 216);
+  --color-primary-800: oklch(0.4 0.07 217);
+  --color-primary-900: oklch(0.32 0.055 218);
+  --color-primary-950: oklch(0.24 0.04 218);
 
-  /* Brand */
-  --primary: #20304d;            /* navy */
+  /* Brand — teal, dark enough to carry link text at AA on the paper
+     (4.7:1) and on cards (6.2:1); the brighter #007f95 is step 600. */
+  --primary: #006a7d;            /* teal */
   --secondary: #d9d2bf;          /* derived: muted paper, a step down from surface */
   --accent: #f0b429;             /* ochre */
 
@@ -76,9 +78,9 @@
 
   /* Borders */
   --border-1: #ddd6c5;
-  --border-2: #20304d;           /* navy hairline-strong */
+  --border-2: #20242c;           /* the ink: the strong edge Bureau draws round panels */
 
-  --focus-ring: #20304d;         /* solid navy: a crisp ring, not a haze */
+  --focus-ring: #006a7d;         /* solid teal: a crisp ring, not a haze */
 
   /* Hard offset shadow — no blur. The bureau signature, reusable by any
      component (e.g. the future window-frame). Uses the ink color
@@ -117,6 +119,10 @@
   /* Interactive cards lift by growing the hard shadow, not by a glow. */
   --card-hover-shadow: var(--shadow-hard-lg);
   --card-hover-shadow-tile: var(--shadow-hard);
+  /* A featured card is framed like a poster: a thick primary border, no
+     shadow. */
+  --card-featured-border-width: 8px;
+  --card-featured-shadow: none;
 
   /* Inside controls: a 1px offset on the Switch knob, the full hard
      shadow on a filled, selected ToggleButton. */
@@ -141,13 +147,14 @@
   --action-button-radius: 3px;
 
   /* Fonts — family tokens only; consumer embeds the files
-     (opt in with themes/bureau-fonts.css). */
-  --font-display: "Pixelify Sans", ui-sans-serif, system-ui, sans-serif;
+     (opt in with themes/bureau-fonts.css). One grotesk for display and
+     body: Fira Sans (SIL OFL), with its weight carrying the hierarchy. */
+  --font-display: "Fira Sans", ui-sans-serif, system-ui, sans-serif;
   /* Components set their display text with `font-serif`; in bureau that
-     role is the pixel face, not a serif. */
-  --font-serif: "Pixelify Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;  /* derived: body == sans */
+     role is the grotesk, not a serif. */
+  --font-serif: "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Fira Sans", ui-sans-serif, system-ui, sans-serif;  /* derived: body == sans */
   --font-mono: "Space Mono", ui-monospace, monospace;
 
   /* Status — error is the only spec'd family (brick = haster/avvik).
@@ -201,7 +208,8 @@
   color-scheme: dark;
 
   /* Brand */
-  --primary: #6c8bff;            /* blue */
+  /* Muted teal: a dark page carries less colour, so the brand steps back. */
+  --primary: #4fa3ae;            /* teal */
   --secondary: #20231b;          /* derived: card-toned secondary */
   --accent: #ffc23d;             /* gold */
 
@@ -212,7 +220,7 @@
   --text-light: #f0e7d2;         /* derived */
   --text-dark: #14140f;          /* derived */
 
-  --text-on-primary: #14140f;    /* derived: ink on light blue */
+  --text-on-primary: #14140f;    /* derived: ink on teal (6.3:1) */
   --text-on-secondary: #f0e7d2;  /* derived */
   --text-on-accent: #14140f;     /* derived: ink on gold */
 
@@ -226,7 +234,7 @@
   --border-1: #2c2c22;           /* derived: subtle hairline */
   --border-2: #565341;           /* derived: visible step */
 
-  --focus-ring: #6c8bff;         /* solid primary blue */
+  --focus-ring: #4fa3ae;         /* solid primary teal */
 
   /* Overlays flip to light ink on the dark field. */
   --overlay-ink: 240 231 210;

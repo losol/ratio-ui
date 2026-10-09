@@ -9,20 +9,20 @@ import { defineTheme, mix, type Scale } from '../theme';
 // block. A reference, so in dark mode it re-resolves to the cream ink.
 const ink = mix('text', 0.62);
 
-// Navy to blue, light to dark. Absolute steps serving both modes: 800 is
-// the light arm's navy, 400 sits next to the dark arm's blue.
+// Teal, light to dark. Absolute steps serving both modes: 700 is the
+// light arm's primary, 400 sits next to the dark arm's muted teal.
 const primary: Scale = {
-  50: 'oklch(0.975 0.008 268)',
-  100: 'oklch(0.945 0.022 268)',
-  200: 'oklch(0.89 0.045 269)',
-  300: 'oklch(0.81 0.085 270)',
-  400: 'oklch(0.7 0.15 270)',
-  500: 'oklch(0.6 0.16 270)',
-  600: 'oklch(0.5 0.13 267)',
-  700: 'oklch(0.4 0.09 264)',
-  800: 'oklch(0.31 0.057 262)',
-  900: 'oklch(0.245 0.045 262)',
-  950: 'oklch(0.18 0.032 262)',
+  50: 'oklch(0.975 0.01 210)',
+  100: 'oklch(0.945 0.024 210)',
+  200: 'oklch(0.89 0.045 211)',
+  300: 'oklch(0.81 0.068 210)',
+  400: 'oklch(0.7 0.085 208)',
+  500: 'oklch(0.62 0.095 212)',
+  600: 'oklch(0.55 0.097 215)',
+  700: 'oklch(0.483 0.086 216)',
+  800: 'oklch(0.4 0.07 217)',
+  900: 'oklch(0.32 0.055 218)',
+  950: 'oklch(0.24 0.04 218)',
 };
 
 // The standard theme's amber, which the CSS cascades into Bureau.
@@ -48,7 +48,7 @@ const neutral700 = 'oklch(0.3715 0 263.3)';
 const neutral900 = 'oklch(0.2046 0 263.3)';
 
 /**
- * Bureau — "moderne retro", paper and navy. Values as in
+ * Bureau — "moderne retro", paper, teal and ink. Values as in
  * `ratio-ui/src/themes/bureau.css`, which stays the web's source until the
  * generator lands; `bureau.test.ts` holds the two to each other.
  * Semantic tokens, the chat's colours, the primary and accent scales, and
@@ -59,7 +59,8 @@ export const bureau = defineTheme({
   name: 'bureau',
 
   light: {
-    primary: '#20304d', // navy
+    // Dark enough to carry link text at AA on the paper and on cards.
+    primary: '#006a7d', // teal
     secondary: '#d9d2bf', // muted paper, a step down from surface
     accent: '#f0b429', // ochre
 
@@ -77,9 +78,9 @@ export const bureau = defineTheme({
     cardHover: '#fbf6ea',
 
     border1: '#ddd6c5',
-    border2: '#20304d', // navy hairline-strong
+    border2: '#20242c', // the ink: the strong edge round panels
 
-    focusRing: '#20304d', // solid navy: a crisp ring, not a haze
+    focusRing: '#006a7d', // solid teal: a crisp ring, not a haze
 
     // 2px matches the press-down distance, so a pressed button covers it.
     shadowHard: { x: 2, y: 2, blur: 0, color: ink },
@@ -135,7 +136,8 @@ export const bureau = defineTheme({
   },
 
   dark: {
-    primary: '#6c8bff', // blue
+    // Muted: a dark page carries less colour.
+    primary: '#4fa3ae', // teal
     secondary: '#20231b',
     accent: '#ffc23d', // gold
 
@@ -154,7 +156,7 @@ export const bureau = defineTheme({
     border1: '#2c2c22',
     border2: '#565341',
 
-    focusRing: '#6c8bff',
+    focusRing: '#4fa3ae',
 
     // Coral.
     errorSolid: '#ff6e52',
@@ -197,7 +199,7 @@ export const bureau = defineTheme({
   radius: { xs: 2, sm: 2, md: 3, lg: 4, xl: 4, pill: 3, overlay: 4 },
 
   // Families only; the web embeds woff2, native loads TTF.
-  font: { display: 'Pixelify Sans', body: 'Archivo', mono: 'Space Mono' },
+  font: { display: 'Fira Sans', body: 'Fira Sans', mono: 'Space Mono' },
 
   scale: { primary, accent },
 

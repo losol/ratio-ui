@@ -4,7 +4,7 @@ Status: **in progress (PR #6).** Round-1 tokens shipped: `bureau.css` (light + d
 
 ## Summary
 
-`bureau` is the first named theme for ratio-ui: a "moderne retro" / retro-bureaucratic look — paper, rubber stamps, navy/ochre/brick, Win95/DOS heritage, hard offset shadows. It plugs into the existing `data-theme` mechanism so existing components adopt it automatically through semantic-token overrides.
+`bureau` is the first named theme for ratio-ui: a "moderne retro" / retro-bureaucratic look — paper, rubber stamps, teal/ochre/brick (navy until 2026-10), Win95/DOS heritage, hard offset shadows. It plugs into the existing `data-theme` mechanism so existing components adopt it automatically through semantic-token overrides.
 
 Derived from the K4 iteration of a Claude Design handoff bundle ("Ratio UI Design System" project). **Look only — no tenant content** ships in the theme.
 
@@ -14,7 +14,7 @@ Derived from the K4 iteration of a Claude Design handoff bundle ("Ratio UI Desig
 - **Plug in via `data-theme`.** `[data-theme="bureau"]` overrides the semantic `var()` tokens globally — same pattern as `[data-theme="dark"]` — so existing Button/Badge/Card adopt it with no component changes.
 - **Ships a dark variant**, based on K4's `.neo--dark` palettes.
 - **CRT is a tilvalg, not a theme.** Keep the green-phosphor palette in `tokens/retro.css` (`--retro-*` + `.retro-scanlines`, consumed by Console), but reframe it as an opt-in surface class on a container — decoupled from being "the theme".
-- **Fonts as tokens only.** The theme defines font-family stacks (Pixelify Sans / Space Mono / Archivo) as CSS vars; the consumer embeds the font files. Ship an optional `@font-face` snippet, do not load fonts from the bundle.
+- **Fonts as tokens only.** The theme defines font-family stacks (Fira Sans for display and body, Space Mono for mono — Pixelify Sans and Archivo until 2026-10) as CSS vars; the consumer embeds the font files. Ship an optional `@font-face` snippet, do not load fonts from the bundle.
 - **Round-1 scope = tokens + core chrome only**: palette, fonts, shadow/stamp utilities, window frame + button + status pill. NOT table/timeline/metadata-grid (round 2). NOT demo toys (IRC client, game, oppslagstavle) — never as library components.
 - **No tenant/KAOS/Losvik content** anywhere in the theme.
 
@@ -66,22 +66,22 @@ Verified 2026-06-18 in `packages/ratio-ui/src/tokens/`:
 
 | Semantic token | Value | Notes |
 | --- | --- | --- |
-| `--primary` | navy `#20304d` | |
+| `--primary` | teal `#006a7d` | navy `#20304d` until 2026-10; dark `#4fa3ae` |
 | `--text-on-primary` | `#f4efe2` | |
 | `--accent` | ochre `#f0b429` | |
 | `--surface` (page) | paper `#e6e0d1` | |
 | `--card` | `#fffdf7` | |
 | `--card-hover` | slightly warmer | |
 | `--border-1` | `#ddd6c5` | |
-| `--border-2` | navy `#20304d` | |
+| `--border-2` | ink `#20242c` | navy until 2026-10 |
 | `--text` | `#20242c` | |
 | `--text-muted` | `#837c6a` | |
 | `--text-subtle` | `#a79d80` | |
 | `--error-*` family | brick `#b53026` | haster/avvik |
-| `--focus-ring` | navy @ ~45% alpha | |
+| `--focus-ring` | solid primary teal | |
 | `--radius-sm/–/lg` | ~2px / 3px / 4px | no `rounded-full` |
-| `--font-display` | "Pixelify Sans" | |
-| `--font-body` | "Archivo" | |
+| `--font-display` | "Fira Sans" | "Pixelify Sans" until 2026-10 |
+| `--font-body` | "Fira Sans" | "Archivo" until 2026-10 |
 | `--font-mono` | "Space Mono" | |
 | NEW `--shadow-hard` | `Npx Npx 0 var(--primary)` | offset, no blur; `:active` = translate + shadow gone |
 

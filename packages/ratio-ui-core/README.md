@@ -24,10 +24,10 @@ A theme is authored once, with references where the CSS has them:
 ```ts
 import { bureau } from '@eventuras/ratio-ui-core/themes/bureau';
 
-bureau.light.primary;          // '#20304d'
+bureau.light.primary;          // '#006a7d'
 bureau.light.shadowHard;       // { x: 2, y: 2, blur: 0, color: { ref: 'text', alpha: 0.62, … } }
 bureau.radius.md;              // 3
-bureau.font.display;           // 'Pixelify Sans'
+bureau.font.display;           // 'Fira Sans'
 ```
 
 A renderer without a CSS engine takes the resolved view — sRGB strings,
@@ -37,9 +37,9 @@ references followed inside their own mode, shadows in parts:
 import { resolveTheme } from '@eventuras/ratio-ui-core';
 
 const theme = resolveTheme(bureau);
-theme.light.shadowHard.color;  // 'rgba(32, 36, 44, 0.62)'   — the navy ink
+theme.light.shadowHard.color;  // 'rgba(32, 36, 44, 0.62)'   — the dark ink
 theme.dark.shadowHard.color;   // 'rgba(240, 231, 210, 0.62)' — the cream ink
-theme.scale.primary[800];      // '#20304d' — step 800 is the light arm's navy
+theme.scale.primary[700];      // '#006a7d' — step 700 is the light arm's teal
 theme.space.m;                 // 21 — points
 theme.components.button.shadow; // 'shadowHard' — read it from the mode you draw in
 ```

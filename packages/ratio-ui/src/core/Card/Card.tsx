@@ -51,6 +51,12 @@ export interface CardProps extends SpacingProps, BorderProps {
    * surfaces (links, calls-to-action).
    */
   hoverEffect?: boolean;
+  /**
+   * The card that should stand out on the page. Its edge comes from the
+   * `--card-featured-*` tokens: a frame in the primary colour, thick in
+   * Bureau. Use for one card in a view, not for every card.
+   */
+  featured?: boolean;
   backgroundImageUrl?: string;
   testId?: string;
 }
@@ -69,6 +75,7 @@ export const Card: React.FC<CardProps> = ({
   transparent = false,
   shadow,
   hoverEffect = false,
+  featured = false,
   gap = 'sm',
   color,
   accent,
@@ -133,6 +140,7 @@ export const Card: React.FC<CardProps> = ({
         borderClasses,
         SHADOW_CLASSES[effectiveShadow],
         accent && 'border-l-4',
+        featured && 'ratio-card--featured',
         transitionClasses,
         hoverClasses,
         spacingClasses,

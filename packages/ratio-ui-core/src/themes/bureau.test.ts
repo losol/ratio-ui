@@ -137,9 +137,9 @@ describe('bureau resolves for a renderer without CSS', () => {
     for (const value of Object.values(resolved.scale.primary)) expect(value).toMatch(/^#[0-9a-f]{6}$/);
   });
 
-  // The CSS comment's claim, held: the scale's steps are absolute and 800 is
+  // The CSS comment's claim, held: the scale's steps are absolute and 700 is
   // the light arm's primary.
-  it('lands step 800 on the navy', () => {
-    expect(resolved.scale.primary[800]).toBe(resolved.light.primary);
+  it('lands step 700 on the teal', () => {
+    expect(resolved.scale.primary[700]).toBe(resolved.light.primary);
   });
 });

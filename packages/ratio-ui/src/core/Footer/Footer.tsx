@@ -18,15 +18,31 @@ export interface Publisher {
   organizationNumber?: string;
 }
 
+/**
+ * The footer's fill.
+ * - `default`: a faint press on the page surface.
+ * - `transparent`: no fill; the page shows through.
+ * - `primary` / `secondary` / `accent`: a band in that brand colour, its text
+ *   in the matching on-colour (`--footer-*-bg` / `--footer-*-fg`). In dark
+ *   mode the primary and accent bands step back into the surface.
+ * - `dark`: a deep `--color-primary-950` block in a `surface-dark` scope,
+ *   dark whatever the page theme.
+ */
+export type FooterSurface = 'default' | 'transparent' | 'primary' | 'secondary' | 'accent' | 'dark';
+
 export interface FooterProps {
   children?: React.ReactNode;
   className?: string;
   /**
-   * Render the footer as a dark surface — a deep `--color-primary-950`
-   * background inside a `surface-dark` scope, so every block's semantic
-   * tokens (`--text`, `--text-muted`, `--text-subtle`, `--border-*`) resolve
-   * to the dark theme's values. Use to anchor the bottom of the page with a
-   * deep block regardless of the page theme.
+   * The footer's fill — see `FooterSurface`. On a coloured surface the
+   * blocks' semantic tokens (`--text`, `--text-muted`, `--text-subtle`,
+   * `--border-*`) are re-derived from the band's ink, so every block stays
+   * legible. Defaults to `default`.
+   */
+  surface?: FooterSurface;
+  /**
+   * @deprecated Use `surface="dark"`. Kept as an alias; `surface` wins when
+   * both are set.
    */
   dark?: boolean;
 }
@@ -248,19 +264,25 @@ const FooterBottomBar: React.FC<FooterBottomBarProps> = ({
  * `Footer.LinkColumn` (with `Footer.Link`), `Footer.Publisher`,
  * `Footer.Newsletter`, `Footer.Social` (with `Footer.Social.Item`) and
  * `Footer.BottomBar` — or use `Footer.Classic` for the legacy fixed layout.
- * Everything is token-driven; set `dark` to anchor the page with a deep block.
+ * Everything is token-driven; `surface` picks the fill — a band in a brand
+ * colour, a deep dark block, or none.
  */
-const FooterRoot: React.FC<FooterProps> = ({ children, className, dark }) => (
-  <footer
-    className={cn(
-      'p-3 pt-10',
-      dark ? 'surface-dark bg-primary-950' : 'bg-overlay-press',
-      className,
-    )}
-  >
-    <Container>{children}</Container>
-  </footer>
-);
+const FooterRoot: React.FC<FooterProps> = ({ children, className, surface, dark }) => {
+  const fill = surface ?? (dark ? 'dark' : 'default');
+  return (
+    <footer
+      data-surface={fill}
+      className={cn(
+        'ratio-footer p-3 pt-10',
+        fill === 'default' && 'bg-overlay-press',
+        fill === 'dark' && 'surface-dark bg-primary-950',
+        className,
+      )}
+    >
+      <Container>{children}</Container>
+    </footer>
+  );
+};
 
 /**
  * Pre-2.0 Footer layout — siteTitle and an optional publisher block on the
@@ -279,10 +301,11 @@ const FooterClassic: React.FC<FooterClassicProps> = ({
   publisher,
   children,
   className,
+  surface,
   dark,
   labels,
 }) => (
-  <FooterRoot className={className} dark={dark}>
+  <FooterRoot className={className} surface={surface} dark={dark}>
     <div className="md:flex md:justify-between">
       {siteTitle && (
         <div className="mb-6 md:mb-0">

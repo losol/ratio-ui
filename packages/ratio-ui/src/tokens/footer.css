@@ -1,0 +1,32 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Footer surface tokens — the fill and the ink of the coloured footers
+ * (`<Footer surface="primary|secondary|accent">`, rules in
+ * core/Footer/Footer.css). Override per theme or scope to reskin a band
+ * without touching the component.
+ */
+:root {
+  --footer-primary-bg: var(--primary);
+  --footer-primary-fg: var(--text-on-primary);
+  --footer-secondary-bg: var(--secondary);
+  --footer-secondary-fg: var(--text-on-secondary);
+  --footer-accent-bg: var(--accent);
+  --footer-accent-fg: var(--text-on-accent);
+}
+
+/* Dark: a full-width band of brand colour is a lot of colour on a dark
+   page, so the primary and accent bands step back into the surface, tinted,
+   with the page's own ink. The secondary is already quiet in dark. Both dark
+   arms, as for every shared token (see theme.css). */
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"] {
+  --footer-primary-bg: color-mix(in oklch, var(--primary) 22%, var(--surface));
+  --footer-primary-fg: var(--text);
+  --footer-accent-bg: color-mix(in oklch, var(--accent) 18%, var(--surface));
+  --footer-accent-fg: var(--text);
+}
