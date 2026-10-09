@@ -23,8 +23,10 @@ export interface SidebarProps {
    * height — one value drives both `top` and `height`. Px, or any CSS
    * length (`"calc(var(--spacing) * 16)"` for a rem-sized topbar on the
    * fluid root font size). Unrelated to `Sidebar.Header`, which lives
-   * inside the sidebar. Leave at 0 for a full-height sidebar with the logo
-   * in `Sidebar.Header`. @default 0
+   * inside the sidebar. Defaults to the height of a sticky
+   * `AppShell.Header` (`--app-shell-header-offset`), and to 0 outside one —
+   * a full-height sidebar with the logo in `Sidebar.Header`.
+   * @default 'var(--app-shell-header-offset, 0px)'
    */
   top?: number | string;
   /** Accessible label for the aside landmark. */
@@ -71,7 +73,7 @@ const SidebarRoot: React.FC<SidebarProps> = ({
   width = 236,
   collapsed = false,
   collapsedWidth = 64,
-  top = 0,
+  top = 'var(--app-shell-header-offset, 0px)',
   'aria-label': ariaLabel,
   className,
   style,

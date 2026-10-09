@@ -32,8 +32,9 @@ export interface AsideLayoutAsideProps {
    * Sticky offset for chrome above the layout (an app header): px, or any
    * CSS length — `"calc(var(--spacing) * 16)"` tracks a rem-sized header
    * exactly on the fluid root font size, where a px constant is off by a
-   * few px at some viewport widths. Same convention as `Sidebar`'s `top`.
-   * @default 0
+   * few px at some viewport widths. Same convention as `Sidebar`'s `top`:
+   * defaults to the height of a sticky `AppShell.Header`, and to 0 outside one.
+   * @default 'var(--app-shell-header-offset, 0px)'
    */
   top?: number | string;
   /** Accessible label for the aside landmark. */
@@ -69,7 +70,7 @@ AsideLayoutMain.displayName = 'AsideLayout.Main';
 const AsideLayoutAside: React.FC<AsideLayoutAsideProps> = ({
   children,
   width = 'md',
-  top = 0,
+  top = 'var(--app-shell-header-offset, 0px)',
   'aria-label': ariaLabel,
   className,
 }) => (

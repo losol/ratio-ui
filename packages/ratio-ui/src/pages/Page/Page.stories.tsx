@@ -18,18 +18,20 @@ import { Section } from '../../layout/Section/Section';
 
 const PageDemo: React.FC<{ title: string }> = ({ title }) => (
   <AppShell>
-    <Navbar sticky>
-      <Navbar.Brand>
-        <a href="#/" className="text-lg tracking-tight whitespace-nowrap no-underline">
-          {title}
-        </a>
-      </Navbar.Brand>
-      <Navbar.Content className="justify-end">
-        <a href="#about" className="hover:underline">About</a>
-        <a href="#features" className="hover:underline">Features</a>
-        <Button variant="primary">Sign in</Button>
-      </Navbar.Content>
-    </Navbar>
+    <AppShell.Header sticky>
+      <Navbar>
+        <Navbar.Brand>
+          <a href="#/" className="text-lg tracking-tight whitespace-nowrap no-underline">
+            {title}
+          </a>
+        </Navbar.Brand>
+        <Navbar.Content className="justify-end">
+          <a href="#about" className="hover:underline">About</a>
+          <a href="#features" className="hover:underline">Features</a>
+          <Button variant="primary">Sign in</Button>
+        </Navbar.Content>
+      </Navbar>
+    </AppShell.Header>
 
     <AppShell.Main>
       <Hero>

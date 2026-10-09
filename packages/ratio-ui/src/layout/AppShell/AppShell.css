@@ -20,6 +20,14 @@
 .ratio-app-shell[data-frame] {
   border: var(--app-shell-frame-width) solid var(--app-shell-frame-color);
 }
+.ratio-app-shell__header {
+  flex: none;
+}
+.ratio-app-shell__header[data-sticky] {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
 .ratio-app-shell__main {
   flex: 1 0 auto;
 }
