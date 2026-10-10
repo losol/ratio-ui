@@ -46,8 +46,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --filter @eventuras/ratio-ui... --frozen-lockfile --ignore-scripts
 
+      # With its workspace dependencies (the trailing `...`): ratio-ui imports
+      # @eventuras/ratio-ui-core, whose dist has to exist before ratio-ui's
+      # type check and build can resolve it.
       - name: Build package
-        run: pnpm --filter @eventuras/ratio-ui build
+        run: pnpm --filter @eventuras/ratio-ui... build
 
       - name: Publish to npm
         run: pnpm --filter @eventuras/ratio-ui publish --access public --provenance --no-git-checks
