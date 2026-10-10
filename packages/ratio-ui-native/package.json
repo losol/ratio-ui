@@ -1,6 +1,6 @@
 {
   "name": "@eventuras/ratio-ui-native",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Ratio UI for React Native: the design system's components for Expo and React Native apps, drawn from @eventuras/ratio-ui-core's theme data.",
   "keywords": [
     "react-native",

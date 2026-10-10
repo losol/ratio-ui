@@ -1,5 +1,22 @@
 # @eventuras/ratio-ui-native
 
+## 0.2.0
+
+### Minor Changes
+
+- 622c7dc: ratio-ui-core: shadows belong to the components, in layers. A `Shadow` is one layer and takes an optional `spread`; a component's shadow is `ShadowLayers` (one or more layers) or `null`, its colours references where the CSS has them. So a theme can say what the standard theme's soft, multi-layer shadows are, not only Bureau's hard one. `ThemeMode` holds colours only: `shadowHard`, `shadowHardLg`, `shadowHardXl` and `ShadowKey` are gone, and Bureau writes its hard shadow straight into its components. `components.button` takes `pressedScale` (the standard button grows on press; Bureau's is 1). `resolveTheme()` gives `components` per mode (`components.light`, `components.dark`), each shadow inked in it. `toCssValue` writes layers, a spread and `null`.
+  
+  ratio-ui-native: `useTheme()` gives the component tokens of the mode in use, and `shadow(layers)` writes every layer, with its spread. `Button` scales by `pressedScale` while pressed.
+- f2cde73: ratio-ui-core: `components.card.featured` (beta) — the frame of the card that should stand out: `borderWidth`, `borderColor` and `shadow`, the native counterpart of the web's `--card-featured-*` tokens. Bureau's is an 8px primary border with no shadow, held to `themes/bureau.css` by its drift test. `Theme` now requires the key.
+  
+  ratio-ui-native: `Card` takes `featured`, framed by the theme's `components.card.featured`, with its shadow in place of the elevation's. A featured card keeps its frame while pressed.
+
+### Patch Changes
+
+- Updated dependencies [622c7dc]
+- Updated dependencies [f2cde73]
+  - @eventuras/ratio-ui-core@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
