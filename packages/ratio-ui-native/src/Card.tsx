@@ -22,6 +22,12 @@ interface CardOwnProps {
   elevation?: CardElevation;
   /** A step of the space scale. @default 'm' */
   padding?: SpaceStep;
+  /**
+   * The card that should stand out: framed by the theme's
+   * `components.card.featured` — a thick primary border in Bureau — with its
+   * shadow in place of the elevation's. Use for one card in a view.
+   */
+  featured?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -43,17 +49,19 @@ export const Card: React.FC<CardProps> = ({
   children,
   elevation = 'xs',
   padding = 'm',
+  featured = false,
   style,
   ...rest
 }) => {
   const theme = useTheme();
   const { card } = theme.components;
-  const resting = elevation === 'none' ? null : card.shadow[elevation];
+  const resting = featured ? card.featured.shadow : elevation === 'none' ? null : card.shadow[elevation];
+  const edge = featured ? theme.colors[card.featured.borderColor] : theme.colors.border1;
 
   const base: ViewStyle = {
     backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.border1,
+    borderWidth: featured ? card.featured.borderWidth : 1,
+    borderColor: edge,
     borderRadius: theme.radius.xl,
     padding: theme.space[padding],
   };
@@ -67,7 +75,8 @@ export const Card: React.FC<CardProps> = ({
           base,
           {
             backgroundColor: pressed ? theme.colors.cardHover : theme.colors.card,
-            borderColor: pressed ? theme.colors.primary : theme.colors.border1,
+            // A featured card keeps its frame; a plain one takes the primary edge.
+            borderColor: pressed && !featured ? theme.colors.primary : edge,
             boxShadow: theme.shadow(pressed ? card.hoverShadow : resting),
           },
           style,

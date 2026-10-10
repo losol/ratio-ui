@@ -101,6 +101,17 @@ describe('bureau matches ratio-ui/src/themes/bureau.css', () => {
     expect(lightCss['card-hover-shadow']).toBe(shadowVar(card.hoverShadow));
   });
 
+  // Width and shadow are Bureau's own; the colour is the base token's, read
+  // in Bureau's mode like every other inherited value.
+  it('--card-featured-*', () => {
+    const base = blocks(read('tokens/card.css'), ':root');
+    expect(lightCss['card-featured-border-width']).toBe(toCssValue(card.featured.borderWidth));
+    expect(lightCss['card-featured-shadow']).toBe(shadowVar(card.featured.shadow));
+    expect(lightCss['card-featured-border-color'] ?? base['card-featured-border-color']).toBe(
+      `var(--${cssName(card.featured.borderColor)})`,
+    );
+  });
+
   it('--chat-bar-shadow and --chat-popover-shadow', () => {
     expect(lightCss['chat-bar-shadow']).toBe(shadowVar(chat.barShadow));
     expect(lightCss['chat-popover-shadow']).toBe(shadowVar(chat.popoverShadow));

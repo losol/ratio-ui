@@ -215,6 +215,8 @@ export const bureau = defineTheme({
     card: {
       shadow: { xs: 'shadowHard', sm: 'shadowHard', md: 'shadowHard' },
       hoverShadow: 'shadowHardLg',
+      // Framed like a poster: a thick primary border, no shadow.
+      featured: { borderWidth: 8, borderColor: 'primary', shadow: null },
     },
     chat: { barShadow: 'shadowHard', popoverShadow: 'shadowHardLg' },
   },

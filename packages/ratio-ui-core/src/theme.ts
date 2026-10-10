@@ -140,6 +140,13 @@ export interface Components {
     shadow: Record<'xs' | 'sm' | 'md', ShadowKey | null>;
     /** The lift of an interactive card on hover, or on press where there is no hover. */
     hoverShadow: ShadowKey | null;
+    /** The card that should stand out (`featured`): its frame, and the shadow it keeps. */
+    featured: {
+      /** In px. */
+      borderWidth: number;
+      borderColor: ColorKey;
+      shadow: ShadowKey | null;
+    };
   };
   chat: {
     /** Under the composer and the room's bar. */

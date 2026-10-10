@@ -84,7 +84,11 @@ const theme = defineTheme({
   },
   components: {
     button: { radius: 'md', shadow: 'shadowHard', pressedShadow: null, pressedOffset: { x: 2, y: 2 } },
-    card: { shadow: { xs: null, sm: 'shadowHard', md: 'shadowHardLg' }, hoverShadow: 'shadowHardLg' },
+    card: {
+      shadow: { xs: null, sm: 'shadowHard', md: 'shadowHardLg' },
+      hoverShadow: 'shadowHardLg',
+      featured: { borderWidth: 8, borderColor: 'primary', shadow: null },
+    },
     chat: { barShadow: 'shadowHard', popoverShadow: 'shadowHardLg' },
   },
 });
