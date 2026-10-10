@@ -61,10 +61,13 @@ const light: ThemeMode = {
   chatReactionMeBorder: '#b7c1e6',
   chatRowHoverBg: 'rgb(0 0 0 / 0.035)',
   chatPopoverBg: '#fafafa',
-  shadowHard: { x: 2, y: 2, blur: 0, color: mix('text', 0.62) },
-  shadowHardLg: { x: 3, y: 3, blur: 0, color: mix('text', 0.62) },
-  shadowHardXl: { x: 5, y: 5, blur: 0, color: mix('text', 0.62) },
 };
+
+const hard = [{ x: 2, y: 2, blur: 0, color: mix('text', 0.62) }];
+const soft = [
+  { x: 0, y: 1, blur: 3, spread: 0, color: '#0000001a' },
+  { x: 0, y: 1, blur: 2, spread: -1, color: '#0000001a' },
+];
 
 const theme = defineTheme({
   name: 'test',
@@ -83,13 +86,13 @@ const theme = defineTheme({
     },
   },
   components: {
-    button: { radius: 'md', shadow: 'shadowHard', pressedShadow: null, pressedOffset: { x: 2, y: 2 } },
+    button: { radius: 'md', shadow: hard, pressedShadow: null, pressedOffset: { x: 2, y: 2 }, pressedScale: 1 },
     card: {
-      shadow: { xs: null, sm: 'shadowHard', md: 'shadowHardLg' },
-      hoverShadow: 'shadowHardLg',
+      shadow: { xs: null, sm: hard, md: soft },
+      hoverShadow: hard,
       featured: { borderWidth: 8, borderColor: 'primary', shadow: null },
     },
-    chat: { barShadow: 'shadowHard', popoverShadow: 'shadowHardLg' },
+    chat: { barShadow: hard, popoverShadow: soft },
   },
 });
 
@@ -97,7 +100,7 @@ describe('defineTheme', () => {
   it('fills dark from light, keeping what dark sets', () => {
     expect(theme.dark.text).toBe('#f0e7d2');
     expect(theme.dark.primary).toBe('#20304d');
-    expect(theme.dark.shadowHard).toBe(light.shadowHard);
+    expect(theme.dark.surfaceGlass).toBe(light.surfaceGlass);
   });
 });
 
@@ -109,9 +112,20 @@ describe('resolveTheme', () => {
   });
 
   it('follows a mix inside its own mode, so a shadow re-inks in dark', () => {
-    expect(resolved.light.shadowHard).toEqual({ x: 2, y: 2, blur: 0, color: 'rgba(32, 36, 44, 0.62)' });
-    expect(resolved.dark.shadowHard).toEqual({ x: 2, y: 2, blur: 0, color: 'rgba(240, 231, 210, 0.62)' });
+    expect(resolved.components.light.button.shadow).toEqual([
+      { x: 2, y: 2, blur: 0, spread: 0, color: 'rgba(32, 36, 44, 0.62)' },
+    ]);
+    expect(resolved.components.dark.button.shadow).toEqual([
+      { x: 2, y: 2, blur: 0, spread: 0, color: 'rgba(240, 231, 210, 0.62)' },
+    ]);
     expect(resolved.dark.surfaceGlass).toBe('rgba(20, 20, 15, 0.88)');
+  });
+
+  it('keeps every layer of a shadow, with its spread', () => {
+    expect(resolved.components.light.card.shadow.md).toEqual([
+      { x: 0, y: 1, blur: 3, spread: 0, color: 'rgba(0, 0, 0, 0.102)' },
+      { x: 0, y: 1, blur: 2, spread: -1, color: 'rgba(0, 0, 0, 0.102)' },
+    ]);
   });
 
   it('turns the scale into hex', () => {
@@ -133,15 +147,17 @@ describe('resolveTheme', () => {
     expect(resolved.space.m).toBe(21);
   });
 
-  it('keeps component tokens naming shadows, and copies them', () => {
-    expect(resolved.components.button.shadow).toBe('shadowHard');
-    expect(resolved.components.card.shadow.xs).toBeNull();
-    resolved.components.button.pressedOffset.x = 9;
+  it('gives component tokens per mode, as copies', () => {
+    expect(resolved.components.light.button.pressedScale).toBe(1);
+    expect(resolved.components.dark.card.shadow.xs).toBeNull();
+    resolved.components.light.button.pressedOffset.x = 9;
     expect(theme.components.button.pressedOffset.x).toBe(2);
+    expect(resolved.components.dark.button.pressedOffset.x).toBe(2);
   });
 
   it('does not touch the authored theme', () => {
-    expect(theme.light.shadowHard.color).toEqual(mix('text', 0.62));
+    expect(theme.components.button.shadow?.[0]?.color).toEqual(mix('text', 0.62));
+    expect(theme.light.surfaceGlass).toEqual(mix('surface', 0.88, 'oklch'));
   });
 
   it('refuses a reference that loops', () => {

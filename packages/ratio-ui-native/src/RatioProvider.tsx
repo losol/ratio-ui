@@ -6,9 +6,10 @@ import React, { createContext, useContext, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 import {
   resolveTheme,
+  type ResolvedComponents,
   type ResolvedMode,
+  type ResolvedShadow,
   type ResolvedTheme,
-  type ShadowKey,
   type Theme,
 } from '@eventuras/ratio-ui-core';
 import { bureau } from '@eventuras/ratio-ui-core/themes/bureau';
@@ -16,29 +17,31 @@ import { bureau } from '@eventuras/ratio-ui-core/themes/bureau';
 export type ColorScheme = 'light' | 'dark';
 
 /** The theme as a component reads it: one mode's colours, and the rest of the theme. @beta */
-export interface RatioTheme extends Omit<ResolvedTheme, 'light' | 'dark'> {
+export interface RatioTheme extends Omit<ResolvedTheme, 'light' | 'dark' | 'components'> {
   scheme: ColorScheme;
   /** The colours of the mode in use. */
   colors: ResolvedMode;
+  /** The component tokens of the mode in use, their shadows inked in it. */
+  components: ResolvedComponents;
   /**
-   * A shadow of the mode in use, as a `boxShadow` value (React Native 0.76
-   * and up). `undefined` for `null`, so it can go straight into a style.
+   * A component's shadow as a `boxShadow` value (React Native 0.76 and up),
+   * every layer of it. `undefined` for `null`, so it can go straight into a
+   * style.
    */
-  shadow: (key: ShadowKey | null) => string | undefined;
+  shadow: (layers: readonly ResolvedShadow[] | null) => string | undefined;
 }
 
 const toRatioTheme = (resolved: ResolvedTheme, scheme: ColorScheme): RatioTheme => {
-  const { light, dark, ...rest } = resolved;
-  const colors = scheme === 'dark' ? dark : light;
+  const { light, dark, components, ...rest } = resolved;
   return {
     ...rest,
     scheme,
-    colors,
-    shadow: key => {
-      if (!key) return undefined;
-      const { x, y, blur, color } = colors[key];
-      return `${x}px ${y}px ${blur}px ${color}`;
-    },
+    colors: scheme === 'dark' ? dark : light,
+    components: components[scheme],
+    shadow: layers =>
+      layers?.length
+        ? layers.map(({ x, y, blur, spread, color }) => `${x}px ${y}px ${blur}px ${spread}px ${color}`).join(', ')
+        : undefined,
   };
 };
 

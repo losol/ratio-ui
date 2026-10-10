@@ -2,12 +2,17 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import { defineTheme, mix, type Scale } from '../theme';
+import { defineTheme, mix, type Scale, type ShadowLayers } from '../theme';
 
 // The hard offset shadow, Bureau's signature: the ink at reduced alpha, so
 // it contrasts both the paper and the element without reading as a solid
 // block. A reference, so in dark mode it re-resolves to the cream ink.
 const ink = mix('text', 0.62);
+
+// The CSS's --shadow-hard (2px), --shadow-hard-lg (3px) and --shadow-hard-xl
+// (5px): an offset with no blur. 2px matches the press-down distance, so a
+// pressed button covers it.
+const hard = (offset: number): ShadowLayers => [{ x: offset, y: offset, blur: 0, color: ink }];
 
 // Teal, light to dark. Absolute steps serving both modes: 700 is the
 // light arm's primary, 400 sits next to the dark arm's muted teal.
@@ -81,11 +86,6 @@ export const bureau = defineTheme({
     border2: '#20242c', // the ink: the strong edge round panels
 
     focusRing: '#006a7d', // solid teal: a crisp ring, not a haze
-
-    // 2px matches the press-down distance, so a pressed button covers it.
-    shadowHard: { x: 2, y: 2, blur: 0, color: ink },
-    shadowHardLg: { x: 3, y: 3, blur: 0, color: ink },
-    shadowHardXl: { x: 5, y: 5, blur: 0, color: ink },
 
     // Brick — the only status family Bureau sets; the rest inherit.
     errorSolid: '#b53026',
@@ -192,7 +192,7 @@ export const bureau = defineTheme({
     chatReactionMeBorder: primary[700],
     chatRowHoverBg: 'rgb(255 255 255 / 0.045)',
     chatPopoverBg: neutral900,
-    // Shadows inherit: the same `ink` reference, now the cream text.
+    // The shadows' ink is a reference, so here it is the cream text.
   },
 
   // Tight corners — every step the same hard edge.
@@ -208,16 +208,17 @@ export const bureau = defineTheme({
     // shadow goes, so the button seems to sink into the page.
     button: {
       radius: 'md',
-      shadow: 'shadowHard',
+      shadow: hard(2),
       pressedShadow: null,
       pressedOffset: { x: 2, y: 2 },
+      pressedScale: 1,
     },
     card: {
-      shadow: { xs: 'shadowHard', sm: 'shadowHard', md: 'shadowHard' },
-      hoverShadow: 'shadowHardLg',
+      shadow: { xs: hard(2), sm: hard(2), md: hard(2) },
+      hoverShadow: hard(3),
       // Framed like a poster: a thick primary border, no shadow.
       featured: { borderWidth: 8, borderColor: 'primary', shadow: null },
     },
-    chat: { barShadow: 'shadowHard', popoverShadow: 'shadowHardLg' },
+    chat: { barShadow: hard(2), popoverShadow: hard(3) },
   },
 });

@@ -20,13 +20,21 @@ export interface Mix {
 
 export type ColorSpec = ColorString | Mix;
 
-/** An offset shadow in parts, so each renderer draws it its own way. */
+/** One layer of a shadow in parts, so each renderer draws it its own way. */
 export interface Shadow {
   x: number;
   y: number;
   blur: number;
+  /** Grows (or, negative, shrinks) the shadow before the blur. Left out, the CSS writes none. */
+  spread?: number;
   color: ColorSpec;
 }
+
+/**
+ * A shadow as the CSS writes it: one or more layers, the first on top. A
+ * component's shadow is `null` for none.
+ */
+export type ShadowLayers = readonly Shadow[];
 
 /** The colours of one mode. Keys are the CSS token names in camelCase: `--text-muted` is `textMuted`. */
 export interface ThemeMode {
@@ -91,14 +99,10 @@ export interface ThemeMode {
   chatReactionMeBorder: ColorSpec;
   chatRowHoverBg: ColorSpec;
   chatPopoverBg: ColorSpec;
-  shadowHard: Shadow;
-  shadowHardLg: Shadow;
-  shadowHardXl: Shadow;
 }
 
-export type ShadowKey = 'shadowHard' | 'shadowHardLg' | 'shadowHardXl';
-/** The keys of a mode that hold a colour — what a `Mix` may point at. */
-export type ColorKey = Exclude<keyof ThemeMode, ShadowKey>;
+/** The colours of a mode — what a `Mix` may point at. */
+export type ColorKey = keyof ThemeMode;
 
 /** Rounding in px, one scale for every corner. */
 export interface Radius {
@@ -120,39 +124,40 @@ export interface Font {
 
 /**
  * How components wear the theme — the CSS's `--button-*`, `--card-*` and
- * the chat's shadows.
- * Shadows name a shadow of the mode, so each mode inks its own; `null` is
- * no shadow.
+ * the chat's shadows. A shadow is its layers, its colours references where
+ * the CSS has them, so each mode inks its own; `null` is no shadow.
  * @beta Grows as renderers need more components; may change before release.
  */
 export interface Components {
   button: {
     /** A step of `radius`. */
     radius: keyof Radius;
-    shadow: ShadowKey | null;
+    shadow: ShadowLayers | null;
     /** The shadow while pressed. */
-    pressedShadow: ShadowKey | null;
+    pressedShadow: ShadowLayers | null;
     /** How far a pressed button moves, in px — Bureau presses into its shadow. */
     pressedOffset: { x: number; y: number };
+    /** How a pressed button scales — the standard button grows a little; 1 is none. */
+    pressedScale: number;
   };
   card: {
     /** The resting shadow of each elevation tier. */
-    shadow: Record<'xs' | 'sm' | 'md', ShadowKey | null>;
+    shadow: Record<'xs' | 'sm' | 'md', ShadowLayers | null>;
     /** The lift of an interactive card on hover, or on press where there is no hover. */
-    hoverShadow: ShadowKey | null;
+    hoverShadow: ShadowLayers | null;
     /** The card that should stand out (`featured`): its frame, and the shadow it keeps. */
     featured: {
       /** In px. */
       borderWidth: number;
       borderColor: ColorKey;
-      shadow: ShadowKey | null;
+      shadow: ShadowLayers | null;
     };
   };
   chat: {
     /** Under the composer and the room's bar. */
-    barShadow: ShadowKey | null;
+    barShadow: ShadowLayers | null;
     /** Under the reaction picker and other popovers. */
-    popoverShadow: ShadowKey | null;
+    popoverShadow: ShadowLayers | null;
   };
 }
 

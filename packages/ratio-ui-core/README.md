@@ -25,23 +25,23 @@ A theme is authored once, with references where the CSS has them:
 import { bureau } from '@eventuras/ratio-ui-core/themes/bureau';
 
 bureau.light.primary;          // '#006a7d'
-bureau.light.shadowHard;       // { x: 2, y: 2, blur: 0, color: { ref: 'text', alpha: 0.62, … } }
+bureau.components.card.shadow.xs; // [{ x: 2, y: 2, blur: 0, color: { ref: 'text', alpha: 0.62, … } }]
 bureau.radius.md;              // 3
 bureau.font.display;           // 'Fira Sans'
 ```
 
 A renderer without a CSS engine takes the resolved view — sRGB strings,
-references followed inside their own mode, shadows in parts:
+references followed inside their own mode, and the component tokens per
+mode, every shadow layer in parts:
 
 ```ts
 import { resolveTheme } from '@eventuras/ratio-ui-core';
 
 const theme = resolveTheme(bureau);
-theme.light.shadowHard.color;  // 'rgba(32, 36, 44, 0.62)'   — the dark ink
-theme.dark.shadowHard.color;   // 'rgba(240, 231, 210, 0.62)' — the cream ink
+theme.components.light.card.shadow.xs[0].color; // 'rgba(32, 36, 44, 0.62)'   — the dark ink
+theme.components.dark.card.shadow.xs[0].color;  // 'rgba(240, 231, 210, 0.62)' — the cream ink
 theme.scale.primary[700];      // '#006a7d' — step 700 is the light arm's teal
 theme.space.m;                 // 21 — points
-theme.components.button.shadow; // 'shadowHard' — read it from the mode you draw in
 ```
 
 `toCssValue` writes any value the way the web's CSS does

@@ -17,13 +17,14 @@ export {
   type Scale,
   type ScaleStep,
   type Shadow,
-  type ShadowKey,
+  type ShadowLayers,
   type Theme,
   type ThemeInput,
   type ThemeMode,
 } from './theme';
 export {
   resolveTheme,
+  type ResolvedComponents,
   type ResolvedMode,
   type ResolvedShadow,
   type ResolvedTheme,
