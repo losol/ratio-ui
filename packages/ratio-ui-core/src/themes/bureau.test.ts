@@ -8,7 +8,7 @@ import { cssName } from '../cssName';
 import { resolveTheme } from '../resolveTheme';
 import { toCssValue } from '../toCssValue';
 import { fontSize, space, type FluidSize } from '../scale';
-import type { ScaleStep, ShadowKey, ThemeMode } from '../theme';
+import type { ScaleStep, ThemeMode } from '../theme';
 import { bureau } from './bureau';
 
 // The web's Bureau stays hand-written until the generator lands. This holds
@@ -79,26 +79,30 @@ describe('bureau matches ratio-ui/src/themes/bureau.css', () => {
     expect(bureau.scale.accent[step]).toBe(lightCss[`color-accent-${step}`] ?? palette[`color-accent-${step}`]);
   });
 
-  const shadowVar = (key: ShadowKey | null) => (key ? `var(--${cssName(key)})` : 'none');
+  // A component's shadow as the CSS writes it, with the --shadow-hard* token
+  // it names followed — the layers are what the data holds.
+  const shadow = (token: string) => lightCss[token]?.replace(/^var\(--([\w-]+)\)$/, (_, name: string) => lightCss[name] ?? _);
   const { button, card, chat } = bureau.components;
 
   it('--button-*', () => {
     // `--button-radius` names `--radius`, Bureau's md step.
     expect(lightCss['button-radius']).toBe('var(--radius)');
     expect(toCssValue(bureau.radius[button.radius])).toBe(lightCss['radius']);
-    expect(lightCss['button-shadow']).toBe(shadowVar(button.shadow));
-    expect(lightCss['button-shadow-active']).toBe(shadowVar(button.pressedShadow));
+    expect(shadow('button-shadow')).toBe(toCssValue(button.shadow));
+    expect(shadow('button-shadow-active')).toBe(toCssValue(button.pressedShadow));
     expect(lightCss['button-transform-active']).toBe(
       `translate(${toCssValue(button.pressedOffset.x)}, ${toCssValue(button.pressedOffset.y)})`,
     );
+    // A press that moves, and does not scale.
+    expect(button.pressedScale).toBe(1);
   });
 
   it.each(['xs', 'sm', 'md'] as const)('--card-shadow-%s', tier => {
-    expect(lightCss[`card-shadow-${tier}`]).toBe(shadowVar(card.shadow[tier]));
+    expect(shadow(`card-shadow-${tier}`)).toBe(toCssValue(card.shadow[tier]));
   });
 
   it('--card-hover-shadow', () => {
-    expect(lightCss['card-hover-shadow']).toBe(shadowVar(card.hoverShadow));
+    expect(shadow('card-hover-shadow')).toBe(toCssValue(card.hoverShadow));
   });
 
   // Width and shadow are Bureau's own; the colour is the base token's, read
@@ -106,15 +110,15 @@ describe('bureau matches ratio-ui/src/themes/bureau.css', () => {
   it('--card-featured-*', () => {
     const base = blocks(read('tokens/card.css'), ':root');
     expect(lightCss['card-featured-border-width']).toBe(toCssValue(card.featured.borderWidth));
-    expect(lightCss['card-featured-shadow']).toBe(shadowVar(card.featured.shadow));
+    expect(shadow('card-featured-shadow')).toBe(toCssValue(card.featured.shadow));
     expect(lightCss['card-featured-border-color'] ?? base['card-featured-border-color']).toBe(
       `var(--${cssName(card.featured.borderColor)})`,
     );
   });
 
   it('--chat-bar-shadow and --chat-popover-shadow', () => {
-    expect(lightCss['chat-bar-shadow']).toBe(shadowVar(chat.barShadow));
-    expect(lightCss['chat-popover-shadow']).toBe(shadowVar(chat.popoverShadow));
+    expect(shadow('chat-bar-shadow')).toBe(toCssValue(chat.barShadow));
+    expect(shadow('chat-popover-shadow')).toBe(toCssValue(chat.popoverShadow));
   });
 });
 
@@ -140,8 +144,10 @@ describe('bureau resolves for a renderer without CSS', () => {
   const resolved = resolveTheme(bureau);
 
   it('inks the hard shadow with the mode it sits in', () => {
-    expect(resolved.light.shadowHard.color).toBe('rgba(32, 36, 44, 0.62)');
-    expect(resolved.dark.shadowHard.color).toBe('rgba(240, 231, 210, 0.62)');
+    expect(resolved.components.light.card.shadow.xs).toEqual([
+      { x: 2, y: 2, blur: 0, spread: 0, color: 'rgba(32, 36, 44, 0.62)' },
+    ]);
+    expect(resolved.components.dark.card.shadow.xs?.[0]?.color).toBe('rgba(240, 231, 210, 0.62)');
   });
 
   it('gives the primary scale as hex', () => {

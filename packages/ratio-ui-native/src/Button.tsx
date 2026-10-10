@@ -93,7 +93,11 @@ export const Button: React.FC<ButtonProps> = ({
           boxShadow: flat ? undefined : theme.shadow(pressed ? button.pressedShadow : button.shadow),
           transform:
             pressed && !disabled
-              ? [{ translateX: button.pressedOffset.x }, { translateY: button.pressedOffset.y }]
+              ? [
+                  { translateX: button.pressedOffset.x },
+                  { translateY: button.pressedOffset.y },
+                  { scale: button.pressedScale },
+                ]
               : [],
         },
         style,

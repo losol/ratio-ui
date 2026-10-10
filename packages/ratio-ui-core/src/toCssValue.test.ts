@@ -25,6 +25,16 @@ it('writes a shadow in CSS order with a unitless zero', () => {
   expect(toCssValue({ x: 0, y: 4, blur: 12, color: '#000' })).toBe('0 4px 12px #000');
 });
 
+it('writes a spread when the shadow has one, and layers comma-separated', () => {
+  expect(
+    toCssValue([
+      { x: 0, y: 1, blur: 3, spread: 0, color: '#0000001a' },
+      { x: 0, y: 1, blur: 2, spread: -1, color: '#0000001a' },
+    ]),
+  ).toBe('0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a');
+  expect(toCssValue(null)).toBe('none');
+});
+
 it('writes a number in px', () => {
   expect(toCssValue(3)).toBe('3px');
   expect(toCssValue(0)).toBe('0');

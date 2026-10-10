@@ -82,9 +82,10 @@ The keys must match `theme.font` — `'Fira Sans'` (display and body) and
 
 ## Shadows
 
-The hard offset shadow is a `boxShadow` style, which React Native has had
-since 0.76 on the New Architecture (Expo's default). It renders the same on
-iOS, Android and the web.
+A component's shadow is a `boxShadow` style — every layer of it, with its
+spread — which React Native has had since 0.76 on the New Architecture
+(Expo's default). It renders the same on iOS, Android and the web.
+`useTheme().shadow(layers)` writes one from the theme's component tokens.
 
 ## Development
 
