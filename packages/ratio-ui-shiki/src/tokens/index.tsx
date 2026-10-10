@@ -15,16 +15,23 @@ import React, { Fragment } from 'react';
 export const SHIKI_TOKEN_CLASS = 'ratio-shiki-token';
 
 /**
- * CSS that flips token colors with the app's mode. Shiki writes each token's
- * light/dark colors into the `--shiki-light` / `--shiki-dark` custom properties;
- * this reads the right one per `data-theme` / `data-color-scheme` — the same
- * dark selectors ratio-ui's own tokens use. Rendered for you by
- * {@link DualThemeStyles} and by the `<CodeBlock>` wrapper; include it yourself
- * only if you render dual-theme lines by hand.
+ * CSS that flips token colors with the mode of the nearest scope. Shiki writes
+ * each token's light/dark colors into `--shiki-light` / `--shiki-dark`; a
+ * switch set on the scope — `:root` and its `data-theme` / `data-color-scheme`
+ * arms, `.surface-light` and `.surface-dark` — is inherited down to the token,
+ * which reads the dark color while the switch is on and falls back to light.
+ * The same scopes and the same inheritance as ratio-ui's own code-surface
+ * tokens, so a band inside a band resolves to the inner one. Rendered for you
+ * by {@link DualThemeStyles} and by the `<CodeBlock>` wrapper; include it
+ * yourself only if you render dual-theme lines by hand.
+ *
+ * The switch: `initial` is a custom property's guaranteed-invalid value, so
+ * `var()` of it voids `--shiki-color` and `color` takes its fallback. A lone
+ * space is a valid, empty value that leaves `--shiki-color` whole.
  */
-export const DUAL_THEME_CSS = `.${SHIKI_TOKEN_CLASS}{color:var(--shiki-light)}
-:root[data-theme="dark"] .${SHIKI_TOKEN_CLASS},
-:root[data-color-scheme="dark"] .${SHIKI_TOKEN_CLASS}{color:var(--shiki-dark)}`;
+export const DUAL_THEME_CSS = `:root,.surface-light{--shiki-dark-on:initial}
+:root[data-theme="dark"],:root[data-color-scheme="dark"],.surface-dark{--shiki-dark-on: }
+.${SHIKI_TOKEN_CLASS}{--shiki-color:var(--shiki-dark-on) var(--shiki-dark);color:var(--shiki-color,var(--shiki-light))}`;
 
 /**
  * One Shiki token in serializable form: its text plus the inline style

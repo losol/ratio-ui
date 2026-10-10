@@ -7,7 +7,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { HighlighterCore } from 'shiki/core';
 import { createRatioHighlighter, codeToDualTokens, shikiToDualLines } from '../index';
-import { tokensToLines, SHIKI_TOKEN_CLASS, type DualTokenLine } from './index';
+import { tokensToLines, DUAL_THEME_CSS, SHIKI_TOKEN_CLASS, type DualTokenLine } from './index';
 
 const CODE = 'const answer: number = 42;\nexport default answer;';
 
@@ -66,5 +66,19 @@ describe('tokensToLines', () => {
     const html = renderToStaticMarkup(<>{tokensToLines([[{ content: 'plain' }]])}</>);
     expect(html).toContain('plain');
     expect(html).not.toContain('style=');
+  });
+});
+
+describe('DUAL_THEME_CSS', () => {
+  it('sets the dark switch on the same scopes as ratio-ui code tokens, and reads it on the token', () => {
+    // Off on the root and the light surface; on in both dark arms and the dark surface.
+    expect(DUAL_THEME_CSS).toContain(':root,.surface-light{--shiki-dark-on:initial}');
+    expect(DUAL_THEME_CSS).toContain(
+      ':root[data-theme="dark"],:root[data-color-scheme="dark"],.surface-dark{--shiki-dark-on: }',
+    );
+    // The token: dark while the switch is on, light as the fallback.
+    expect(DUAL_THEME_CSS).toContain(
+      `.${SHIKI_TOKEN_CLASS}{--shiki-color:var(--shiki-dark-on) var(--shiki-dark);color:var(--shiki-color,var(--shiki-light))}`,
+    );
   });
 });

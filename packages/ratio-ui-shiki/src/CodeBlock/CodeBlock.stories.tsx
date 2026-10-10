@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, waitFor, within } from 'storybook/test';
 import type { CodeAnnotation } from '@eventuras/ratio-ui/core/CodeBlock';
 import { CodeBlock } from './CodeBlock';
 
@@ -94,5 +95,63 @@ export const Review: Story = {
     filename: 'Flashcard.tsx',
     showLineNumbers: true,
     annotations: REVIEW_NOTES,
+  },
+};
+
+const SNIPPET = `const answer = 42; // the question comes first`;
+
+// `#rrggbb` as the browser reports a computed color, for comparing against
+// the token's own `--shiki-*` custom property.
+const rgb = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
+};
+
+/**
+ * Token colors follow the nearest surface scope, not only the page's mode.
+ * ratio-ui's `.surface-dark` and `.surface-light` flip the code surface
+ * inside a band of the other mode; the Shiki token colors flip with it, so a
+ * block in a dark band on a light page reads as dark code, and the reverse —
+ * also for a band nested inside another, where the inner one wins. Flip the
+ * mode toggle: each block keeps the colors of its own band.
+ */
+export const SurfaceContexts: Story = {
+  args: { code: SNIPPET, language: 'ts', showHeader: false },
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      <div className="surface-dark rounded-lg bg-surface p-4" data-testid="dark-band">
+        <CodeBlock {...args} />
+      </div>
+      <div className="surface-light rounded-lg bg-surface p-4" data-testid="light-band">
+        <CodeBlock {...args} />
+        {/* A dark band inside the light one: the nearest scope decides. */}
+        <div className="surface-dark mt-4 rounded-lg bg-surface p-4" data-testid="nested-dark-band">
+          <CodeBlock {...args} />
+        </div>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The first token of a band's own block — `:scope >` keeps a nested band's
+    // tokens out of its parent's match.
+    const firstToken = (band: HTMLElement) =>
+      band.querySelector<HTMLElement>(':scope > * .ratio-shiki-token[style*="--shiki-dark"]');
+    const reads = (token: HTMLElement, side: 'light' | 'dark') =>
+      expect(getComputedStyle(token).color).toBe(rgb(token.style.getPropertyValue(`--shiki-${side}`).trim()));
+
+    // The highlighter loads asynchronously; raw code shows until then.
+    const dark = canvas.getByTestId('dark-band');
+    const light = canvas.getByTestId('light-band');
+    const nested = canvas.getByTestId('nested-dark-band');
+    for (const band of [dark, light, nested]) {
+      await waitFor(() => expect(firstToken(band)).not.toBeNull(), { timeout: 10_000 });
+    }
+
+    // Each token reads its own band's color, whatever the page's mode …
+    reads(firstToken(dark)!, 'dark');
+    reads(firstToken(light)!, 'light');
+    // … and inside a band of the other mode, the nearest one wins.
+    reads(firstToken(nested)!, 'dark');
   },
 };
