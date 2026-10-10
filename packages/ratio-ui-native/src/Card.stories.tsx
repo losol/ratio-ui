@@ -62,6 +62,30 @@ export const Elevation: Story = {
   ),
 };
 
+/**
+ * `featured`: the card that should stand out, framed by the theme — in
+ * Bureau a thick primary border with no shadow, as on the web.
+ */
+export const Featured: Story = {
+  render: () => (
+    <View style={{ gap: 12 }}>
+      <Card featured>
+        <Heading level={3}>Good morning</Heading>
+        <Text tone="muted">The card that should stand out.</Text>
+      </Card>
+      <Card>
+        <Text>An ordinary card.</Text>
+      </Card>
+    </View>
+  ),
+  play: async ({ canvasElement }) => {
+    const [heading] = within(canvasElement).getAllByRole('heading', { name: 'Good morning' });
+    const card = heading!.closest('div[style*="border"]') ?? heading!.parentElement!;
+    await expect(getComputedStyle(card).borderTopWidth).toBe('8px');
+    await expect(getComputedStyle(card).boxShadow).toBe('none');
+  },
+};
+
 /** With `onPress` the whole card is one button, named by its content. */
 export const Pressable: Story = {
   args: { onPress: fn() },
