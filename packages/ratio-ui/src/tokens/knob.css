@@ -1,0 +1,25 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Knob tokens — the four colours of `forms/Knob`: the turned part of the arc,
+ * the rest of it, the face of the knob, and the pointer on it. Overridable
+ * per scope, so a dark instrument panel can give its knobs an accent pointer
+ * without a component variant:
+ *
+ *   .rack { --knob-fill: var(--accent); --knob-pointer: var(--accent); }
+ */
+
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-light,
+.surface-dark {
+  --knob-fill: var(--primary);
+  --knob-track: var(--border-2);
+  --knob-face: var(--card);
+  --knob-pointer: var(--primary);
+}

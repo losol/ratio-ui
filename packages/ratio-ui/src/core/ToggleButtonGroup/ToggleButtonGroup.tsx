@@ -10,13 +10,18 @@ import { ToggleButton } from '../ToggleButton';
 import { cn } from '../../utils/cn';
 
 export type ToggleButtonGroupSize = 'sm' | 'md' | 'lg';
-export type ToggleButtonGroupVariant = 'segmented' | 'chips' | 'tints';
+export type ToggleButtonGroupVariant = 'segmented' | 'chips' | 'tints' | 'tiles';
 
 export interface ToggleButtonOption {
   /** Stable identity of the segment; the key reported in the selection. */
   value: string;
   /** Visible content of the segment. */
   label: React.ReactNode;
+  /**
+   * Icon before the label — above it in the `tiles` variant. Decorative:
+   * the label names the option.
+   */
+  icon?: React.ReactNode;
   /** Optional count badge rendered after the label. */
   count?: number;
   /** Native tooltip / longer description. */
@@ -35,13 +40,16 @@ export interface ToggleButtonGroupProps {
    * own outlined pill, wrapping onto further lines: the filter-chip row,
    * where the set can be long and any number may be on at once. `'tints'`
    * (beta) is the same row with a soft selected fill, for toggles inside
-   * content — reactions under a message.
+   * content — reactions under a message. `'tiles'` (beta) lays equal-width
+   * blocks side by side, each stacking its `icon` over its label: a choice
+   * among a few things best shown rather than named, like a waveform or a
+   * layout. Pair with `disallowEmptySelection` when one must stay chosen.
    * @default 'segmented'
    */
   variant?: ToggleButtonGroupVariant;
   /** Segment size — same `sm | md | lg` scale as Button. @default 'md' */
   size?: ToggleButtonGroupSize;
-  /** Stretch to fill the container; segments then share the width equally. Segmented only. */
+  /** Stretch to fill the container; segments then share the width equally. Segmented and tiles only. */
   fullWidth?: boolean;
 
   // — React Aria selection model —
@@ -115,7 +123,7 @@ export interface ToggleButtonGroupProps {
  *   ]}
  * />
  */
-const VARIANT_PILL = { segmented: 'segmented', chips: 'chip', tints: 'tint' } as const;
+const VARIANT_PILL = { segmented: 'segmented', chips: 'chip', tints: 'tint', tiles: 'tile' } as const;
 
 export function ToggleButtonGroup({
   variant = 'segmented',
@@ -175,11 +183,16 @@ export function ToggleButtonGroup({
           ? // Recessed pill track: a low-opacity tint of the text color reads on
             // both light and dark surfaces without a dedicated token.
             'inline-flex gap-1 p-0.75 rounded-pill border border-border-1 bg-[color-mix(in_srgb,var(--text)_7%,transparent)]'
-          : // Chips carry their own outline, so the row is just layout — and it
-            // wraps, since a filter set has no fixed length. Tints sit inside
-            // content, so they pack a little tighter.
-            cn('flex flex-wrap items-center', variant === 'tints' ? 'gap-1.5' : 'gap-2'),
-        variant === 'segmented' && fullWidth && 'flex w-full',
+          : variant === 'tiles'
+            ? // Tiles share the width equally, so a short word and a long one
+              // make the same block. The set is a few options, so no wrapping.
+              'inline-grid auto-cols-fr grid-flow-col gap-1.5'
+            : // Chips carry their own outline, so the row is just layout — and it
+              // wraps, since a filter set has no fixed length. Tints sit inside
+              // content, so they pack a little tighter.
+              cn('flex flex-wrap items-center', variant === 'tints' ? 'gap-1.5' : 'gap-2'),
+        fullWidth && variant === 'segmented' && 'flex w-full',
+        fullWidth && variant === 'tiles' && 'grid w-full',
         className,
       )}
     >
@@ -200,7 +213,18 @@ export function ToggleButtonGroup({
         >
           {/* `title` lives on the content span: React Aria's ToggleButton only
               forwards its curated DOM-attribute set, which omits `title`. */}
-          <span className="inline-flex items-center gap-1.5" title={option.title}>
+          <span
+            className={cn(
+              'inline-flex items-center gap-1.5',
+              variant === 'tiles' && 'flex-col gap-1',
+            )}
+            title={option.title}
+          >
+            {option.icon && (
+              <span aria-hidden className="inline-flex shrink-0">
+                {option.icon}
+              </span>
+            )}
             {option.label}
             {option.count !== undefined && (
               // Inherit the segment's text color at full strength (no opacity

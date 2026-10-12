@@ -32,3 +32,15 @@ export type {
   FileUploadStatus,
   FileUploadRejection,
 } from './FileUpload';
+export { Knob, knobToNormal, knobFromNormal } from './Knob';
+export type { KnobProps, KnobSize, KnobScale } from './Knob';
+export { Counter } from './Counter';
+export type { CounterProps, CounterSize, CounterLabels } from './Counter';
+export { ToggleGrid, toggleGridKey } from './ToggleGrid';
+export type {
+  ToggleGridProps,
+  ToggleGridRow,
+  ToggleGridColumn,
+  ToggleGridChange,
+  ToggleGridSize,
+} from './ToggleGrid';

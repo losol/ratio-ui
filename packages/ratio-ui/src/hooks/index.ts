@@ -8,3 +8,4 @@ export { useKeyboardShortcut, shortcutLabel, isApplePlatform } from './useKeyboa
 export type { UseKeyboardShortcutOptions } from './useKeyboardShortcut';
 export { useActiveSection } from './useActiveSection';
 export type { UseActiveSectionOptions } from './useActiveSection';
+export { useMediaQuery } from './useMediaQuery';
