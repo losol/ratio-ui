@@ -5,6 +5,8 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { useState, type CSSProperties } from 'react';
 import type { Key } from 'react-aria-components';
+import { expect, userEvent, within } from 'storybook/test';
+import { Badge } from '../Badge/Badge';
 import { ToggleButtonGroup, ToggleButtonGroupProps } from './ToggleButtonGroup';
 
 const meta: Meta<typeof ToggleButtonGroup> = {
@@ -278,4 +280,111 @@ export const Tints: ToggleButtonGroupStory = () => {
       options={Object.entries(counts).map(([emoji, n]) => ({ value: emoji, label: `${emoji} ${n}` }))}
     />
   );
+};
+
+const wave = (d: string) => (
+  <svg width="36" height="20" viewBox="0 0 28 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d={d} />
+  </svg>
+);
+
+/**
+ * `tiles` (beta): equal-width blocks, each stacking its `icon` over its
+ * label — for a choice among a few things best shown rather than named.
+ * Single selection with `disallowEmptySelection` keeps one chosen, so the
+ * group announces as a radio group.
+ */
+export const Tiles: ToggleButtonGroupStory = () => {
+  const [selected, setSelected] = useState<Set<Key>>(() => new Set(['triangle']));
+
+  return (
+    <div>
+      <ToggleButtonGroup
+        aria-label="Waveform"
+        variant="tiles"
+        disallowEmptySelection
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+        options={[
+          { value: 'sine', label: 'Sine', icon: wave('M1 8 C 4 1, 8 1, 10 8 S 16 15, 19 8 S 24 1, 27 8') },
+          { value: 'triangle', label: 'Triangle', icon: wave('M1 8 L5 2 L13 14 L21 2 L27 11') },
+          { value: 'square', label: 'Square', icon: wave('M1 13 L1 3 L8 3 L8 13 L15 13 L15 3 L22 3 L22 13 L27 13') },
+          { value: 'sawtooth', label: 'Sawtooth', icon: wave('M1 13 L10 3 L10 13 L19 3 L19 13 L27 4') },
+        ]}
+      />
+      <p style={caption}>Waveform: {[...selected][0]}</p>
+    </div>
+  );
+};
+Tiles.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  const group = canvas.getByRole('radiogroup', { name: 'Waveform' });
+  const square = within(group).getByRole('radio', { name: 'Square' });
+  expect(square).not.toBeChecked();
+  await userEvent.click(square);
+  expect(square).toBeChecked();
+  expect(within(group).getByRole('radio', { name: 'Triangle' })).not.toBeChecked();
+};
+
+/**
+ * Numbered steps: a `Badge` as each option's `icon` numbers the levels, and
+ * the segmented track shows them as one scale. The page below it explains
+ * the chosen level.
+ */
+export const NumberedSteps: ToggleButtonGroupStory = () => {
+  const [selected, setSelected] = useState<Set<Key>>(() => new Set(['2']));
+  const levels = [
+    { value: '1', label: 'Simple', text: 'One oscillator, wired for you.' },
+    { value: '2', label: 'More modules', text: 'Every module, with the cables fixed.' },
+    { value: '3', label: 'Patch it yourself', text: 'Drag from an output to an input.' },
+  ];
+  const current = levels.find((l) => selected.has(l.value));
+
+  return (
+    <div>
+      <ToggleButtonGroup
+        aria-label="Level"
+        disallowEmptySelection
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+        options={levels.map((l) => ({
+          value: l.value,
+          label: l.label,
+          icon: (
+            <Badge variant="count" tone="inherit">
+              {l.value}
+            </Badge>
+          ),
+        }))}
+      />
+      <p style={caption}>{current?.text}</p>
+    </div>
+  );
+};
+
+/**
+ * Icon-only segments, for a control that must stay narrow. The `label` is
+ * the icon, so `title` becomes the accessible name — set it on every option.
+ */
+export const IconOnly: ToggleButtonGroupStory = () => (
+  <ToggleButtonGroup
+    aria-label="Waveform"
+    size="sm"
+    disallowEmptySelection
+    defaultSelectedKeys={['sawtooth']}
+    options={[
+      { value: 'sine', title: 'Sine', label: wave('M1 8 C 4 1, 8 1, 10 8 S 16 15, 19 8 S 24 1, 27 8') },
+      { value: 'triangle', title: 'Triangle', label: wave('M1 8 L5 2 L13 14 L21 2 L27 11') },
+      { value: 'square', title: 'Square', label: wave('M1 13 L1 3 L8 3 L8 13 L15 13 L15 3 L22 3 L22 13 L27 13') },
+      { value: 'sawtooth', title: 'Sawtooth', label: wave('M1 13 L10 3 L10 13 L19 3 L19 13 L27 4') },
+    ]}
+  />
+);
+IconOnly.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  const group = canvas.getByRole('radiogroup', { name: 'Waveform' });
+  const sine = within(group).getByRole('radio', { name: 'Sine' });
+  expect(within(group).getByRole('radio', { name: 'Sawtooth' })).toBeChecked();
+  await userEvent.click(sine);
+  expect(sine).toBeChecked();
 };

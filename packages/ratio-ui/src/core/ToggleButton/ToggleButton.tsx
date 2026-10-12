@@ -7,13 +7,27 @@ import { ToggleButton as AriaToggleButton, ToggleButtonProps as AriaToggleButton
 import { cn } from '../../utils/cn';
 
 export type ToggleButtonSize = 'sm' | 'md' | 'lg';
-export type ToggleButtonVariant = 'default' | 'primary' | 'outline' | 'segmented' | 'chip' | 'tint';
+export type ToggleButtonVariant =
+  | 'default'
+  | 'primary'
+  | 'outline'
+  | 'segmented'
+  | 'chip'
+  | 'tint'
+  | 'tile';
 
 /** Pill sizes, shared with `ToggleButtonGroup` so a lone toggle matches a row of them. */
 const PILL_SIZE: Record<ToggleButtonSize, string> = {
   sm: 'px-2 py-0.5 text-xs',
   md: 'px-3 py-1.25 text-[13px]',
   lg: 'px-4 py-2 text-sm',
+};
+
+/** Tile sizes, shared with `ToggleButtonGroup`'s `tiles` variant. */
+const TILE_SIZE: Record<ToggleButtonSize, string> = {
+  sm: 'px-2 py-1.5 text-xs',
+  md: 'px-3 py-2.5 text-sm',
+  lg: 'px-4 py-3 text-base',
 };
 
 export interface ToggleButtonProps extends Omit<AriaToggleButtonProps, 'className'> {
@@ -29,14 +43,18 @@ export interface ToggleButtonProps extends Omit<AriaToggleButtonProps, 'classNam
    * - 'tint' (beta): a chip whose selected state is a soft fill
    *   (`--toggle-tint-bg/-border`) and whose text never changes — for toggles
    *   that sit inside content, like reactions, where a solid fill would shout
+   * - 'tile' (beta): a rounded block that stacks its content — an icon over
+   *   a word — and fills with the primary colour when selected; for a
+   *   choice among a few things that are best shown, like a shape or a layout
    *
-   * `segmented`, `chip` and `tint` are what `ToggleButtonGroup` renders;
-   * reach for them directly only for a toggle that stands alone.
+   * `segmented`, `chip`, `tint` and `tile` are what `ToggleButtonGroup`
+   * renders; reach for them directly only for a toggle that stands alone.
    */
   variant?: ToggleButtonVariant;
   /**
    * Size — same `sm | md | lg` scale as Button. Applies to the pill variants
-   * (`segmented`, `chip`); the older variants carry their own padding.
+   * (`segmented`, `chip`, `tint`) and to `tile`; the older variants carry
+   * their own padding.
    * @default 'md'
    */
   size?: ToggleButtonSize;
@@ -127,6 +145,30 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
             !isSelected &&
               isHovered &&
               'text-(--text) bg-[color-mix(in_srgb,var(--text)_5%,transparent)]',
+            isFocusVisible && 'ring-2 ring-(--focus-ring)',
+            isDisabled && 'opacity-50 cursor-not-allowed',
+            className,
+          )
+        }
+      >
+        {children}
+      </AriaToggleButton>
+    );
+  }
+
+  if (variant === 'tile') {
+    return (
+      <AriaToggleButton
+        {...props}
+        className={({ isSelected, isHovered, isFocusVisible, isDisabled }) =>
+          cn(
+            'flex flex-col items-center justify-center gap-1 rounded-lg border-2 font-semibold',
+            'cursor-pointer outline-none transition-colors duration-150',
+            TILE_SIZE[size],
+            isSelected
+              ? 'border-(--primary) bg-(--primary) text-(--text-on-primary)'
+              : 'border-border-1 bg-card text-(--text-muted)',
+            !isSelected && isHovered && 'border-border-2 text-(--text)',
             isFocusVisible && 'ring-2 ring-(--focus-ring)',
             isDisabled && 'opacity-50 cursor-not-allowed',
             className,

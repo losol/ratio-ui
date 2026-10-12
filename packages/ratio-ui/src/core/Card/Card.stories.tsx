@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Card } from './Card';
 import { Image } from '../Image';
 import { Box } from '../../layout/Box';
 import { Heading } from '../Heading';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 const meta: Meta<typeof Card> = {
   title: 'Core/Card',
@@ -340,5 +341,111 @@ export const Featured: Story = {
     const featured = canvas.getByText('The card that should stand out.').closest('.ratio-card')!;
     const token = getComputedStyle(featured).getPropertyValue('--card-featured-border-width').trim();
     await expect(getComputedStyle(featured).borderTopWidth).toBe(token);
+  },
+};
+
+/**
+ * `collapsible` renders the card as a native `<details>`: `Card.Header` is
+ * the `<summary>`, everything after it is the body. The header's `summary`
+ * keeps one line of the content visible when the card is closed. Cards that
+ * share a `name` open one at a time.
+ */
+export const Collapsible: Story = {
+  render: () => (
+    <div className="flex max-w-[28rem] flex-col gap-3">
+      <Card collapsible name="programme">
+        <Card.Header summary="Three sessions">
+          <Heading as="h3" size="sm">Programme</Heading>
+        </Card.Header>
+        <p className="m-0">Opening at 09:00, workshop at 10:15, close at 13:00.</p>
+      </Card>
+      <Card collapsible name="programme" defaultOpen={false}>
+        <Card.Header summary="Charged in full after 1 June">
+          <Heading as="h3" size="sm">Terms</Heading>
+        </Card.Header>
+        <p className="m-0">Cancellations after 1 June are charged in full.</p>
+      </Card>
+    </div>
+  ),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const programme = canvas.getByText('Programme').closest('details') as HTMLDetailsElement;
+    const terms = canvas.getByText('Terms').closest('details') as HTMLDetailsElement;
+    expect(programme.open).toBe(true);
+    expect(terms.open).toBe(false);
+    await userEvent.click(canvas.getByText('Terms'));
+    expect(terms.open).toBe(true);
+    // Same `name`: the browser closes the other one.
+    expect(programme.open).toBe(false);
+  },
+};
+
+/**
+ * Collapsible only where there is no room: `useMediaQuery` decides, so on a
+ * wide screen every module is a plain open card, and on a phone each is a
+ * disclosure with its settings in the header's `summary`, one open at a
+ * time. Resize the canvas to see it.
+ */
+export const CollapsibleOnNarrowScreens: Story = {
+  render: function CollapsibleOnNarrowScreensStory() {
+    const narrow = useMediaQuery('(max-width: 639px)');
+    const modules = [
+      { title: 'Oscillator', summary: 'Sawtooth · octave 0 · 0 c' },
+      { title: 'Filter', summary: '1.8 kHz · resonance 4.0' },
+      { title: 'Envelope', summary: '10 ms · 400 ms' },
+    ];
+    return (
+      <div className="flex flex-col gap-3">
+        {modules.map((m, i) => (
+          <Card key={m.title} collapsible={narrow} name="modules" defaultOpen={!narrow || i === 0}>
+            <Card.Header summary={narrow ? m.summary : undefined}>
+              <Heading as="h3" size="sm">{m.title}</Heading>
+            </Card.Header>
+            <p className="m-0">The controls of the {m.title.toLowerCase()} go here.</p>
+          </Card>
+        ))}
+      </div>
+    );
+  },
+};
+
+/**
+ * The three slots. `Card.Header` is the title row, `Card.Body` the content
+ * (optional: bare children are the body too), and `Card.Footer` the bottom
+ * row: its two children sit at either end, a rule sets it off from the
+ * content, and it sinks to the bottom, so the footers line up across a row
+ * of cards of different heights — the sockets of a rack of modules.
+ */
+export const Slots: Story = {
+  render: () => {
+    const Socket = ({ label }: { label: string }) => (
+      <span className="flex flex-col items-center gap-1 text-xs text-(--text-muted)">
+        <span aria-hidden className="h-6 w-6 rounded-full border-[3px] border-(--primary) bg-card" />
+        {label}
+      </span>
+    );
+    const modules = [
+      { title: 'Oscillator', body: 'Waveform and octave.', ins: ['Mod'], outs: ['Out'] },
+      { title: 'Mixer', body: 'Three inputs, one level each, summed.', ins: ['1', '2', '3'], outs: ['Out'] },
+      { title: 'Filter', body: 'Cutoff and resonance.', ins: ['In', 'Mod'], outs: ['Out'] },
+    ];
+    return (
+      <div className="grid gap-3 md:grid-cols-3">
+        {modules.map((m) => (
+          <Card key={m.title}>
+            <Card.Header>
+              <Heading as="h3" size="sm">{m.title}</Heading>
+            </Card.Header>
+            <Card.Body>
+              <p className="m-0">{m.body}</p>
+            </Card.Body>
+            <Card.Footer>
+              <span className="flex gap-2">{m.ins.map((i) => <Socket key={i} label={i} />)}</span>
+              <span className="flex gap-2">{m.outs.map((o) => <Socket key={o} label={o} />)}</span>
+            </Card.Footer>
+          </Card>
+        ))}
+      </div>
+    );
   },
 };
