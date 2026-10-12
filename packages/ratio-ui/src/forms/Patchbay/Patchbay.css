@@ -1,0 +1,196 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Patchbay — the board, its ports and its cables. Colours come from the
+ * --patchbay-* tokens (tokens/patchbay.css); a port's own `color` lands in
+ * --patchbay-port-color and a cable's in --patchbay-cable-color.
+ */
+.patchbay {
+  position: relative;
+}
+
+/* --- Cables: an SVG over the whole board, hit-testable only on the lines. */
+.patchbay-cables {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.patchbay-cable-shadow {
+  fill: none;
+  stroke: var(--patchbay-cable-shadow);
+  stroke-width: 7;
+  stroke-linecap: round;
+  transform: translateY(3px);
+}
+
+.patchbay-cable-line {
+  fill: none;
+  stroke: var(--patchbay-cable-color, var(--patchbay-cable));
+  stroke-width: 5;
+  stroke-linecap: round;
+  transition: stroke-width 120ms;
+}
+
+.patchbay-cable-end {
+  fill: var(--patchbay-cable-color, var(--patchbay-cable));
+}
+
+/* Moving dashes, output to input. Still for reduced motion. */
+.patchbay-cable-line--flow {
+  stroke-dasharray: 6 10;
+  animation: patchbay-flow 0.8s linear infinite;
+}
+
+@keyframes patchbay-flow {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patchbay-cable-line--flow {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}
+
+/* The invisible, wide stroke that takes the click and the focus. */
+.patchbay-cable-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  stroke-linecap: round;
+  pointer-events: stroke;
+  cursor: pointer;
+  outline: none;
+}
+
+.patchbay-cable.is-selected .patchbay-cable-line,
+.patchbay-cable:has(.patchbay-cable-hit:focus-visible) .patchbay-cable-line {
+  stroke-width: 7;
+}
+
+.patchbay-cable:has(.patchbay-cable-hit:focus-visible) .patchbay-cable-shadow {
+  stroke: var(--focus-ring);
+  stroke-width: 13;
+  transform: none;
+}
+
+.patchbay-cable--drag .patchbay-cable-line {
+  stroke-dasharray: 8 6;
+}
+
+.patchbay-cable-remove {
+  pointer-events: all;
+  cursor: pointer;
+  outline: none;
+}
+
+.patchbay-cable-remove circle {
+  fill: var(--patchbay-port-bg);
+  stroke: var(--patchbay-cable-color, var(--patchbay-cable));
+  stroke-width: 2;
+}
+
+.patchbay-cable-remove path {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.patchbay-cable-remove:focus-visible circle {
+  stroke: var(--focus-ring);
+  stroke-width: 4;
+}
+
+/* --- Ports: a 40px touch target round a 28px socket. */
+.patchbay-port-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  position: relative;
+  z-index: 3;
+}
+
+.patchbay-port {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+
+.patchbay--read-only .patchbay-port {
+  cursor: default;
+}
+
+.patchbay-port-dot {
+  box-sizing: border-box;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  border: 3px solid var(--patchbay-port-border);
+  background: var(--patchbay-port-bg);
+  transition:
+    transform 150ms ease-in-out,
+    box-shadow 150ms,
+    border-color 150ms;
+}
+
+/* An output is filled; an input is a ring that takes the cable's colour once connected. */
+.patchbay-port[data-direction='out'] .patchbay-port-dot {
+  border-color: var(--patchbay-port-color, var(--patchbay-cable));
+  background: var(--patchbay-port-color, var(--patchbay-cable));
+  box-shadow: inset 0 0 0 4px var(--patchbay-port-bg);
+}
+
+.patchbay-port[data-direction='in'].is-connected .patchbay-port-dot {
+  border-color: var(--patchbay-port-color, var(--patchbay-cable));
+}
+
+.patchbay:not(.patchbay--read-only) .patchbay-port:hover .patchbay-port-dot,
+.patchbay-port.is-pending .patchbay-port-dot {
+  transform: scale(1.12);
+}
+
+.patchbay-port.is-pending .patchbay-port-dot,
+.patchbay-port.is-target .patchbay-port-dot {
+  box-shadow:
+    inset 0 0 0 4px var(--patchbay-port-bg),
+    0 0 0 4px color-mix(in oklch, var(--patchbay-port-color, var(--patchbay-cable)) 40%, transparent);
+}
+
+.patchbay-port[data-direction='in'].is-target .patchbay-port-dot,
+.patchbay-port[data-direction='in'].is-pending .patchbay-port-dot {
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--patchbay-port-color, var(--patchbay-cable)) 40%, transparent);
+}
+
+.patchbay-port:focus-visible .patchbay-port-dot {
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+.patchbay-port-label {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: var(--text-muted);
+}

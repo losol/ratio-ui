@@ -44,3 +44,13 @@ export type {
   ToggleGridChange,
   ToggleGridSize,
 } from './ToggleGrid';
+export { Patchbay } from './Patchbay';
+export type {
+  PatchbayProps,
+  PatchbayPortProps,
+  PatchbayConnection,
+  PatchbayChange,
+  PatchbayDirection,
+  PatchbayLabels,
+  PatchbayPortInfo,
+} from './Patchbay';

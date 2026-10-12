@@ -1,0 +1,23 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Patchbay tokens — the default cable colour, the cable's shadow, and the
+ * socket's fill and idle ring. A port's own `color` wins over the cable
+ * colour. Overridable per scope, so a dark rack keeps its sockets in the
+ * rack's surface.
+ */
+
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-light,
+.surface-dark {
+  --patchbay-cable: var(--primary);
+  --patchbay-cable-shadow: rgb(0 0 0 / 0.3);
+  --patchbay-port-bg: var(--card);
+  --patchbay-port-border: var(--border-2);
+}
