@@ -156,21 +156,27 @@ export const Disabled: Story = {
 };
 
 /**
- * Held notes: `spans` gives an on cell a length in columns, and it draws as
- * one bar. Press a note to pick it up, then a later step in the same row to
- * set how long it lasts; press it again to shorten a long one to one step,
- * or to remove a short one. Shift+arrow adjusts by one from the keyboard.
- * The map is plain JSON — store it with the melody.
+ * Held notes: `cellData` carries a `span` per on cell, a length in columns,
+ * and the cell draws as one bar. Press a note to pick it up, then a later
+ * step in the same row to set how long it lasts; press it again to shorten
+ * a long one to one step, or to remove a short one. Shift+arrow adjusts by
+ * one from the keyboard. The map is plain JSON — store it with the melody.
+ * Other fields on a cell, like the `velocity` here, are the app's and ride
+ * along untouched.
  */
 export const HeldNotes: Story = {
   args: { 'aria-label': 'Melody', rows: noteRows, columns: steps(16) },
   render: function HeldNotesStory(args) {
     const [cells, setCells] = useState(() => melody('G E E - F D D - C D E F G - - -'));
-    const [spans, setSpans] = useState<Record<string, number>>({ 'E:2': 2, 'D:6': 2, 'G:12': 4 });
+    const [notes, setNotes] = useState<Record<string, { span?: number; velocity?: number }>>({
+      'E:2': { span: 2 },
+      'D:6': { span: 2 },
+      'G:12': { span: 4, velocity: 0.6 },
+    });
     return (
       <div className="flex flex-col gap-3">
-        <ToggleGrid {...args} selectedKeys={cells} onSelectionChange={setCells} spans={spans} onSpansChange={setSpans} />
-        <pre className="m-0 text-xs text-(--text-muted)" data-testid="spans">{JSON.stringify(spans)}</pre>
+        <ToggleGrid {...args} selectedKeys={cells} onSelectionChange={setCells} cellData={notes} onCellDataChange={setNotes} />
+        <pre className="m-0 text-xs text-(--text-muted)" data-testid="spans">{JSON.stringify(notes)}</pre>
       </div>
     );
   },
@@ -184,7 +190,7 @@ export const HeldNotes: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'C, beat 9' }));
     await userEvent.click(canvas.getByRole('button', { name: 'C, beat 12' }));
     expect(canvas.getByRole('button', { name: 'C, beat 9 to beat 12' })).toBeInTheDocument();
-    expect(canvas.getByTestId('spans')).toHaveTextContent('"C:8":4');
+    expect(canvas.getByTestId('spans')).toHaveTextContent('"C:8":{"span":4}');
 
     // The same long note again, twice: back to one step, then gone.
     const longC = canvas.getByRole('button', { name: 'C, beat 9 to beat 12' });
@@ -201,13 +207,19 @@ export const HeldNotes: Story = {
     g1.focus();
     await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
     expect(canvas.getByRole('button', { name: 'G, beat 1 to beat 2' })).toBeInTheDocument();
+
+    // Shortening the long G keeps the app's own field on it.
+    const longG = canvas.getByRole('button', { name: 'G, beat 13 to beat 16' });
+    longG.focus();
+    await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
+    expect(canvas.getByTestId('spans')).toHaveTextContent('"G:12":{"velocity":0.6,"span":3}');
   },
 };
 
 /**
  * `readOnly`: the grid as plain markup, with nothing to press and no
  * JavaScript needed. A server component can render a saved melody with it,
- * `spans` and all, straight from the stored JSON.
+ * `cellData` and all, straight from the stored JSON.
  */
 export const ReadOnly: Story = {
   args: {
@@ -216,7 +228,7 @@ export const ReadOnly: Story = {
     columns: steps(16),
     readOnly: true,
     selectedKeys: [...melody('G E E - F D D - C D E F G - - -')],
-    spans: { 'E:2': 2, 'D:6': 2, 'G:12': 4 },
+    cellData: { 'E:2': { span: 2 }, 'D:6': { span: 2 }, 'G:12': { span: 4 } },
     activeColumn: '5',
   },
 };

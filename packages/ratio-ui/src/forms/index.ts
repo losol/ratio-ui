@@ -42,7 +42,8 @@ export type {
   ToggleGridRow,
   ToggleGridColumn,
   ToggleGridChange,
-  ToggleGridSpanChange,
+  ToggleGridCellData,
+  ToggleGridCellDataChange,
   ToggleGridLabels,
   ToggleGridSize,
 } from './ToggleGrid';

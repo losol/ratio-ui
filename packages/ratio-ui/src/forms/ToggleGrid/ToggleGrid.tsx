@@ -42,11 +42,20 @@ export interface ToggleGridChange {
   selected: boolean;
 }
 
-/** A cell's new length, alongside the new map of spans. */
-export interface ToggleGridSpanChange {
+/**
+ * What a cell carries besides being on. `span` is the one field the grid
+ * reads: how many columns the cell covers. Everything else is the app's —
+ * velocity, accent, a note on a booking — stored and handed back untouched.
+ */
+export interface ToggleGridCellData {
+  span?: number;
+}
+
+/** A cell's new data, alongside the new map. `data` is `undefined` when the entry was removed. */
+export interface ToggleGridCellDataChange<T extends ToggleGridCellData = ToggleGridCellData> {
   row: string;
   column: string;
-  span: number;
+  data: T | undefined;
 }
 
 /** Built-in text of `ToggleGrid`, spoken as a cell's length is set. Each entry falls back to English. */
@@ -59,7 +68,7 @@ export interface ToggleGridLabels {
   putDown?: string;
 }
 
-export interface ToggleGridProps {
+export interface ToggleGridProps<T extends ToggleGridCellData = ToggleGridCellData> {
   rows: ToggleGridRow[];
   columns: ToggleGridColumn[];
   /** Controlled selection: the keys (see `toggleGridKey`) of the cells that are on. */
@@ -69,19 +78,21 @@ export interface ToggleGridProps {
   /** Fires with the whole new selection and the one cell that changed. */
   onSelectionChange?: (keys: Set<string>, change: ToggleGridChange) => void;
   /**
-   * How many columns each on cell covers, by key — a held note, a booking
-   * over several hours. Keys absent cover one. Plain JSON, so it is stored
-   * and rendered on the server as it is. Giving `spans`, `defaultSpans` or
-   * `onSpansChange` turns lengths on: pressing an on cell picks it up, a
-   * later cell in the row sets the length, the same cell again shortens it
-   * to one and then turns it off; Shift+arrow adjusts by one from the
-   * keyboard.
+   * Data per on cell, by key. The grid reads one field, `span`: how many
+   * columns the cell covers — a held note, a booking over several hours;
+   * absent means one. The rest of each object is the app's and comes back
+   * untouched. Plain JSON, so it is stored and rendered on the server as it
+   * is. Giving `cellData`, `defaultCellData` or `onCellDataChange` turns
+   * lengths on: pressing an on cell picks it up, a later cell in the row
+   * sets the length, the same cell again shortens it to one and then turns
+   * it off; Shift+arrow adjusts by one from the keyboard. Turning a cell
+   * off removes its entry.
    */
-  spans?: Record<string, number>;
-  /** Uncontrolled start lengths. */
-  defaultSpans?: Record<string, number>;
-  /** Fires with the whole new map and the one cell whose length changed. */
-  onSpansChange?: (spans: Record<string, number>, change: ToggleGridSpanChange) => void;
+  cellData?: Record<string, T>;
+  /** Uncontrolled start data. */
+  defaultCellData?: Record<string, T>;
+  /** Fires with the whole new map and the one cell whose data changed. */
+  onCellDataChange?: (cellData: Record<string, T>, change: ToggleGridCellDataChange<T>) => void;
   /** Column to frame — the step that is playing, the hour it is now. */
   activeColumn?: string | null;
   /**
@@ -111,7 +122,7 @@ export interface ToggleGridProps {
   testId?: string;
 }
 
-/** The key of one cell in `selectedKeys` and `spans`. */
+/** The key of one cell in `selectedKeys` and `cellData`. */
 export const toggleGridKey = (row: string, column: string): string => `${row}:${column}`;
 
 const SIZE = {
@@ -139,8 +150,9 @@ const textOf = (node: React.ReactNode): string | undefined =>
  *
  * Selection is a set of `row:column` keys — build them with `toggleGridKey`.
  * Controlled with `selectedKeys` + `onSelectionChange`, or uncontrolled with
- * `defaultSelectedKeys`. `spans` gives on cells a length in columns — a held
- * note — as a plain map by key, controlled or uncontrolled the same way.
+ * `defaultSelectedKeys`. `cellData` carries what a cell is besides on: its
+ * `span` in columns — a held note — and whatever the app adds, as a plain
+ * map by key, controlled or uncontrolled the same way.
  *
  * `readOnly` renders the grid as plain markup for a server component to show
  * saved data with.
@@ -153,23 +165,23 @@ const textOf = (node: React.ReactNode): string | undefined =>
  *   columns={Array.from({ length: 8 }, (_, i) => ({ id: String(i), emphasized: i % 4 === 0 }))}
  *   selectedKeys={cells}
  *   onSelectionChange={setCells}
- *   spans={lengths}
- *   onSpansChange={setLengths}
+ *   cellData={notes}
+ *   onCellDataChange={setNotes}
  *   activeColumn={String(step)}
  * />
  * ```
  *
  * @beta This component is experimental — prop shape may change before release.
  */
-export function ToggleGrid({
+export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
   rows,
   columns,
   selectedKeys,
   defaultSelectedKeys,
   onSelectionChange,
-  spans: spansProp,
-  defaultSpans,
-  onSpansChange,
+  cellData: cellDataProp,
+  defaultCellData,
+  onCellDataChange,
   activeColumn,
   onRowPress,
   cellName,
@@ -180,13 +192,14 @@ export function ToggleGrid({
   'aria-label': ariaLabel,
   className,
   testId,
-}: Readonly<ToggleGridProps>) {
+}: Readonly<ToggleGridProps<T>>) {
   const text = { ...DEFAULT_LABELS, ...labels };
   const [inner, setInner] = useState(() => new Set(defaultSelectedKeys ?? []));
   const selected = selectedKeys !== undefined ? new Set(selectedKeys) : inner;
-  const [innerSpans, setInnerSpans] = useState<Record<string, number>>(() => defaultSpans ?? {});
-  const spans = spansProp ?? innerSpans;
-  const spansEnabled = spansProp !== undefined || defaultSpans !== undefined || onSpansChange !== undefined;
+  const [innerData, setInnerData] = useState<Record<string, T>>(() => defaultCellData ?? {});
+  const cellData = cellDataProp ?? innerData;
+  const spansEnabled =
+    cellDataProp !== undefined || defaultCellData !== undefined || onCellDataChange !== undefined;
   const interactive = !readOnly && !isDisabled;
 
   // The cell that waits for its length — picked up by a press, put down by
@@ -195,15 +208,15 @@ export function ToggleGrid({
   const [status, setStatus] = useState('');
 
   const columnIndex = new Map(columns.map((c, i) => [c.id, i]));
-  const spanOf = (key: string) => Math.max(1, Math.floor(spans[key] ?? 1));
+  const spanOf = (key: string) => Math.max(1, Math.floor(cellData[key]?.span ?? 1));
 
   const commitSelection = (next: Set<string>, change: ToggleGridChange) => {
     if (selectedKeys === undefined) setInner(next);
     onSelectionChange?.(next, change);
   };
-  const commitSpans = (next: Record<string, number>, change: ToggleGridSpanChange) => {
-    if (spansProp === undefined) setInnerSpans(next);
-    onSpansChange?.(next, change);
+  const commitData = (next: Record<string, T>, change: ToggleGridCellDataChange<T>) => {
+    if (cellDataProp === undefined) setInnerData(next);
+    onCellDataChange?.(next, change);
   };
 
   const nameOf = (row: ToggleGridRow, column: ToggleGridColumn, span = 1) => {
@@ -222,10 +235,10 @@ export function ToggleGrid({
     if (on) next.add(key);
     else next.delete(key);
     commitSelection(next, { row: row.id, column: column.id, selected: on });
-    if (!on && spans[key] !== undefined) {
-      const rest = { ...spans };
+    if (!on && cellData[key] !== undefined) {
+      const rest = { ...cellData };
       delete rest[key];
-      commitSpans(rest, { row: row.id, column: column.id, span: 0 });
+      commitData(rest, { row: row.id, column: column.id, data: undefined });
     }
   };
 
@@ -234,10 +247,13 @@ export function ToggleGrid({
     const key = toggleGridKey(row.id, column.id);
     const start = columnIndex.get(column.id) ?? 0;
     const clamped = Math.max(1, Math.min(columns.length - start, span));
-    const next = { ...spans };
-    if (clamped === 1) delete next[key];
-    else next[key] = clamped;
-    commitSpans(next, { row: row.id, column: column.id, span: clamped });
+    const next = { ...cellData };
+    // Only the length changes; the app's own fields on the cell stay.
+    const { span: _span, ...rest } = (cellData[key] ?? {}) as T;
+    const data = (clamped === 1 ? rest : { ...rest, span: clamped }) as T;
+    if (Object.keys(data).length === 0) delete next[key];
+    else next[key] = data;
+    commitData(next, { row: row.id, column: column.id, data: next[key] });
 
     const covered = columns
       .slice(start + 1, start + clamped)
