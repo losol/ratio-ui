@@ -42,7 +42,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "pnpm run clean && vite build && node scripts/check-imports.mjs",
+    "build": "pnpm run clean && tsc --emitDeclarationOnly --outDir dist && vite build --emptyOutDir false && node scripts/check-imports.mjs",
     "check:imports": "node scripts/check-imports.mjs",
     "clean": "rm -rf dist",
     "lint": "eslint .",
