@@ -42,6 +42,8 @@ export type {
   ToggleGridRow,
   ToggleGridColumn,
   ToggleGridChange,
+  ToggleGridSpanChange,
+  ToggleGridLabels,
   ToggleGridSize,
 } from './ToggleGrid';
 export { Patchbay } from './Patchbay';

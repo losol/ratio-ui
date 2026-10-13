@@ -154,3 +154,69 @@ export const Disabled: Story = {
     isDisabled: true,
   },
 };
+
+/**
+ * Held notes: `spans` gives an on cell a length in columns, and it draws as
+ * one bar. Press a note to pick it up, then a later step in the same row to
+ * set how long it lasts; press it again to shorten a long one to one step,
+ * or to remove a short one. Shift+arrow adjusts by one from the keyboard.
+ * The map is plain JSON — store it with the melody.
+ */
+export const HeldNotes: Story = {
+  args: { 'aria-label': 'Melody', rows: noteRows, columns: steps(16) },
+  render: function HeldNotesStory(args) {
+    const [cells, setCells] = useState(() => melody('G E E - F D D - C D E F G - - -'));
+    const [spans, setSpans] = useState<Record<string, number>>({ 'E:2': 2, 'D:6': 2, 'G:12': 4 });
+    return (
+      <div className="flex flex-col gap-3">
+        <ToggleGrid {...args} selectedKeys={cells} onSelectionChange={setCells} spans={spans} onSpansChange={setSpans} />
+        <pre className="m-0 text-xs text-(--text-muted)" data-testid="spans">{JSON.stringify(spans)}</pre>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    // A long note is one button, named by its first and last step.
+    const heldG = canvas.getByRole('button', { name: 'G, beat 13 to beat 16' });
+    expect(heldG).toHaveAttribute('aria-pressed', 'true');
+
+    // Pick up the C on beat 9, then press beat 12 in the same row: four steps.
+    await userEvent.click(canvas.getByRole('button', { name: 'C, beat 9' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'C, beat 12' }));
+    expect(canvas.getByRole('button', { name: 'C, beat 9 to beat 12' })).toBeInTheDocument();
+    expect(canvas.getByTestId('spans')).toHaveTextContent('"C:8":4');
+
+    // The same long note again, twice: back to one step, then gone.
+    const longC = canvas.getByRole('button', { name: 'C, beat 9 to beat 12' });
+    await userEvent.click(longC);
+    await userEvent.click(longC);
+    const shortC = canvas.getByRole('button', { name: 'C, beat 9' });
+    expect(shortC).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(shortC);
+    await userEvent.click(shortC);
+    expect(canvas.getByRole('button', { name: 'C, beat 9' })).toHaveAttribute('aria-pressed', 'false');
+
+    // Shift+ArrowRight lengthens from the keyboard.
+    const g1 = canvas.getByRole('button', { name: 'G, beat 1' });
+    g1.focus();
+    await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
+    expect(canvas.getByRole('button', { name: 'G, beat 1 to beat 2' })).toBeInTheDocument();
+  },
+};
+
+/**
+ * `readOnly`: the grid as plain markup, with nothing to press and no
+ * JavaScript needed. A server component can render a saved melody with it,
+ * `spans` and all, straight from the stored JSON.
+ */
+export const ReadOnly: Story = {
+  args: {
+    'aria-label': 'Saved melody',
+    rows: noteRows,
+    columns: steps(16),
+    readOnly: true,
+    selectedKeys: [...melody('G E E - F D D - C D E F G - - -')],
+    spans: { 'E:2': 2, 'D:6': 2, 'G:12': 4 },
+    activeColumn: '5',
+  },
+};
