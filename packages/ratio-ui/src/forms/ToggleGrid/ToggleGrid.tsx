@@ -247,7 +247,14 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
     const key = toggleGridKey(row.id, column.id);
     const start = columnIndex.get(column.id) ?? 0;
     const clamped = Math.max(1, Math.min(columns.length - start, span));
+    // The cells the bar now covers go off, data and all — the same as turning
+    // them off — so a stale length cannot come back when one is turned on later.
+    const covered = columns
+      .slice(start + 1, start + clamped)
+      .map((c) => toggleGridKey(row.id, c.id))
+      .filter((k) => selected.has(k) || cellData[k] !== undefined);
     const next = { ...cellData };
+    covered.forEach((k) => delete next[k]);
     // Only the length changes; the app's own fields on the cell stay.
     const { span: _span, ...rest } = (cellData[key] ?? {}) as T;
     const data = (clamped === 1 ? rest : { ...rest, span: clamped }) as T;
@@ -255,14 +262,11 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
     else next[key] = data;
     commitData(next, { row: row.id, column: column.id, data: next[key] });
 
-    const covered = columns
-      .slice(start + 1, start + clamped)
-      .map((c) => toggleGridKey(row.id, c.id))
-      .filter((k) => selected.has(k));
-    if (covered.length > 0) {
+    const coveredOn = covered.filter((k) => selected.has(k));
+    if (coveredOn.length > 0) {
       const sel = new Set(selected);
-      covered.forEach((k) => sel.delete(k));
-      const lastCovered = covered[covered.length - 1]!;
+      coveredOn.forEach((k) => sel.delete(k));
+      const lastCovered = coveredOn[coveredOn.length - 1]!;
       commitSelection(sel, { row: row.id, column: lastCovered.slice(row.id.length + 1), selected: false });
     }
     setStatus(text.length(nameOf(row, column, clamped), clamped));

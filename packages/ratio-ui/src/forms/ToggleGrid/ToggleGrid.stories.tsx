@@ -213,6 +213,20 @@ export const HeldNotes: Story = {
     longG.focus();
     await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
     expect(canvas.getByTestId('spans')).toHaveTextContent('"G:12":{"velocity":0.6,"span":3}');
+
+    // Extending over a held note swallows it, data and all: the E on beat 2
+    // grows over the held E on beats 3–4, whose length must not survive to
+    // resurface when beat 3 is turned on again later.
+    await userEvent.click(canvas.getByRole('button', { name: 'E, beat 2' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'E, beat 5' }));
+    expect(canvas.getByRole('button', { name: 'E, beat 2 to beat 5' })).toBeInTheDocument();
+    expect(canvas.getByTestId('spans')).not.toHaveTextContent('"E:2"');
+    const longE = canvas.getByRole('button', { name: 'E, beat 2 to beat 5' });
+    await userEvent.click(longE);
+    await userEvent.click(longE);
+    await userEvent.click(canvas.getByRole('button', { name: 'E, beat 3' }));
+    expect(canvas.getByRole('button', { name: 'E, beat 3' })).toHaveAttribute('aria-pressed', 'true');
+    expect(canvas.queryByRole('button', { name: /^E, beat 3 to/ })).toBeNull();
   },
 };
 
