@@ -8,5 +8,8 @@ export type {
   ToggleGridRow,
   ToggleGridColumn,
   ToggleGridChange,
+  ToggleGridCellData,
+  ToggleGridCellDataChange,
+  ToggleGridLabels,
   ToggleGridSize,
 } from './ToggleGrid';
