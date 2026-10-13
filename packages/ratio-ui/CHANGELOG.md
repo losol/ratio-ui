@@ -1,5 +1,24 @@
 # @eventuras/ratio-ui
 
+## 2.32.0
+
+### Minor Changes
+
+- 440a679: New `Patchbay` (beta), under `forms`: connect things with cables — an oscillator to a filter, a question to its answer, a battery to a lamp. `Patchbay.Port` is a socket that sits in ordinary markup (a card's footer, a column of a list); the board measures the ports and draws the cables on top, following the layout as it changes. Connect by dragging from one port to another, by pressing one and then the other, or with the keyboard (Enter picks a port up, Tab to the other, Enter connects, Escape puts it down); the same gesture on a cable that exists removes it, as does selecting the cable and pressing Delete, or its remove button. One output may feed many inputs and one input take many outputs; `canConnect` is where an app says otherwise. `connections` + `onConnectionsChange`, or `defaultConnections`; `readOnly` for a diagram; `flow` for dashes moving along the cables (still for reduced motion); `labels` for the spoken text. Colours from the new `--patchbay-cable`, `--patchbay-cable-shadow`, `--patchbay-port-bg` and `--patchbay-port-border` tokens, and each port's `color`.
+- 898d84c: Three controls for a panel of parameters, all beta, under `forms`:
+  
+  - `Knob`: a rotary control for one continuous value — drag up or down (Shift for fine movement), arrow keys with focus (Page Up/Down for a tenth of the turn, Home/End for the ends), double-click back to `defaultValue`. `scale="log"` spreads the turn evenly over octaves, for frequency and time; `step` snaps a linear knob. A `role="slider"`, with `formatValue` as the spoken value. `knobToNormal` and `knobFromNormal` are exported for anyone mapping the same scale elsewhere.
+  - `Counter`: a value with − and + round it in a pill, one `step` per press, inactive at `minValue` and `maxValue`. `formatValue` writes it the way it reads ("110 bpm", "+1"); `labels` name the buttons. For a handful of steps that are nudged, where `NumberField` would be typed.
+  - `ToggleGrid`: a matrix of on/off cells with a header per row and a label per column — notes on beats, people on hours. Selection is a set of `row:column` keys (`toggleGridKey`), controlled or uncontrolled; `activeColumn` frames one column for a playhead; a row `color` carries through to its selected cells; `onRowPress` makes the row headers buttons.
+  
+  `ToggleButtonGroup` takes `variant="tiles"` (beta): equal-width blocks that stack an option's new `icon` over its label, for a choice among a few things best shown rather than named. The matching `ToggleButton` variant is `tile`.
+  
+  For the same panel on a phone:
+  
+  - `Knob` reads its colours from the new `--knob-fill`, `--knob-track`, `--knob-face` and `--knob-pointer` tokens, so a dark instrument panel can reskin its knobs in a scope.
+  - `Card` takes `collapsible` (beta): the card renders as a native `<details>`, its new `Card.Header` as the `<summary>` and the rest of the children as the body — `defaultOpen`, or `open` with `onToggle`. Cards that share a `name` open one at a time, the browser closing the rest. `Card.Header` takes `summary`: one truncated line at the end of the header, so a closed card still tells what is inside. `Card.Body` is the content between them, optional, grown to fill the card. `Card.Footer` is the bottom row — inputs and outputs, a status and an action — ruled off from the content and sunk to the bottom, so footers line up across a row of cards of different heights.
+  - `useMediaQuery(query)` under `hooks`: whether a media query matches, `false` on the server and during hydration, for the layout decisions CSS cannot make — which component to render, whether a panel starts collapsed.
+
 ## 2.31.1
 
 ### Patch Changes

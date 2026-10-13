@@ -1,5 +1,0 @@
----
-"@eventuras/ratio-ui": minor
----
-
-New `Patchbay` (beta), under `forms`: connect things with cables — an oscillator to a filter, a question to its answer, a battery to a lamp. `Patchbay.Port` is a socket that sits in ordinary markup (a card's footer, a column of a list); the board measures the ports and draws the cables on top, following the layout as it changes. Connect by dragging from one port to another, by pressing one and then the other, or with the keyboard (Enter picks a port up, Tab to the other, Enter connects, Escape puts it down); the same gesture on a cable that exists removes it, as does selecting the cable and pressing Delete, or its remove button. One output may feed many inputs and one input take many outputs; `canConnect` is where an app says otherwise. `connections` + `onConnectionsChange`, or `defaultConnections`; `readOnly` for a diagram; `flow` for dashes moving along the cables (still for reduced motion); `labels` for the spoken text. Colours from the new `--patchbay-cable`, `--patchbay-cable-shadow`, `--patchbay-port-bg` and `--patchbay-port-border` tokens, and each port's `color`.
