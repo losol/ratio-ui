@@ -104,9 +104,9 @@ export function TextField({
   const inputClassName = cn(
     !unstyled && formStyles.defaultInputStyle,
     hasError && formStyles.inputErrorGlow,
-    // inputErrorGlow carries a 1px `border`; keep the default input's 2px
+    // inputErrorGlow carries a 1px `border`; keep the default input's token
     // width when it has one (cn keeps only the last border width).
-    hasError && !unstyled && 'border-2',
+    hasError && !unstyled && 'border-(length:--input-border-width)',
     disabled && 'cursor-not-allowed',
     showCopyToClipboard && 'pr-10',
     multiline && formStyles.textarea,

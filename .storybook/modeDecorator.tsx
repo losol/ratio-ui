@@ -15,6 +15,8 @@ const VARIANTS: Variant[] = [
   { label: '☀️ Light', theme: 'light' },
   { label: '🗂️ Bureau', theme: 'bureau', colorScheme: 'light' },
   { label: '🗂️ Bureau dark', theme: 'bureau', colorScheme: 'dark' },
+  { label: '📋 Tabula', theme: 'tabula', colorScheme: 'light' },
+  { label: '📋 Tabula dark', theme: 'tabula', colorScheme: 'dark' },
   { label: '🖋️ Ink', theme: 'ink', colorScheme: 'dark' },
   { label: '📄 Ink paper', theme: 'ink', colorScheme: 'light' },
 ];
@@ -31,7 +33,10 @@ const apply = (v: Variant) => {
 
 export const ModeDecorator = (Story: any, context: any) => {
   const noPadding = context?.parameters?.noPadding === true;
-  const [index, setIndex] = useState(0);
+  // A story about one theme (`parameters.theme = 'tabula'`) opens in it; the
+  // button still cycles the rest.
+  const preferred = VARIANTS.findIndex((v) => v.theme === context?.parameters?.theme);
+  const [index, setIndex] = useState(preferred === -1 ? 0 : preferred);
   const variant = VARIANTS[index];
 
   const next = () => setIndex((i) => (i + 1) % VARIANTS.length);

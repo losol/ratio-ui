@@ -10,6 +10,8 @@ import '../packages/ratio-ui/src/ratio-ui.css';
 import '../packages/ratio-ui/src/themes/bureau.css';
 import '../packages/ratio-ui/src/themes/bureau-fonts.css';
 import '../packages/ratio-ui/src/themes/ink.css';
+import '../packages/ratio-ui/src/themes/tabula.css';
+import '../packages/ratio-ui/src/themes/tabula-fonts.css';
 
 const preview: Preview = {
   parameters: {

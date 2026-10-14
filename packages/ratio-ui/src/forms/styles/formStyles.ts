@@ -102,15 +102,17 @@ export const componentStyles = {
 
 // Updated formStyles with extracted text styles
 export const formStyles = {
+  // The field's chrome (paper, frame, corner) comes from the --input-*
+  // tokens in tokens/form.css, so a theme restyles every field at once.
   defaultInputStyle: `
         appearance-none
         ${layoutStyles.widthFull}
         ${textStyles.comboBoxInput}
         p-4
-        rounded-lg
-        bg-card
-        border-2
-        border-border-1
+        rounded-(--input-radius)
+        bg-(--input-bg)
+        border-(length:--input-border-width)
+        border-(--input-border-color)
         leading-tight
         focus:outline-hidden
         focus:ring-2

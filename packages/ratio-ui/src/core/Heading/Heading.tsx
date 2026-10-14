@@ -113,14 +113,17 @@ const eyebrowToneClasses: Record<NonNullable<HeadingEyebrowProps['tone']>, strin
 };
 
 /**
- * Small mono-font kicker line for above a heading. Pair with `Heading`
- * inside `Heading.Group` so screen readers announce it as the heading's
- * subtitle.
+ * Small kicker line for above a heading, in capitals. Its face, size, weight
+ * and tracking come from the `--eyebrow-*` tokens (tokens/eyebrow.css): mono
+ * and widely tracked in the standard theme, a theme's own small print
+ * elsewhere. Pair with `Heading` inside `Heading.Group` so screen readers
+ * announce it as the heading's subtitle.
  */
 const HeadingEyebrow = ({ children, className, tone = 'primary' }: HeadingEyebrowProps) => (
   <p
     className={cn(
-      'font-mono text-[10.5px] uppercase tracking-[0.18em] font-bold mb-2',
+      'font-(family-name:--eyebrow-font-family) text-(length:--eyebrow-font-size) uppercase',
+      'tracking-(--eyebrow-letter-spacing) font-(--eyebrow-font-weight) mb-2',
       eyebrowToneClasses[tone],
       className,
     )}

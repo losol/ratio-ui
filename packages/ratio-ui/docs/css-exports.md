@@ -84,6 +84,7 @@ so a page only downloads the ones it uses. Import them after the main one:
 import '@eventuras/ratio-ui/ratio-ui.css';
 import '@eventuras/ratio-ui/themes/bureau.css'; // data-theme="bureau"
 import '@eventuras/ratio-ui/themes/ink.css';    // data-theme="ink"
+import '@eventuras/ratio-ui/themes/tabula.css'; // data-theme="tabula"
 ```
 
 ### Avoiding a flash of the default theme

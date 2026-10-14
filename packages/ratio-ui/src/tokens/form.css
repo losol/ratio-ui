@@ -11,6 +11,13 @@
  * per scope to restyle all field labels without touching the components.
  *
  * `--label-gap` is the space between a label and its control.
+ *
+ * The `--input-*` tokens are the chrome of a field (`TextField`'s input and
+ * the bare `forms/Input`): the paper it is printed on, its frame and its
+ * corner.
+ * References (`var(--card)`), so they are declared on the surface scopes
+ * too: a var() resolves where it is written, and a field inside a dark
+ * rail on a light page must take the rail's card.
  */
 :root {
   --label-font-size: var(--font-size-sm);
@@ -20,4 +27,13 @@
   --label-font-weight: 500;
   --label-color: var(--text);
   --label-gap: 0.25rem;
+}
+
+:root,
+.surface-light,
+.surface-dark {
+  --input-bg: var(--card);
+  --input-border-width: 2px;
+  --input-border-color: var(--border-1);
+  --input-radius: var(--radius-lg);
 }

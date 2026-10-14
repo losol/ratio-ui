@@ -1,0 +1,193 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * tabula theme — the printed sheet. Latin for a board, a tablet, a form:
+ * every surface is a white sheet in a thick petrol frame on a sand page, with no rounded corner anywhere. One condensed grotesk for the
+ * big words and the small print (Fira Sans Condensed, 700–800, in
+ * capitals), its wider sibling for the running text (Fira Sans). Flat:
+ * the frames carry the hierarchy, and the only shadow is the soft one
+ * under a button, which goes when the button is pressed.
+ *
+ * Axes (named-theme convention, see docs/authoring-themes.md):
+ *   palette → data-theme="tabula"
+ *   mode    → data-color-scheme="light|dark"
+ * A tabula element with no data-color-scheme is the light sheet.
+ *
+ * What it changes against the standard theme (docs/tabula-theme-spec.md):
+ *   corners   0 everywhere (every radius token, pills included)
+ *   frames    the sheet 10px, fields and choices 2–4px, in the primary
+ *   cards     opaque white sheets, no shadow
+ *   shadow    soft, on buttons only; none when pressed, and no growing
+ *   fonts     Fira Sans Condensed (display, eyebrows) + Fira Sans (body)
+ *   eyebrows  capitals, condensed, in the primary, a little tracking
+ *   labels    bold
+ *   page      sand, not near-white
+ *
+ * Look only — no tenant content ships in the theme. Fonts are family
+ * tokens; opt in to the files with themes/tabula-fonts.css.
+ */
+
+/* --------------------------------------------
+   tabula — light — also the `.surface-light` context
+   -------------------------------------------- */
+:root[data-theme="tabula"],
+:root[data-theme="tabula"] .surface-light {
+  color-scheme: light;
+
+  /* Primary scale — petrol, light to dark. Chrome that reaches for a
+     step directly (`bg-primary-100` pills, steppers, toggles, chat rows)
+     would otherwise show the standard theme's Linseed on a tabula page.
+     Absolute steps serving both modes: 700 is the light arm's primary,
+     500 the dark arm's, 50 the tint a picked tile fills with. */
+  --color-primary-50: #ddf1f4;
+  --color-primary-100: #c6e6eb;
+  --color-primary-200: #a3d4dc;
+  --color-primary-300: #7cc4cf;
+  --color-primary-400: #5aaebb;
+  --color-primary-500: #3e9aa8;
+  --color-primary-600: #22808f;
+  --color-primary-700: #0b6a78;
+  --color-primary-800: #084f5a;
+  --color-primary-900: #063f48;
+  --color-primary-950: #042a30;
+
+  /* Brand — petrol. Dark enough for text at AA on the sand (5.6:1) and
+     on the sheet (6.9:1), so the frames and the big words share it. */
+  --primary: #0b6a78;            /* petrol */
+  --secondary: #ddf1f4;          /* ice: the tint, a step off the sheet */
+  /* --accent inherits the standard ochre; the theme has no second colour. */
+
+  /* Text — a cool ink, and a grey-green for the running words. */
+  --text: #1e2a2e;
+  --text-muted: #4a5558;
+  --text-subtle: #5e6a6d;        /* derived: a step below muted, 4.5:1 on the sand */
+  --text-light: #f2eee3;         /* derived */
+  --text-dark: #1e2a2e;          /* derived */
+
+  --text-on-primary: #ffffff;
+  --text-on-secondary: #1e2a2e;  /* derived: ink on ice */
+
+  /* Surfaces — the sand page, the white sheet, and the paper a field
+     is printed on. */
+  --surface: #e7e1d1;            /* sand */
+  --surface-glass: color-mix(in oklch, var(--surface) 88%, transparent);
+  --card: #ffffff;               /* the sheet */
+  --card-hover: #fffcf0;         /* paper */
+
+  /* Borders — the rule between rows, and the frame round a field or a
+     choice: the primary, so `outline` buttons and strong borders are
+     petrol too. */
+  --border-1: #cfc6b0;           /* rule */
+  --border-2: #0b6a78;           /* frame */
+
+  --focus-ring: rgb(11 106 120 / 0.4);
+
+  /* The sheet has no shadow: the frame carries it. Interactive cards
+     change their fill and border, not their elevation. */
+  --card-shadow-xs: none;
+  --card-shadow-sm: none;
+  --card-shadow-md: none;
+  --card-hover-shadow: none;
+  --card-hover-shadow-tile: none;
+  /* A featured card is the sheet itself: a thick frame in the primary. */
+  --card-featured-border-width: 10px;
+  --card-featured-shadow: none;
+
+  /* Button chrome — square, a soft shadow at rest, and a press that
+     drops the shadow instead of growing. */
+  --button-radius: 0;
+  --button-shadow: 0 1px 3px rgb(0 0 0 / 0.18), 0 1px 2px rgb(0 0 0 / 0.12);
+  --button-shadow-active: none;
+  --button-transform-active: none;
+
+  /* Corners — every step Tailwind's `rounded-*` reads, so no component
+     keeps a soft corner. Pills, chips, menus and overlays square off too;
+     only spinners, avatars and decorative circles keep `rounded-full`. */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-overlay: 0;
+  --radius-pill: 0;
+  --chip-radius: 0;
+  --action-button-radius: 0;
+  --menu-trigger-radius: 0;
+  --menu-popover-radius: 0;
+
+  /* Fields — printed on paper, framed in the primary. */
+  --input-bg: #fffcf0;
+  --input-border-width: 2px;
+  --input-border-color: var(--primary);
+  --input-radius: 0;
+
+  /* Labels — bold, in the ink. */
+  --label-font-weight: 700;
+
+  /* Eyebrows (Heading.Eyebrow, Card.Meta) — the condensed grotesk in
+     capitals, heavy, a little tracking: the small print on a form. */
+  --eyebrow-font-family: var(--font-display);
+  --eyebrow-font-size: 0.8125rem;
+  --eyebrow-font-weight: 800;
+  --eyebrow-letter-spacing: 0.06em;
+
+  /* Fonts — family tokens only; the consumer embeds the files (opt in
+     with themes/tabula-fonts.css). The condensed cut for display, so a
+     heading set in `font-serif` comes out condensed and bold (it ships
+     700 and 800 only; the browser picks 700 for lighter requests). */
+  --font-display: "Fira Sans Condensed", "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fira Sans Condensed", "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* --------------------------------------------
+   tabula — dark — also the `.surface-dark` context
+   The sheet goes slate, the frame a lighter petrol, the ink a warm
+   off-white; the paper a field is printed on goes darker than the sheet.
+   -------------------------------------------- */
+:root[data-theme="tabula"][data-color-scheme="dark"],
+:root[data-theme="tabula"] .surface-dark {
+  color-scheme: dark;
+
+  /* Brand — a lighter petrol, 5.0:1 on the sheet, so links and eyebrows
+     still read; the primary scale is absolute and stays. */
+  --primary: #3e9aa8;
+  --secondary: #173a40;          /* the tint, dark */
+
+  --text: #e9e4d6;
+  --text-muted: #b8b3a6;
+  --text-subtle: #9a958a;        /* derived */
+  --text-light: #e9e4d6;         /* derived */
+  --text-dark: #101c1f;          /* derived */
+
+  --text-on-primary: #101c1f;
+  --text-on-secondary: #e9e4d6;  /* derived */
+
+  --surface: #101c1f;
+  --surface-glass: color-mix(in oklch, var(--surface) 88%, transparent);
+  --card: #172629;
+  --card-hover: #1c2f33;         /* derived: a step lighter than the sheet */
+
+  --border-1: #2d3f43;
+  --border-2: #3e9aa8;
+
+  --focus-ring: rgb(62 154 168 / 0.45);
+
+  --input-bg: #0e1a1d;
+
+  /* Overlays flip to the warm ink on the dark field. */
+  --overlay-ink: 233 228 214;
+  --scrim: rgb(0 0 0 / 0.65);
+
+  /* The standard dark block sets its own navbar shadow; a tabula page is
+     flat in both modes. */
+  --navbar-shadow: none;
+}

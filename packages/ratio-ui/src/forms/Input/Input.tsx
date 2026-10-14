@@ -12,7 +12,8 @@ import { mergeClassName } from '../../utils/mergeClassName';
  */
 export const inputStyles = {
   default:
-    'px-3 py-2 border border-border-1 rounded-lg bg-card text-(--text) focus:outline-none focus:ring-2 focus:ring-(--focus-ring)',
+    'px-3 py-2 border-(length:--input-border-width) border-(--input-border-color) rounded-(--input-radius) bg-(--input-bg) ' +
+    'text-(--text) focus:outline-none focus:ring-2 focus:ring-(--focus-ring)',
 };
 
 /**

@@ -9,7 +9,10 @@ is a real worked example.
 A ready-to-edit starting point ships at
 [`src/tokens/theme-template.css`](../src/tokens/theme-template.css) — copy it,
 rename, and fill in. The built-in [`ink`](../src/themes/ink.css) theme is a
-second worked example: semantic tokens only, two arms, nothing else.
+second worked example: semantic tokens only, two arms, nothing else. The
+[`tabula`](../src/themes/tabula.css) theme shows the chrome tokens — corners,
+frames, shadows, the press on a button, the paper under a field, the eyebrow
+face — all set to a flat, square look.
 
 ## Loading a theme
 

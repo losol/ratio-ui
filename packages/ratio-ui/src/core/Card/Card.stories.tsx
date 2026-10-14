@@ -7,6 +7,9 @@ import { Card } from './Card';
 import { Image } from '../Image';
 import { Box } from '../../layout/Box';
 import { Heading } from '../Heading';
+import { Button } from '../Button';
+import { BrandMark } from '../BrandMark';
+import { TextField } from '../../forms/Input/TextField';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 const meta: Meta<typeof Card> = {
@@ -447,5 +450,52 @@ export const Slots: Story = {
         ))}
       </div>
     );
+  },
+};
+
+/**
+ * Something in all four corners. `Card.Meta` is the small print at the top,
+ * in capitals and the primary colour: what the card is at the start, who it
+ * is from at the end. `Card.Footer` holds the bottom two: whose it is, and
+ * who signed. With `featured` the card is a sheet in a thick frame — in the
+ * Tabula theme, the sheet every form is printed on.
+ */
+export const FourCorners: Story = {
+  render: () => (
+    <Card featured padding="lg" gap="md" className="max-w-lg">
+      <Card.Meta>
+        <span>Enrolment form</span>
+        <span>Spring term</span>
+      </Card.Meta>
+      <Card.Body className="flex flex-col gap-4">
+        <TextField
+          name="name"
+          label="Name"
+          description="As you want it on the course list."
+          placeholder="e.g. Kari Nordmann"
+        />
+        <Button block size="lg">Enrol</Button>
+      </Card.Body>
+      <Card.Footer>
+        <BrandMark>
+          <BrandMark.Logo>
+            <svg viewBox="0 0 36 36" width="32" height="32" aria-hidden className="text-(--primary)">
+              <rect x="3" y="3" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="3" />
+              <path d="M10 12h16M10 18h16M10 24h10" stroke="currentColor" strokeWidth="3" />
+            </svg>
+          </BrandMark.Logo>
+          <BrandMark.Name>Nordlys</BrandMark.Name>
+          <BrandMark.Subtitle>Evening school</BrandMark.Subtitle>
+        </BrandMark>
+        <strong className="text-right text-(--primary)">The course office</strong>
+      </Card.Footer>
+    </Card>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const meta = canvas.getByText('Enrolment form').parentElement!;
+    await expect(meta).toHaveTextContent('Spring term');
+    await expect(canvas.getByRole('textbox', { name: 'Name' })).toBeInTheDocument();
+    await expect(canvas.getByText('The course office')).toBeInTheDocument();
   },
 };
