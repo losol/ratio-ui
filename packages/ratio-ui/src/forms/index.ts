@@ -53,6 +53,7 @@ export type {
   PatchbayPortProps,
   PatchbayConnection,
   PatchbayChange,
+  PatchbayConnector,
   PatchbayDirection,
   PatchbayLabels,
   PatchbayPortInfo,

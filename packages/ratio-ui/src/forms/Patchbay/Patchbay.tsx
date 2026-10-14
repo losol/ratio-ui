@@ -22,6 +22,12 @@ import './Patchbay.css';
 
 export type PatchbayDirection = 'in' | 'out';
 
+/**
+ * How a cable is drawn: a `cable` hangs in a curve, as on a rack; `straight`
+ * is one line, as in a quiz; `elbow` turns at right angles, as in a diagram.
+ */
+export type PatchbayConnector = 'cable' | 'straight' | 'elbow';
+
 /** A cable: `from` is an output port, `to` an input port. */
 export interface PatchbayConnection {
   from: string;
@@ -79,6 +85,14 @@ export interface PatchbayProps {
   ) => boolean;
   /** Draw the cables, take no input — a diagram. */
   readOnly?: boolean;
+  /**
+   * How a cable is drawn. `cable` (default) hangs in a curve, the way a
+   * patch cable does; `straight` is one line from port to port, for a quiz;
+   * `elbow` turns at right angles, down, across and down, for a chart that
+   * reads top to bottom. Press feedback and the remove button sit on the
+   * line whichever it is.
+   */
+  connector?: PatchbayConnector;
   /** Dashes moving from output to input along each cable. Off for reduced motion. */
   flow?: boolean;
   labels?: PatchbayLabels;
@@ -91,6 +105,8 @@ export interface PatchbayProps {
 
 interface PortEntry extends PatchbayPortInfo {
   el: HTMLElement;
+  /** An anchor: a point a line ends at, with no socket drawn. */
+  anchor?: boolean;
 }
 
 interface Point {
@@ -134,9 +150,22 @@ const curve = (a: Point, b: Point) => {
   const sag = sagOf(a, b);
   return `M${a.x} ${a.y} C${a.x} ${a.y + sag}, ${b.x} ${b.y + sag}, ${b.x} ${b.y}`;
 };
-const midpoint = (a: Point, b: Point): Point => ({
+/** One line, port to port. */
+const straight = (a: Point, b: Point) => `M${a.x} ${a.y} L${b.x} ${b.y}`;
+/**
+ * Two right angles, for a chart that reads top to bottom: down from the
+ * port, across at the middle, down into the other. Two elbows leaving one
+ * port run together until they part, as the branches of a chart do.
+ */
+const elbow = (a: Point, b: Point) => {
+  const my = (a.y + b.y) / 2;
+  return `M${a.x} ${a.y} V${my} H${b.x} V${b.y}`;
+};
+const PATHS: Record<PatchbayConnector, (a: Point, b: Point) => string> = { cable: curve, straight, elbow };
+/** Where the remove button sits: on the line, at its middle. */
+const midpoint = (connector: PatchbayConnector, a: Point, b: Point): Point => ({
   x: (a.x + b.x) / 2,
-  y: (a.y + b.y) / 2 + sagOf(a, b) * 0.75,
+  y: (a.y + b.y) / 2 + (connector === 'cable' ? sagOf(a, b) * 0.75 : 0),
 });
 
 const samePositions = (a: Record<string, Point>, b: Record<string, Point>) => {
@@ -182,6 +211,7 @@ export function PatchbayRoot({
   canConnect,
   readOnly = false,
   flow = false,
+  connector = 'cable',
   labels,
   'aria-label': ariaLabel,
   className,
@@ -190,6 +220,7 @@ export function PatchbayRoot({
 }: Readonly<PatchbayProps>) {
   const boardId = useId();
   const text = { ...DEFAULT_LABELS, ...labels };
+  const path = PATHS[connector];
 
   const [inner, setInner] = useState<PatchbayConnection[]>(() => defaultConnections ?? []);
   const connections = connectionsProp ?? inner;
@@ -398,9 +429,21 @@ export function PatchbayRoot({
     const a = positions[c.from];
     const b = positions[c.to];
     if (!a || !b) return [];
-    const from = info(c.from);
-    const to = info(c.to);
-    return [{ key: cableKey(c), c, a, b, color: colorOf(c), name: from && to ? text.cable(from, to) : undefined }];
+    const from = ports.get(c.from);
+    const to = ports.get(c.to);
+    return [
+      {
+        key: cableKey(c),
+        c,
+        a,
+        b,
+        color: colorOf(c),
+        name: from && to ? text.cable(from, to) : undefined,
+        // A line into an anchor ends flush with it; a cable into a socket ends in a plug.
+        endA: !from?.anchor,
+        endB: !to?.anchor,
+      },
+    ];
   });
   const dragFrom = drag ? positions[drag.from] : undefined;
   const dragLine = drag && dragFrom ? { a: dragFrom, b: drag.to, color: info(drag.from)?.color } : null;
@@ -414,21 +457,22 @@ export function PatchbayRoot({
         data-testid={testId}
         data-patchbay-board={boardId}
         onKeyDown={onKeyDown}
+        data-connector={connector}
         className={cn('patchbay', readOnly && 'patchbay--read-only', className)}
       >
         {children}
         <svg className="patchbay-cables" aria-hidden={readOnly || undefined}>
-          {cables.map(({ key, c, a, b, color, name }) => {
-            const d = curve(a, b);
+          {cables.map(({ key, c, a, b, color, name, endA, endB }) => {
+            const d = path(a, b);
             const style = color ? ({ '--patchbay-cable-color': color } as React.CSSProperties) : undefined;
             const isSelected = selected === key;
-            const mid = midpoint(a, b);
+            const mid = midpoint(connector, a, b);
             return (
               <g key={key} className={cn('patchbay-cable', isSelected && 'is-selected')} style={style}>
                 <path className="patchbay-cable-shadow" d={d} />
                 <path className={cn('patchbay-cable-line', flow && 'patchbay-cable-line--flow')} d={d} />
-                <circle className="patchbay-cable-end" cx={a.x} cy={a.y} r={7} />
-                <circle className="patchbay-cable-end" cx={b.x} cy={b.y} r={7} />
+                {endA && <circle className="patchbay-cable-end" cx={a.x} cy={a.y} r={7} />}
+                {endB && <circle className="patchbay-cable-end" cx={b.x} cy={b.y} r={7} />}
                 {!readOnly && (
                   <path
                     className="patchbay-cable-hit"
@@ -479,8 +523,8 @@ export function PatchbayRoot({
               className="patchbay-cable patchbay-cable--drag"
               style={dragLine.color ? ({ '--patchbay-cable-color': dragLine.color } as React.CSSProperties) : undefined}
             >
-              <path className="patchbay-cable-shadow" d={curve(dragLine.a, dragLine.b)} />
-              <path className="patchbay-cable-line" d={curve(dragLine.a, dragLine.b)} />
+              <path className="patchbay-cable-shadow" d={path(dragLine.a, dragLine.b)} />
+              <path className="patchbay-cable-line" d={path(dragLine.a, dragLine.b)} />
               <circle className="patchbay-cable-end" cx={dragLine.a.x} cy={dragLine.a.y} r={7} />
               <circle className="patchbay-cable-end" cx={dragLine.b.x} cy={dragLine.b.y} r={7} />
             </g>
@@ -507,6 +551,13 @@ export interface PatchbayPortProps {
   name?: string;
   /** Any CSS colour for the socket and the cables that leave it. Defaults to `--patchbay-cable`. */
   color?: string;
+  /**
+   * An anchor: a point a line ends at, with no socket drawn and nothing to
+   * press — the edge of a box in a diagram. Place it where the line should
+   * meet the box. For a `readOnly` board; an anchor cannot be connected by
+   * hand.
+   */
+  anchor?: boolean;
   className?: string;
 }
 
@@ -514,7 +565,16 @@ export interface PatchbayPortProps {
  * A socket on the board. Put it where the thing it belongs to is — a card's
  * footer, a row of a list — and the board finds it.
  */
-export function PatchbayPort({ id, direction, kind, label, name, color, className }: Readonly<PatchbayPortProps>) {
+export function PatchbayPort({
+  id,
+  direction,
+  kind,
+  label,
+  name,
+  color,
+  anchor = false,
+  className,
+}: Readonly<PatchbayPortProps>) {
   const ctx = useContext(PatchbayContext);
   if (!ctx) throw new Error('[ratio-ui] Patchbay.Port must be rendered inside a Patchbay.');
   const ref = useRef<HTMLElement>(null);
@@ -522,10 +582,24 @@ export function PatchbayPort({ id, direction, kind, label, name, color, classNam
 
   useLayoutEffect(() => {
     if (!ref.current) return;
-    return ctx.register({ id, direction, kind, name: spoken, color, el: ref.current });
+    return ctx.register({ id, direction, kind, name: spoken, color, anchor, el: ref.current });
     // `register` is stable; re-register when the port's facts change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ctx.register, id, direction, kind, spoken, color]);
+  }, [ctx.register, id, direction, kind, spoken, color, anchor]);
+
+  if (anchor) {
+    return (
+      <span
+        ref={ref as React.RefObject<HTMLSpanElement>}
+        aria-hidden
+        data-patchbay-port={id}
+        data-patchbay={ctx.boardId}
+        data-direction={direction}
+        className={cn('patchbay-anchor', className)}
+        style={color ? ({ '--patchbay-cable-color': color } as React.CSSProperties) : undefined}
+      />
+    );
+  }
 
   const connected = ctx.connectedIds.has(id);
   const pending = ctx.pending === id;

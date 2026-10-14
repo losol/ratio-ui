@@ -29,6 +29,7 @@
   stroke: var(--patchbay-cable-shadow);
   stroke-width: 7;
   stroke-linecap: round;
+  stroke-linejoin: round;
   transform: translateY(3px);
 }
 
@@ -37,7 +38,17 @@
   stroke: var(--patchbay-cable-color, var(--patchbay-cable));
   stroke-width: 5;
   stroke-linecap: round;
+  stroke-linejoin: round;
   transition: stroke-width 120ms;
+}
+
+/* An anchor: a point to measure, nothing to see. One pixel, so the board
+   finds it; the line ends on its centre. */
+.patchbay-anchor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
 }
 
 .patchbay-cable-end {

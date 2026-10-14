@@ -1,0 +1,18 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Flowchart tokens — the frame round a box, the line between boxes, the
+ * boxes' face, and the gaps of the grid. Consumed by `core/Flowchart`.
+ * Override per theme (tabula: thicker, in the condensed face) or per scope.
+ */
+:root {
+  --flowchart-frame: 3px;
+  --flowchart-line: 3px;
+  --flowchart-font: inherit;
+  --flowchart-gap-x: 2.5rem;
+  --flowchart-gap-y: 2rem;
+}

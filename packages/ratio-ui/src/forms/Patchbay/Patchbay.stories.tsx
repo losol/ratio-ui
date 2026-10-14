@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../../core/Button';
 import { Card } from '../../core/Card';
@@ -300,6 +300,78 @@ export const Diagram: Story = {
       ))}
     </Patchbay>
   ),
+};
+
+/**
+ * `connector="straight"`: one line from port to port. A quiz reads better
+ * this way — each match is seen at a glance, where hanging cables cross and
+ * bunch at the bottom.
+ */
+export const StraightLines: Story = {
+  render: () => (
+    <Patchbay
+      aria-label="Match the question to its answer"
+      connector="straight"
+      defaultConnections={[
+        { from: 'q1', to: 'a2' },
+        { from: 'q2', to: 'a4' },
+        { from: 'q4', to: 'a3' },
+      ]}
+      canConnect={(from, to, all) => !all.some((c) => c.from === from.id || c.to === to.id)}
+      className="grid max-w-[44rem] grid-cols-[1fr_auto_auto_1fr] items-center gap-x-3 gap-y-2"
+    >
+      {ROWS.map(({ question, answer }, i) => (
+        <div key={question.id} className="contents">
+          <span className="text-(--text)">{question.text}</span>
+          <Patchbay.Port id={question.id} direction="out" name={`Question ${i + 1}: ${question.text}`} />
+          <Patchbay.Port id={answer.id} direction="in" name={`Answer: ${answer.text}`} />
+          <span className="text-(--text)">{answer.text}</span>
+        </div>
+      ))}
+    </Patchbay>
+  ),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    await waitFor(() => expect(canvasElement.querySelectorAll('.patchbay-cable-line').length).toBe(3));
+    const d = canvasElement.querySelector('.patchbay-cable-line')?.getAttribute('d') ?? '';
+    await expect(d).toMatch(/^M[-\d. ]+L[-\d. ]+$/);
+  },
+};
+
+/**
+ * `connector="elbow"`: right angles, for a diagram. Two lines leaving one
+ * port run together until they part. `anchor` ports draw no socket: the
+ * line ends on the point, here the edge of a card — what `Flowchart` builds on.
+ */
+export const Elbows: Story = {
+  render: () => (
+    <Patchbay
+      aria-label="One source feeds two sinks"
+      readOnly
+      connector="elbow"
+      defaultConnections={[
+        { from: 'a.out', to: 'b.in' },
+        { from: 'a.out', to: 'c.in' },
+      ]}
+      className="grid max-w-md grid-cols-2 gap-x-10 gap-y-12"
+    >
+      <Card featured padding="sm" className="relative col-span-2 text-center font-bold">
+        Source
+        <Patchbay.Port anchor id="a.out" direction="out" name="Source out" className="bottom-[-2px] left-1/2" />
+      </Card>
+      {['b', 'c'].map((id, i) => (
+        <Card key={id} featured padding="sm" className="relative text-center font-bold">
+          <Patchbay.Port anchor id={`${id}.in`} direction="in" name={`Sink ${i + 1} in`} className="top-[-2px] left-1/2" />
+          Sink {i + 1}
+        </Card>
+      ))}
+    </Patchbay>
+  ),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    await waitFor(() => expect(canvasElement.querySelectorAll('.patchbay-cable-line').length).toBe(2));
+    await expect(canvasElement.querySelector('.patchbay-cable-line')?.getAttribute('d')).toMatch(/V.*H.*V/);
+    // Anchors: no plug drawn at either end.
+    await expect(canvasElement.querySelectorAll('.patchbay-cable-end').length).toBe(0);
+  },
 };
 
 /** Removing with the pointer: click a cable, then its remove button. */
