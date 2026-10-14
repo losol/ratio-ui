@@ -1,0 +1,27 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Choice tokens — the box a choice is drawn in: a `RadioGroup` option and a
+ * `ToggleButton` tile (so `ToggleButtonGroup`'s `tiles` too). Its frame at
+ * rest and under a pointer, its corner, and the tile's resting text. The
+ * picked state stays the primary fill in every theme. Override per theme
+ * (tabula: a thick frame in the primary) or per scope.
+ *
+ * References (`var(--border-1)`), so they are declared on the surface
+ * scopes too: a var() resolves where it is written.
+ */
+:root,
+.surface-light,
+.surface-dark {
+  --choice-border-width: 2px;
+  --choice-border-color: var(--border-1);
+  --choice-border-color-hover: var(--border-2);
+  --choice-radius: var(--radius-lg);
+  /* The resting text of a tile, whose text is all it holds. A radio
+     option's label is reading text and keeps `--text`. */
+  --choice-fg: var(--text-muted);
+}

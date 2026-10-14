@@ -74,10 +74,12 @@ export function RadioGroup<T extends string = string>({
           return (
             <label
               key={option.value}
-              className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+              // The box's frame and corner come from the --choice-* tokens
+              // (tokens/choice.css), shared with ToggleButton's tile.
+              className={`flex items-center justify-between p-4 rounded-(--choice-radius) border-(length:--choice-border-width) cursor-pointer transition-colors ${
                 isSelected
                   ? 'border-(--primary) bg-(--primary) text-(--text-on-primary)'
-                  : 'border-border-1 hover:border-border-2 hover:bg-card-hover'
+                  : 'border-(--choice-border-color) hover:border-(--choice-border-color-hover) hover:bg-card-hover'
               } ${
                 isDisabled ? 'opacity-50 cursor-not-allowed' : ''
               }`}

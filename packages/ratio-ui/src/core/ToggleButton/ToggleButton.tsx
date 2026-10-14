@@ -162,13 +162,16 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
         {...props}
         className={({ isSelected, isHovered, isFocusVisible, isDisabled }) =>
           cn(
-            'flex flex-col items-center justify-center gap-1 rounded-lg border-2 font-semibold',
+            // Frame, corner and resting text from the --choice-* tokens
+            // (tokens/choice.css), shared with RadioGroup's options.
+            'flex flex-col items-center justify-center gap-1 font-semibold',
+            'rounded-(--choice-radius) border-(length:--choice-border-width)',
             'cursor-pointer outline-none transition-colors duration-150',
             TILE_SIZE[size],
             isSelected
               ? 'border-(--primary) bg-(--primary) text-(--text-on-primary)'
-              : 'border-border-1 bg-card text-(--text-muted)',
-            !isSelected && isHovered && 'border-border-2 text-(--text)',
+              : 'border-(--choice-border-color) bg-card text-(--choice-fg)',
+            !isSelected && isHovered && 'border-(--choice-border-color-hover) text-(--text)',
             isFocusVisible && 'ring-2 ring-(--focus-ring)',
             isDisabled && 'opacity-50 cursor-not-allowed',
             className,
