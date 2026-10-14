@@ -181,7 +181,18 @@
 
   --focus-ring: rgb(62 154 168 / 0.45);
 
+  /* Fields and eyebrows — the base tokens declare these straight on
+     `.surface-dark`, which outranks the inherited light-arm values inside
+     a dark rail, so the dark arm says them again. */
   --input-bg: #0e1a1d;
+  --input-border-width: 2px;
+  --input-border-color: var(--primary);
+  --input-radius: 0;
+
+  --eyebrow-font-family: var(--font-display);
+  --eyebrow-font-size: 0.8125rem;
+  --eyebrow-font-weight: 800;
+  --eyebrow-letter-spacing: 0.06em;
 
   /* Overlays flip to the warm ink on the dark field. */
   --overlay-ink: 233 228 214;
