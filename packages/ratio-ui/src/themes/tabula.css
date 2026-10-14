@@ -64,7 +64,7 @@
   /* Text — a cool ink, and a grey-green for the running words. */
   --text: #1e2a2e;
   --text-muted: #4a5558;
-  --text-subtle: #5e6a6d;        /* derived: a step below muted, 4.5:1 on the sand */
+  --text-subtle: #566265;        /* derived: a step below muted, 4.8:1 on the sand, 6.3:1 on the sheet */
   --text-light: #f2eee3;         /* derived */
   --text-dark: #1e2a2e;          /* derived */
 
