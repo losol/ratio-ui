@@ -38,7 +38,7 @@ stacks in its font tokens.
 | | Standard | Tabula |
 | --- | --- | --- |
 | Corners | 4–16 px, buttons as pills | 0 everywhere, pills included |
-| Frames | 1–2 px, neutral | sheet 10 px, fields 2 px, choices as `border-2`: the primary |
+| Frames | 1–2 px, neutral | sheet 10 px, fields 2 px, choices 3 px: the primary |
 | Cards | tinted, soft shadow | opaque white sheets, no shadow |
 | Shadow | `shadow-xs` / `sm` | soft, on buttons only; none when pressed |
 | Press | grows (104 %) | no growing, the shadow goes |
@@ -66,6 +66,7 @@ Light arm (`:root[data-theme="tabula"]`, also `.surface-light`):
 | `--button-radius` / `-shadow` / `-shadow-active` / `-transform-active` | `0` / soft / `none` / `none` | |
 | every `--radius-*`, `--chip-radius`, `--action-button-radius`, `--menu-*-radius` | `0` | |
 | `--input-bg` / `-border-width` / `-border-color` / `-radius` | `#fffcf0` / `2px` / primary / `0` | |
+| `--choice-border-width` / `-border-color` / `-border-color-hover` / `-radius` / `-fg` | `3px` / primary / primary / `0` / primary | radio options and tiles |
 | `--label-font-weight` | `700` | |
 | `--eyebrow-font-family` / `-size` / `-weight` / `-letter-spacing` | display / `0.8125rem` / `800` / `0.06em` | |
 | `--font-display`, `--font-serif` | Fira Sans Condensed | |
@@ -90,6 +91,9 @@ the standard look as their default:
   them.
 - **`--eyebrow-*`** (`tokens/eyebrow.css`): the face, size, weight and tracking
   of `Heading.Eyebrow` and `Card.Meta`.
+- **`--choice-*`** (`tokens/choice.css`): the frame, corner and resting text of
+  a choice box: a `RadioGroup` option, a `ToggleButton` tile. The picked state
+  stays the primary fill.
 - **`Card.Meta`**: the top corners of a card, the small print in capitals and
   the primary colour, one item at each end. With `Card.Footer` a card has
   something in all four corners: what it is and who it is from at the top,

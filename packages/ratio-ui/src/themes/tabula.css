@@ -19,7 +19,7 @@
  *
  * What it changes against the standard theme (docs/tabula-theme-spec.md):
  *   corners   0 everywhere (every radius token, pills included)
- *   frames    the sheet 10px, fields and choices 2–4px, in the primary
+ *   frames    the sheet 10px, fields 2px and choices 3px, in the primary
  *   cards     opaque white sheets, no shadow
  *   shadow    soft, on buttons only; none when pressed, and no growing
  *   fonts     Fira Sans Condensed (display, eyebrows) + Fira Sans (body)
@@ -128,6 +128,14 @@
   --input-border-color: var(--primary);
   --input-radius: 0;
 
+  /* Choices — a radio option, a tile: a thick frame in the primary, the
+     tile's text in it too; picked, they fill with it. */
+  --choice-border-width: 3px;
+  --choice-border-color: var(--primary);
+  --choice-border-color-hover: var(--primary);
+  --choice-radius: 0;
+  --choice-fg: var(--primary);
+
   /* Labels — bold, in the ink. */
   --label-font-weight: 700;
 
@@ -193,6 +201,12 @@
   --eyebrow-font-size: 0.8125rem;
   --eyebrow-font-weight: 800;
   --eyebrow-letter-spacing: 0.06em;
+
+  --choice-border-width: 3px;
+  --choice-border-color: var(--primary);
+  --choice-border-color-hover: var(--primary);
+  --choice-radius: 0;
+  --choice-fg: var(--primary);
 
   /* Overlays flip to the warm ink on the dark field. */
   --overlay-ink: 233 228 214;
