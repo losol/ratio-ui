@@ -55,7 +55,7 @@ Light arm (`:root[data-theme="tabula"]`, also `.surface-light`):
 | --- | --- | --- |
 | `--primary` | `#0b6a78` | petrol; 5.6:1 on the sand, 6.9:1 on the sheet |
 | `--secondary` | `#ddf1f4` | ice, the tint |
-| `--text` / `--text-muted` / `--text-subtle` | `#1e2a2e` / `#4a5558` / `#5e6a6d` | subtle is derived |
+| `--text` / `--text-muted` / `--text-subtle` | `#1e2a2e` / `#4a5558` / `#566265` | subtle is derived: 4.8:1 on the sand, where the footer sets its headings in it |
 | `--text-on-primary` | `#ffffff` | |
 | `--surface` | `#e7e1d1` | sand |
 | `--card` / `--card-hover` | `#ffffff` / `#fffcf0` | the sheet, and paper |
