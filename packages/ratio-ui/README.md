@@ -94,7 +94,9 @@ in [`docs/authoring-themes.md`](docs/authoring-themes.md), with the built-in
 Bureau theme documented in [`docs/bureau-theme-spec.md`](docs/bureau-theme-spec.md).
 The quiet, near-black `ink` theme (`data-theme="ink"`, pin
 `data-color-scheme="dark"` for always-ink) lives in
-[`src/themes/ink.css`](src/themes/ink.css).
+[`src/themes/ink.css`](src/themes/ink.css). The `tabula` theme — the printed
+sheet: white sheets in thick petrol frames, no rounded corners — is documented
+in [`docs/tabula-theme-spec.md`](docs/tabula-theme-spec.md).
 
 The named themes are opt-in, so pages that don't use them don't download
 them. Import the ones you use after the main stylesheet:

@@ -289,6 +289,38 @@ const CardHeader: React.FC<CardHeaderProps> = ({ children, summary, className, a
 };
 CardHeader.displayName = 'Card.Header';
 
+export interface CardMetaProps {
+  /**
+   * The small print, at either end of the row: what the card is at the
+   * start, who it is from at the end. One child sits at the start; give two
+   * for both corners.
+   */
+  children?: ReactNode;
+  className?: string;
+}
+
+/**
+ * The top corners of a card: a line of small print in capitals, in the
+ * primary colour, with one item at each end: what the card is, and who it
+ * is from. With `Card.Footer` (an element at each end, sunk to the bottom)
+ * a card has something in all four corners. Set in the `--eyebrow-*` tokens,
+ * like `Heading.Eyebrow`, so a theme restyles both at once.
+ */
+const CardMeta: React.FC<CardMetaProps> = ({ children, className }) => (
+  <div
+    className={cn(
+      'flex items-baseline justify-between gap-3 uppercase text-(--primary)',
+      'font-(family-name:--eyebrow-font-family) text-(length:--eyebrow-font-size)',
+      'tracking-(--eyebrow-letter-spacing) font-(--eyebrow-font-weight)',
+      '[&>*:last-child:not(:first-child)]:text-right',
+      className,
+    )}
+  >
+    {children}
+  </div>
+);
+CardMeta.displayName = 'Card.Meta';
+
 export interface CardBodyProps {
   children?: ReactNode;
   className?: string;
@@ -333,4 +365,9 @@ const CardFooter: React.FC<CardFooterProps> = ({ children, divider = true, class
 );
 CardFooter.displayName = 'Card.Footer';
 
-export const Card = Object.assign(CardRoot, { Header: CardHeader, Body: CardBody, Footer: CardFooter });
+export const Card = Object.assign(CardRoot, {
+  Meta: CardMeta,
+  Header: CardHeader,
+  Body: CardBody,
+  Footer: CardFooter,
+});

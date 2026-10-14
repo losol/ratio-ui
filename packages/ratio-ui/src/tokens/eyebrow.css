@@ -1,0 +1,24 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Eyebrow tokens — the small line of capitals above a heading
+ * (`Heading.Eyebrow`) and in the corners of a card (`Card.Meta`). The
+ * standard theme sets it in the mono face, small and widely tracked;
+ * a theme can make it its own small print (tabula: the condensed
+ * grotesk, heavier, tighter) without touching the components.
+ *
+ * `--eyebrow-font-family` is a reference, so it is declared on the
+ * surface scopes too: a var() resolves where it is written.
+ */
+:root,
+.surface-light,
+.surface-dark {
+  --eyebrow-font-family: var(--font-mono);
+  --eyebrow-font-size: 10.5px;
+  --eyebrow-font-weight: 700;
+  --eyebrow-letter-spacing: 0.18em;
+}

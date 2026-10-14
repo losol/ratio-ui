@@ -3,4 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Card } from './Card';
-export type { CardProps, CardHeaderProps, CardBodyProps, CardFooterProps, CardShadow } from './Card';
+export type { CardProps, CardMetaProps, CardHeaderProps, CardBodyProps, CardFooterProps, CardShadow } from './Card';

@@ -223,16 +223,18 @@ export function Knob({
         className,
       )}
     >
-      {/* The arc: the turned part in the primary colour, the rest in the border tone. */}
+      {/* The arc: the turned part in the primary colour, the rest in the border tone.
+          `rounded-full`, not the pill token: a knob is a circle in every theme,
+          where Bureau squares its pills off. */}
       <div
         aria-hidden
-        className={cn('grid place-items-center rounded-pill', s.ring)}
+        className={cn('grid place-items-center rounded-full', s.ring)}
         style={{
           background: `conic-gradient(from 225deg, var(--knob-fill) 0deg ${degrees}deg, var(--knob-track) ${degrees}deg ${SWEEP}deg, transparent ${SWEEP}deg 360deg)`,
         }}
       >
         <div
-          className={cn('relative rounded-pill bg-(--knob-face) shadow-(--control-shadow)', s.disc)}
+          className={cn('relative rounded-full bg-(--knob-face) shadow-(--control-shadow)', s.disc)}
           style={{ transform: `rotate(${-SWEEP / 2 + degrees}deg)` }}
         >
           <span

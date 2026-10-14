@@ -11,6 +11,7 @@ these docs cover package-level contracts and decisions.
 | [`css-exports.md`](css-exports.md) | Explains the CSS entry points and when to use each one. |
 | [`authoring-themes.md`](authoring-themes.md) | Describes the custom theme contract and required tokens. |
 | [`bureau-theme-spec.md`](bureau-theme-spec.md) | Captures the Bureau theme direction and token choices. |
+| [`tabula-theme-spec.md`](tabula-theme-spec.md) | The Tabula theme: the printed sheet, its tokens and what Ratio learned for it. |
 | [`autocomplete-api-design.md`](autocomplete-api-design.md) | Records the Autocomplete API design notes. |
 
 ## Architecture Decisions
