@@ -291,8 +291,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0
       '@eventuras/vite-config':
-        specifier: ^0.4.0
-        version: 0.4.0(@swc/helpers@0.5.23)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1))
+        specifier: ^0.5.0
+        version: 0.5.0(@swc/helpers@0.5.23)(typescript@6.0.3)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1))
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
@@ -892,6 +892,15 @@ packages:
     resolution: {integrity: sha512-hywumQFuiN5amYsbbw24+apJL+Emy/DTqgBwHTjdtWq87HTyOZ17zsNHTRvhM6nFf4ZdS+2BsTjdu5OvEoogWA==}
     peerDependencies:
       vite: ^7.0.0 || ^8.0.0
+
+  '@eventuras/vite-config@0.5.0':
+    resolution: {integrity: sha512-jhYSmItMhfV3pWIzlXqc/6w6DCvrmugTEv2n7SNYs9GWeMchdSU8D+ku+iTUdiANzvYE6M7voytv9+ATXwh0OQ==}
+    peerDependencies:
+      typescript: '>=5.5'
+      vite: ^7.0.0 || ^8.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   '@exodus/bytes@1.16.0':
     resolution: {integrity: sha512-IcpW84uEn3N7ETtNZMlxKhfl6Pec8rUNGOTBtWbK1FKhJxIFAptZyVrvVRVBimAJxJCgc3PxepxkdWWG4DVzfA==}
@@ -5149,6 +5158,21 @@ snapshots:
       '@vitejs/plugin-react-swc': 4.3.3(@swc/helpers@0.5.23)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1))
       glob: 13.0.6
       vite: 8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1)
+    transitivePeerDependencies:
+      - '@rolldown/plugin-babel'
+      - '@swc/helpers'
+      - babel-plugin-react-compiler
+      - oxc-transform-react
+
+  '@eventuras/vite-config@0.5.0(@swc/helpers@0.5.23)(typescript@6.0.3)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1))':
+    dependencies:
+      '@tailwindcss/vite': 4.3.3(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1))
+      '@vitejs/plugin-react': 6.1.1(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1))
+      '@vitejs/plugin-react-swc': 4.3.3(@swc/helpers@0.5.23)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1))
+      glob: 13.0.6
+      vite: 8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.1)
+    optionalDependencies:
+      typescript: 6.0.3
     transitivePeerDependencies:
       - '@rolldown/plugin-babel'
       - '@swc/helpers'
