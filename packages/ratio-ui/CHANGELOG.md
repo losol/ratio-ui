@@ -1,5 +1,30 @@
 # @eventuras/ratio-ui
 
+## 2.34.0
+
+### Minor Changes
+
+- d7fa74d: `--choice-*` tokens: the frame, corner and resting text of a choice box. `RadioGroup` options and `ToggleButton` tiles (so `ToggleButtonGroup`'s `tiles` too) read them; the standard look is unchanged. Tabula frames its choices 3px in the primary, square, with the tile's text in the primary.
+- ee7551a: `Flowchart`: boxes on a grid, joined by lines. Each `Flowchart.Node` says which boxes it follows (`from`), takes its place with `span` and `align`, and the chart draws the lines at right angles (or `connector="straight"`). The boxes are framed `Card`s, sized by the `--flowchart-*` tokens; Tabula frames them 4px in the condensed face.
+  
+  `Patchbay` learns two things for it: `connector` (`cable`, `straight` or `elbow`: a hanging patch cable, one line for a quiz, right angles for a diagram) and `anchor` ports (a point a line ends at, with no socket drawn), for a `readOnly` diagram.
+- 66197c3: `Setting`: a setting's name over its control, for the controls that are not form fields: a `Counter` for the tempo, a `ToggleButtonGroup` for the meter, a `Select`, a row of `Knob`s. The name is set like a field's label, and it names the control for a screen reader: one unnamed child gets `aria-labelledby` (and `aria-describedby` from the description). `inline` puts the name beside the control, for a `Switch`.
+  
+  `Counter`, `ToggleButtonGroup` and `Select` take `aria-labelledby` and `aria-describedby`.
+- 24e4263: `Stamp`: a word in capitals in a frame, at a slant, as a rubber stamp lands on a paper that has been through the office. Ink only, in the primary or a status colour (`tone`), two sizes, `tilt` in degrees, and `decorative` for a stamp whose word the page already says. The frame, face, corner and slant are the `--stamp-*` tokens; Tabula stamps thicker, square, in its condensed face.
+- a155bf0: The `tabula` theme: the printed sheet. White sheets in thick petrol frames on a sand page, no rounded corner anywhere, Fira Sans Condensed for the big words and the small print, and no shadow but the soft one under a button. Load `themes/tabula.css` and, for the fonts, `themes/tabula-fonts.css`; set `data-theme="tabula"`.
+  
+  Three things a theme can now set without touching a component:
+  
+  - `--input-*` tokens: the paper a field is printed on, its frame and its corner. `TextField` and the bare `Input` read them. `TextField` is unchanged; `Input` takes the same 2px frame as `TextField`, where it had 1px.
+  - `--eyebrow-*` tokens: the face, size, weight and tracking of `Heading.Eyebrow`.
+  - `Card.Meta`: the top corners of a card, small print in capitals and the primary colour with one item at each end. With `Card.Footer` a card has something in all four corners.
+- 8b1c5cd: `ToggleGrid` follows the playhead: `followActive` scrolls the grid on when `activeColumn` leaves the visible part, a page at a time, so the step playing is always in view (smooth, unless the reader prefers reduced motion); `columnWidth` sets the least width of a column, so the steps stay a finger wide however many there are and the grid scrolls sideways below it. Row headers now stay put at the left while the steps scroll under them.
+
+### Patch Changes
+
+- a155bf0: `Knob` stays a circle in every theme. It drew its arc and face with the pill radius, which Bureau squares off, so a Bureau knob was a square with a rotating square inside. Round controls are circles; pills are pills.
+
 ## 2.33.0
 
 ### Minor Changes
