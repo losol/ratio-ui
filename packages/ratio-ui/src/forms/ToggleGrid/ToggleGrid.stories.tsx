@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button } from '../../core/Button';
 import { Card } from '../../core/Card';
@@ -18,6 +18,8 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     size: { control: 'select', options: ['sm', 'md'] },
+    followActive: { control: 'boolean' },
+    columnWidth: { control: 'text' },
   },
 } satisfies Meta<typeof ToggleGrid>;
 
@@ -123,6 +125,91 @@ export const StepSequencer: Story = {
         />
       </Card>
     );
+  },
+};
+
+/**
+ * A grid wider than its box: `columnWidth` keeps each step a finger wide
+ * however many there are, and `followActive` scrolls the grid on when the
+ * playhead leaves the visible part, a page at a time, so the step playing is
+ * always in view. The row headers stay put while the steps scroll under
+ * them. Press the buttons to move the playhead.
+ */
+export const FollowsThePlayhead: Story = {
+  args: {
+    'aria-label': 'Melody',
+    rows: noteRows.slice(4),
+    columns: steps(32),
+    columnWidth: '2.25rem',
+    followActive: true,
+  },
+  render: function FollowsStory(args) {
+    const [cells, setCells] = useState(() => melody('C D E C C D E C E F G - E F G - G A G F E - - - G A G F E - - -'));
+    const [step, setStep] = useState(0);
+    return (
+      <div className="flex max-w-md flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {[1, 12, 24, 32].map((n) => (
+            <Button key={n} variant={step === n - 1 ? 'primary' : 'outline'} size="sm" onPress={() => setStep(n - 1)}>
+              Step {n}
+            </Button>
+          ))}
+        </div>
+        <ToggleGrid {...args} selectedKeys={cells} onSelectionChange={setCells} activeColumn={String(step)} />
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = canvas.getByRole('group', { name: 'Melody' });
+    await expect(box.scrollLeft).toBe(0);
+    await userEvent.click(canvas.getByRole('button', { name: 'Step 24' }));
+    // The grid scrolls on until step 24 is the first in view after the row headers.
+    await waitFor(() => expect(box.scrollLeft).toBeGreaterThan(0));
+    const beat24 = canvas.getAllByRole('button', { name: /beat 24$/ })[0]!;
+    await waitFor(() => expect(beat24.getBoundingClientRect().left).toBeGreaterThanOrEqual(box.getBoundingClientRect().left));
+    await userEvent.click(canvas.getByRole('button', { name: 'Step 1' }));
+    await waitFor(() => expect(box.scrollLeft).toBe(0));
+  },
+};
+
+/**
+ * Following into a held note: a note over several columns is one cell, so
+ * the playhead's column is found by index, not by id. Both rows hold a note
+ * over steps 22 to 26; the playhead at step 24 is inside them, and the grid
+ * still scrolls to it.
+ */
+export const FollowsIntoAHeldNote: Story = {
+  args: {
+    'aria-label': 'Melody',
+    rows: noteRows.slice(6),
+    columns: steps(32),
+    columnWidth: '2.25rem',
+    followActive: true,
+    cellData: { [toggleGridKey('D', '21')]: { span: 5 }, [toggleGridKey('C', '21')]: { span: 5 } },
+    selectedKeys: [toggleGridKey('D', '21'), toggleGridKey('C', '21')],
+  },
+  render: function FollowsHeldStory(args) {
+    const [step, setStep] = useState(0);
+    return (
+      <div className="flex max-w-md flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {[1, 24].map((n) => (
+            <Button key={n} variant={step === n - 1 ? 'primary' : 'outline'} size="sm" onPress={() => setStep(n - 1)}>
+              Step {n}
+            </Button>
+          ))}
+        </div>
+        <ToggleGrid {...args} activeColumn={String(step)} />
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = canvas.getByRole('group', { name: 'Melody' });
+    await expect(box.scrollLeft).toBe(0);
+    await userEvent.click(canvas.getByRole('button', { name: 'Step 24' }));
+    await waitFor(() => expect(box.scrollLeft).toBeGreaterThan(0));
   },
 };
 
