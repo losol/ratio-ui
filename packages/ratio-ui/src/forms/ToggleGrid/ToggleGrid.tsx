@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 
 import { cn } from '../../utils/cn';
 
@@ -96,6 +96,21 @@ export interface ToggleGridProps<T extends ToggleGridCellData = ToggleGridCellDa
   /** Column to frame — the step that is playing, the hour it is now. */
   activeColumn?: string | null;
   /**
+   * Keep `activeColumn` in view: when it leaves the visible part of a grid
+   * wider than its box, the grid scrolls on so that column is the first in
+   * view, a page at a time, as a sequencer follows its playhead. Smooth,
+   * unless the reader prefers reduced motion. Row headers stay put while
+   * the steps scroll.
+   */
+  followActive?: boolean;
+  /**
+   * The least width of a column, any CSS length. Columns share the room
+   * above it; below it the grid scrolls sideways. The default follows
+   * `size` (1.25rem, 1.5rem); a sequencer played with a finger wants about
+   * `2.25rem`.
+   */
+  columnWidth?: string;
+  /**
    * Makes each row header a button; pressed with the row's id. For hearing a
    * note or opening a person.
    */
@@ -126,8 +141,8 @@ export interface ToggleGridProps<T extends ToggleGridCellData = ToggleGridCellDa
 export const toggleGridKey = (row: string, column: string): string => `${row}:${column}`;
 
 const SIZE = {
-  sm: { cell: 'h-7', header: 'h-7 px-1.5 text-xs', column: 'minmax(1.25rem, 1fr)' },
-  md: { cell: 'h-9', header: 'h-9 px-2 text-sm', column: 'minmax(1.5rem, 1fr)' },
+  sm: { cell: 'h-7', header: 'h-7 px-1.5 text-xs', column: '1.25rem' },
+  md: { cell: 'h-9', header: 'h-9 px-2 text-sm', column: '1.5rem' },
 } as const;
 
 const DEFAULT_LABELS: Required<ToggleGridLabels> = {
@@ -183,6 +198,8 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
   defaultCellData,
   onCellDataChange,
   activeColumn,
+  followActive = false,
+  columnWidth,
   onRowPress,
   cellName,
   size = 'md',
@@ -327,20 +344,49 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
   const hasFooter = columns.some((c) => c.label !== undefined);
   const activeIndex = activeColumn != null ? columnIndex.get(activeColumn) : undefined;
 
+  // Following the playhead: when the active column leaves the box, scroll
+  // so it is the first column after the row headers — a page at a time, not
+  // a creep. Only a grid wider than its box scrolls at all.
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const box = scroller.current;
+    if (!followActive || !box || activeColumn == null) return;
+    if (box.scrollWidth <= box.clientWidth) return;
+    const cell = box.querySelector<HTMLElement>(`[data-column="${CSS.escape(activeColumn)}"]`);
+    const header = box.querySelector<HTMLElement>('[data-row-header]');
+    if (!cell) return;
+    const boxRect = box.getBoundingClientRect();
+    const rect = cell.getBoundingClientRect();
+    const left = rect.left - boxRect.left + box.scrollLeft;
+    const headerWidth = header ? header.getBoundingClientRect().width : 0;
+    const visibleFrom = box.scrollLeft + headerWidth;
+    const visibleTo = box.scrollLeft + box.clientWidth;
+    if (left >= visibleFrom && left + rect.width <= visibleTo) return;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    box.scrollTo({ left: Math.max(0, left - headerWidth - 4), behavior: reduce ? 'auto' : 'smooth' });
+  }, [followActive, activeColumn]);
+
   return (
     <div
+      ref={scroller}
       role="group"
       aria-label={ariaLabel}
       data-testid={testId}
       className={cn('overflow-x-auto', isDisabled && 'opacity-60', className)}
     >
       <div
-        className="grid gap-1"
-        style={{ gridTemplateColumns: `auto repeat(${columns.length}, ${s.column})` }}
+        // At least as wide as its columns, so the grid's own box spans the
+        // scroll and the sticky row headers can stay in it; wider boxes share
+        // the room among the columns.
+        className="grid min-w-max gap-1"
+        style={{ gridTemplateColumns: `auto repeat(${columns.length}, minmax(${columnWidth ?? s.column}, 1fr))` }}
       >
         {rows.map((row) => {
           const headerClass = cn(
             'flex items-center justify-center rounded-lg font-bold',
+            // Stuck to the left edge, so the row keeps its name while the
+            // steps scroll under it.
+            'sticky left-0 z-10',
             row.color ? 'text-(--text-dark)' : 'bg-card text-(--text)',
             s.header,
           );
@@ -380,6 +426,7 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
                   key={column.id}
                   role="img"
                   aria-label={`${name}${on ? ', on' : ', off'}`}
+                  data-column={column.id}
                   className={cellClass}
                   style={cellStyle}
                 />
@@ -390,6 +437,7 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
                   aria-label={name}
                   aria-pressed={on}
                   disabled={isDisabled}
+                  data-column={column.id}
                   onClick={() => press(row, column)}
                   onKeyDown={(e) => onCellKeyDown(e, row, column)}
                   className={cellClass}
@@ -405,6 +453,7 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
                 <button
                   type="button"
                   disabled={isDisabled}
+                  data-row-header
                   onClick={() => onRowPress(row.id)}
                   className={cn(
                     headerClass,
@@ -417,7 +466,7 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
                   {row.label}
                 </button>
               ) : (
-                <div className={headerClass} style={headerStyle}>
+                <div data-row-header className={headerClass} style={headerStyle}>
                   {row.label}
                 </div>
               )}
@@ -427,7 +476,7 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
         })}
         {hasFooter && (
           <>
-            <span />
+            <span className="sticky left-0" />
             {columns.map((column) => (
               <span
                 key={column.id}
