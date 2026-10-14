@@ -174,6 +174,46 @@ export const FollowsThePlayhead: Story = {
 };
 
 /**
+ * Following into a held note: a note over several columns is one cell, so
+ * the playhead's column is found by index, not by id. Both rows hold a note
+ * over steps 22 to 26; the playhead at step 24 is inside them, and the grid
+ * still scrolls to it.
+ */
+export const FollowsIntoAHeldNote: Story = {
+  args: {
+    'aria-label': 'Melody',
+    rows: noteRows.slice(6),
+    columns: steps(32),
+    columnWidth: '2.25rem',
+    followActive: true,
+    cellData: { [toggleGridKey('D', '21')]: { span: 5 }, [toggleGridKey('C', '21')]: { span: 5 } },
+    selectedKeys: [toggleGridKey('D', '21'), toggleGridKey('C', '21')],
+  },
+  render: function FollowsHeldStory(args) {
+    const [step, setStep] = useState(0);
+    return (
+      <div className="flex max-w-md flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {[1, 24].map((n) => (
+            <Button key={n} variant={step === n - 1 ? 'primary' : 'outline'} size="sm" onPress={() => setStep(n - 1)}>
+              Step {n}
+            </Button>
+          ))}
+        </div>
+        <ToggleGrid {...args} activeColumn={String(step)} />
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = canvas.getByRole('group', { name: 'Melody' });
+    await expect(box.scrollLeft).toBe(0);
+    await userEvent.click(canvas.getByRole('button', { name: 'Step 24' }));
+    await waitFor(() => expect(box.scrollLeft).toBeGreaterThan(0));
+  },
+};
+
+/**
  * Not only music: who is free when. Rows without `color` fill with the
  * primary colour, and columns without `label` drop the footer.
  */

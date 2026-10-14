@@ -346,25 +346,43 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
 
   // Following the playhead: when the active column leaves the box, scroll
   // so it is the first column after the row headers — a page at a time, not
-  // a creep. Only a grid wider than its box scrolls at all.
+  // a creep. Only a grid wider than its box scrolls at all. The column's
+  // place comes from any cell that covers it: a held note is one cell over
+  // several columns, so the column is found by index, not by id.
   const scroller = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const box = scroller.current;
-    if (!followActive || !box || activeColumn == null) return;
+    if (!followActive || !box || activeIndex === undefined) return;
     if (box.scrollWidth <= box.clientWidth) return;
-    const cell = box.querySelector<HTMLElement>(`[data-column="${CSS.escape(activeColumn)}"]`);
-    const header = box.querySelector<HTMLElement>('[data-row-header]');
+    let cell: HTMLElement | undefined;
+    let from = 0;
+    let span = 1;
+    for (const el of box.querySelectorAll<HTMLElement>('[data-column-index]')) {
+      const start = Number(el.dataset.columnIndex);
+      const width = Number(el.dataset.columnSpan ?? 1);
+      if (start <= activeIndex && activeIndex < start + width) {
+        cell = el;
+        from = start;
+        span = width;
+        if (width === 1) break;
+      }
+    }
     if (!cell) return;
+    const header = box.querySelector<HTMLElement>('[data-row-header]');
+    const grid = cell.parentElement;
+    const gap = grid ? parseFloat(getComputedStyle(grid).columnGap) || 0 : 0;
     const boxRect = box.getBoundingClientRect();
     const rect = cell.getBoundingClientRect();
-    const left = rect.left - boxRect.left + box.scrollLeft;
+    // One column of a cell that covers several: the cell's width less the gaps, shared.
+    const columnWidthPx = (rect.width - gap * (span - 1)) / span;
+    const left = rect.left - boxRect.left + box.scrollLeft + (activeIndex - from) * (columnWidthPx + gap);
     const headerWidth = header ? header.getBoundingClientRect().width : 0;
     const visibleFrom = box.scrollLeft + headerWidth;
     const visibleTo = box.scrollLeft + box.clientWidth;
-    if (left >= visibleFrom && left + rect.width <= visibleTo) return;
+    if (left >= visibleFrom && left + columnWidthPx <= visibleTo) return;
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    box.scrollTo({ left: Math.max(0, left - headerWidth - 4), behavior: reduce ? 'auto' : 'smooth' });
-  }, [followActive, activeColumn]);
+    box.scrollTo({ left: Math.max(0, left - headerWidth - gap), behavior: reduce ? 'auto' : 'smooth' });
+  }, [followActive, activeIndex]);
 
   return (
     <div
@@ -426,7 +444,8 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
                   key={column.id}
                   role="img"
                   aria-label={`${name}${on ? ', on' : ', off'}`}
-                  data-column={column.id}
+                  data-column-index={i}
+                  data-column-span={span > 1 ? span : undefined}
                   className={cellClass}
                   style={cellStyle}
                 />
@@ -437,7 +456,8 @@ export function ToggleGrid<T extends ToggleGridCellData = ToggleGridCellData>({
                   aria-label={name}
                   aria-pressed={on}
                   disabled={isDisabled}
-                  data-column={column.id}
+                  data-column-index={i}
+                  data-column-span={span > 1 ? span : undefined}
                   onClick={() => press(row, column)}
                   onKeyDown={(e) => onCellKeyDown(e, row, column)}
                   className={cellClass}
