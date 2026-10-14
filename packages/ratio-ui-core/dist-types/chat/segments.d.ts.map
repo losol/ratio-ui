@@ -1,0 +1,1 @@
+{"version":3,"file":"segments.d.ts","sourceRoot":"","sources":["../../src/chat/segments.ts"],"names":[],"mappings":"AAIA;;;GAGG;AACH,MAAM,MAAM,eAAe,GAAG;IAC5B,IAAI,EAAE,MAAM,GAAG,SAAS,GAAG,MAAM,CAAC;IAClC,KAAK,EAAE,MAAM,CAAC;CACf,CAAC;AAiCF;;;;;;GAMG;AACH,wBAAgB,eAAe,CAAC,IAAI,EAAE,MAAM,EAAE,EAAE,QAAe,EAAE;;CAAK,GAAG,eAAe,EAAE,CAwBzF"}

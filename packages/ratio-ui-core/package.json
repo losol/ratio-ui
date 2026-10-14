@@ -42,7 +42,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "pnpm run clean && vite build && node scripts/check-imports.mjs",
+    "build": "pnpm run clean && tsc --emitDeclarationOnly --outDir dist && vite build --emptyOutDir false && node scripts/check-imports.mjs",
     "check:imports": "node scripts/check-imports.mjs",
     "clean": "rm -rf dist",
     "lint": "eslint .",
@@ -51,12 +51,12 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
-    "@eventuras/eslint-config": "^1.0.4",
-    "@eventuras/typescript-config": "^1.0.0",
-    "@eventuras/vite-config": "^0.3.1",
-    "@types/node": "^24.13.6",
+    "@eventuras/eslint-config": "^1.0.6",
+    "@eventuras/typescript-config": "^1.1.0",
+    "@eventuras/vite-config": "^0.4.0",
+    "@types/node": "^24.19.0",
     "typescript": "6.0.3",
-    "vite": "8.3.0",
+    "vite": "8.3.1",
     "vitest": "4.1.11"
   },
   "engines": {
