@@ -40,6 +40,10 @@ export interface CounterProps {
   label?: React.ReactNode;
   /** Accessible name when there is no visible `label`. */
   'aria-label'?: string;
+  /** The element that names the counter, when there is no visible `label`: a `Setting`. */
+  'aria-labelledby'?: string;
+  /** The element that describes the counter: a `Setting`'s description. */
+  'aria-describedby'?: string;
   /** Names of the two buttons. */
   labels?: CounterLabels;
   /** Height of the pill — same `sm | md | lg` scale as Button. @default 'md' */
@@ -100,6 +104,8 @@ export function Counter({
   formatValue,
   label,
   'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
   labels,
   size = 'md',
   isDisabled = false,
@@ -124,7 +130,8 @@ export function Counter({
     <div
       role="group"
       aria-label={label ? undefined : ariaLabel}
-      aria-labelledby={label ? labelId : undefined}
+      aria-labelledby={label ? labelId : ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
       data-testid={testId}
       className={cn('inline-flex items-center gap-2.5', className)}
     >

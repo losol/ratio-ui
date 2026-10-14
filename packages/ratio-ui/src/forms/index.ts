@@ -34,6 +34,8 @@ export type {
 } from './FileUpload';
 export { Knob, knobToNormal, knobFromNormal } from './Knob';
 export type { KnobProps, KnobSize, KnobScale } from './Knob';
+export { Setting } from './Setting';
+export type { SettingProps } from './Setting';
 export { Counter } from './Counter';
 export type { CounterProps, CounterSize, CounterLabels } from './Counter';
 export { ToggleGrid, toggleGridKey } from './ToggleGrid';
