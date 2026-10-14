@@ -87,6 +87,10 @@ export interface ToggleButtonGroupProps {
 
   /** Accessible label for the group (use when there's no visible label). */
   'aria-label'?: string;
+  /** The element that names the group: a `Setting`, a heading. */
+  'aria-labelledby'?: string;
+  /** The element that describes the group: a `Setting`'s description. */
+  'aria-describedby'?: string;
   className?: string;
   testId?: string;
 }
@@ -139,6 +143,8 @@ export function ToggleButtonGroup({
   value,
   onChange,
   'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
   className,
   testId,
 }: Readonly<ToggleButtonGroupProps>) {
@@ -177,6 +183,8 @@ export function ToggleButtonGroup({
       disallowEmptySelection={disallowEmptySelection}
       isDisabled={isDisabled}
       aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
       data-testid={testId}
       className={cn(
         variant === 'segmented'
