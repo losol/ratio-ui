@@ -102,7 +102,7 @@
     "src/themes"
   ],
   "scripts": {
-    "build": "tsc && vite build && node scripts/build-components-css.mjs && node scripts/check-client-statics.mjs && node scripts/check-token-syntax.mjs",
+    "build": "tsc --noEmit && vite build && node scripts/build-components-css.mjs && node scripts/check-client-statics.mjs && node scripts/check-token-syntax.mjs",
     "lint": "eslint .",
     "check:client-statics": "node scripts/check-client-statics.mjs",
     "check:token-syntax": "node scripts/check-token-syntax.mjs"
@@ -118,7 +118,7 @@
   "devDependencies": {
     "@eventuras/eslint-config": "^1.0.6",
     "@eventuras/typescript-config": "^1.1.0",
-    "@eventuras/vite-config": "^0.4.0",
+    "@eventuras/vite-config": "^0.5.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
