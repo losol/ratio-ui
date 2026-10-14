@@ -1,0 +1,48 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Flowchart — the grid the boxes sit on, the boxes' frame, and where the
+ * lines meet them. Widths from the --flowchart-* tokens (tokens/flowchart.css).
+ */
+.flowchart {
+  /* A diagram's lines cast no shadow. */
+  --patchbay-cable-shadow: transparent;
+}
+
+.flowchart-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--flowchart-columns, 2), minmax(0, 1fr));
+  column-gap: var(--flowchart-gap-x);
+  row-gap: var(--flowchart-gap-y);
+  align-items: start;
+}
+
+.flowchart .patchbay-cable-line {
+  stroke-width: var(--flowchart-line);
+}
+
+.flowchart-node {
+  --card-featured-border-width: var(--flowchart-frame);
+  --card-featured-shadow: none;
+  text-align: center;
+  font-family: var(--flowchart-font);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* The lines meet the box on its outer edge, above and below its frame. */
+.flowchart-anchor {
+  left: 50%;
+}
+
+.flowchart-anchor--in {
+  top: calc(-1 * var(--flowchart-frame));
+}
+
+.flowchart-anchor--out {
+  bottom: calc(-1 * var(--flowchart-frame));
+}

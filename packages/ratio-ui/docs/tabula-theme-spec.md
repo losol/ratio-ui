@@ -104,8 +104,10 @@ the standard look as their default:
 
 ## Not in the theme
 
-- A poster block, a flowchart, a rubber stamp: these are the consumer's,
-  composed from `Card featured`, `Card.Meta`, `Card.Footer`, `BrandMark` and
+- A poster block, a rubber stamp: these are the consumer's, composed from
+  `Card featured`, `Card.Meta`, `Card.Footer`, `BrandMark` and
   `Heading.Eyebrow`. The stories under *Themes/Tabula* show the composition.
+  A chart of boxes and lines is `Flowchart`, framed by the theme's
+  `--flowchart-*` tokens.
 - Capitals on headings. The sketch sets its big words in capitals; the theme
   does not, since a heading is content. Add `uppercase` where a page wants it.
