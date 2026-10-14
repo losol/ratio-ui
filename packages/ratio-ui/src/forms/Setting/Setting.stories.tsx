@@ -77,7 +77,7 @@ export const ARow: Story = {
             disallowEmptySelection
           />
         </Setting>
-        <Setting label="Scale">
+        <Setting label="Scale" description="The notes the grid offers.">
           <Select
             className="w-40"
             selectedKey={scale}
@@ -96,6 +96,8 @@ export const ARow: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('radiogroup', { name: 'Meter' })).toBeInTheDocument();
     await expect(canvas.getByRole('radiogroup', { name: 'Bars' })).toBeInTheDocument();
+    const select = canvas.getByRole('button', { name: /Scale/ });
+    await expect(select).toHaveAccessibleDescription('The notes the grid offers.');
   },
 };
 

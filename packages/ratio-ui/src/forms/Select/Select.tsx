@@ -77,6 +77,8 @@ export interface SelectProps {
   className?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
+  /** The element that describes the select: a `Setting`'s description. */
+  'aria-describedby'?: string;
   testId?: string;
 }
 
@@ -144,6 +146,7 @@ export const Select: React.FC<SelectProps> = ({
   className,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
   testId,
 }) => {
   // Selection precedence: the new controlled `selectedKey` wins, then the
@@ -173,6 +176,7 @@ export const Select: React.FC<SelectProps> = ({
       name={name}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
     >
       {label && <Label>{label}</Label>}
       <Button
