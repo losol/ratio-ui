@@ -136,6 +136,12 @@
   --choice-radius: 0;
   --choice-fg: var(--primary);
 
+  /* A stamp: a thicker frame, square, in the condensed face. */
+  --stamp-border-width: 3px;
+  --stamp-radius: 0;
+  --stamp-font-family: var(--font-display);
+  --stamp-letter-spacing: 0.06em;
+
   /* Labels — bold, in the ink. */
   --label-font-weight: 700;
 

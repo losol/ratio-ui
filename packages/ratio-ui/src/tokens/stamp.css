@@ -1,0 +1,20 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Stamp tokens — the frame, face, corner and slant of `core/Stamp`, a word
+ * in capitals in a frame, as a rubber stamp lands. The ink is the tone the
+ * component sets. Override per theme (tabula: a thicker frame, the
+ * condensed face, square) or per scope.
+ */
+:root {
+  --stamp-border-width: 2px;
+  --stamp-radius: var(--radius-sm);
+  --stamp-font-family: var(--font-sans);
+  --stamp-font-weight: 800;
+  --stamp-letter-spacing: 0.08em;
+  --stamp-tilt: -6deg;
+}

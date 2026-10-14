@@ -104,9 +104,10 @@ the standard look as their default:
 
 ## Not in the theme
 
-- A poster block, a rubber stamp: these are the consumer's, composed from
-  `Card featured`, `Card.Meta`, `Card.Footer`, `BrandMark` and
-  `Heading.Eyebrow`. The stories under *Themes/Tabula* show the composition.
+- A poster block is the consumer's, composed from `Card featured`,
+  `Card.Meta`, `Card.Footer`, `BrandMark` and `Heading.Eyebrow`; the stories
+  under *Themes/Tabula* show the composition. A rubber stamp is `Stamp`,
+  framed by the theme's `--stamp-*` tokens.
   A chart of boxes and lines is `Flowchart`, framed by the theme's
   `--flowchart-*` tokens.
 - Capitals on headings. The sketch sets its big words in capitals; the theme
