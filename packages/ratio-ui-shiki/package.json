@@ -56,21 +56,21 @@
   "devDependencies": {
     "@eventuras/eslint-config": "^1.0.6",
     "@eventuras/ratio-ui": "workspace:*",
-    "@eventuras/typescript-config": "^1.1.0",
+    "@eventuras/typescript-config": "^1.1.1",
     "@eventuras/vite-config": "^0.4.0",
-    "@shikijs/langs": "^4.4.3",
-    "@shikijs/themes": "^4.4.3",
+    "@shikijs/langs": "^4.5.0",
+    "@shikijs/themes": "^4.5.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "shiki": "^4.4.3",
+    "shiki": "^4.5.0",
     "typescript": "6.0.3",
-    "vite": "8.3.1",
+    "vite": "8.3.2",
     "vitest": "4.1.11"
   },
   "peerDependencies": {
     "@eventuras/ratio-ui": "^2.13.0",
-    "@shikijs/langs": "^4.4.3",
-    "@shikijs/themes": "^4.4.3",
-    "shiki": "^4.4.3"
+    "@shikijs/langs": "^4.5.0",
+    "@shikijs/themes": "^4.5.0",
+    "shiki": "^4.5.0"
   }
 }
