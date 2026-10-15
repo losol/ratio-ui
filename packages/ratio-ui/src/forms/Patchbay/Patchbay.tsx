@@ -45,9 +45,20 @@ export interface PatchbayPortInfo {
   color?: string;
 }
 
+/**
+ * How a cable is hung: `down` sags below its two ports, as a patch cable
+ * does on a rack; `up` arches over them, for ports at the bottom edge of a
+ * panel or labels under the sockets. Only the `cable` connector hangs.
+ */
+export type PatchbaySag = 'down' | 'up';
+
 export interface PatchbayChange {
-  type: 'connect' | 'disconnect';
+  /** A cable plugged in, pulled out, or moved from one port to another. */
+  type: 'connect' | 'disconnect' | 'move';
+  /** The cable as it is now; for `disconnect`, the one that went. */
   connection: PatchbayConnection;
+  /** For `move`: the cable as it was before one of its ends was moved. */
+  previous?: PatchbayConnection;
 }
 
 /** Built-in text of `Patchbay`. Each entry falls back to English. */
@@ -58,6 +69,8 @@ export interface PatchbayLabels {
   putDown?: string;
   connected?: (from: PatchbayPortInfo, to: PatchbayPortInfo) => string;
   disconnected?: (from: PatchbayPortInfo, to: PatchbayPortInfo) => string;
+  /** Announced when a cable is moved: where it runs now. */
+  moved?: (from: PatchbayPortInfo, to: PatchbayPortInfo) => string;
   /** Accessible name of a cable. */
   cable?: (from: PatchbayPortInfo, to: PatchbayPortInfo) => string;
   /** Name of the remove button on a selected cable. @default 'Remove cable' */
@@ -93,6 +106,12 @@ export interface PatchbayProps {
    * line whichever it is.
    */
   connector?: PatchbayConnector;
+  /**
+   * Which way a `cable` hangs: `down` (default) sags below the ports, `up`
+   * arches over them. Pick `up` when the ports sit at a panel's lower edge or
+   * their labels are under the sockets, so the cables stay off the words.
+   */
+  sag?: PatchbaySag;
   /** Dashes moving from output to input along each cable. Off for reduced motion. */
   flow?: boolean;
   labels?: PatchbayLabels;
@@ -134,6 +153,7 @@ const DEFAULT_LABELS: Required<PatchbayLabels> = {
   putDown: 'Put down.',
   connected: (from, to) => `Connected ${from.name} to ${to.name}.`,
   disconnected: (from, to) => `Disconnected ${from.name} from ${to.name}.`,
+  moved: (from, to) => `Moved the cable: ${from.name} to ${to.name}.`,
   cable: (from, to) => `Cable from ${from.name} to ${to.name}`,
   remove: 'Remove cable',
 };
@@ -146,8 +166,8 @@ const cableKey = (c: PatchbayConnection) => `${c.from}→${c.to}`;
 /** A hanging cable: a cubic curve whose sag grows with the distance. */
 const sagOf = (a: Point, b: Point) =>
   Math.min(140, 30 + Math.abs(b.x - a.x) * 0.25 + Math.abs(b.y - a.y) * 0.15);
-const curve = (a: Point, b: Point) => {
-  const sag = sagOf(a, b);
+const curve = (a: Point, b: Point, up = false) => {
+  const sag = sagOf(a, b) * (up ? -1 : 1);
   return `M${a.x} ${a.y} C${a.x} ${a.y + sag}, ${b.x} ${b.y + sag}, ${b.x} ${b.y}`;
 };
 /** One line, port to port. */
@@ -163,9 +183,9 @@ const elbow = (a: Point, b: Point) => {
 };
 const PATHS: Record<PatchbayConnector, (a: Point, b: Point) => string> = { cable: curve, straight, elbow };
 /** Where the remove button sits: on the line, at its middle. */
-const midpoint = (connector: PatchbayConnector, a: Point, b: Point): Point => ({
+const midpoint = (connector: PatchbayConnector, a: Point, b: Point, sag: PatchbaySag = 'down'): Point => ({
   x: (a.x + b.x) / 2,
-  y: (a.y + b.y) / 2 + (connector === 'cable' ? sagOf(a, b) * 0.75 : 0),
+  y: (a.y + b.y) / 2 + (connector === 'cable' ? sagOf(a, b) * 0.75 * (sag === 'up' ? -1 : 1) : 0),
 });
 
 const samePositions = (a: Record<string, Point>, b: Record<string, Point>) => {
@@ -190,6 +210,13 @@ const samePositions = (a: Record<string, Point>, b: Record<string, Point>) => {
  * (Escape puts it down). Doing it again on a cable that exists removes it,
  * as does selecting the cable and pressing Delete, or its remove button.
  *
+ * Moving a cable is a drag too, as on a rack: drag from an input that has a
+ * cable and its plug comes out; drop it on another port and the cable runs
+ * there, drop it in the air and the cable is gone, drop it back and nothing
+ * changes. An output keeps feeding new cables when dragged. Hold Alt for
+ * the other one: Alt-drag an output to lift its last cable, an occupied
+ * input to start a new cable. Escape puts a lifted plug back.
+ *
  * One output may feed many inputs and one input may take many outputs;
  * `canConnect` is where an app says otherwise. Colours come from the
  * `--patchbay-*` tokens (tokens/patchbay.css) and each port's `color`.
@@ -212,6 +239,7 @@ export function PatchbayRoot({
   readOnly = false,
   flow = false,
   connector = 'cable',
+  sag = 'down',
   labels,
   'aria-label': ariaLabel,
   className,
@@ -220,7 +248,7 @@ export function PatchbayRoot({
 }: Readonly<PatchbayProps>) {
   const boardId = useId();
   const text = { ...DEFAULT_LABELS, ...labels };
-  const path = PATHS[connector];
+  const path = (a: Point, b: Point) => (connector === 'cable' ? curve(a, b, sag === 'up') : PATHS[connector](a, b));
 
   const [inner, setInner] = useState<PatchbayConnection[]>(() => defaultConnections ?? []);
   const connections = connectionsProp ?? inner;
@@ -232,7 +260,9 @@ export function PatchbayRoot({
   const [positions, setPositions] = useState<Record<string, Point>>({});
   const [pending, setPending] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
-  const [drag, setDrag] = useState<{ from: string; to: Point } | null>(null);
+  // A cable being drawn: from a port (a new cable) or from the end of a
+  // lifted one that stays put (a move), to the pointer.
+  const [drag, setDrag] = useState<{ from: string; to: Point; lifted?: PatchbayConnection } | null>(null);
   const [status, setStatus] = useState('');
 
   // --- Measuring: every port's centre, relative to the board. -------------
@@ -349,22 +379,75 @@ export function PatchbayRoot({
     }
   };
 
+  /**
+   * The cable a drag from `id` lifts, if it lifts one: an input's cable, or
+   * with Alt an output's. The last one plugged in, when there are several.
+   */
+  const liftable = (id: string, alt: boolean): PatchbayConnection | null => {
+    const p = ports.get(id);
+    if (!p) return null;
+    const lift = (p.direction === 'in') !== alt;
+    if (!lift) return null;
+    const own = connections.filter((c) => (p.direction === 'in' ? c.to : c.from) === id);
+    return own[own.length - 1] ?? null;
+  };
+
+  /** Move one end of `c` from `moving` to `target`, keeping the other end. */
+  const move = (c: PatchbayConnection, moving: string, target: string): boolean => {
+    const fixed = c.from === moving ? c.to : c.from;
+    const next = resolve(fixed, target);
+    if (!next) return false;
+    const others = connections.filter((x) => !(x.from === c.from && x.to === c.to));
+    if (others.some((x) => x.from === next.from && x.to === next.to)) return false;
+    const from = info(next.from)!;
+    const to = info(next.to)!;
+    if (canConnect && !canConnect(from, to, others)) return false;
+    // In the place of the old one, so the order of the cables holds.
+    commit(
+      connections.map((x) => (x.from === c.from && x.to === c.to ? next : x)),
+      { type: 'move', connection: next, previous: c },
+    );
+    setStatus(text.moved(from, to));
+    return true;
+  };
+
   // Drag: the port captures the pointer, so the move and the release reach
-  // it wherever the pointer goes. Under the threshold it is a press.
-  const dragRef = useRef<{ id: string; x0: number; y0: number; moved: boolean } | null>(null);
+  // it wherever the pointer goes. Under the threshold it is a press. Past
+  // it, the drag either starts a new cable or lifts one that is there.
+  const dragRef = useRef<{
+    id: string;
+    x0: number;
+    y0: number;
+    alt: boolean;
+    moved: boolean;
+    lifted: PatchbayConnection | null;
+  } | null>(null);
   const dragStart = (id: string, e: React.PointerEvent<HTMLElement>) => {
     if (readOnly || e.button !== 0) return;
     e.preventDefault();
-    e.currentTarget.setPointerCapture(e.pointerId);
-    dragRef.current = { id, x0: e.clientX, y0: e.clientY, moved: false };
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // A pointer the browser no longer tracks: the drag still works over the port.
+    }
+    dragRef.current = { id, x0: e.clientX, y0: e.clientY, alt: e.altKey, moved: false, lifted: null };
   };
   const dragMove = (e: React.PointerEvent<HTMLElement>) => {
     const d = dragRef.current;
     if (!d) return;
     if (!d.moved && Math.hypot(e.clientX - d.x0, e.clientY - d.y0) < DRAG_THRESHOLD) return;
-    d.moved = true;
+    if (!d.moved) {
+      d.moved = true;
+      d.lifted = liftable(d.id, d.alt);
+      setPending(null);
+      setSelected(null);
+    }
     const rr = rootRef.current?.getBoundingClientRect();
-    if (rr) setDrag({ from: d.id, to: { x: e.clientX - rr.left, y: e.clientY - rr.top } });
+    if (!rr) return;
+    const to = { x: e.clientX - rr.left, y: e.clientY - rr.top };
+    const lifted = d.lifted;
+    if (lifted) setDrag({ from: lifted.from === d.id ? lifted.to : lifted.from, to, lifted });
+    else setDrag({ from: d.id, to });
   };
   const dragEnd = (id: string, e: React.PointerEvent<HTMLElement>) => {
     const d = dragRef.current;
@@ -377,9 +460,31 @@ export function PatchbayRoot({
       return;
     }
     const el = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>('[data-patchbay-port]');
-    const target = el?.dataset.patchbayPort;
-    if (el?.dataset.patchbay === boardId && target && toggle(d.id, target)) setPending(null);
+    const onBoard = el?.dataset.patchbay === boardId;
+    const target = onBoard ? el?.dataset.patchbayPort : undefined;
+    if (d.lifted) {
+      // Back where it came from, or onto a port that will not take it: it stays.
+      // In the air: pulled out.
+      if (!target) remove(d.lifted);
+      else if (target !== d.id) move(d.lifted, d.id, target);
+      return;
+    }
+    if (target && toggle(d.id, target)) setPending(null);
   };
+
+  // Escape during a drag lets go of it: the plug goes back, no cable is
+  // drawn. On the window, since a drag does not move the focus.
+  const dragging = drag !== null;
+  useEffect(() => {
+    if (!dragging) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      dragRef.current = null;
+      setDrag(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [dragging]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Escape') return;
@@ -391,14 +496,17 @@ export function PatchbayRoot({
   };
 
   // --- What the ports read. -----------------------------------------------
+  // A lifted cable is out of its socket while it is carried.
+  const liftedKey = drag?.lifted ? cableKey(drag.lifted) : null;
+  const plugged = liftedKey ? connections.filter((c) => cableKey(c) !== liftedKey) : connections;
   const connectedIds = useMemo(() => {
     const s = new Set<string>();
-    connections.forEach((c) => {
+    plugged.forEach((c) => {
       s.add(c.from);
       s.add(c.to);
     });
     return s;
-  }, [connections]);
+  }, [plugged]);
 
   const isTarget = (id: string) => {
     if (pending === null || pending === id) return false;
@@ -425,7 +533,7 @@ export function PatchbayRoot({
 
   // --- The cables. --------------------------------------------------------
   const colorOf = (c: PatchbayConnection) => info(c.from)?.color ?? info(c.to)?.color;
-  const cables = connections.flatMap((c) => {
+  const cables = plugged.flatMap((c) => {
     const a = positions[c.from];
     const b = positions[c.to];
     if (!a || !b) return [];
@@ -446,7 +554,10 @@ export function PatchbayRoot({
     ];
   });
   const dragFrom = drag ? positions[drag.from] : undefined;
-  const dragLine = drag && dragFrom ? { a: dragFrom, b: drag.to, color: info(drag.from)?.color } : null;
+  const dragLine =
+    drag && dragFrom
+      ? { a: dragFrom, b: drag.to, color: drag.lifted ? colorOf(drag.lifted) : info(drag.from)?.color }
+      : null;
 
   return (
     <PatchbayContext.Provider value={ctx}>
@@ -458,6 +569,7 @@ export function PatchbayRoot({
         data-patchbay-board={boardId}
         onKeyDown={onKeyDown}
         data-connector={connector}
+        data-sag={connector === 'cable' ? sag : undefined}
         className={cn('patchbay', readOnly && 'patchbay--read-only', className)}
       >
         {children}
@@ -466,7 +578,7 @@ export function PatchbayRoot({
             const d = path(a, b);
             const style = color ? ({ '--patchbay-cable-color': color } as React.CSSProperties) : undefined;
             const isSelected = selected === key;
-            const mid = midpoint(connector, a, b);
+            const mid = midpoint(connector, a, b, sag);
             return (
               <g key={key} className={cn('patchbay-cable', isSelected && 'is-selected')} style={style}>
                 <path className="patchbay-cable-shadow" d={d} />
@@ -558,6 +670,11 @@ export interface PatchbayPortProps {
    * hand.
    */
   anchor?: boolean;
+  /**
+   * Where the label sits: `below` the socket (default), or `above` it, for a
+   * row of sockets whose cables hang down under them.
+   */
+  labelPosition?: 'below' | 'above';
   className?: string;
 }
 
@@ -573,6 +690,7 @@ export function PatchbayPort({
   name,
   color,
   anchor = false,
+  labelPosition = 'below',
   className,
 }: Readonly<PatchbayPortProps>) {
   const ctx = useContext(PatchbayContext);
@@ -613,7 +731,7 @@ export function PatchbayPort({
   const dot = <span aria-hidden className="patchbay-port-dot" />;
 
   return (
-    <span className={cn('patchbay-port-wrap', className)}>
+    <span className={cn('patchbay-port-wrap', labelPosition === 'above' && 'patchbay-port-wrap--label-above', className)}>
       {ctx.readOnly ? (
         <span
           ref={ref as React.RefObject<HTMLSpanElement>}

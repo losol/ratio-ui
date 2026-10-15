@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { useState } from 'react';
+import type { Key } from 'react-aria-components';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
@@ -404,5 +405,145 @@ export const RemoveByPointer: Story = {
     await userEvent.click(cable);
     await userEvent.click(canvas.getByRole('button', { name: 'Remove cable' }));
     expect(canvas.getByTestId('count')).toHaveTextContent('0 cable(s)');
+  },
+};
+
+// --- A switch panel: move a cable to change a setting. ---------------------
+
+/** Drag a plug from `from` to the centre of `to`, as a pointer would; `alt` holds Alt. */
+async function dragPlug(from: HTMLElement, to: { x: number; y: number }, alt = false) {
+  const r = from.getBoundingClientRect();
+  const start = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  const at = (type: string, p: { x: number; y: number }) =>
+    from.dispatchEvent(
+      new PointerEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        pointerId: 1,
+        pointerType: 'mouse',
+        isPrimary: true,
+        button: 0,
+        buttons: type === 'pointerup' ? 0 : 1,
+        altKey: alt,
+        clientX: p.x,
+        clientY: p.y,
+      }),
+    );
+  at('pointerdown', start);
+  // Past the threshold first, then onto the target: the drag is drawn on the way.
+  at('pointermove', { x: start.x + 12, y: start.y + 12 });
+  await new Promise((r) => requestAnimationFrame(() => r(null)));
+  at('pointermove', to);
+  await new Promise((r) => requestAnimationFrame(() => r(null)));
+  at('pointerup', to);
+}
+const centreOf = (el: HTMLElement) => {
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+};
+
+const SWITCHES = [
+  { id: 'theme', label: 'Theme', color: 'var(--color-accent-400)', options: [{ id: 'light', label: 'Light' }, { id: 'dark', label: 'Dark' }] },
+  { id: 'language', label: 'Site', color: 'var(--color-primary-200)', options: [{ id: 'nb', label: 'Norsk' }, { id: 'en', label: 'English' }] },
+];
+
+/**
+ * A switch panel, as in a site's footer: each setting is an output, each
+ * choice an input, and the cable says which is on. Move a cable by its plug:
+ * drag it out of "Norsk" and into "English". An output takes one cable here
+ * (`canConnect`), so a new cable from it is refused; Alt-drag the output to
+ * move the cable from that end instead. Drop a plug in the air to pull the
+ * cable out.
+ *
+ * `sag="up"` arches the cables over the sockets, off the labels under them;
+ * `labelPosition="above"` puts the labels over the sockets instead.
+ */
+export const SwitchPanel: Story = {
+  render: function SwitchPanelStory() {
+    const [connections, setConnections] = useState<PatchbayConnection[]>([
+      { from: 'theme', to: 'light' },
+      { from: 'language', to: 'nb' },
+    ]);
+    const [sag, setSag] = useState<Set<Key>>(() => new Set(['up']));
+    const [labels, setLabels] = useState<Set<Key>>(() => new Set(['below']));
+    const on = (output: string) => connections.find((c) => c.from === output)?.to ?? 'none';
+    const above = labels.has('above');
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-6">
+          <ToggleButtonGroup
+            aria-label="Cables"
+            disallowEmptySelection
+            selectedKeys={sag}
+            onSelectionChange={setSag}
+            options={[{ value: 'down', label: 'Hang down' }, { value: 'up', label: 'Arch up' }]}
+          />
+          <ToggleButtonGroup
+            aria-label="Labels"
+            disallowEmptySelection
+            selectedKeys={labels}
+            onSelectionChange={setLabels}
+            options={[{ value: 'below', label: 'Labels below' }, { value: 'above', label: 'Labels above' }]}
+          />
+        </div>
+        <Patchbay
+          aria-label="Switch panel"
+          connections={connections}
+          onConnectionsChange={setConnections}
+          sag={sag.has('up') ? 'up' : 'down'}
+          // A switch: one cable per setting.
+          canConnect={(from, _to, all) => !all.some((c) => c.from === from.id)}
+          className="surface-dark flex max-w-2xl items-center justify-around gap-6 rounded-xl border border-border-2 bg-primary-950 px-6 py-10 text-(--text)"
+        >
+          {SWITCHES.map((s, i) => (
+            <div key={s.id} className={i > 0 ? 'flex gap-6 border-l border-dashed border-border-1 pl-6' : 'flex gap-6'}>
+              <Patchbay.Port id={s.id} direction="out" label={s.label} name={s.label} color={s.color} labelPosition={above ? 'above' : 'below'} />
+              {s.options.map((o) => (
+                <Patchbay.Port key={o.id} id={o.id} direction="in" label={o.label} name={`${s.label}: ${o.label}`} color={s.color} labelPosition={above ? 'above' : 'below'} />
+              ))}
+            </div>
+          ))}
+        </Patchbay>
+        <p className="m-0 text-sm text-(--text-muted)" data-testid="settings">
+          Theme: {on('theme')}. Site: {on('language')}.
+        </p>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const settings = canvas.getByTestId('settings');
+    const port = (name: string) => canvas.getByRole('button', { name });
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Cable from Site to Site: Norsk' })).toBeInTheDocument());
+
+    // The plug out of Norsk and into English: one cable, moved.
+    await dragPlug(port('Site: Norsk'), centreOf(port('Site: English')));
+    await waitFor(() => expect(settings).toHaveTextContent('Site: en.'));
+    expect(canvas.getByRole('button', { name: 'Cable from Site to Site: English' })).toBeInTheDocument();
+    expect(canvas.queryByRole('button', { name: 'Cable from Site to Site: Norsk' })).not.toBeInTheDocument();
+
+    // A plain drag from the output starts a new cable, which the switch refuses.
+    await dragPlug(port('Theme'), centreOf(port('Theme: Dark')));
+    expect(settings).toHaveTextContent('Theme: light.');
+
+    // With Alt, the output's own cable comes along instead: dropped in the air, it is pulled out.
+    await dragPlug(port('Theme'), centreOf(settings), true);
+    await waitFor(() => expect(settings).toHaveTextContent('Theme: none.'));
+
+    // With no cable on it, a plain drag from the output makes a new one.
+    await dragPlug(port('Theme'), centreOf(port('Theme: Dark')));
+    await waitFor(() => expect(settings).toHaveTextContent('Theme: dark.'));
+
+    // Moved from the input end, onto a port that will not take it (an output): it stays.
+    await dragPlug(port('Theme: Dark'), centreOf(port('Site')));
+    expect(settings).toHaveTextContent('Theme: dark. Site: en.');
+
+    // Dropped back where it came from: nothing changes.
+    await dragPlug(port('Theme: Dark'), centreOf(port('Theme: Dark')));
+    expect(settings).toHaveTextContent('Theme: dark.');
+
+    // Back to Light, by its plug.
+    await dragPlug(port('Theme: Dark'), centreOf(port('Theme: Light')));
+    await waitFor(() => expect(settings).toHaveTextContent('Theme: light.'));
   },
 };

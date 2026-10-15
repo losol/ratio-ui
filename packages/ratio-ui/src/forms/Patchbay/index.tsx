@@ -33,4 +33,5 @@ export type {
   PatchbayDirection,
   PatchbayLabels,
   PatchbayPortInfo,
+  PatchbaySag,
 } from './Patchbay';
