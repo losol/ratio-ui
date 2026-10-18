@@ -102,7 +102,11 @@ function highlightStyle(dark: boolean): HighlightStyle {
   ]);
 }
 
-/** Syntax highlighting for the given mode (the only highlighter — no basicSetup default). */
+/**
+ * Syntax highlighting for the given mode. `basicSetup` brings CodeMirror's
+ * default style too, but only as a fallback: wherever this style has a rule,
+ * this one wins.
+ */
 export function highlightExtension(dark: boolean): Extension {
   return syntaxHighlighting(highlightStyle(dark));
 }

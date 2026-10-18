@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { CodeEditor, type EditorDiagnostic } from './CodeEditor';
 
 /**
@@ -133,5 +134,48 @@ export const TypeScript: Story = {
         <CodeEditor value={value} onChange={setValue} language="ts" aria-label="TypeScript example" />
       </div>
     );
+  },
+};
+
+/**
+ * Controlled: the count follows each edit through `onChange`, and Reset puts
+ * a new `value` in from outside, which the editor takes without reporting it
+ * back as an edit.
+ */
+export const Controlled: Story = {
+  render: function ControlledStory() {
+    const [value, setValue] = useState('{ "a": 1 }');
+    const [edits, setEdits] = useState(0);
+    return (
+      <div className="flex flex-col gap-3">
+        <CodeEditor
+          value={value}
+          onChange={(v) => {
+            setValue(v);
+            setEdits((n) => n + 1);
+          }}
+          aria-label="JSON"
+        />
+        <div className="flex items-center gap-3 text-sm">
+          <button type="button" className="rounded border px-2 py-1" onClick={() => setValue('{ "reset": true }')}>
+            Reset
+          </button>
+          <span data-testid="state">
+            {value.length} characters, {edits} edits
+          </span>
+        </div>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const editor = canvas.getByRole('textbox', { name: 'JSON' });
+    await userEvent.click(editor);
+    await userEvent.keyboard('{End} ');
+    await waitFor(() => expect(canvas.getByTestId('state')).toHaveTextContent('11 characters, 1 edits'));
+    await userEvent.click(canvas.getByRole('button', { name: 'Reset' }));
+    await waitFor(() => expect(editor).toHaveTextContent('{ "reset": true }'));
+    // Taken from outside: not counted as an edit.
+    expect(canvas.getByTestId('state')).toHaveTextContent('17 characters, 1 edits');
   },
 };

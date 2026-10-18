@@ -4,10 +4,10 @@
 
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { basicSetup } from 'codemirror';
 import { EditorView } from '@codemirror/view';
-import { EditorState, Compartment, type Extension } from '@codemirror/state';
+import { Annotation, EditorState, Compartment, type Extension } from '@codemirror/state';
 import { json } from '@codemirror/lang-json';
 import { xml } from '@codemirror/lang-xml';
 import { javascript } from '@codemirror/lang-javascript';
@@ -25,7 +25,9 @@ export interface EditorDiagnostic {
 }
 
 export interface CodeEditorProps {
+  /** The document. Change it from outside (a reset, a file loaded) and the editor follows. */
   value: string;
+  /** Called with the whole document after each edit made in the editor. */
   onChange?: (value: string) => void;
   /** @default 'json' */
   language?: CodeEditorLanguage;
@@ -35,6 +37,9 @@ export interface CodeEditorProps {
   className?: string;
   'aria-label'?: string;
 }
+
+/** Marks a change that came from the `value` prop, so it is not echoed back through `onChange`. */
+const fromProps = Annotation.define<boolean>();
 
 function languageExtension(language: CodeEditorLanguage): Extension {
   switch (language) {
@@ -62,8 +67,10 @@ function toCmDiagnostics(state: EditorState, diagnostics: EditorDiagnostic[]): D
 /**
  * A CodeMirror 6 editor dressed in ratio-ui: chrome from the `--code-*` tokens,
  * github light/dark syntax colors that follow the app's mode, JSON/XML/JS/TS
- * languages, and inline `diagnostics` (squiggles + gutter). Controlled via
- * `value` / `onChange`.
+ * languages, and inline `diagnostics` (squiggles + gutter). Controlled:
+ * `onChange` reports each edit, and a new `value` from outside replaces the
+ * document. Diagnostics are mapped through later edits, so a squiggle stays
+ * on its text until the next set replaces them.
  */
 export function CodeEditor({
   value,
@@ -80,7 +87,9 @@ export function CodeEditor({
   const readOnly_ = useRef(new Compartment());
   const highlight_ = useRef(new Compartment());
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  useLayoutEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   // Create the editor once.
   useEffect(() => {
@@ -97,7 +106,8 @@ export function CodeEditor({
           ratioChrome,
           highlight_.current.of(highlightExtension(isDarkMode())),
           EditorView.updateListener.of((u) => {
-            if (u.docChanged) onChangeRef.current?.(u.state.doc.toString());
+            if (!u.docChanged || u.transactions.some((tr) => tr.annotation(fromProps))) return;
+            onChangeRef.current?.(u.state.doc.toString());
           }),
         ],
       }),
@@ -123,13 +133,22 @@ export function CodeEditor({
       editor.destroy();
       view.current = null;
     };
-    // Created once; prop changes are synced by the effects below.
+    // Created once with the props it starts from; later changes are synced by
+    // the effects below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // NOTE (spike): `value` is the initial document only — the editor is
-  // uncontrolled after mount. This isolates whether the controlled value-sync
-  // was what wiped highlighting on edit. A robust external-value sync comes
-  // later (or remount via a `key`).
+  // Keep the document in step with `value`. The editor's own edits come back
+  // through `onChange` equal to the document and change nothing; a value from
+  // outside replaces it, marked so it is not reported as an edit.
+  useEffect(() => {
+    const v = view.current;
+    if (!v || v.state.doc.toString() === value) return;
+    v.dispatch({
+      changes: { from: 0, to: v.state.doc.length, insert: value },
+      annotations: fromProps.of(true),
+    });
+  }, [value]);
 
   // Reconfigure language / read-only.
   useEffect(() => {
