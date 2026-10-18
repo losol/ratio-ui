@@ -33,35 +33,66 @@ import { CodeEditor } from '@eventuras/ratio-ui-codeeditor';
 
 function Editor() {
   const [code, setCode] = useState('print("Hei")');
-  return <CodeEditor aria-label="Program" language="python" value={code} onChange={setCode} />;
+  return <CodeEditor aria-label="Program" language="python" value={code} onChange={setCode} onRun={run} />;
 }
 ```
 
 | Prop | | |
 |---|---|---|
 | `value`, `onChange` | | Controlled. `onChange` gets the whole document after each edit; a new `value` from outside (a reset, a file loaded) replaces it without being reported back. |
-| `language` | `'json'` | `json`, `xml`, `js`, `ts` or `python` (four spaces a level). |
+| `language` | `'json'` | A name — `json`, `xml`, `js`, `ts` or `python` (four spaces a level) — loaded when first asked for, so a page bundles only the parsers it uses. Or a language extension the app made, `python()` from `@codemirror/lang-python`, used as it is and read once. |
+| `setup` | `'basic'` | `basic` is CodeMirror's full editor: completion pop-ups, brackets closed as you type, folding, search. `minimal` keeps line numbers, undo, bracket matching and indentation, and nothing that moves on its own — for beginners. |
+| `onRun` | | Called with the document on Ctrl+Enter (Cmd+Enter on a Mac). |
 | `diagnostics` | | `{ line, message, severity }[]` — squiggles, gutter marks and a tooltip, mapped through later edits. For a server's verdict (a FHIR `OperationOutcome`) or a run's traceback. |
 | `readOnly` | `false` | |
 | `tabIndents` | `true` | Tab indents; Escape, then Tab, moves the focus on. Off, Tab moves the focus as on any field. |
 | `extensions` | | More CodeMirror extensions, read once when the editor is made: a keymap, an autocompletion source, a linter. They come before the editor's own, so a key bound here wins over the default. |
+| `ref` | | `insert(text)`, `focus()` and the CodeMirror `view` — see below. |
 | `aria-label` | | The editor's accessible name. |
 
-Running the code on Ctrl+Enter, for example:
+### Typing in from outside
+
+A ref's `insert` types text where the cursor is (over the selection, if
+there is one) and puts the focus back in the editor. It is an ordinary edit:
+it reaches `onChange` and can be undone. For a row of the characters a
+tablet keyboard hides:
 
 ```tsx
-import { keymap } from '@codemirror/view';
+const editor = useRef<CodeEditorHandle>(null);
 
-<CodeEditor
-  language="python"
-  value={code}
-  onChange={setCode}
-  extensions={[keymap.of([{ key: 'Mod-Enter', run: () => (run(), true) }])]}
-/>;
+<CodeEditor ref={editor} language="python" setup="minimal" value={code} onChange={setCode} onRun={run} />
+{[':', '(', ')', '[', ']', '"'].map((ch) => (
+  <button
+    key={ch}
+    type="button"
+    // Keep the focus (and the on-screen keyboard) in the editor.
+    onPointerDown={(e) => e.preventDefault()}
+    onClick={() => editor.current?.insert(ch)}
+  >
+    {ch}
+  </button>
+))}
 ```
 
-Import `@codemirror/view` from the same version the editor uses (a direct
-dependency at `^6`), for the reason above.
+### The language as an extension
+
+```tsx
+import { python } from '@codemirror/lang-python';
+import { indentUnit } from '@codemirror/language';
+
+// Made once, outside the component.
+const PYTHON = python();
+const FOUR_SPACES = [indentUnit.of('    ')];
+
+<CodeEditor language={PYTHON} extensions={FOUR_SPACES} value={code} onChange={setCode} />;
+```
+
+By name, `python` brings the four-space indent itself; as an extension, the
+app adds it. Either way only the Python parser is bundled. `basicSetup` is
+bundled whichever `setup` is chosen.
+
+Anything CodeMirror has goes in through `extensions`. Import it from the
+same major version the editor uses (`^6`), for the reason above.
 
 ## Light and dark
 

@@ -2,11 +2,13 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { keymap } from '@codemirror/view';
+import { indentUnit } from '@codemirror/language';
+import { python } from '@codemirror/lang-python';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { CodeEditor, type EditorDiagnostic } from './CodeEditor';
+import { CodeEditor, type CodeEditorHandle, type EditorDiagnostic } from './CodeEditor';
 
 /**
  * A CodeMirror 6 editor wearing ratio-ui — spike for the FHIR-resource editor:
@@ -224,6 +226,8 @@ export const Python: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const editor = canvas.getByRole('textbox', { name: 'Program' });
+    // Python by name is loaded on demand: wait for its colours, so its four-space indent is in.
+    await waitFor(() => expect(editor.querySelector('.cm-line span')).not.toBeNull());
     await userEvent.click(editor);
     // Tab indents: the line gains four spaces, and the focus stays.
     await userEvent.keyboard('{Control>}{Home}{/Control}{Tab}');
@@ -259,5 +263,79 @@ export const SurfaceContexts: Story = {
     };
     await waitFor(() => expect(colorOf('light', '"light"')).toBe('rgb(10, 124, 66)'));
     expect(colorOf('dark', '"dark"')).toBe('rgb(126, 231, 135)');
+  },
+};
+
+// Made once, outside the component, as an app would: the language extension
+// and the four-space indent that goes with Python.
+const PYTHON = python();
+const FOUR_SPACES = [indentUnit.of('    ')];
+const CHARACTERS = [':', '(', ')', '[', ']', '"'];
+
+/**
+ * For a beginner: `setup="minimal"` (no pop-ups, no brackets closed for you),
+ * the language as an extension the app made (`python()`), a row of the
+ * characters a tablet keyboard hides, typed in through the ref's `insert`,
+ * and `onRun` on Ctrl+Enter. The buttons keep the focus where it is
+ * (`onPointerDown` prevents the default), so the cursor stays put and the
+ * on-screen keyboard stays up.
+ */
+export const CharacterRow: Story = {
+  render: function CharacterRowStory() {
+    const editor = useRef<CodeEditorHandle>(null);
+    const [value, setValue] = useState('for i in range');
+    const [output, setOutput] = useState('');
+    return (
+      <div className="flex max-w-xl flex-col gap-2">
+        <CodeEditor
+          ref={editor}
+          value={value}
+          onChange={setValue}
+          language={PYTHON}
+          extensions={FOUR_SPACES}
+          setup="minimal"
+          onRun={(code) => setOutput(`Ran ${code.split('\n').length} line(s).`)}
+          aria-label="Program"
+        />
+        <div className="flex gap-1" role="toolbar" aria-label="Characters">
+          {CHARACTERS.map((ch) => (
+            <button
+              key={ch}
+              type="button"
+              className="min-w-10 rounded border border-(--code-border) bg-(--code-surface) px-2 py-1 font-mono text-(--code-text)"
+              onPointerDown={(e) => e.preventDefault()}
+              onClick={() => editor.current?.insert(ch)}
+            >
+              {ch}
+            </button>
+          ))}
+        </div>
+        <p className="m-0 text-sm text-(--text-muted)" data-testid="output">
+          {output || 'Ctrl+Enter to run.'}
+        </p>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const editor = canvas.getByRole('textbox', { name: 'Program' });
+    await userEvent.click(editor);
+    await userEvent.keyboard('{Control>}{End}{/Control}');
+
+    // The characters go in where the cursor is, and the focus stays in the editor.
+    await userEvent.click(canvas.getByRole('button', { name: '(' }));
+    await userEvent.keyboard('3');
+    await userEvent.click(canvas.getByRole('button', { name: ')' }));
+    await userEvent.click(canvas.getByRole('button', { name: ':' }));
+    await waitFor(() => expect(editor).toHaveTextContent('for i in range(3):'));
+    expect(editor).toHaveFocus();
+
+    // Minimal: a bracket typed is not closed for you, and no completion pops up.
+    await userEvent.keyboard('{Enter}print(');
+    await waitFor(() => expect(editor.querySelectorAll('.cm-line')[1]?.textContent).toBe('    print('));
+    expect(canvasElement.ownerDocument.querySelector('.cm-tooltip-autocomplete')).toBeNull();
+
+    await userEvent.keyboard('{Control>}{Enter}{/Control}');
+    await waitFor(() => expect(canvas.getByTestId('output')).toHaveTextContent('Ran 2 line(s).'));
   },
 };

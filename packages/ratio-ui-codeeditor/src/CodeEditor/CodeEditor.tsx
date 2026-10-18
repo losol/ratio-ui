@@ -4,20 +4,33 @@
 
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
-import { basicSetup } from 'codemirror';
+import React, { useEffect, useImperativeHandle, useLayoutEffect, useRef } from 'react';
 import { EditorView, keymap } from '@codemirror/view';
-import { Annotation, EditorState, Compartment, type Extension } from '@codemirror/state';
+import { Annotation, EditorState, Compartment, Prec, type Extension } from '@codemirror/state';
 import { indentWithTab } from '@codemirror/commands';
 import { indentUnit } from '@codemirror/language';
-import { json } from '@codemirror/lang-json';
-import { xml } from '@codemirror/lang-xml';
-import { javascript } from '@codemirror/lang-javascript';
-import { python } from '@codemirror/lang-python';
 import { lintGutter, setDiagnostics, type Diagnostic } from '@codemirror/lint';
+import { SETUPS, type CodeEditorSetup } from './setup';
 import { ensureTokenStyles, highlightExtension, ratioChrome } from './theme';
 
 export type CodeEditorLanguage = 'js' | 'ts' | 'json' | 'xml' | 'python';
+export type { CodeEditorSetup };
+
+/** What a ref to `CodeEditor` holds. */
+export interface CodeEditorHandle {
+  /**
+   * Type `text` where the cursor is, over the selection if there is one, and
+   * put the focus back in the editor: for a row of buttons with the
+   * characters a keyboard makes hard to reach (`:`, `(`, `[`, `"`). An edit
+   * like any other, so it reaches `onChange` and can be undone. Does nothing
+   * when the editor is read-only.
+   */
+  insert: (text: string) => void;
+  /** Move the focus into the editor. */
+  focus: () => void;
+  /** The CodeMirror view, for anything else; `null` before mount and after unmount. */
+  readonly view: EditorView | null;
+}
 
 /** A diagnostic to render inline — e.g. mapped from a FHIR `OperationOutcome`. */
 export interface EditorDiagnostic {
@@ -32,8 +45,29 @@ export interface CodeEditorProps {
   value: string;
   /** Called with the whole document after each edit made in the editor. */
   onChange?: (value: string) => void;
-  /** @default 'json' */
-  language?: CodeEditorLanguage;
+  /**
+   * The language: a name, loaded when it is first asked for, so a page bundles
+   * only the parsers it uses; or a CodeMirror language extension made by the
+   * app (`python()` from `@codemirror/lang-python`), used as it is. An
+   * extension is read once, when the editor is made, like `extensions`; a
+   * name can change at any time. `python` by name indents four spaces a
+   * level; with `python()`, add `indentUnit.of('    ')` to `extensions` for
+   * the same. @default 'json'
+   */
+  language?: CodeEditorLanguage | Extension;
+  /**
+   * `basic` is CodeMirror's full editor: completion pop-ups, brackets closed
+   * as you type, folding, search. `minimal` keeps line numbers, undo,
+   * bracket matching and indentation, and nothing that moves on its own —
+   * for beginners. @default 'basic'
+   */
+  setup?: CodeEditorSetup;
+  /**
+   * Called with the document on Ctrl+Enter (Cmd+Enter on a Mac): run the
+   * code, submit the answer. Without it the key does what it does in the
+   * setup.
+   */
+  onRun?: (value: string) => void;
   /** Externally-provided diagnostics rendered as inline squiggles + gutter marks. */
   diagnostics?: EditorDiagnostic[];
   readOnly?: boolean;
@@ -53,26 +87,25 @@ export interface CodeEditorProps {
   extensions?: Extension[];
   className?: string;
   'aria-label'?: string;
+  /** A handle with `insert`, `focus` and the `view`. */
+  ref?: React.Ref<CodeEditorHandle>;
 }
 
 /** Marks a change that came from the `value` prop, so it is not echoed back through `onChange`. */
 const fromProps = Annotation.define<boolean>();
 
-function languageExtension(language: CodeEditorLanguage): Extension {
-  switch (language) {
-    case 'json':
-      return json();
-    case 'xml':
-      return xml();
-    case 'ts':
-      return javascript({ typescript: true });
-    case 'python':
-      // PEP 8: four spaces a level.
-      return [python(), indentUnit.of('    ')];
-    default:
-      return javascript();
-  }
-}
+/**
+ * The named languages, each a dynamic import: the app's bundler splits every
+ * parser into a chunk of its own, and only the ones asked for are loaded.
+ */
+const LANGUAGES: Record<CodeEditorLanguage, () => Promise<Extension>> = {
+  json: () => import('@codemirror/lang-json').then((m) => m.json()),
+  xml: () => import('@codemirror/lang-xml').then((m) => m.xml()),
+  js: () => import('@codemirror/lang-javascript').then((m) => m.javascript()),
+  ts: () => import('@codemirror/lang-javascript').then((m) => m.javascript({ typescript: true })),
+  // PEP 8: four spaces a level.
+  python: () => import('@codemirror/lang-python').then((m) => [m.python(), indentUnit.of('    ')]),
+};
 
 function toCmDiagnostics(state: EditorState, diagnostics: EditorDiagnostic[]): Diagnostic[] {
   const { doc } = state;
@@ -97,21 +130,51 @@ export function CodeEditor({
   value,
   onChange,
   language = 'json',
+  setup = 'basic',
+  onRun,
   diagnostics,
   readOnly = false,
   tabIndents = true,
   extensions,
   className,
   'aria-label': ariaLabel,
+  ref,
 }: Readonly<CodeEditorProps>) {
   const host = useRef<HTMLDivElement>(null);
   const view = useRef<EditorView | null>(null);
   const language_ = useRef(new Compartment());
   const readOnly_ = useRef(new Compartment());
   const onChangeRef = useRef(onChange);
+  const onRunRef = useRef(onRun);
   useLayoutEffect(() => {
     onChangeRef.current = onChange;
+    onRunRef.current = onRun;
   });
+
+  // A language given as an extension is taken as it was at mount; a name is
+  // followed. So `language={python()}` written inline does not reparse the
+  // document on every render.
+  const ownLanguage = useRef(typeof language === 'string' ? null : language);
+  const languageName = typeof language === 'string' ? language : null;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      insert(text: string) {
+        const v = view.current;
+        if (!v || v.state.readOnly) return;
+        v.dispatch(v.state.replaceSelection(text), { scrollIntoView: true, userEvent: 'input' });
+        v.focus();
+      },
+      focus() {
+        view.current?.focus();
+      },
+      get view() {
+        return view.current;
+      },
+    }),
+    [],
+  );
 
   // Create the editor once.
   useEffect(() => {
@@ -122,9 +185,22 @@ export function CodeEditor({
       state: EditorState.create({
         doc: value,
         extensions: [
+          // Ctrl+Enter runs, ahead of everything; with no onRun it falls through.
+          Prec.highest(
+            keymap.of([
+              {
+                key: 'Mod-Enter',
+                run: (v) => {
+                  if (!onRunRef.current) return false;
+                  onRunRef.current(v.state.doc.toString());
+                  return true;
+                },
+              },
+            ]),
+          ),
           extensions ?? [],
-          basicSetup,
-          language_.current.of(languageExtension(language)),
+          SETUPS[setup],
+          language_.current.of(ownLanguage.current ?? []),
           readOnly_.current.of(EditorState.readOnly.of(readOnly)),
           tabIndents ? keymap.of([indentWithTab]) : [],
           lintGutter(),
@@ -162,10 +238,28 @@ export function CodeEditor({
     });
   }, [value]);
 
-  // Reconfigure language / read-only.
+  // The language. A name is loaded, then put in unless the name has moved on
+  // or the editor is gone by then. An extension is the first one given.
   useEffect(() => {
-    view.current?.dispatch({ effects: language_.current.reconfigure(languageExtension(language)) });
-  }, [language]);
+    const v = view.current;
+    if (!v) return;
+    if (!languageName) {
+      ownLanguage.current ??= language as Extension;
+      if (language_.current.get(v.state) !== ownLanguage.current) {
+        v.dispatch({ effects: language_.current.reconfigure(ownLanguage.current) });
+      }
+      return;
+    }
+    let current = true;
+    LANGUAGES[languageName]().then((ext) => {
+      if (current) view.current?.dispatch({ effects: language_.current.reconfigure(ext) });
+    });
+    return () => {
+      current = false;
+    };
+    // Follows the name only; an extension is read once (see `ownLanguage`).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [languageName]);
   useEffect(() => {
     view.current?.dispatch({
       effects: readOnly_.current.reconfigure(EditorState.readOnly.of(readOnly)),
