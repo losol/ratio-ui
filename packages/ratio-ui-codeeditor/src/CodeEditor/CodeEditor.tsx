@@ -6,15 +6,18 @@
 
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { basicSetup } from 'codemirror';
-import { EditorView } from '@codemirror/view';
+import { EditorView, keymap } from '@codemirror/view';
 import { Annotation, EditorState, Compartment, type Extension } from '@codemirror/state';
+import { indentWithTab } from '@codemirror/commands';
+import { indentUnit } from '@codemirror/language';
 import { json } from '@codemirror/lang-json';
 import { xml } from '@codemirror/lang-xml';
 import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
 import { lintGutter, setDiagnostics, type Diagnostic } from '@codemirror/lint';
-import { ratioChrome, highlightExtension, isDarkMode } from './theme';
+import { ensureTokenStyles, highlightExtension, ratioChrome } from './theme';
 
-export type CodeEditorLanguage = 'js' | 'ts' | 'json' | 'xml';
+export type CodeEditorLanguage = 'js' | 'ts' | 'json' | 'xml' | 'python';
 
 /** A diagnostic to render inline — e.g. mapped from a FHIR `OperationOutcome`. */
 export interface EditorDiagnostic {
@@ -34,6 +37,20 @@ export interface CodeEditorProps {
   /** Externally-provided diagnostics rendered as inline squiggles + gutter marks. */
   diagnostics?: EditorDiagnostic[];
   readOnly?: boolean;
+  /**
+   * Tab indents instead of moving the focus on, as a code editor's Tab does.
+   * The way out stays: Escape, then Tab. Off, Tab moves the focus as on any
+   * field. @default true
+   */
+  tabIndents?: boolean;
+  /**
+   * More CodeMirror extensions: a keymap (run the code on Ctrl+Enter), an
+   * autocompletion source, a linter. They come before the editor's own, so a
+   * key bound here wins over the default one (Ctrl+Enter otherwise inserts a
+   * blank line). Read once, when the editor is made; give a new `key` to
+   * change them.
+   */
+  extensions?: Extension[];
   className?: string;
   'aria-label'?: string;
 }
@@ -49,6 +66,9 @@ function languageExtension(language: CodeEditorLanguage): Extension {
       return xml();
     case 'ts':
       return javascript({ typescript: true });
+    case 'python':
+      // PEP 8: four spaces a level.
+      return [python(), indentUnit.of('    ')];
     default:
       return javascript();
   }
@@ -66,8 +86,9 @@ function toCmDiagnostics(state: EditorState, diagnostics: EditorDiagnostic[]): D
 
 /**
  * A CodeMirror 6 editor dressed in ratio-ui: chrome from the `--code-*` tokens,
- * github light/dark syntax colors that follow the app's mode, JSON/XML/JS/TS
- * languages, and inline `diagnostics` (squiggles + gutter). Controlled:
+ * github light/dark syntax colors that follow the nearest mode (the page, or a
+ * `.surface-dark` / `.surface-light` band), JSON/XML/JS/TS/Python, and inline
+ * `diagnostics` (squiggles + gutter). Controlled:
  * `onChange` reports each edit, and a new `value` from outside replaces the
  * document. Diagnostics are mapped through later edits, so a squiggle stays
  * on its text until the next set replaces them.
@@ -78,6 +99,8 @@ export function CodeEditor({
   language = 'json',
   diagnostics,
   readOnly = false,
+  tabIndents = true,
+  extensions,
   className,
   'aria-label': ariaLabel,
 }: Readonly<CodeEditorProps>) {
@@ -85,7 +108,6 @@ export function CodeEditor({
   const view = useRef<EditorView | null>(null);
   const language_ = useRef(new Compartment());
   const readOnly_ = useRef(new Compartment());
-  const highlight_ = useRef(new Compartment());
   const onChangeRef = useRef(onChange);
   useLayoutEffect(() => {
     onChangeRef.current = onChange;
@@ -94,17 +116,20 @@ export function CodeEditor({
   // Create the editor once.
   useEffect(() => {
     if (!host.current) return;
+    ensureTokenStyles(host.current.ownerDocument);
     const editor = new EditorView({
       parent: host.current,
       state: EditorState.create({
         doc: value,
         extensions: [
+          extensions ?? [],
           basicSetup,
           language_.current.of(languageExtension(language)),
           readOnly_.current.of(EditorState.readOnly.of(readOnly)),
+          tabIndents ? keymap.of([indentWithTab]) : [],
           lintGutter(),
           ratioChrome,
-          highlight_.current.of(highlightExtension(isDarkMode())),
+          highlightExtension,
           EditorView.updateListener.of((u) => {
             if (!u.docChanged || u.transactions.some((tr) => tr.annotation(fromProps))) return;
             onChangeRef.current?.(u.state.doc.toString());
@@ -116,20 +141,7 @@ export function CodeEditor({
     if (ariaLabel) editor.contentDOM.setAttribute('aria-label', ariaLabel);
     view.current = editor;
 
-    // Follow the app's light/dark mode: re-highlight when data-theme flips.
-    let observer: MutationObserver | undefined;
-    if (typeof MutationObserver !== 'undefined') {
-      observer = new MutationObserver(() => {
-        editor.dispatch({ effects: highlight_.current.reconfigure(highlightExtension(isDarkMode())) });
-      });
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['data-theme', 'data-color-scheme'],
-      });
-    }
-
     return () => {
-      observer?.disconnect();
       editor.destroy();
       view.current = null;
     };

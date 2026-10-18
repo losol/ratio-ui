@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import { useState } from 'react';
+import { keymap } from '@codemirror/view';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { CodeEditor, type EditorDiagnostic } from './CodeEditor';
@@ -177,5 +178,86 @@ export const Controlled: Story = {
     await waitFor(() => expect(editor).toHaveTextContent('{ "reset": true }'));
     // Taken from outside: not counted as an edit.
     expect(canvas.getByTestId('state')).toHaveTextContent('17 characters, 1 edits');
+  },
+};
+
+const PYTHON_SAMPLE = `def fizzbuzz(n):
+    for i in range(1, n + 1):
+        if i % 15 == 0:
+            print("FizzBuzz")
+        elif i % 3 == 0:
+            print("Fizz")
+        elif i % 5 == 0:
+            print("Buzz")
+        else:
+            print(i)
+
+
+fizzbuzz(15)`;
+
+/**
+ * Python, four spaces a level. Tab indents (Escape, then Tab, moves on), and
+ * `extensions` adds a keymap: Ctrl+Enter (Cmd+Enter on a Mac) "runs" the code,
+ * here by counting the lines. A traceback's line goes in as a diagnostic.
+ */
+export const Python: Story = {
+  render: function PythonStory() {
+    const [value, setValue] = useState(PYTHON_SAMPLE);
+    const [ran, setRan] = useState<string | null>(null);
+    const [run] = useState(() => keymap.of([{ key: 'Mod-Enter', run: (view) => (setRan(`${view.state.doc.lines} lines`), true) }]));
+    return (
+      <div className="flex flex-col gap-2">
+        <CodeEditor
+          value={value}
+          onChange={setValue}
+          language="python"
+          aria-label="Program"
+          extensions={[run]}
+          diagnostics={[{ line: 13, severity: 'info', message: 'Ran to the end: 15 lines printed.' }]}
+        />
+        <p className="m-0 text-sm text-(--text-muted)" data-testid="ran">
+          {ran ? `Ran: ${ran}` : 'Ctrl+Enter to run.'}
+        </p>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const editor = canvas.getByRole('textbox', { name: 'Program' });
+    await userEvent.click(editor);
+    // Tab indents: the line gains four spaces, and the focus stays.
+    await userEvent.keyboard('{Control>}{Home}{/Control}{Tab}');
+    await waitFor(() => expect(editor.querySelector('.cm-line')?.textContent).toBe('    def fizzbuzz(n):'));
+    expect(editor).toHaveFocus();
+    await userEvent.keyboard('{Control>}{Enter}{/Control}');
+    await waitFor(() => expect(canvas.getByTestId('ran')).toHaveTextContent('Ran: 13 lines'));
+  },
+};
+
+/**
+ * The syntax colours follow the nearest scope: the same JSON on a light band
+ * and a dark band, whatever the page's mode.
+ */
+export const SurfaceContexts: Story = {
+  render: () => (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div className="surface-light rounded-xl bg-(--surface) p-4" data-testid="light">
+        <CodeEditor value={'{ "mode": "light" }'} aria-label="On a light band" readOnly />
+      </div>
+      <div className="surface-dark rounded-xl bg-(--surface) p-4" data-testid="dark">
+        <CodeEditor value={'{ "mode": "dark" }'} aria-label="On a dark band" readOnly />
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const colorOf = (band: string, text: string) => {
+      const span = [...canvas.getByTestId(band).querySelectorAll<HTMLElement>('.cm-line span')].find(
+        (el) => el.textContent === text,
+      );
+      return span ? getComputedStyle(span).color : null;
+    };
+    await waitFor(() => expect(colorOf('light', '"light"')).toBe('rgb(10, 124, 66)'));
+    expect(colorOf('dark', '"dark"')).toBe('rgb(126, 231, 135)');
   },
 };

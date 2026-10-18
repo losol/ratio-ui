@@ -8,3 +8,4 @@ export {
   type CodeEditorLanguage,
   type EditorDiagnostic,
 } from './CodeEditor';
+export { CODE_EDITOR_TOKEN_CSS } from './theme';

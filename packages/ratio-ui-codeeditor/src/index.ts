@@ -7,4 +7,5 @@ export {
   type CodeEditorProps,
   type CodeEditorLanguage,
   type EditorDiagnostic,
+  CODE_EDITOR_TOKEN_CSS,
 } from './CodeEditor';

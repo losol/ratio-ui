@@ -1,9 +1,24 @@
 {
   "name": "@eventuras/ratio-ui-codeeditor",
   "version": "0.0.0",
-  "description": "Alpha spike \u2014 CodeMirror 6 code editor with ratio-ui styling",
+  "description": "Alpha \u2014 a CodeMirror 6 code editor dressed in Ratio UI",
   "license": "MPL-2.0",
-  "private": true,
+  "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/ratio-ui-codeeditor#readme",
+  "bugs": {
+    "url": "https://github.com/losol/ratio-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/losol/ratio-ui.git",
+    "directory": "packages/ratio-ui-codeeditor"
+  },
+  "keywords": [
+    "ratio-ui",
+    "codemirror",
+    "code-editor",
+    "python",
+    "alpha"
+  ],
   "type": "module",
   "exports": {
     ".": {
@@ -21,13 +36,19 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
   "scripts": {
     "build": "tsc && vite build",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@codemirror/commands": "^6",
     "@codemirror/lang-javascript": "^6",
     "@codemirror/lang-json": "^6",
+    "@codemirror/lang-python": "^6",
     "@codemirror/lang-xml": "^6",
     "@codemirror/language": "^6",
     "@codemirror/lint": "^6",

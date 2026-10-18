@@ -9,9 +9,10 @@ import type { Extension } from '@codemirror/state';
 
 /**
  * Editor chrome + tooltips — surface, gutter, cursor, lint popup. Uses ratio-ui's
- * own `--code-*` tokens, which already flip with the app's mode, so the chrome
- * re-themes via CSS. Scoped under the editor theme so it beats CodeMirror's own
- * base themes (incl. the lint tooltip).
+ * own `--code-*` tokens, which already flip with the app's mode and with a
+ * `.surface-dark` / `.surface-light` band, so the chrome follows by CSS alone.
+ * Scoped under the editor theme so it beats CodeMirror's own base themes
+ * (incl. the lint tooltip).
  */
 export const ratioChrome: Extension = EditorView.theme({
   '&': {
@@ -27,7 +28,7 @@ export const ratioChrome: Extension = EditorView.theme({
     lineHeight: '1.6',
   },
   '.cm-content': { padding: '10px 0', caretColor: 'var(--code-text)' },
-  '&.cm-focused': { outline: 'none', boxShadow: 'var(--shadow-focus, 0 0 0 3px rgba(127,178,214,0.4))' },
+  '&.cm-focused': { outline: 'none', boxShadow: '0 0 0 3px var(--focus-ring, rgba(127,178,214,0.4))' },
   '.cm-gutters': {
     backgroundColor: 'var(--code-surface)',
     color: 'var(--code-gutter)',
@@ -62,58 +63,82 @@ export const ratioChrome: Extension = EditorView.theme({
     borderLeft: '3px solid transparent',
     whiteSpace: 'normal',
   },
-  '.cm-diagnostic-error': { borderLeftColor: '#e5534b' },
-  '.cm-diagnostic-warning': { borderLeftColor: '#d4a72c' },
-  '.cm-diagnostic-info': { borderLeftColor: '#539bf5' },
+  '.cm-diagnostic-error': { borderLeftColor: 'var(--code-syntax-error)' },
+  '.cm-diagnostic-warning': { borderLeftColor: 'var(--code-syntax-warning)' },
+  '.cm-diagnostic-info': { borderLeftColor: 'var(--code-syntax-info)' },
 });
 
-// GitHub palettes — fixed hex, so token colors always resolve (no dependency on
-// injected CSS variables). Non-syntax text stays --code-text.
-//
-// Hues are assigned by *role* so a JSON key never reads like its value:
+// GitHub palettes. Hues are assigned by *role* so a JSON key never reads
+// like its value:
 //   blue = keys / XML tags · green = strings · orange = numbers
 //   red = booleans, null, keywords · purple = attributes, functions
 const LIGHT = {
   key: '#0550ae', str: '#0a7c42', num: '#953800', atom: '#cf222e', kw: '#cf222e',
   com: '#6e7781', tag: '#0550ae', attr: '#8250df', fn: '#8250df', type: '#953800',
+  error: '#cf222e', warning: '#9a6700', info: '#0969da',
 };
 const DARK = {
   key: '#79c0ff', str: '#7ee787', num: '#ffa657', atom: '#ff7b72', kw: '#ff7b72',
   com: '#8b949e', tag: '#79c0ff', attr: '#d2a8ff', fn: '#d2a8ff', type: '#ffa657',
+  error: '#e5534b', warning: '#d4a72c', info: '#539bf5',
 };
 
-function highlightStyle(dark: boolean): HighlightStyle {
-  const c = dark ? DARK : LIGHT;
-  return HighlightStyle.define([
-    { tag: [t.propertyName, t.definition(t.propertyName)], color: c.key },
-    { tag: [t.string, t.special(t.string), t.attributeValue], color: c.str },
-    { tag: [t.number], color: c.num },
-    { tag: [t.bool, t.null, t.atom], color: c.atom },
-    { tag: [t.keyword, t.operator, t.modifier], color: c.kw },
-    { tag: [t.comment, t.lineComment, t.blockComment], color: c.com, fontStyle: 'italic' },
-    { tag: [t.tagName, t.angleBracket], color: c.tag },
-    { tag: [t.attributeName], color: c.attr },
-    { tag: [t.function(t.variableName), t.function(t.propertyName)], color: c.fn },
-    { tag: [t.typeName, t.className], color: c.type },
+const vars = (palette: Record<string, string>) =>
+  Object.entries(palette)
+    .map(([k, v]) => `--code-syntax-${k}:${v};`)
+    .join('');
+
+/**
+ * The syntax colours as custom properties, on the same scopes ratio-ui's
+ * `code.css` puts the `--code-*` tokens on: the root in either mode, and the
+ * `.surface-light` / `.surface-dark` bands. A custom property is inherited
+ * from the nearest scope that sets it, so an editor in a dark band on a light
+ * page takes the dark palette, nested bands included — no observer, no
+ * re-highlighting when the mode flips.
+ *
+ * Injected once by `CodeEditor`; exported for an app that would rather ship
+ * it in its own stylesheet (a strict `style-src` policy, for one).
+ */
+export const CODE_EDITOR_TOKEN_CSS =
+  `:root,.surface-light{${vars(LIGHT)}}` +
+  `:root[data-theme="dark"],:root[data-color-scheme="dark"],.surface-dark{${vars(DARK)}}`;
+
+const STYLE_ID = 'ratio-code-editor-tokens';
+
+/** Put the token stylesheet into the document once. */
+export function ensureTokenStyles(doc: Document = document): void {
+  if (doc.getElementById(STYLE_ID)) return;
+  const style = doc.createElement('style');
+  style.id = STYLE_ID;
+  style.textContent = CODE_EDITOR_TOKEN_CSS;
+  doc.head.appendChild(style);
+}
+
+const c = (k: keyof typeof LIGHT) => `var(--code-syntax-${k})`;
+
+/**
+ * Syntax highlighting from the token custom properties above. `basicSetup`
+ * brings CodeMirror's default style too, but only as a fallback: wherever
+ * this style has a rule, this one wins.
+ */
+export const highlightExtension: Extension = syntaxHighlighting(
+  HighlightStyle.define([
+    { tag: [t.propertyName, t.definition(t.propertyName)], color: c('key') },
+    { tag: [t.string, t.special(t.string), t.attributeValue], color: c('str') },
+    { tag: [t.number], color: c('num') },
+    { tag: [t.bool, t.null, t.atom], color: c('atom') },
+    { tag: [t.keyword, t.operator, t.modifier, t.controlKeyword, t.definitionKeyword], color: c('kw') },
+    { tag: [t.comment, t.lineComment, t.blockComment], color: c('com'), fontStyle: 'italic' },
+    { tag: [t.tagName, t.angleBracket], color: c('tag') },
+    { tag: [t.attributeName], color: c('attr') },
+    {
+      tag: [t.function(t.variableName), t.function(t.propertyName), t.function(t.definition(t.variableName))],
+      color: c('fn'),
+    },
+    { tag: [t.typeName, t.className, t.definition(t.className)], color: c('type') },
     {
       tag: [t.variableName, t.name, t.content, t.punctuation, t.separator, t.bracket, t.brace, t.squareBracket, t.paren],
       color: 'var(--code-text)',
     },
-  ]);
-}
-
-/**
- * Syntax highlighting for the given mode. `basicSetup` brings CodeMirror's
- * default style too, but only as a fallback: wherever this style has a rule,
- * this one wins.
- */
-export function highlightExtension(dark: boolean): Extension {
-  return syntaxHighlighting(highlightStyle(dark));
-}
-
-/** Read the current mode from the document root (`data-theme` / `data-color-scheme`). */
-export function isDarkMode(): boolean {
-  if (typeof document === 'undefined') return false;
-  const r = document.documentElement;
-  return r.getAttribute('data-theme') === 'dark' || r.getAttribute('data-color-scheme') === 'dark';
-}
+  ]),
+);
