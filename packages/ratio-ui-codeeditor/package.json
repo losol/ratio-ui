@@ -1,6 +1,6 @@
 {
   "name": "@eventuras/ratio-ui-codeeditor",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Alpha \u2014 a CodeMirror 6 code editor dressed in Ratio UI",
   "license": "MPL-2.0",
   "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/ratio-ui-codeeditor#readme",
