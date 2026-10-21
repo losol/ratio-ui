@@ -19,7 +19,7 @@ export const collapsibleToggle = (
     collapsible
     onToggle={(open) => {
       const next: boolean = open;
-      return next;
+      void next;
     }}
   />
 );
