@@ -16,7 +16,10 @@ import './Card.css';
 
 export type CardShadow = 'none' | 'xs' | 'sm' | 'md';
 
-export interface CardProps extends SpacingProps, BorderProps {
+export interface CardProps
+  extends SpacingProps,
+    BorderProps,
+    Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'color' | 'onToggle'> {
   children?: ReactNode;
   as?: React.ElementType;
   className?: string;
