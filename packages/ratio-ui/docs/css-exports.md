@@ -48,6 +48,23 @@ import '@eventuras/ratio-ui/components.css';
 Import one or the other, not both: `ratio-ui.css` already contains everything
 in `components.css`.
 
+## Import order when your app runs Tailwind
+
+`ratio-ui.css` and `components.css` both include a bundled `@layer utilities`
+block. If your app also builds Tailwind, import ratio-ui **before** your app's
+Tailwind entry so your own responsive variants stay in control:
+
+```css
+@import '@eventuras/ratio-ui/ratio-ui.css'; /* or components.css */
+@import '@eventuras/ratio-ui/themes/tabula.css'; /* optional */
+@import 'tailwindcss';
+```
+
+If you import ratio-ui after Tailwind, equal-specificity utilities like
+`.hidden`, `.flex-col`, and `.sr-only` can override app-side variants that
+ratio-ui doesn't bundle (for example `xl:flex`, `lg:flex-row`,
+`sm:not-sr-only`).
+
 ## Which utility classes are in the bundle
 
 The bundled CSS is generated from ratio-ui's own sources, so it contains the

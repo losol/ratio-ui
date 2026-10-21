@@ -31,6 +31,15 @@ This includes the design tokens, Tailwind-generated component utilities, and
 global page styles. See [`docs/css-exports.md`](docs/css-exports.md) for the
 available CSS entry points and theme initialization requirements.
 
+If your app also imports `tailwindcss`, import ratio-ui first and Tailwind
+afterwards so app-defined responsive variants win at equal specificity:
+
+```css
+@import '@eventuras/ratio-ui/ratio-ui.css'; /* or components.css */
+@import '@eventuras/ratio-ui/themes/tabula.css'; /* optional */
+@import 'tailwindcss';
+```
+
 Brand fonts are opt-in:
 
 ```tsx
