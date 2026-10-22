@@ -24,30 +24,29 @@ const picture = (seed: string) => (
 );
 
 const lead = {
-  eyebrow: 'Nyheter · 21. okt. 2026',
-  title: 'Ny giv for allmennlegetjenesten i nord',
-  lead: 'Helsetjenesten er i endring. Flere og mer komplekse pasienter tvinger frem mer tverrfaglig samarbeid.',
-  seed: 'nord',
+  eyebrow: 'Teaching · 21 Oct 2026',
+  title: 'What a good explanation does, and how to write one',
+  lead: 'The best explanations answer the question the reader has not asked yet. A look at how three teachers structure theirs.',
+  seed: 'explain',
 };
 
 const opinion = {
-  eyebrow: 'Ytring · 20. okt. 2026',
-  title: 'En nord-norsk helsepolitikk?',
-  lead: 'Så mange forhold gjør oss forskjellige fra resten av landet.',
-  seed: 'ytring',
+  eyebrow: 'Opinion · 20 Oct 2026',
+  title: 'Stop grading the reading list',
+  lead: 'A reading list is an invitation, not a syllabus. Why one department dropped the quiz.',
+  seed: 'reading',
 };
 
 const stories = [
   lead,
   opinion,
   {
-    eyebrow: 'Nyheter · 19. okt. 2026',
-    title: 'Flere generalister og høyere lønn i nord',
-    lead: 'Engasjementet var stort både i panel og sal da bærekraftprosjektet ble debattert.',
-    seed: 'panel',
+    eyebrow: 'Research · 19 Oct 2026',
+    title: 'Spaced repetition works. Most courses still ignore it',
+    lead: 'Forty years of evidence, and a schedule that fits a term. What it would take to use it.',
+    seed: 'spaced',
   },
 ];
-
 
 export const Card: Story = {
   args: {
@@ -94,9 +93,9 @@ export const Rows: Story = {
   },
   render: () => (
     <div className="max-w-lg flex flex-col border-t border-border-1">
-      <Teaser href="#" variant="row" eyebrow="9. nov. 2026" title="Grunnkurs D — Allmennlegen som forsker" />
-      <Teaser href="#" variant="row" eyebrow="1. des. 2026" title="Emnekurs i helserett" />
-      <Teaser href="#" variant="row" eyebrow="21. des. 2026" title="Kirurgi i allmennpraksis" image={picture('kirurgi')} />
+      <Teaser href="#" variant="row" eyebrow="9 Nov 2026" title="Writing for readers who skim" />
+      <Teaser href="#" variant="row" eyebrow="1 Dec 2026" title="Peer review in the classroom" />
+      <Teaser href="#" variant="row" eyebrow="21 Dec 2026" title="Teaching with worked examples" image={picture('examples')} />
     </div>
   ),
 };

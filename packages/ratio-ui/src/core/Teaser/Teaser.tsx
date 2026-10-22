@@ -36,11 +36,11 @@ export interface TeaserProps {
  * @example
  * ```tsx
  * <Teaser
- *   href="/no/c/artikler/ny-giv--abc1234"
- *   eyebrow="Nyheter · 21. okt. 2026"
- *   title="Ny giv for allmennlegetjenesten i nord"
- *   lead="Helsetjenesten er i endring."
- *   image={<img src="/kontor.jpg" alt="" />}
+ *   href="/articles/what-a-good-explanation-does"
+ *   eyebrow="Teaching · 21 Oct 2026"
+ *   title="What a good explanation does, and how to write one"
+ *   lead="The best explanations answer the question the reader has not asked yet."
+ *   image={<img src="/classroom.jpg" alt="" />}
  *   variant="lg"
  *   LinkComponent={Link}
  * />
