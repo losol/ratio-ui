@@ -41,12 +41,12 @@
     "@eventuras/eslint-config": "^1.0.6",
     "@eventuras/ratio-ui": "workspace:*",
     "@eventuras/typescript-config": "^1.1.1",
-    "@eventuras/vite-config": "^0.4.0",
+    "@eventuras/vite-config": "^0.5.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "next": "16.3.8",
+    "next": "16.4.0",
     "typescript": "6.0.3",
-    "vite": "8.3.2"
+    "vite": "8.3.4"
   },
   "peerDependencies": {
     "@eventuras/ratio-ui": "^2.8.0",

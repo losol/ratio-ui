@@ -53,10 +53,10 @@
   "devDependencies": {
     "@eventuras/eslint-config": "^1.0.6",
     "@eventuras/typescript-config": "^1.1.1",
-    "@eventuras/vite-config": "^0.4.0",
-    "@types/node": "^24.19.1",
+    "@eventuras/vite-config": "^0.5.0",
+    "@types/node": "^24.19.2",
     "typescript": "6.0.3",
-    "vite": "8.3.2",
+    "vite": "8.3.4",
     "vitest": "4.1.11"
   },
   "engines": {
