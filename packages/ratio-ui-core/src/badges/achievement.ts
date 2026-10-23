@@ -73,13 +73,13 @@ export function defineProfile(input: ProfileInput): OBProfile {
  *
  * @example
  * ```ts
- * const gangemester = defineAchievement({
- *   id: 'https://civitas.example/achievements/gangemester',
- *   name: 'Gangemester',
- *   description: 'Kan gangetabellen fra 1 til 10.',
- *   criteria: { narrative: 'Alle gangestykkene fra 1·1 til 10·10 riktig, to ganger på rad.' },
+ * const timesTables = defineAchievement({
+ *   id: 'https://school.example/achievements/times-tables',
+ *   name: 'Times Tables Master',
+ *   description: 'Knows the times tables from 1 to 10.',
+ *   criteria: { narrative: 'Every product from 1 × 1 to 10 × 10 right, twice in a row.' },
  *   achievementType: 'Competency',
- *   inLanguage: 'nb',
+ *   inLanguage: 'en',
  * });
  * ```
  */
@@ -92,7 +92,7 @@ export interface CredentialInput {
   id?: string;
   issuer: OBProfile | ProfileInput;
   achievement: OBAchievement | AchievementInput;
-  /** Who earned it: a DID or URL. Optional in the spec; Civitas would use its own profile URL. */
+  /** Who earned it: a DID or URL. Optional in the spec; an app would use its own profile URL. */
   subject?: Omit<OBAchievementSubject, 'type' | 'achievement'>;
   /** ISO 8601. @default now */
   validFrom?: string;

@@ -29,17 +29,17 @@ export interface DiplomaProps extends React.HTMLAttributes<HTMLElement> {
  * @example
  * ```tsx
  * <Diploma sheet="a4">
- *   <Diploma.Eyebrow>Civitas skole</Diploma.Eyebrow>
- *   <Diploma.Title>Diplom</Diploma.Title>
- *   <Diploma.Text>tildeles</Diploma.Text>
- *   <Diploma.Recipient>Ola Nordmann</Diploma.Recipient>
- *   <Diploma.Text>for oppnådde læringsmål i matematikk, 4. trinn</Diploma.Text>
+ *   <Diploma.Eyebrow>Example School</Diploma.Eyebrow>
+ *   <Diploma.Title>Diploma</Diploma.Title>
+ *   <Diploma.Text>is awarded to</Diploma.Text>
+ *   <Diploma.Recipient>Alex Example</Diploma.Recipient>
+ *   <Diploma.Text>for the learning goals reached in mathematics, year 4</Diploma.Text>
  *   <Diploma.Achievements>
- *     <AchievementBadge achievement={gangemester} credential={award} />
+ *     <AchievementBadge achievement={timesTables} credential={award} />
  *   </Diploma.Achievements>
  *   <Diploma.Footer>
- *     <Diploma.Signature name="Kari Lærer" role="Kontaktlærer" />
- *     <Diploma.Meta>Oslo, 23. oktober 2026</Diploma.Meta>
+ *     <Diploma.Signature name="Sam Teacher" role="Class teacher" />
+ *     <Diploma.Meta>Oslo, 23 October 2026</Diploma.Meta>
  *   </Diploma.Footer>
  * </Diploma>
  * ```
@@ -76,11 +76,11 @@ const part =
 
 /** Who issues it, above the title: the school, the course. */
 const Eyebrow = part('Diploma.Eyebrow', 'ratio-diploma__eyebrow', 'p');
-/** The big word: "Diplom", "Certificate of Completion". An `h1` by default. */
+/** The big word: "Diploma", "Certificate of Completion". An `h1` by default. */
 const Title = part('Diploma.Title', 'ratio-diploma__title', 'h1');
 /** The recipient's name. */
 const Recipient = part('Diploma.Recipient', 'ratio-diploma__recipient', 'p');
-/** A line of running text: "tildeles", "for oppnådde læringsmål i …". */
+/** A line of running text: "is awarded to", "for the learning goals reached in …". */
 const Text = part('Diploma.Text', 'ratio-diploma__text', 'p');
 /** Signatures, the date and place, side by side at the foot. */
 const Footer = part('Diploma.Footer', 'ratio-diploma__footer', 'footer');
@@ -107,7 +107,7 @@ function Achievements({ className, children, ...rest }: DiplomaAchievementsProps
 export interface DiplomaSignatureProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The signer. */
   name: string;
-  /** Their role: "Kontaktlærer", "Rektor". */
+  /** Their role: "Class teacher", "Head teacher". */
   role?: string;
   /** The signature itself, above the line: an image, or nothing for a line to sign by hand. */
   children?: ReactNode;

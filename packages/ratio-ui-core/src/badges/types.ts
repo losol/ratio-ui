@@ -192,7 +192,7 @@ export interface BadgeDisplay {
    * the times tables, `'7'` for the seventh level, `'ABC'`.
    */
   symbol?: string;
-  /** A word under the emblem, in capitals: `'GANGE'`, `'2026'`. Keep it short. */
+  /** A word under the emblem, in capitals: `'TIMES'`, `'2026'`. Keep it short. */
   caption?: string;
 }
 

@@ -8,44 +8,53 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
 import { BookOpen, Calculator, Compass } from 'lucide-react';
 import { AchievementBadge, AchievementBadgeArt } from './AchievementBadge';
-import { bakeSvg, defineAchievement, defineCredential, unbakeSvg } from '@eventuras/ratio-ui-core/badges';
+import {
+  achievementOf,
+  bakeSvg,
+  defineAchievement,
+  defineCredential,
+  isOpenBadgeCredential,
+  unbakeSvg,
+} from '@eventuras/ratio-ui-core/badges';
 import { Card } from '../../core/Card';
 import { Heading } from '../../core/Heading';
 
-const gangemester = defineAchievement({
-  id: 'https://civitas.example/achievements/gangemester',
-  name: 'Gangemester',
-  description: 'Kan gangetabellen fra 1 til 10.',
-  criteria: { narrative: 'Alle gangestykkene fra 1·1 til 10·10 riktig, to ganger på rad.' },
+// The achievement is Open Badges JSON: what can be earned, defined once by
+// its creator. `defineAchievement` fills in the `type`.
+const timesTables = defineAchievement({
+  id: 'https://school.example/achievements/times-tables',
+  name: 'Times Tables Master',
+  description: 'Knows the times tables from 1 to 10.',
+  criteria: { narrative: 'Every product from 1 × 1 to 10 × 10 right, twice in a row.' },
   achievementType: 'Competency',
-  inLanguage: 'nb',
+  inLanguage: 'en',
 });
 
-const leser = defineAchievement({
-  id: 'https://civitas.example/achievements/leser',
-  name: 'Leser',
-  description: 'Har lest ti bøker på egen hånd.',
-  criteria: { narrative: 'Ti bøker lest og fortalt om i leseloggen.' },
+const reader = defineAchievement({
+  id: 'https://school.example/achievements/reader',
+  name: 'Reader',
+  description: 'Has read ten books on their own.',
+  criteria: { narrative: 'Ten books read and written up in the reading log.' },
 });
 
-const kartleser = defineAchievement({
-  id: 'https://civitas.example/achievements/kartleser',
-  name: 'Kartleser',
-  description: 'Finner fram med kart og kompass.',
-  criteria: { narrative: 'Fullført orienteringsløypa i skogen uten hjelp.' },
+const navigator = defineAchievement({
+  id: 'https://school.example/achievements/navigator',
+  name: 'Navigator',
+  description: 'Finds the way with a map and a compass.',
+  criteria: { narrative: 'The orienteering course in the woods, completed without help.' },
 });
 
+// The award: a Verifiable Credential whose subject holds the achievement.
+// With one the badge is earned; `validFrom` is the date shown.
 const award = defineCredential({
   id: 'urn:uuid:3b7a0c2e-4c1a-4a52-9a2e-7c1f0e0d1a01',
-  issuer: { id: 'https://civitas.example', name: 'Civitas skole' },
-  achievement: gangemester,
-  subject: { id: 'https://civitas.example/users/42' },
+  issuer: { id: 'https://school.example', name: 'Example School' },
+  achievement: timesTables,
+  subject: { id: 'https://school.example/users/42' },
   validFrom: '2026-10-23T00:00:00Z',
 });
 
-const nb = (iso: string) => new Date(iso).toLocaleDateString('nb-NO', { dateStyle: 'long' });
-
-const labels = { earned: 'Oppnådd', locked: 'Ikke oppnådd ennå', inProgress: 'Underveis' };
+const longDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { dateStyle: 'long' });
 
 const meta: Meta<typeof AchievementBadge> = {
   title: 'Badges/AchievementBadge',
@@ -58,22 +67,26 @@ const meta: Meta<typeof AchievementBadge> = {
     size: { control: { type: 'number', min: 24, max: 240 } },
   },
   args: {
-    achievement: gangemester,
+    achievement: timesTables,
     display: { shape: 'rosette', tier: 'gold', symbol: '×' },
     credential: award,
-    formatDate: nb,
-    labels,
+    formatDate: longDate,
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof AchievementBadge>;
 
-/** Earned: the medallion in full colour, the name, and the date it was awarded. */
+/**
+ * Earned: the medallion in full colour, the name, and the date it was
+ * awarded. Two inputs: the `achievement` (Open Badges JSON, what can be
+ * earned) and the `credential` (the award, who earned it and when); the
+ * `display` says how it is drawn.
+ */
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText('Gangemester')).toBeInTheDocument();
+    await expect(canvas.getByText('Times Tables Master')).toBeInTheDocument();
     const time = canvasElement.querySelector('time');
     await expect(time).toHaveAttribute('datetime', '2026-10-23T00:00:00Z');
     await expect(canvasElement.querySelector('.ratio-achievement')).toHaveAttribute('data-state', 'earned');
@@ -96,10 +109,10 @@ export const Shapes: Story = {
 export const Tiers: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-start gap-8">
-      <AchievementBadge {...args} achievement={{ ...gangemester, name: 'Gangemester' }} display={{ shape: 'circle', symbol: '×' }} />
-      <AchievementBadge {...args} achievement={{ ...gangemester, name: 'Bronse' }} display={{ shape: 'circle', tier: 'bronze', symbol: '×' }} />
-      <AchievementBadge {...args} achievement={{ ...gangemester, name: 'Sølv' }} display={{ shape: 'circle', tier: 'silver', symbol: '×' }} />
-      <AchievementBadge {...args} achievement={{ ...gangemester, name: 'Gull' }} display={{ shape: 'circle', tier: 'gold', symbol: '×' }} />
+      <AchievementBadge {...args} achievement={{ ...timesTables, name: 'No tier' }} display={{ shape: 'circle', symbol: '×' }} />
+      <AchievementBadge {...args} achievement={{ ...timesTables, name: 'Bronze' }} display={{ shape: 'circle', tier: 'bronze', symbol: '×' }} />
+      <AchievementBadge {...args} achievement={{ ...timesTables, name: 'Silver' }} display={{ shape: 'circle', tier: 'silver', symbol: '×' }} />
+      <AchievementBadge {...args} achievement={{ ...timesTables, name: 'Gold' }} display={{ shape: 'circle', tier: 'gold', symbol: '×' }} />
     </div>
   ),
 };
@@ -119,8 +132,8 @@ export const States: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText('Ikke oppnådd ennå')).toBeInTheDocument();
-    await expect(canvas.getByText('Underveis')).toBeInTheDocument();
+    await expect(canvas.getByText('Not yet earned')).toBeInTheDocument();
+    await expect(canvas.getByText('In progress')).toBeInTheDocument();
     const states = [...canvasElement.querySelectorAll('.ratio-achievement')].map((el) =>
       el.getAttribute('data-state'),
     );
@@ -136,10 +149,10 @@ export const States: Story = {
 export const Emblems: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-start gap-8">
-      <AchievementBadge {...args} emblem={<Calculator />} display={{ shape: 'rosette', tier: 'gold', caption: 'Gange' }} />
-      <AchievementBadge {...args} achievement={leser} emblem={<BookOpen />} display={{ shape: 'circle', tier: 'silver', caption: '10 bøker' }} />
-      <AchievementBadge {...args} achievement={kartleser} emblem={<Compass />} display={{ shape: 'shield', caption: '2026' }} />
-      <AchievementBadge {...args} display={{ shape: 'hexagon', tier: 'bronze', symbol: '7', caption: 'Trinn' }} />
+      <AchievementBadge {...args} emblem={<Calculator />} display={{ shape: 'rosette', tier: 'gold', caption: 'Times' }} />
+      <AchievementBadge {...args} achievement={reader} emblem={<BookOpen />} display={{ shape: 'circle', tier: 'silver', caption: '10 books' }} />
+      <AchievementBadge {...args} achievement={navigator} emblem={<Compass />} display={{ shape: 'shield', caption: '2026' }} />
+      <AchievementBadge {...args} display={{ shape: 'hexagon', tier: 'bronze', symbol: '7', caption: 'Level' }} />
       <AchievementBadge {...args} display={{ shape: 'circle', symbol: 'ABC' }} />
     </div>
   ),
@@ -160,32 +173,106 @@ export const Layouts: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('img', { name: 'Gangemester' })).toBeInTheDocument();
-    await expect(canvas.getByText(gangemester.criteria.narrative!)).toBeInTheDocument();
+    await expect(canvas.getByRole('img', { name: 'Times Tables Master' })).toBeInTheDocument();
+    await expect(canvas.getByText(timesTables.criteria.narrative!)).toBeInTheDocument();
   },
 };
 
-/** A list of what there is to earn, in rows, with the ones earned dated. */
+/**
+ * A list of what there is to earn, in rows: the ones earned dated, one
+ * underway, one still locked. `nameAs="h3"` makes each name a heading
+ * under the list's own.
+ */
 export const InAList: Story = {
   name: 'In a list',
   render: (args) => (
     <Card>
       <Heading as="h2" className="mb-4">
-        Matematikk, 4. trinn
+        Mathematics, year 4
       </Heading>
       <ul className="flex flex-col gap-4 p-0 list-none">
         <li>
-          <AchievementBadge {...args} layout="row" nameAs="h3" emblem={<Calculator />} display={{ shape: 'rosette', tier: 'gold', caption: 'Gange' }} />
+          <AchievementBadge {...args} layout="row" nameAs="h3" emblem={<Calculator />} display={{ shape: 'rosette', tier: 'gold', caption: 'Times' }} />
         </li>
         <li>
-          <AchievementBadge {...args} layout="row" nameAs="h3" achievement={leser} credential={undefined} state="in-progress" progress={0.4} emblem={<BookOpen />} display={{ shape: 'circle', tier: 'silver' }} />
+          <AchievementBadge {...args} layout="row" nameAs="h3" achievement={reader} credential={undefined} state="in-progress" progress={0.4} emblem={<BookOpen />} display={{ shape: 'circle', tier: 'silver' }} />
         </li>
         <li>
-          <AchievementBadge {...args} layout="row" nameAs="h3" achievement={kartleser} credential={undefined} emblem={<Compass />} display={{ shape: 'shield' }} />
+          <AchievementBadge {...args} layout="row" nameAs="h3" achievement={navigator} credential={undefined} emblem={<Compass />} display={{ shape: 'shield' }} />
         </li>
       </ul>
     </Card>
   ),
+};
+
+/**
+ * From a credential alone. What an app is handed is usually the award —
+ * an `OpenBadgeCredential`, from its own issuer or another — and the
+ * achievement is inside it: `isOpenBadgeCredential` checks the shape and
+ * `achievementOf` takes it out. The look is not in the credential (the
+ * spec has no field for it), so the app pairs the achievement's `id` with
+ * a `BadgeDisplay` of its own.
+ */
+export const FromACredential: Story = {
+  name: 'From a credential',
+  render: () => {
+    // As it would arrive: parsed JSON of unknown shape.
+    const json: unknown = JSON.parse(JSON.stringify(award));
+    if (!isOpenBadgeCredential(json)) return <p>Not an Open Badge.</p>;
+    const achievement = achievementOf(json);
+    const looks: Record<string, React.ComponentProps<typeof AchievementBadge>['display']> = {
+      'https://school.example/achievements/times-tables': { shape: 'rosette', tier: 'gold', symbol: '×' },
+    };
+    return (
+      <AchievementBadge
+        achievement={achievement}
+        credential={json}
+        display={looks[achievement.id]}
+        layout="row"
+        formatDate={longDate}
+      />
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Times Tables Master')).toBeInTheDocument();
+    await expect(canvas.getByText(/23 October 2026/)).toBeInTheDocument();
+  },
+};
+
+/**
+ * In another language. The achievement's text comes from its creator in
+ * whatever language it was written (`inLanguage` says which); the words
+ * the component adds — "Earned", "Not yet earned", "In progress" — are
+ * `labels`, and the date is `formatDate`. Here, Norwegian.
+ */
+export const InAnotherLanguage: Story = {
+  name: 'In another language',
+  render: (args) => {
+    const gangemester = defineAchievement({
+      ...timesTables,
+      id: 'https://skole.example/achievements/gangemester',
+      name: 'Gangemester',
+      description: 'Kan gangetabellen fra 1 til 10.',
+      criteria: { narrative: 'Alle gangestykkene fra 1·1 til 10·10 riktig, to ganger på rad.' },
+      inLanguage: 'nb',
+    });
+    const labels = { earned: 'Oppnådd', locked: 'Ikke oppnådd ennå', inProgress: 'Underveis' };
+    const nb = (iso: string) => new Date(iso).toLocaleDateString('nb-NO', { dateStyle: 'long' });
+    return (
+      <div className="flex flex-wrap items-start gap-8">
+        <AchievementBadge {...args} achievement={gangemester} labels={labels} formatDate={nb} />
+        <AchievementBadge {...args} achievement={gangemester} labels={labels} credential={undefined} />
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // getByText matches an element's own text nodes: the label and the <time> are two.
+    await expect(canvas.getByText(/^Oppnådd/)).toBeInTheDocument();
+    await expect(canvas.getByText('23. oktober 2026')).toBeInTheDocument();
+    await expect(canvas.getByText('Ikke oppnådd ennå')).toBeInTheDocument();
+  },
 };
 
 /** On the printed sheet: the frame thickens and the words go condensed, from the tabula tokens. */
@@ -194,8 +281,8 @@ export const OnTabula: Story = {
   render: (args) => (
     <Card>
       <div className="flex flex-wrap items-start gap-8">
-        <AchievementBadge {...args} emblem={<Calculator />} display={{ shape: 'rosette', tier: 'gold', caption: 'Gange' }} />
-        <AchievementBadge {...args} achievement={leser} credential={undefined} display={{ shape: 'shield', symbol: '10' }} />
+        <AchievementBadge {...args} emblem={<Calculator />} display={{ shape: 'rosette', tier: 'gold', caption: 'Times' }} />
+        <AchievementBadge {...args} achievement={reader} credential={undefined} display={{ shape: 'shield', symbol: '10' }} />
       </div>
     </Card>
   ),
@@ -214,8 +301,8 @@ export const ForAFile: Story = {
   render: () => {
     const svg = renderToStaticMarkup(
       <AchievementBadgeArt
-        display={{ shape: 'rosette', tier: 'gold', symbol: '×', caption: 'Gange' }}
-        title="Gangemester"
+        display={{ shape: 'rosette', tier: 'gold', symbol: '×', caption: 'Times' }}
+        title="Times Tables Master"
         colors={{ ink: '#0b6a78', paper: '#ffffff', muted: '#6b7280' }}
         frame={3}
         fontFamily="Georgia, serif"
@@ -227,9 +314,9 @@ export const ForAFile: Story = {
     const href = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(baked)}`;
     return (
       <div className="flex flex-col gap-4">
-        <img src={href} alt="Gangemester, as the SVG file" width={120} height={120} />
-        <a href={href} download="gangemester.svg">
-          Download gangemester.svg
+        <img src={href} alt="Times Tables Master, as the SVG file" width={120} height={120} />
+        <a href={href} download="times-tables.svg">
+          Download times-tables.svg
         </a>
         <pre className="max-w-full overflow-auto text-xs" data-testid="baked">
           {baked.slice(0, 600)}…

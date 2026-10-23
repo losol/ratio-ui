@@ -108,7 +108,7 @@ function outline(shape: BadgeShape, s: number): string {
  *
  * @example
  * ```tsx
- * <AchievementBadgeArt display={{ shape: 'rosette', tier: 'gold', symbol: '×' }} title="Gangemester" width={96} />
+ * <AchievementBadgeArt display={{ shape: 'rosette', tier: 'gold', symbol: '×' }} title="Times Tables Master" width={96} />
  * ```
  */
 export function AchievementBadgeArt({
@@ -303,10 +303,10 @@ const DEFAULT_SIZE: Record<AchievementBadgeLayout, number> = { art: 64, tile: 96
  * @example
  * ```tsx
  * <AchievementBadge
- *   achievement={gangemester}
+ *   achievement={timesTables}
  *   display={{ shape: 'rosette', tier: 'gold', symbol: '×' }}
  *   credential={award}
- *   formatDate={(iso) => new Date(iso).toLocaleDateString('nb')}
+ *   formatDate={(iso) => new Date(iso).toLocaleDateString('en-GB')}
  * />
  * ```
  */
