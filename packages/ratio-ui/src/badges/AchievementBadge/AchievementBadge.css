@@ -41,6 +41,7 @@
 
 .ratio-achievement__name {
   font-family: var(--badge-font-family);
+  font-size: 1.0625rem;
   font-weight: 700;
   line-height: 1.2;
   color: var(--text);
@@ -53,7 +54,7 @@
 }
 
 .ratio-achievement__status {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   line-height: 1.3;
   color: var(--text-subtle);
 }

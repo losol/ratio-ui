@@ -138,8 +138,10 @@ export function AchievementBadgeArt({
         : (colors.metal ?? `var(--badge-${tier}, ${BADGE_TIER_COLORS[tier]})`);
   const rim = 2 * Math.PI * 48;
   const pct = Math.min(Math.max(progress, 0), 1);
-  const hasCaption = Boolean(caption);
-  const glyphY = hasCaption ? 44 : 50;
+  // Under 64px the caption is too small to read; the medallion goes without.
+  const px = typeof rest.width === 'number' ? rest.width : undefined;
+  const hasCaption = Boolean(caption) && (px === undefined || px >= 64);
+  const glyphY = hasCaption ? 41 : 50;
 
   return (
     <svg
@@ -185,10 +187,10 @@ export function AchievementBadgeArt({
       )}
       {emblem ? (
         <svg
-          x={50 - 20}
-          y={glyphY - 20}
-          width="40"
-          height="40"
+          x={50 - 21}
+          y={glyphY - 21}
+          width="42"
+          height="42"
           viewBox="0 0 24 24"
           style={{ color: ink, opacity: locked ? 0.6 : 1 }}
         >
@@ -204,7 +206,7 @@ export function AchievementBadgeArt({
             fill: ink,
             fontFamily,
             fontWeight: 800,
-            fontSize: symbol.length > 2 ? 22 : symbol.length > 1 ? 30 : 38,
+            fontSize: symbol.length > 2 ? 26 : symbol.length > 1 ? 34 : 42,
             opacity: locked ? 0.6 : 1,
           }}
         >
@@ -214,15 +216,15 @@ export function AchievementBadgeArt({
       {hasCaption && (
         <text
           x="50"
-          y="76"
+          y="72"
           textAnchor="middle"
           dominantBaseline="central"
           style={{
             fill: ink,
             fontFamily,
             fontWeight: 700,
-            fontSize: 9,
-            letterSpacing: 0.8,
+            fontSize: caption!.length > 6 ? 10 : 12,
+            letterSpacing: 0.6,
             textTransform: 'uppercase',
           }}
         >
