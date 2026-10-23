@@ -12,18 +12,28 @@
  * stroke in the art's own units (a 100-unit medallion), so a theme with
  * thick frames (tabula) thickens the badge the same way.
  */
-:root {
+
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-light,
+.surface-dark {
   --badge-ink: var(--primary);
   --badge-paper: var(--card);
   --badge-muted: var(--text-subtle);
+
+  --diploma-ink: var(--primary);
+  --diploma-paper: var(--card);
+}
+
+/* Literals and structure: the same on every surface. */
+:root {
   --badge-frame: 3;
   --badge-font-family: var(--font-display);
   --badge-bronze: #b4713d;
   --badge-silver: #8f98a3;
   --badge-gold: #d4a017;
 
-  --diploma-ink: var(--primary);
-  --diploma-paper: var(--card);
   --diploma-frame-width: 3px;
   --diploma-font-family: var(--font-display);
   --diploma-body-font-family: var(--font-body);
