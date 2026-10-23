@@ -1,5 +1,17 @@
 # @eventuras/ratio-ui
 
+## 2.35.0
+
+### Minor Changes
+
+- 3b16620: New `@eventuras/ratio-ui/badges` (beta): Open Badges on the page. `AchievementBadge` draws an Open Badges achievement as a medallion — four shapes, three metals, a glyph or a symbol in the middle, a caption — with its name, criteria and the date it was earned; without a credential it is locked, or `in-progress` with the way there around the rim; `tile`, `row` and `art` layouts. `AchievementBadgeArt` is the medallion alone as self-contained SVG, for the page or for the file to bake. `Diploma` is a sheet in a double frame — eyebrow, title, recipient, text, the achievements as badges, signatures and the small print — that prints as it shows. New `--badge-*` and `--diploma-*` tokens; Tabula thickens the frames. The data and baking from `@eventuras/ratio-ui-core/badges` are re-exported.
+- c978534: New `Teaser`: one story as a link — picture, eyebrow, title and lead, in the magazine look. Three variants: `md`, a card for a grid; `lg`, the lead story with a 16:9 picture and a display-size title; and `row`, a compact line with a small picture on the right, for a list of the next courses or the latest in a topic. The picture is any image element, fitted to the frame; `LinkComponent` takes a router link; `titleAs` sets the heading level (default `h3`). Plain markup and CSS from the semantic tokens, server-safe.
+
+### Patch Changes
+
+- Updated dependencies [3b16620]
+  - @eventuras/ratio-ui-core@0.3.0
+
 ## 2.34.2
 
 ### Patch Changes
