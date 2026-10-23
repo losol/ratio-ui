@@ -65,6 +65,16 @@ theme generator.
   mentions, `sameNick`/`mentionsNick`, and `hostOf`/`previewLabel`/
   `hasPreviewContent` for link previews. The web's `Chat.Log` uses them
   and `ChatLog` in `@eventuras/ratio-ui-native` both use them.
+- **Badges** in `@eventuras/ratio-ui-core/badges` (beta): an Open Badges
+  3.0 credential's shape (`OpenBadgeCredential`, `OBAchievement`,
+  `OBProfile`, …), `defineAchievement`/`defineCredential`/`defineProfile`
+  to build one with the `type` and `@context` filled in,
+  `isOpenBadgeCredential` for the shape (not the signature), the look of
+  the medallion (`BadgeDisplay`, `BadgeTier`, `BadgeState`), and
+  `bakeSvg`/`bakePng` with their `unbake` twins, which put a credential
+  inside its picture the way the spec says. No signing: a `proof` is
+  carried, never made or checked. See
+  [docs/adr/0002-open-badges.md](docs/adr/0002-open-badges.md).
 - **The schema**: `defineTheme`, `mix`, `Theme` and friends.
 - **Colour maths**: `parseColor`, `oklchToRgba`, `formatColor`. Out-of-gamut
   OKLCH is clipped, not gamut-mapped as CSS does — a step at the edge of

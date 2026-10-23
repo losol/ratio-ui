@@ -1,0 +1,142 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Diploma — a sheet in a double frame: the ink and paper from the
+ * --diploma-* tokens (tokens/badge.css), the big words in the display face.
+ * Sized by its content; `data-sheet="a4"` holds the portrait proportion
+ * for a preview of the printed page. In print it keeps together and drops
+ * the shadow; the page size and margins are the app's `@page`.
+ */
+.ratio-diploma {
+  --_frame: var(--diploma-frame-width);
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 48rem;
+  margin: 0;
+  padding: clamp(1.5rem, 5vw, 3rem) clamp(1.25rem, 5vw, 3rem);
+  border: var(--_frame) solid var(--diploma-ink);
+  outline: 1px solid var(--diploma-ink);
+  outline-offset: calc(var(--_frame) * -1 - 4px);
+  background: var(--diploma-paper);
+  color: var(--text);
+  font-family: var(--diploma-body-font-family);
+  text-align: center;
+  break-inside: avoid;
+}
+
+.ratio-diploma[data-sheet='a4'] {
+  aspect-ratio: 210 / 297;
+  justify-content: center;
+}
+
+.ratio-diploma__eyebrow {
+  font-family: var(--diploma-font-family);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--diploma-ink);
+}
+
+.ratio-diploma__title {
+  margin: 0;
+  font-family: var(--diploma-font-family);
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--diploma-ink);
+}
+
+.ratio-diploma__recipient {
+  margin: 0;
+  font-family: var(--diploma-font-family);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.ratio-diploma__text {
+  max-width: 36rem;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.ratio-diploma__achievements {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem 2rem;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ratio-diploma__achievements > li {
+  display: flex;
+  justify-content: center;
+}
+
+.ratio-diploma__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem 3rem;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.ratio-diploma__signature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 11rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--diploma-ink);
+}
+
+.ratio-diploma__signature-name {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ratio-diploma__signature-role {
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+}
+
+.ratio-diploma__meta {
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+}
+
+.ratio-diploma__seal {
+  position: absolute;
+  right: clamp(1rem, 4vw, 2.5rem);
+  bottom: clamp(1rem, 4vw, 2.5rem);
+}
+
+@media print {
+  .ratio-diploma {
+    max-width: none;
+    box-shadow: none;
+    color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

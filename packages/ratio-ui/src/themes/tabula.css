@@ -145,6 +145,11 @@
   /* Labels — bold, in the ink. */
   --label-font-weight: 700;
 
+  /* A badge and a diploma: thick frames, the condensed face. */
+  --badge-frame: 5;
+  --badge-font-family: var(--font-display);
+  --diploma-frame-width: 6px;
+
   /* A chart's boxes and lines: as thick as a choice, in the condensed face. */
   --flowchart-frame: 4px;
   --flowchart-line: 4px;
