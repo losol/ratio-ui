@@ -58,6 +58,10 @@
       "types": "./dist/commerce/*/index.d.ts",
       "import": "./dist/commerce/*/index.js"
     },
+    "./badges": {
+      "types": "./dist/badges/index.d.ts",
+      "import": "./dist/badges/index.js"
+    },
     "./toast": {
       "types": "./dist/toast/index.d.ts",
       "import": "./dist/toast/index.js"

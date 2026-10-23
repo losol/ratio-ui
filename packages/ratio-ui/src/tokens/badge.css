@@ -1,0 +1,40 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Badge tokens — the medallion of `badges/AchievementBadge` and the sheet
+ * of `badges/Diploma`. The ink draws the frame, the emblem and the words;
+ * the paper fills the medallion; the metals are the tiers and stay the
+ * same in every theme (gold is gold). `--badge-frame` is the outline's
+ * stroke in the art's own units (a 100-unit medallion), so a theme with
+ * thick frames (tabula) thickens the badge the same way.
+ */
+
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-light,
+.surface-dark {
+  --badge-ink: var(--primary);
+  --badge-paper: var(--card);
+  --badge-muted: var(--text-subtle);
+
+  --diploma-ink: var(--primary);
+  --diploma-paper: var(--card);
+}
+
+/* Literals and structure: the same on every surface. */
+:root {
+  --badge-frame: 3;
+  --badge-font-family: var(--font-display);
+  --badge-bronze: #b4713d;
+  --badge-silver: #8f98a3;
+  --badge-gold: #d4a017;
+
+  --diploma-frame-width: 3px;
+  --diploma-font-family: var(--font-display);
+  --diploma-body-font-family: var(--font-body);
+}

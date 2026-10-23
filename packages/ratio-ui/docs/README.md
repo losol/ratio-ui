@@ -19,6 +19,7 @@ these docs cover package-level contracts and decisions.
 | ADR | Purpose |
 | --- | --- |
 | [`adr/0001-spacing-borders-colors.md`](adr/0001-spacing-borders-colors.md) | Documents the spacing, border, and color token decision. |
+| [`../../ratio-ui-core/docs/adr/0002-open-badges.md`](../../ratio-ui-core/docs/adr/0002-open-badges.md) | Open Badges 3.0 as the data behind `badges/`: the data in core, the drawing here, signing elsewhere. |
 
 ## Where To Document New Work
 

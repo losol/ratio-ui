@@ -5,7 +5,8 @@
   "keywords": [
     "design-tokens",
     "theme",
-    "ratio-ui"
+    "ratio-ui",
+    "open-badges"
   ],
   "license": "MPL-2.0",
   "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/ratio-ui-core#readme",
@@ -27,6 +28,10 @@
     "./chat": {
       "types": "./dist/chat/index.d.ts",
       "import": "./dist/chat/index.js"
+    },
+    "./badges": {
+      "types": "./dist/badges/index.d.ts",
+      "import": "./dist/badges/index.js"
     },
     "./themes/*": {
       "types": "./dist/themes/*.d.ts",
