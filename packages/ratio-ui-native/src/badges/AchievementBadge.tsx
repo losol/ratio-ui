@@ -63,12 +63,6 @@ export interface AchievementBadgeArtProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/**
- * The medallion alone, in a 100-unit box drawn at `size`. The same
- * `BadgeDisplay` as the web's `AchievementBadgeArt`, the same outline.
- *
- * @beta This component is experimental — prop shape may change before release.
- */
 // The way there, clockwise from the top: an arc rather than a dashed,
 // rotated circle, which every platform draws the same.
 function progressArc(mid: number, r: number, pct: number): string {
@@ -79,6 +73,12 @@ function progressArc(mid: number, r: number, pct: number): string {
   return `M${mid} ${mid - r} A${r} ${r} 0 ${sweep > Math.PI ? 1 : 0} 1 ${x} ${y}`;
 }
 
+/**
+ * The medallion alone, in a 100-unit box drawn at `size`. The same
+ * `BadgeDisplay` as the web's `AchievementBadgeArt`, the same outline.
+ *
+ * @beta This component is experimental — prop shape may change before release.
+ */
 export const AchievementBadgeArt: React.FC<AchievementBadgeArtProps> = ({
   display = {},
   state = 'earned',
