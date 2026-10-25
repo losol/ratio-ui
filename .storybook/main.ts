@@ -87,8 +87,35 @@ const config: StorybookConfig = {
     });
     // ratio-ui-native's stories run on the web through react-native-web,
     // the same way Expo's web target does.
-    const reactNativeWeb = [{ find: /^react-native$/, replacement: 'react-native-web' }];
+    // react-native-svg (ratio-ui-native's badges) ships its web
+    // implementation beside the native one as `.web.js` files, which Metro
+    // picks by suffix. Its elements entry is the whole of what a component
+    // draws with (`Svg`, `Path`, `Text`, …) and leaves the deprecated XML
+    // and asset loaders, with their TurboModules, out.
+    const reactNativeWeb = [
+      { find: /^react-native$/, replacement: 'react-native-web' },
+      {
+        find: /^react-native-svg$/,
+        replacement: join(packagesDir, 'ratio-ui-native/node_modules/react-native-svg/lib/module/elements.web.js'),
+      },
+      // Two React Native internals its web build still reaches for, which
+      // react-native-web does not ship: the asset registry (stubbed), and
+      // a TurboModule for touch responders (shimmed to `undefined` below).
+      {
+        find: /^@react-native\/assets-registry\/registry$/,
+        replacement: join(dirname(fileURLToPath(import.meta.url)), 'stubs/assets-registry.ts'),
+      },
+    ];
     resolve.alias = [...existing, ...srcAliases, ...reactNativeWeb];
+    // …and inside it, `./resolveAssetUri` is `resolveAssetUri.web.js`: the
+    // web twin wins wherever there is one, in the dev server and in the
+    // dependency optimizer alike.
+    const extensions = ['.web.js', '.web.mjs', '.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'];
+    resolve.extensions = extensions;
+    const optimizeDeps = (viteConfig.optimizeDeps ??= {});
+    const rolldownOptions = (optimizeDeps.rolldownOptions ??= {});
+    rolldownOptions.resolve = { ...rolldownOptions.resolve, extensions };
+    rolldownOptions.shimMissingExports = true;
     return viteConfig;
   },
 };

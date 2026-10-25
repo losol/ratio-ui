@@ -4,9 +4,13 @@
 
 import React, { type ReactNode } from 'react';
 import {
+  BADGE_BOX,
+  BADGE_LAYOUT,
   BADGE_TIER_COLORS,
+  badgeOutline,
+  captionFontSize,
+  symbolFontSize,
   type BadgeDisplay,
-  type BadgeShape,
   type BadgeState,
   type OBAchievement,
   type OpenBadgeCredential,
@@ -14,9 +18,9 @@ import {
 import { cn } from '../../utils/cn';
 import './AchievementBadge.css';
 
-// The achievement's shape and look come from ratio-ui-core, shared with
-// the native renderer and with whatever bakes the credential into the
-// picture. This file draws it.
+// The achievement's shape, its look and the medallion's geometry come from
+// ratio-ui-core, shared with the native renderer and with whatever bakes
+// the credential into the picture. This file draws it for the DOM.
 
 /**
  * The medallion's colours. On a page they default to the `--badge-*`
@@ -56,50 +60,6 @@ export interface AchievementBadgeArtProps
   fontFamily?: string;
 }
 
-/** The outline, scaled about the centre, as a path. */
-function outline(shape: BadgeShape, s: number): string {
-  const c = 50;
-  const p = (x: number, y: number) => `${(c + x * s).toFixed(2)} ${(c + y * s).toFixed(2)}`;
-  switch (shape) {
-    case 'circle': {
-      const r = 46 * s;
-      return `M${p(0, -46)} A${r} ${r} 0 1 1 ${p(0, 46)} A${r} ${r} 0 1 1 ${p(0, -46)} Z`;
-    }
-    case 'hexagon': {
-      const r = 47;
-      const pts = Array.from({ length: 6 }, (_, i) => {
-        const a = (Math.PI / 3) * i - Math.PI / 2;
-        return p(r * Math.cos(a), r * Math.sin(a));
-      });
-      return `M${pts.join(' L')} Z`;
-    }
-    case 'shield': {
-      return (
-        `M${p(0, -46)} L${p(40, -34)} L${p(40, -2)} ` +
-        `C${p(40, 22)} ${p(22, 40)} ${p(0, 46)} ` +
-        `C${p(-22, 40)} ${p(-40, 22)} ${p(-40, -2)} ` +
-        `L${p(-40, -34)} Z`
-      );
-    }
-    case 'rosette': {
-      const n = 12;
-      const r = 43;
-      const pts = Array.from({ length: n }, (_, i) => {
-        const a = (2 * Math.PI * i) / n - Math.PI / 2;
-        return [r * Math.cos(a), r * Math.sin(a)] as const;
-      });
-      const chord = 2 * r * Math.sin(Math.PI / n);
-      const bulge = (chord * 0.62 * s).toFixed(2);
-      let d = `M${p(...pts[0]!)}`;
-      for (let i = 1; i <= n; i++) {
-        const [x, y] = pts[i % n]!;
-        d += ` A${bulge} ${bulge} 0 0 1 ${p(x, y)}`;
-      }
-      return `${d} Z`;
-    }
-  }
-}
-
 /**
  * The medallion alone: an SVG in a 100-unit box that scales to any size,
  * self-contained — its colours are attributes, not classes — so the same
@@ -136,17 +96,19 @@ export function AchievementBadgeArt({
       : locked
         ? ink
         : (colors.metal ?? `var(--badge-${tier}, ${BADGE_TIER_COLORS[tier]})`);
-  const rim = 2 * Math.PI * 48;
+  const { ringScale, ringWidth, rimRadius, rimWidth, emblemSize, captionY } = BADGE_LAYOUT;
+  const rim = 2 * Math.PI * rimRadius;
   const pct = Math.min(Math.max(progress, 0), 1);
   // Under 64px the caption is too small to read; the medallion goes without.
   const px = typeof rest.width === 'number' ? rest.width : undefined;
   const hasCaption = Boolean(caption) && (px === undefined || px >= 64);
-  const glyphY = hasCaption ? 41 : 50;
+  const glyphY = hasCaption ? BADGE_LAYOUT.glyphY.withCaption : BADGE_LAYOUT.glyphY.alone;
+  const mid = BADGE_BOX / 2;
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 100 100"
+      viewBox={`0 0 ${BADGE_BOX} ${BADGE_BOX}`}
       role={title ? 'img' : undefined}
       aria-hidden={title ? undefined : true}
       className={cn('ratio-achievement__art', className)}
@@ -155,7 +117,7 @@ export function AchievementBadgeArt({
     >
       {title && <title>{title}</title>}
       <path
-        d={outline(shape, 1)}
+        d={badgeOutline(shape)}
         style={{
           fill: paper,
           stroke: ink,
@@ -166,20 +128,20 @@ export function AchievementBadgeArt({
       />
       {metal && (
         <path
-          d={outline(shape, 0.84)}
-          style={{ fill: 'none', stroke: metal, strokeWidth: 2.5, strokeLinejoin: 'round' }}
+          d={badgeOutline(shape, ringScale)}
+          style={{ fill: 'none', stroke: metal, strokeWidth: ringWidth, strokeLinejoin: 'round' }}
         />
       )}
       {state === 'in-progress' && pct > 0 && (
         <circle
-          cx="50"
-          cy="50"
-          r="48"
-          transform="rotate(-90 50 50)"
+          cx={mid}
+          cy={mid}
+          r={rimRadius}
+          transform={`rotate(-90 ${mid} ${mid})`}
           style={{
             fill: 'none',
             stroke: colors.ink ?? 'var(--badge-ink, #1f2937)',
-            strokeWidth: 3,
+            strokeWidth: rimWidth,
             strokeLinecap: 'round',
             strokeDasharray: `${(pct * rim).toFixed(2)} ${rim.toFixed(2)}`,
           }}
@@ -187,10 +149,10 @@ export function AchievementBadgeArt({
       )}
       {emblem ? (
         <svg
-          x={50 - 21}
-          y={glyphY - 21}
-          width="42"
-          height="42"
+          x={mid - emblemSize / 2}
+          y={glyphY - emblemSize / 2}
+          width={emblemSize}
+          height={emblemSize}
           viewBox="0 0 24 24"
           style={{ color: ink, opacity: locked ? 0.6 : 1 }}
         >
@@ -198,7 +160,7 @@ export function AchievementBadgeArt({
         </svg>
       ) : symbol ? (
         <text
-          x="50"
+          x={mid}
           y={glyphY}
           textAnchor="middle"
           dominantBaseline="central"
@@ -206,7 +168,7 @@ export function AchievementBadgeArt({
             fill: ink,
             fontFamily,
             fontWeight: 800,
-            fontSize: symbol.length > 2 ? 26 : symbol.length > 1 ? 34 : 42,
+            fontSize: symbolFontSize(symbol),
             opacity: locked ? 0.6 : 1,
           }}
         >
@@ -215,15 +177,15 @@ export function AchievementBadgeArt({
       ) : null}
       {hasCaption && (
         <text
-          x="50"
-          y="72"
+          x={mid}
+          y={captionY}
           textAnchor="middle"
           dominantBaseline="central"
           style={{
             fill: ink,
             fontFamily,
             fontWeight: 700,
-            fontSize: caption!.length > 6 ? 10 : 12,
+            fontSize: captionFontSize(caption!),
             letterSpacing: 0.6,
             textTransform: 'uppercase',
           }}
