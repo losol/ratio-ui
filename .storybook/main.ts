@@ -99,11 +99,16 @@ const config: StorybookConfig = {
         replacement: join(packagesDir, 'ratio-ui-native/node_modules/react-native-svg/lib/module/elements.web.js'),
       },
       // Two React Native internals its web build still reaches for, which
-      // react-native-web does not ship: the asset registry (stubbed), and
-      // a TurboModule for touch responders (shimmed to `undefined` below).
+      // react-native-web does not ship: the asset registry, and the
+      // TurboModules behind its lazy native calls. Both stubbed, for the
+      // dev server and the static build alike.
       {
         find: /^@react-native\/assets-registry\/registry$/,
         replacement: join(dirname(fileURLToPath(import.meta.url)), 'stubs/assets-registry.ts'),
+      },
+      {
+        find: /^(\.\.\/)+fabric\/NativeSvg\w+Module$/,
+        replacement: join(dirname(fileURLToPath(import.meta.url)), 'stubs/turbo-module.ts'),
       },
     ];
     resolve.alias = [...existing, ...srcAliases, ...reactNativeWeb];
@@ -115,6 +120,9 @@ const config: StorybookConfig = {
     const optimizeDeps = (viteConfig.optimizeDeps ??= {});
     const rolldownOptions = (optimizeDeps.rolldownOptions ??= {});
     rolldownOptions.resolve = { ...rolldownOptions.resolve, extensions };
+    // The optimizer bundles the lazy `require('../fabric/NativeSvg…Module')`
+    // calls without the alias above; the TurboModuleRegistry they import is
+    // shimmed to `undefined` there, as nothing on the web calls them.
     rolldownOptions.shimMissingExports = true;
     return viteConfig;
   },
