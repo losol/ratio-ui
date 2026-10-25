@@ -6,8 +6,8 @@ looks like its web sibling — Bureau's paper and navy, the hard shadows, the
 pixel display face — without installing the web renderer.
 
 **Beta.** Built for Expo SDK 57 (React Native 0.86, React 19.2). The
-components are `Text`, `Heading`, `Button`, `Card` and `ChatLog`; more
-follow as apps need them. Every component and prop may still change.
+components are `Text`, `Heading`, `Button`, `Card`, `ChatLog` and, on its
+own subpath, `AchievementBadge`; more follow as apps need them. Every component and prop may still change.
 
 ## Installation
 
@@ -63,6 +63,42 @@ with a mention band, link previews and reactions. It is a `FlatList` and
 does not scroll itself; the ref is the list, so the app decides when to
 follow new messages. Not yet in native: the reaction picker, a highlighted
 message and message links.
+
+## Badges
+
+`@eventuras/ratio-ui-native/badges` draws an Open Badges achievement as a
+medallion — the web's `AchievementBadge`, from the same data and the same
+outline geometry in `@eventuras/ratio-ui-core/badges`, so a rosette in the
+app is the rosette on the site. It needs `react-native-svg`, which is why
+it is its own subpath: an app without badges installs nothing for them.
+
+```bash
+npx expo install react-native-svg
+```
+
+```tsx
+import { AchievementBadge, defineAchievement } from '@eventuras/ratio-ui-native/badges';
+
+const timesTables = defineAchievement({
+  id: 'https://school.example/achievements/times-tables',
+  name: 'Times Tables Master',
+  description: 'Knows the times tables from 1 to 10.',
+  criteria: { narrative: 'Every product from 1 × 1 to 10 × 10 right, twice in a row.' },
+});
+
+<AchievementBadge
+  achievement={timesTables}
+  display={{ shape: 'rosette', tier: 'gold', symbol: '×' }}
+  credential={award}            // the OpenBadgeCredential; without it the badge is locked
+  layout="row"                  // or 'tile' (default), 'art'
+  formatDate={iso => new Date(iso).toLocaleDateString()}
+/>
+```
+
+The ink is the theme's primary and the paper its card; the metals are the
+same in every theme. An `emblem` is a 24-unit glyph as react-native-svg
+elements, as `lucide-react-native` gives. `AchievementBadgeArt` is the
+medallion alone.
 
 ## Fonts
 

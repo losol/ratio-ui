@@ -35,6 +35,13 @@ export {
   type ProfileInput,
 } from './achievement';
 export {
+  BADGE_BOX,
+  BADGE_LAYOUT,
+  badgeOutline,
+  captionFontSize,
+  symbolFontSize,
+} from './geometry';
+export {
   OB_PNG_KEYWORD,
   OB_SVG_NAMESPACE,
   bakePng,
