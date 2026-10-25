@@ -1,5 +1,16 @@
 # @eventuras/ratio-ui-native
 
+## 0.3.0
+
+### Minor Changes
+
+- cef3e23: New `@eventuras/ratio-ui-native/badges` (beta): `AchievementBadge` and `AchievementBadgeArt` draw an Open Badges achievement as a medallion in the app, through `react-native-svg` (an optional peer dependency, needed only for this subpath), from the same `BadgeDisplay` and the same outline geometry as the web — four shapes, three metals, a glyph or a symbol, a caption, and the earned, locked and in-progress states, in `tile`, `row` and `art` layouts. The ink is the theme's primary and the paper its card. The data and baking from `@eventuras/ratio-ui-core/badges` are re-exported.
+
+### Patch Changes
+
+- Updated dependencies [cef3e23]
+  - @eventuras/ratio-ui-core@0.4.0
+
 ## 0.2.1
 
 ### Patch Changes
