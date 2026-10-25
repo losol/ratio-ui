@@ -1,5 +1,11 @@
 # @eventuras/ratio-ui-core
 
+## 0.4.0
+
+### Minor Changes
+
+- cef3e23: `@eventuras/ratio-ui-core/badges`: the medallion's geometry — `badgeOutline(shape, scale)` as an SVG path, `BADGE_BOX`, `BADGE_LAYOUT`, `symbolFontSize` and `captionFontSize` — so the web and native renderers draw the same badge from the same `BadgeDisplay`.
+
 ## 0.3.0
 
 ### Minor Changes
