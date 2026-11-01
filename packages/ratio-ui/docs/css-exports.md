@@ -77,15 +77,44 @@ Tailwind build of its own** has something predictable to lean on:
 | Spacing | `p`, `px`, `py`, `pt`, `pb`, `pl`, `pr`, `m`, `mx`, `my`, `mt`, `mb`, `ml`, `mr`, `gap` × `0`–`16`, `20`, `24`, `28`, `32`, `40` |
 | Stacking | `z-0`, `z-10`, `z-20`, `z-30`, `z-40`, `z-50` |
 | Responsive display | `sm:` / `md:` / `lg:` × `block`, `hidden`, `inline`, `flex`, `inline-flex` |
+| Grid columns | `grid-cols-1` … `grid-cols-6`, bare and under `sm:` / `md:` / `lg:` |
 | Section heights | `min-h-[20vh]` … `min-h-[80vh]` |
 | Surface tone | `surface-dark`, `surface-light` |
 
-Anything else (`scroll-mt-*`, `w-*`, colours, other breakpoints) is present
-only if a component happens to use it — do not rely on it. Apps that need
-utilities beyond the table should run Tailwind themselves and scan their own
-sources; the tokens and `@theme` aliases are all in the bundle, so the app's
-utilities resolve to the same values. Whole scales are added here on request;
-individual classes are not.
+Anything else (`scroll-mt-*`, `w-*`, colours, other breakpoints, arbitrary
+values like `md:grid-cols-[2fr_1fr]`, pseudo-element variants like
+`after:absolute`) is present only if a component happens to use it — do not
+rely on it. Apps that need utilities beyond the table should run Tailwind
+themselves and scan their own sources; the tokens and `@theme` aliases are all
+in the bundle, so the app's utilities resolve to the same values. Whole scales
+are added here on request; individual classes are not.
+
+Before reaching for utilities at all, see whether a layout primitive does the
+job: `Stack` (a column or row with `gap`, `align`, `justify`, `wrap`,
+`dividers`), `Grid` (equal columns per breakpoint), `Container`, `Section`
+and `Box`. They ship their own classes, so they work in an app with no
+Tailwind build.
+
+## Token names in the bundle
+
+Every token in `tokens/theme.css` is in the bundle under its own name
+(`--primary`, `--text-muted`, `--warning-solid`, `--warning-bg`,
+`--warning-text`, …), and the status tokens again under the `@theme` aliases
+that the colour utilities use:
+
+| Role | Token | `@theme` alias | Utilities |
+| --- | --- | --- | --- |
+| Solid | `--warning-solid` | `--color-warning` | `bg-warning`, `text-warning`, `border-warning` |
+| Text on solid | `--warning-on-solid` | `--color-warning-on` | `text-warning-on` |
+| Tinted background | `--warning-bg` | `--color-warning-bg` | `bg-warning-bg` |
+| Tinted border | `--warning-border` | `--color-warning-border` | `border-warning-border` |
+| Text on tint | `--warning-text` | `--color-warning-text` | `text-warning-text` |
+
+The same five exist for `success`, `info` and `error`. There is no
+`--color-warning-solid`: the solid colour's alias is the bare
+`--color-warning`. The numbered scales (`--color-warning-600`) are the
+palette the tokens are picked from, not the semantic colour — a theme may
+move the semantic token without touching the scale.
 
 ## Theming and the flash guard
 
