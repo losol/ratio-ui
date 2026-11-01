@@ -1,0 +1,198 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/**
+ * RowTable — a list of clickable rows with columns.
+ *
+ * Below the `stackBelow` breakpoint each row stacks its cells, the header
+ * row is only visually hidden (screen readers keep the column names) and
+ * the chevron is dropped. From that breakpoint up the table is one grid
+ * with the column template for the viewport, set by the component as
+ * `--row-table-cols-{sm,md,lg}` on the root, and the row groups and rows
+ * are subgrids of it, so an `auto` column is as wide as its widest cell in
+ * every row. Each row keeps its own box for the rule, the hover and the
+ * link overlay. Breakpoints are Tailwind's: sm 40rem, md 48rem, lg 64rem.
+ * The `data-stack-below` selectors sit in `:where()` so every breakpoint's
+ * rule has the same specificity and the widest one that matches wins.
+ */
+
+.ratio-row-table__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.25rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border-1);
+}
+
+/* The first row of the table has no rule above it: the card's edge is enough. */
+.ratio-row-table__table > :first-child > .ratio-row-table__row:first-child {
+  border-top: 0;
+}
+
+.ratio-row-table__row--header {
+  /* Visually hidden while stacked; unhidden in the media queries below. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ratio-row-table__row--link:hover {
+  background: var(--card-hover);
+}
+
+/* The row shows the link's focus, since the link's own box is just its text. */
+.ratio-row-table__row--link:has(.ratio-row-table__link:focus-visible) {
+  box-shadow: inset 0 0 0 2px var(--focus-ring);
+}
+
+.ratio-row-table__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ratio-row-table__link:focus-visible {
+  outline: none;
+}
+
+/* The overlay that makes the whole row the link's target. Other controls in
+   a row sit above it with `.ratio-row-table__action` (position: relative,
+   z-index 2). */
+.ratio-row-table__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.ratio-row-table__action {
+  position: relative;
+  z-index: 2;
+}
+
+.ratio-row-table__cell {
+  min-width: 0;
+}
+
+.ratio-row-table__cell--decor,
+.ratio-row-table__cell[data-hide-below] {
+  display: none;
+}
+
+@media (min-width: 40rem) {
+  .ratio-row-table__cell[data-hide-below='sm'] {
+    display: block;
+  }
+  .ratio-row-table:where([data-stack-below='sm']) .ratio-row-table__table {
+    display: grid;
+    grid-template-columns: var(--row-table-cols-sm);
+    column-gap: 1rem;
+  }
+  .ratio-row-table:where([data-stack-below='sm']) [role='rowgroup'],
+  .ratio-row-table:where([data-stack-below='sm']) .ratio-row-table__row {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    /* A subgrid's own gap wins over the parent's, so restate the column gap
+       the stacked `gap` would otherwise shrink. */
+    column-gap: 1rem;
+  }
+  .ratio-row-table:where([data-stack-below='sm']) .ratio-row-table__row--header {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    overflow: hidden;
+    clip: auto;
+    white-space: normal;
+  }
+  .ratio-row-table:where([data-stack-below='sm']) .ratio-row-table__cell--decor {
+    display: block;
+  }
+  .ratio-row-table:where([data-stack-below='sm']) .ratio-row-table__cell[data-align='end'] {
+    text-align: end;
+  }
+}
+
+@media (min-width: 48rem) {
+  .ratio-row-table__cell[data-hide-below='md'] {
+    display: block;
+  }
+  .ratio-row-table:where([data-stack-below='sm'], [data-stack-below='md']) .ratio-row-table__table {
+    display: grid;
+    grid-template-columns: var(--row-table-cols-md);
+    column-gap: 1rem;
+  }
+  .ratio-row-table:where([data-stack-below='sm'], [data-stack-below='md']) [role='rowgroup'],
+  .ratio-row-table:where([data-stack-below='sm'], [data-stack-below='md']) .ratio-row-table__row {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    /* A subgrid's own gap wins over the parent's, so restate the column gap
+       the stacked `gap` would otherwise shrink. */
+    column-gap: 1rem;
+  }
+  .ratio-row-table:where([data-stack-below='sm'], [data-stack-below='md']) .ratio-row-table__row--header {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    overflow: hidden;
+    clip: auto;
+    white-space: normal;
+  }
+  .ratio-row-table:where([data-stack-below='sm'], [data-stack-below='md']) .ratio-row-table__cell--decor {
+    display: block;
+  }
+  .ratio-row-table:where([data-stack-below='sm'], [data-stack-below='md']) .ratio-row-table__cell[data-align='end'] {
+    text-align: end;
+  }
+}
+
+@media (min-width: 64rem) {
+  .ratio-row-table__cell[data-hide-below='lg'] {
+    display: block;
+  }
+  .ratio-row-table .ratio-row-table__table {
+    display: grid;
+    grid-template-columns: var(--row-table-cols-lg);
+    column-gap: 1rem;
+  }
+  .ratio-row-table [role='rowgroup'],
+  .ratio-row-table .ratio-row-table__row {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    /* A subgrid's own gap wins over the parent's, so restate the column gap
+       the stacked `gap` would otherwise shrink. */
+    column-gap: 1rem;
+  }
+  .ratio-row-table .ratio-row-table__row--header {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    overflow: hidden;
+    clip: auto;
+    white-space: normal;
+  }
+  .ratio-row-table .ratio-row-table__cell--decor {
+    display: block;
+  }
+  .ratio-row-table .ratio-row-table__cell[data-align='end'] {
+    text-align: end;
+  }
+}
