@@ -16,7 +16,7 @@ const meta: Meta<typeof Badge> = {
     },
     variant: {
       control: 'inline-radio',
-      options: ['filled', 'subtle', 'count'],
+      options: ['filled', 'subtle', 'soft', 'count'],
     },
     tone: {
       control: 'inline-radio',
@@ -92,6 +92,33 @@ export const SubtleAllStatuses: Story = {
       <Badge variant="subtle" status="success">Available</Badge>
       <Badge variant="subtle" status="warning">Few seats</Badge>
       <Badge variant="subtle" status="error">Full</Badge>
+    </div>
+  ),
+};
+
+/**
+ * `soft` is the quiet state pill for a list row or a table cell: tinted
+ * background, the status colour as text, sentence case, no border. Loud
+ * enough to read at a glance, quiet enough to repeat on every line.
+ */
+export const Soft: Story = {
+  args: {
+    children: 'Published',
+    status: 'success',
+    variant: 'soft',
+  },
+};
+
+export const SoftAllStatuses: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+      <Badge variant="soft" status="neutral">Draft</Badge>
+      <Badge variant="soft" status="info">Planned</Badge>
+      <Badge variant="soft" status="success">Published</Badge>
+      <Badge variant="soft" status="warning">Few seats</Badge>
+      <Badge variant="soft" status="error">Full</Badge>
+      <Badge variant="soft" tone="primary">New</Badge>
+      <Badge variant="soft" tone="accent">Featured</Badge>
     </div>
   ),
 };
