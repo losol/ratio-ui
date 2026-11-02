@@ -4,3 +4,5 @@
 
 export { ProgressRing } from './ProgressRing';
 export { ProgressBar } from './ProgressBar';
+export { Meter, meterTone } from './Meter';
+export type { MeterProps, MeterTone, MeterThreshold } from './Meter';

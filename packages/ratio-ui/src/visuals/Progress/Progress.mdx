@@ -1,6 +1,7 @@
 import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks';
 import * as ProgressRingStories from './ProgressRing.stories';
 import * as ProgressBarStories from './ProgressBar.stories';
+import * as MeterStories from './Meter.stories';
 
 <Meta title="Visuals/Progress" />
 
@@ -44,13 +45,24 @@ Horizontal bar with optional label and value display. Works well in lists, table
 
 ---
 
+## Meter
+
+A thin bar for a value against its ceiling — registrations against capacity, storage used. Not the progress of a task: a measurement, with `role="meter"`. The tone follows `thresholds`, so a list shows at a glance which rows are nearly full.
+
+<Canvas of={MeterStories.Thresholds} />
+
+<Controls of={MeterStories.Default} />
+
+---
+
 ## Which one should you use?
 
-| | ProgressRing | ProgressBar |
-|---|---|---|
-| **Best for** | Hero metrics, dashboards, cards | Lists, tables, dense layouts |
-| **Visual weight** | High — draws attention | Low — blends into content |
-| **Custom content** | Yes — via `children` slot | Label + value only |
+| | ProgressRing | ProgressBar | Meter |
+|---|---|---|---|
+| **Best for** | Hero metrics, dashboards, cards | A task's progress in lists and cards | A value against its ceiling, in list rows |
+| **Visual weight** | High — draws attention | Low — blends into content | Lowest — a hairline under the text |
+| **Custom content** | Yes — via `children` slot | Label + value only | None — the row shows the numbers |
+| **Tone** | One `color` | One `color` | `tone`, changing at `thresholds` |
 
 They pair well together: a ring as the hero element at the top, with bars for the breakdown below.
 
@@ -74,6 +86,7 @@ Avoid hardcoding hex values unless the color is outside the design system (e.g. 
 
 - **ProgressRing** uses `role="meter"` with `aria-valuenow`, `aria-valuemin`, and `aria-valuemax`.
 - **ProgressBar** uses `role="progressbar"` with the same aria attributes.
+- **Meter** uses `role="meter"` with the same aria attributes, plus `aria-valuetext` from `valueText`. Name it with `aria-label` or `aria-labelledby`.
 - Ring content (`children`) is visible to screen readers — make sure it reads well as plain text.
 
 ## Animation
