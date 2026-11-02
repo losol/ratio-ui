@@ -168,6 +168,47 @@ export const DisabledTab: Story = {
 };
 
 /**
+ * `size="sm"` is the compact bar for filtering what a panel shows — here the
+ * activity feed of an event. Smaller text, tighter padding, less room above
+ * the panel; the same underline and the same keyboard behaviour.
+ */
+export const Compact: Story = {
+  args: {
+    size: 'sm',
+    children: (
+      <>
+        <Tabs.Item id="all" title="All">
+          <p className="text-sm">Every registration, order and change, newest first.</p>
+        </Tabs.Item>
+        <Tabs.Item id="registrations" title="Registrations">
+          <p className="text-sm">Ingrid Hansen registered for the autumn seminar.</p>
+        </Tabs.Item>
+        <Tabs.Item id="orders" title="Orders">
+          <p className="text-sm">Order 1042 paid by invoice.</p>
+        </Tabs.Item>
+        <Tabs.Item id="changes" title="Changes">
+          <p className="text-sm">Capacity raised from 50 to 60.</p>
+        </Tabs.Item>
+      </>
+    ),
+  },
+  render: (args) => (
+    <div className="w-[480px] max-w-full">
+      <Tabs {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByRole('tablist')).toHaveAttribute('data-size', 'sm');
+    const orders = canvas.getByRole('tab', { name: 'Orders' });
+    expect(orders).toHaveClass('text-sm');
+    await userEvent.click(orders);
+    expect(orders).toHaveAttribute('aria-selected', 'true');
+    expect(canvas.getByText(/Order 1042/)).toBeVisible();
+  },
+};
+
+/**
  * `title` takes any node, so a tab can carry a marker beside its label — a
  * count of what is inside, or a dot flagging a section that needs attention.
  * Two rules come with it: give the item an `id` (the title is otherwise what
