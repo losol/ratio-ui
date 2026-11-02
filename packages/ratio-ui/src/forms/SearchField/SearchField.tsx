@@ -38,9 +38,10 @@ export interface SearchFieldProps {
   size?: SearchFieldSize;
   /**
    * Global keyboard shortcut that focuses the field, e.g. `'mod+k'` (⌘K on
-   * Apple platforms, Ctrl+K elsewhere). Shows a `Kbd` hint inside the field
-   * while it's empty and unfocused. Built on the generic
-   * `useKeyboardShortcut` hook.
+   * Apple platforms, Ctrl+K elsewhere) or `'/'`. A single-key shortcut works
+   * on every keyboard layout and never fires while the user types in another
+   * field. Shows a `Kbd` hint inside the field while it's empty and
+   * unfocused. Built on the generic `useKeyboardShortcut` hook.
    */
   shortcut?: string;
   /** Name for native form submission. Mirrors React Aria. */

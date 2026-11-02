@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { useState } from 'react';
 import { NavTree, type NavTreeItem } from '../../core/NavTree';
 import { SearchField } from './SearchField';
@@ -51,6 +52,39 @@ export const WithShortcut: Story = {
       aria-label="Search the archive"
     />
   ),
+};
+
+/**
+ * A single-key shortcut — `/` focuses the field, as on GitHub and in most
+ * admin tools. The hook matches on the produced character, so it works where
+ * `/` is Shift+7 (Norwegian and other non-US layouts) as well as on a US
+ * keyboard. It never fires while you type in an input — so "1/11" is still
+ * typeable in the field it focuses — and `Kbd` shows the bare `/`.
+ */
+export const SlashShortcut: Story = {
+  render: () => (
+    <SearchField
+      shortcut="/"
+      placeholder="Search registrations…"
+      aria-label="Search registrations"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('searchbox');
+    input.blur();
+    await expect(input).not.toHaveFocus();
+
+    // Norwegian layout: `/` arrives as Shift+7, with shiftKey set.
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: '/', code: 'Digit7', shiftKey: true, bubbles: true }),
+    );
+    await expect(input).toHaveFocus();
+
+    // Typing a `/` inside the field must insert it, not re-trigger the shortcut.
+    await userEvent.type(input, '1/11');
+    await expect(input).toHaveValue('1/11');
+  },
 };
 
 /** The three sizes: `sm` (sidebars/toolbars) · `md` (default) · `lg`. */
