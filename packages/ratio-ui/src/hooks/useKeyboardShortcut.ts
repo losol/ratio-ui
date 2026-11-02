@@ -131,9 +131,9 @@ export function useKeyboardShortcut(
 
     // A printable non-letter key already encodes Shift on the layouts where
     // it needs it (`/` is Shift+7 on Norwegian keyboards), so `event.key`
-    // alone decides and `shiftKey` is not compared. Letters and named keys
-    // keep the exact match.
-    const shiftAgnostic = key.length === 1 && !/[a-z]/i.test(key);
+    // alone decides and `shiftKey` is not compared. Letters (`\p{L}`, so `ø`
+    // and `å` count) and named keys keep the exact match.
+    const shiftAgnostic = key.length === 1 && !/\p{L}/u.test(key);
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.isComposing) return;
