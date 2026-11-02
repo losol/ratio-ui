@@ -56,6 +56,15 @@
   box-shadow: inset 0 0 0 2px var(--focus-ring);
 }
 
+/* Forced colours drop box shadows, so the focus falls back to an outline in
+   the system highlight colour. */
+@media (forced-colors: active) {
+  .ratio-row-table__row--link:has(.ratio-row-table__link:focus-visible) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
 .ratio-row-table__link {
   color: inherit;
   text-decoration: none;

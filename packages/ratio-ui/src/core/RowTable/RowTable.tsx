@@ -21,7 +21,10 @@ export interface RowTableColumn<T> {
    * @default 'minmax(0, 1fr)'
    */
   width?: string;
-  /** Leave the column out below this breakpoint, on every row. */
+  /**
+   * Leave the column out below this breakpoint, on every row. Ignored on the
+   * first column: it is the row's title and carries the row's link.
+   */
   hideBelow?: RowTableBreakpoint;
   /** Align the cell's text to the trailing edge: numbers, dates. Stacked cells stay at the start. */
   align?: 'start' | 'end';
@@ -58,10 +61,18 @@ export interface RowTableProps<T> {
 
 const BREAKPOINT_ORDER: Record<RowTableBreakpoint, number> = { sm: 0, md: 1, lg: 2 };
 
+/** The breakpoint a column hides below; the first column never hides. */
+function hideBelowOf<T>(column: RowTableColumn<T>, index: number): RowTableBreakpoint | undefined {
+  return index === 0 ? undefined : column.hideBelow;
+}
+
 /** The grid template at a breakpoint: the tracks of the columns visible there, plus the chevron's. */
 function templateAt<T>(columns: RowTableColumn<T>[], at: RowTableBreakpoint, withChevron: boolean): string {
   const tracks = columns
-    .filter((c) => !c.hideBelow || BREAKPOINT_ORDER[c.hideBelow] <= BREAKPOINT_ORDER[at])
+    .filter((c, i) => {
+      const hide = hideBelowOf(c, i);
+      return !hide || BREAKPOINT_ORDER[hide] <= BREAKPOINT_ORDER[at];
+    })
     .map((c) => c.width ?? 'minmax(0, 1fr)');
   if (withChevron) tracks.push('auto');
   return tracks.join(' ');
@@ -130,11 +141,11 @@ export function RowTable<T>({
       >
         <div role="rowgroup">
           <div role="row" className="ratio-row-table__row ratio-row-table__row--header">
-            {columns.map((column) => (
+            {columns.map((column, index) => (
               <div
                 key={column.key}
                 role="columnheader"
-                data-hide-below={column.hideBelow}
+                data-hide-below={hideBelowOf(column, index)}
                 data-align={column.align}
                 className="ratio-row-table__cell text-xs font-medium uppercase tracking-wider text-(--text-muted)"
               >
@@ -142,7 +153,11 @@ export function RowTable<T>({
               </div>
             ))}
             {withChevron && (
-              <div role="columnheader" className="ratio-row-table__cell ratio-row-table__cell--decor" />
+              <div
+                role="columnheader"
+                aria-hidden="true"
+                className="ratio-row-table__cell ratio-row-table__cell--decor"
+              />
             )}
           </div>
         </div>
@@ -163,7 +178,7 @@ export function RowTable<T>({
                       <div
                         key={column.key}
                         role="cell"
-                        data-hide-below={column.hideBelow}
+                        data-hide-below={hideBelowOf(column, index)}
                         data-align={column.align}
                         className={cn(
                           'ratio-row-table__cell text-sm',

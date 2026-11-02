@@ -93,8 +93,14 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const table = canvas.getByRole('table', { name: 'Events' });
-    await expect(within(table).getAllByRole('columnheader')).toHaveLength(columns.length + 1);
-    await expect(within(table).getAllByRole('row')).toHaveLength(EVENTS.length + 1);
+    // Structural counts, so hidden headers (a column below its breakpoint,
+    // the decorative chevron) are included whatever the viewport width.
+    await expect(table.querySelectorAll('[role="columnheader"]')).toHaveLength(columns.length + 1);
+    await expect(table.querySelectorAll('[role="row"]')).toHaveLength(EVENTS.length + 1);
+    await expect(table.querySelector('.ratio-row-table__cell--decor[role="columnheader"]')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
     const link = canvas.getByRole('link', { name: 'Annual conference' });
     await expect(link).toHaveAttribute('href', '#/admin/events/3');
     await expect(link.closest('[role="row"]')).toHaveClass('ratio-row-table__row--link');
