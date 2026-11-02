@@ -8,18 +8,20 @@
  * Timeline gutter layout: the items' timestamps sit in a column to the left
  * of the rail, aligned on their trailing edge. Styled here rather than from
  * a context so `Timeline.Item` needs no `'use client'` and the statics stay
- * on a directive-free module. `--timeline-gutter` is the column's width.
+ * on a directive-free module. `--timeline-gutter` is the column's width,
+ * 3.5rem unless the caller sets it. It is read with a fallback, not
+ * declared here: an unlayered declaration would beat a Tailwind utility
+ * such as `[--timeline-gutter:6rem]` on the root.
  */
 .ratio-timeline--gutter {
-  --timeline-gutter: 3.5rem;
-  padding-left: var(--timeline-gutter);
+  padding-left: var(--timeline-gutter, 3.5rem);
 }
 
 .ratio-timeline--gutter .ratio-timeline__time {
   position: absolute;
   top: 0.0625rem;
   right: 100%;
-  width: calc(var(--timeline-gutter) - 1rem);
+  width: calc(var(--timeline-gutter, 3.5rem) - 1rem);
   margin-right: 1rem;
   text-align: end;
   font-variant-numeric: tabular-nums;

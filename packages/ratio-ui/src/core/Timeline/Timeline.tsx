@@ -33,7 +33,8 @@ export interface TimelineProps {
    * Put every item's timestamp in a column to the left of the rail, aligned
    * on its trailing edge, so a feed reads "10:22 · Ingrid Hansen registered".
    * Pass short timestamps ("10:22"); the column is `--timeline-gutter` wide
-   * (3.5rem) and can be widened on `className` or `style`.
+   * (3.5rem) and can be widened by setting that property on the root, e.g.
+   * `className="[--timeline-gutter:6rem]"` or `style`.
    * @default false
    */
   gutter?: boolean;
