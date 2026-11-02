@@ -3,3 +3,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Heading } from './Heading';
+export type {
+  HeadingProps,
+  HeadingSize,
+  HeadingGroupProps,
+  HeadingEyebrowProps,
+} from './Heading';
