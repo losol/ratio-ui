@@ -6,19 +6,22 @@ import React from 'react';
 import type { Space } from '../../tokens/spacing';
 import { cn } from '../../utils/cn';
 
+/** The column counts whose classes the bundled CSS guarantees. */
 export type GridCols = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface GridProps {
   /**
    * Columns per breakpoint. `base` applies from the narrowest screen (one
-   * column when unset), the others from Tailwind's `sm`/`md`/`lg`.
+   * column when unset), the others from Tailwind's `sm`/`md`/`lg`. 1–6 are
+   * in the bundled CSS (`GridCols`); a larger count renders its class too,
+   * but needs the app's own Tailwind build to supply it.
    * @default { md: 2, lg: 3 }
    */
   cols?: {
-    base?: GridCols;
-    sm?: GridCols;
-    md?: GridCols;
-    lg?: GridCols;
+    base?: number;
+    sm?: number;
+    md?: number;
+    lg?: number;
   };
   /**
    * Gap between cells, on the spacing scale. Unset keeps the 1rem default.
@@ -77,12 +80,20 @@ const gapClasses: Record<Space, string> = {
   xl: 'gap-xl',
 };
 
+const isGridCols = (n: number): n is GridCols => Number.isInteger(n) && n >= 1 && n <= 6;
+
+// The lookup for the guaranteed range; the template literal, as before,
+// for anything else, so a `cols={{ lg: 8 }}` an app's Tailwind build
+// supplies keeps working.
+const colClass = (table: Record<GridCols, string>, prefix: string, n: number | undefined) =>
+  n == null ? undefined : isGridCols(n) ? table[n] : `${prefix}grid-cols-${n}`;
+
 const getGridCols = (cols?: GridProps['cols']) =>
   cn(
-    cols?.base && colClasses[cols.base],
-    cols?.sm && smColClasses[cols.sm],
-    cols?.md && mdColClasses[cols.md],
-    cols?.lg && lgColClasses[cols.lg],
+    colClass(colClasses, '', cols?.base),
+    colClass(smColClasses, 'sm:', cols?.sm),
+    colClass(mdColClasses, 'md:', cols?.md),
+    colClass(lgColClasses, 'lg:', cols?.lg),
   );
 
 /**

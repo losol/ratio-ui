@@ -80,6 +80,21 @@ FromBase.play = async ({ canvasElement }) => {
   await expect(grid).toHaveClass('grid-cols-2', 'lg:grid-cols-4', 'gap-sm');
 };
 
+/** A count beyond the bundled 1–6 still renders its class, for an app whose own Tailwind build supplies it. */
+export const BeyondBundledRange: GridStory = () => {
+  const cols = { base: 2, lg: 8 };
+  return (
+    <Grid cols={cols}>
+      {Array.from({ length: 8 }, (_, i) => (
+        <DemoCard key={i}>{i + 1}</DemoCard>
+      ))}
+    </Grid>
+  );
+};
+BeyondBundledRange.play = async ({ canvasElement }) => {
+  await expect(canvasElement.querySelector('.grid')).toHaveClass('grid-cols-2', 'lg:grid-cols-8');
+};
+
 export const WithContainer: GridStory = () => (
   <Grid cols={{ md: 3 }} container>
     <DemoCard>Item 1</DemoCard>
