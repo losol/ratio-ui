@@ -29,7 +29,10 @@
 }
 
 /* The surrounding layout owns the space around the header: the leading
-   block's outer margins (a paragraph's, from the prose scale) are trimmed. */
+   block's outer margins are trimmed — its own, when it is a bare `Heading`
+   on the prose scale, and its first and last child's, when it groups a
+   paragraph or a heading that carries them. */
+.ratio-header > :not(.ratio-header__actions) { margin-block: 0; }
 .ratio-header > :not(.ratio-header__actions) > :first-child { margin-top: 0; }
 .ratio-header > :not(.ratio-header__actions) > :last-child { margin-bottom: 0; }
 

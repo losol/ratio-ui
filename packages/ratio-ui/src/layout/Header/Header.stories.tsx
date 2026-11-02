@@ -154,6 +154,28 @@ export const SectionHeader: Story = {
   ),
 };
 
+/**
+ * A bare `Heading` as the leading block, on the prose scale (no `size`):
+ * the header trims its margins as well, so the link lines up with the
+ * title and the surrounding layout owns the space around the row.
+ */
+export const BareHeading: Story = {
+  render: (args) => (
+    <Header {...args}>
+      <Heading as="h2">Recent activity</Heading>
+      <Header.Actions>
+        <Link href="#">See all</Link>
+      </Header.Actions>
+    </Header>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const style = getComputedStyle(canvas.getByRole('heading', { level: 2, name: 'Recent activity' }));
+    await expect(style.marginTop).toBe('0px');
+    await expect(style.marginBottom).toBe('0px');
+  },
+};
+
 /** Without actions the heading block takes the whole row. */
 export const WithoutActions: Story = {
   render: (args) => (
