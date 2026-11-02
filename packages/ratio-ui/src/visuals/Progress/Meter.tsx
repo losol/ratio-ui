@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
+'use client';
+
 import React from 'react';
 import { cn } from '../../utils/cn';
 import { useProgressAnimation } from './useProgressAnimation';
@@ -117,7 +119,10 @@ export const Meter: React.FC<MeterProps> = ({
       style={{ height }}
     >
       <div
-        className={cn('h-full rounded-pill transition-[width] duration-500 ease-out', toneClasses[current])}
+        className={cn(
+          'h-full rounded-pill transition-[width] duration-500 ease-out motion-reduce:transition-none',
+          toneClasses[current],
+        )}
         style={{ width: `${(animated ? pct : 0) * 100}%` }}
       />
     </div>
