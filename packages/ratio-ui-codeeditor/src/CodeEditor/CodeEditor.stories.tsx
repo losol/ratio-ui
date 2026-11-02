@@ -339,3 +339,86 @@ export const CharacterRow: Story = {
     await waitFor(() => expect(canvas.getByTestId('output')).toHaveTextContent('Ran 2 line(s).'));
   },
 };
+
+/**
+ * A parent whose state lands a little after each edit, as React's does when
+ * it renders the echo of one keystroke after the next keystroke is in. The
+ * late echo is older than the document and must not replace it: every
+ * character typed stays.
+ */
+export const LateEcho: Story = {
+  render: function LateEchoStory() {
+    const [value, setValue] = useState('');
+    return (
+      <CodeEditor
+        value={value}
+        onChange={(v) => setTimeout(() => setValue(v), 15)}
+        language="python"
+        setup="minimal"
+        aria-label="Program"
+      />
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const editor = within(canvasElement).getByRole('textbox', { name: 'Program' });
+    await userEvent.click(editor);
+    await userEvent.keyboard('print(', { delay: 5 });
+    // Let every delayed echo land before checking the document.
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await waitFor(() => expect(editor.querySelector('.cm-line')?.textContent).toBe('print('));
+  },
+};
+
+/**
+ * Late echoes of an edit, a backspace and a retype: the document passes
+ * through the same text twice (`a`, `ab`, `a`, `ac`…). Each echo answers the
+ * oldest edit still waiting, so none of them replaces the text typed since.
+ */
+export const LateEchoRetype: Story = {
+  render: function LateEchoRetypeStory() {
+    const [value, setValue] = useState('');
+    return (
+      <CodeEditor
+        value={value}
+        onChange={(v) => setTimeout(() => setValue(v), 15)}
+        language="python"
+        setup="minimal"
+        aria-label="Program"
+      />
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const editor = within(canvasElement).getByRole('textbox', { name: 'Program' });
+    await userEvent.click(editor);
+    await userEvent.keyboard('ab{Backspace}cdefgh', { delay: 5 });
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await waitFor(() => expect(editor.querySelector('.cm-line')?.textContent).toBe('acdefgh'));
+  },
+};
+
+/**
+ * Without `onChange` there is no echo to wait for, so a new `value` from
+ * outside always replaces the document — even one the editor showed before.
+ */
+export const ResetWithoutOnChange: Story = {
+  render: function ResetWithoutOnChangeStory() {
+    const [value, setValue] = useState('a');
+    return (
+      <div className="flex flex-col gap-2">
+        <CodeEditor value={value} language="python" setup="minimal" aria-label="Program" />
+        <button type="button" onClick={() => setValue('ab')}>
+          Reset to ab
+        </button>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const editor = canvas.getByRole('textbox', { name: 'Program' });
+    await userEvent.click(editor);
+    await userEvent.keyboard('{Control>}{End}{/Control}bc');
+    await waitFor(() => expect(editor.querySelector('.cm-line')?.textContent).toBe('abc'));
+    await userEvent.click(canvas.getByRole('button', { name: 'Reset to ab' }));
+    await waitFor(() => expect(editor.querySelector('.cm-line')?.textContent).toBe('ab'));
+  },
+};
