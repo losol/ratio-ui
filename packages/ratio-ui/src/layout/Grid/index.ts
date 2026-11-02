@@ -3,3 +3,4 @@
 // SPDX-License-Identifier: MPL-2.0
 
 export { Grid } from './Grid';
+export type { GridProps, GridCols } from './Grid';
