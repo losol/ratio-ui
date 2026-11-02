@@ -169,7 +169,7 @@ export const AlexandriaArchive: Story = {
               Archive dashboard
             </Heading>
           </div>
-          <Badge status="success" variant="subtle">
+          <Badge status="success" variant="soft">
             Catalogue in sync
           </Badge>
         </div>
