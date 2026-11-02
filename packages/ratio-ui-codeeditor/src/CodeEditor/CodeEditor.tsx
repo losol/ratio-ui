@@ -146,6 +146,10 @@ export function CodeEditor({
   const readOnly_ = useRef(new Compartment());
   const onChangeRef = useRef(onChange);
   const onRunRef = useRef(onRun);
+  // Documents reported through `onChange` whose echo as `value` has not come
+  // back yet. A parent's state can land after the next keystroke is in, so an
+  // echo may be older than the document; it must not replace it.
+  const pending = useRef<string[]>([]);
   useLayoutEffect(() => {
     onChangeRef.current = onChange;
     onRunRef.current = onRun;
@@ -208,7 +212,11 @@ export function CodeEditor({
           highlightExtension,
           EditorView.updateListener.of((u) => {
             if (!u.docChanged || u.transactions.some((tr) => tr.annotation(fromProps))) return;
-            onChangeRef.current?.(u.state.doc.toString());
+            const doc = u.state.doc.toString();
+            pending.current.push(doc);
+            // A parent that never echoes must not grow this without bound.
+            if (pending.current.length > 100) pending.current.shift();
+            onChangeRef.current?.(doc);
           }),
         ],
       }),
@@ -226,12 +234,20 @@ export function CodeEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep the document in step with `value`. The editor's own edits come back
-  // through `onChange` equal to the document and change nothing; a value from
-  // outside replaces it, marked so it is not reported as an edit.
+  // Keep the document in step with `value`. An echo of the editor's own edit
+  // changes nothing, even one that arrives after a newer keystroke; a value
+  // from outside replaces the document, marked so it is not reported as an
+  // edit.
   useEffect(() => {
     const v = view.current;
-    if (!v || v.state.doc.toString() === value) return;
+    if (!v) return;
+    const echo = pending.current.lastIndexOf(value);
+    if (echo !== -1) {
+      pending.current.splice(0, echo + 1);
+      return;
+    }
+    pending.current = [];
+    if (v.state.doc.toString() === value) return;
     v.dispatch({
       changes: { from: 0, to: v.state.doc.length, insert: value },
       annotations: fromProps.of(true),

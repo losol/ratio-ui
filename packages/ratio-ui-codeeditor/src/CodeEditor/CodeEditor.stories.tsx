@@ -339,3 +339,32 @@ export const CharacterRow: Story = {
     await waitFor(() => expect(canvas.getByTestId('output')).toHaveTextContent('Ran 2 line(s).'));
   },
 };
+
+/**
+ * A parent whose state lands a little after each edit, as React's does when
+ * it renders the echo of one keystroke after the next keystroke is in. The
+ * late echo is older than the document and must not replace it: every
+ * character typed stays.
+ */
+export const LateEcho: Story = {
+  render: function LateEchoStory() {
+    const [value, setValue] = useState('');
+    return (
+      <CodeEditor
+        value={value}
+        onChange={(v) => setTimeout(() => setValue(v), 15)}
+        language="python"
+        setup="minimal"
+        aria-label="Program"
+      />
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const editor = within(canvasElement).getByRole('textbox', { name: 'Program' });
+    await userEvent.click(editor);
+    await userEvent.keyboard('print(', { delay: 5 });
+    // Let every delayed echo land before checking the document.
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await waitFor(() => expect(editor.querySelector('.cm-line')?.textContent).toBe('print('));
+  },
+};
