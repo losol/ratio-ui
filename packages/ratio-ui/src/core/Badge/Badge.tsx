@@ -40,7 +40,8 @@ export type BadgeProps = {
    * Colour from the brand instead of `status`, for a badge that reports no
    * state — an unread count is news, not a warning. `inherit` follows the
    * host's text colour, e.g. a count inside a `Button`. Applies to `filled`,
-   * `soft` and `count`.
+   * `soft` and `count`. On `soft` the tone is the tint and the text stays
+   * `--text`, so the label keeps its contrast in every theme.
    * @beta
    */
   tone?: BadgeTone;
@@ -79,9 +80,13 @@ const toneClasses: Record<BadgeTone, string> = {
   inherit: 'bg-current/15',
 };
 
+// The tint carries the tone; the text stays `--text`. A brand colour used as
+// 12px text on its own tint falls short of 4.5:1 in some themes (an ochre
+// accent on a warm page), and the status variants' `*-text` tokens have no
+// brand equivalent.
 const softToneClasses: Record<BadgeTone, string> = {
-  primary: 'bg-(--primary)/12 text-(--primary)',
-  accent: 'bg-(--accent)/15 text-(--accent)',
+  primary: 'bg-(--primary)/12 text-(--text)',
+  accent: 'bg-(--accent)/20 text-(--text)',
   inherit: 'bg-current/15',
 };
 
