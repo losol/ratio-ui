@@ -1,0 +1,30 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/**
+ * Timeline gutter layout: the items' timestamps sit in a column to the left
+ * of the rail, aligned on their trailing edge. Styled here rather than from
+ * a context so `Timeline.Item` needs no `'use client'` and the statics stay
+ * on a directive-free module. `--timeline-gutter` is the column's width.
+ */
+.ratio-timeline--gutter {
+  --timeline-gutter: 3.5rem;
+  padding-left: var(--timeline-gutter);
+}
+
+.ratio-timeline--gutter .ratio-timeline__time {
+  position: absolute;
+  top: 0.0625rem;
+  right: 100%;
+  width: calc(var(--timeline-gutter) - 1rem);
+  margin-right: 1rem;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.ratio-timeline--gutter .ratio-timeline__sep {
+  display: none;
+}
