@@ -14,6 +14,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Badge } from '../../core/Badge';
 import { Heading } from '../../core/Heading';
+import { Text } from '../../core/Text';
+import { Header } from '../../layout/Header';
 import { ValueTile } from '../../core/ValueTile';
 import { NavTree } from '../../core/NavTree';
 import { Console } from '../../console';
@@ -162,17 +164,21 @@ export const AlexandriaArchive: Story = {
       </aside>
 
       <main className="mx-auto max-w-275 flex-1 px-10 pb-20 pt-9">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm text-(--text-subtle)">The Great Library · est. c. 285 BCE</p>
+        <Header align="center">
+          <Heading.Group>
+            <Text variant="subtle" size="sm">
+              The Great Library · est. c. 285 BCE
+            </Text>
             <Heading as="h1" className="mt-1">
               Archive dashboard
             </Heading>
-          </div>
-          <Badge status="success" variant="soft">
-            Catalogue in sync
-          </Badge>
-        </div>
+          </Heading.Group>
+          <Header.Actions>
+            <Badge status="success" variant="soft">
+              Catalogue in sync
+            </Badge>
+          </Header.Actions>
+        </Header>
 
         <div className="mt-8 grid grid-cols-2 gap-3.5 lg:grid-cols-4">
           <ValueTile number="~400,000" label="Scrolls at the library's height" />
