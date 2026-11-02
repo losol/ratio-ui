@@ -212,11 +212,14 @@ export function CodeEditor({
           highlightExtension,
           EditorView.updateListener.of((u) => {
             if (!u.docChanged || u.transactions.some((tr) => tr.annotation(fromProps))) return;
+            const report = onChangeRef.current;
+            // Without `onChange` no echo will come, so nothing waits for one.
+            if (!report) return;
             const doc = u.state.doc.toString();
             pending.current.push(doc);
             // A parent that never echoes must not grow this without bound.
             if (pending.current.length > 100) pending.current.shift();
-            onChangeRef.current?.(doc);
+            report(doc);
           }),
         ],
       }),
@@ -241,7 +244,10 @@ export function CodeEditor({
   useEffect(() => {
     const v = view.current;
     if (!v) return;
-    const echo = pending.current.lastIndexOf(value);
+    // Echoes come back in order, so one answers the oldest edit still
+    // waiting. The document can pass through the same text twice (a backspace
+    // and a retype); matching the first keeps the later one waiting.
+    const echo = pending.current.indexOf(value);
     if (echo !== -1) {
       pending.current.splice(0, echo + 1);
       return;
