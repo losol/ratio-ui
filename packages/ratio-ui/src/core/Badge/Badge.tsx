@@ -6,7 +6,7 @@ import React from 'react';
 import type { Status } from '../../tokens/colors';
 import { cn } from '../../utils/cn';
 
-export type BadgeVariant = 'filled' | 'subtle' | 'count';
+export type BadgeVariant = 'filled' | 'subtle' | 'soft' | 'count';
 
 /**
  * Tone for badges that carry no status. `primary` and `accent` are the brand
@@ -28,6 +28,10 @@ export type BadgeProps = {
    * - `'subtle'` — outline pill with mono-uppercase text on a quiet
    *   tinted background. Use as a category tag or kicker where the
    *   badge sits inside a larger card or list row and shouldn't shout.
+   * - `'soft'` — small tinted pill in sentence case, the status colour as
+   *   text and no border. The state of a row in a list or table
+   *   ("Published", "Draft", "Full"): read at a glance, quiet enough to
+   *   repeat on every line.
    * - `'count'` (beta) — a small solid pill for a number or a single
    *   glyph: unread counts, tallies, an `@` for a mention.
    */
@@ -35,8 +39,9 @@ export type BadgeProps = {
   /**
    * Colour from the brand instead of `status`, for a badge that reports no
    * state — an unread count is news, not a warning. `inherit` follows the
-   * host's text colour, e.g. a count inside a `Button`. Applies to `filled`
-   * and `count`.
+   * host's text colour, e.g. a count inside a `Button`. Applies to `filled`,
+   * `soft` and `count`. On `soft` the tone is the tint and the text stays
+   * `--text`, so the label keeps its contrast in every theme.
    * @beta
    */
   tone?: BadgeTone;
@@ -61,9 +66,27 @@ const subtleStatusClasses: Record<Status, string> = {
   error: 'bg-error-bg border border-error-border text-error-text',
 };
 
+const softStatusClasses: Record<Status, string> = {
+  neutral: 'bg-(--text-muted)/10 text-(--text-muted)',
+  info: 'bg-info-bg text-info-text',
+  success: 'bg-success-bg text-success-text',
+  warning: 'bg-warning-bg text-warning-text',
+  error: 'bg-error-bg text-error-text',
+};
+
 const toneClasses: Record<BadgeTone, string> = {
   primary: 'bg-(--primary) text-(--text-on-primary)',
   accent: 'bg-(--accent) text-(--text-on-accent)',
+  inherit: 'bg-current/15',
+};
+
+// The tint carries the tone; the text stays `--text`. A brand colour used as
+// 12px text on its own tint falls short of 4.5:1 in some themes (an ochre
+// accent on a warm page), and the status variants' `*-text` tokens have no
+// brand equivalent.
+const softToneClasses: Record<BadgeTone, string> = {
+  primary: 'bg-(--primary)/12 text-(--text)',
+  accent: 'bg-(--accent)/20 text-(--text)',
   inherit: 'bg-current/15',
 };
 
@@ -78,11 +101,16 @@ export const Badge: React.FC<BadgeProps> = ({
   label,
 }) => {
   const isSubtle = variant === 'subtle';
+  const isSoft = variant === 'soft';
   const variantClasses = isSubtle
     ? subtleStatusClasses[status]
-    : tone
-      ? toneClasses[tone]
-      : filledStatusClasses[status];
+    : isSoft
+      ? tone
+        ? softToneClasses[tone]
+        : softStatusClasses[status]
+      : tone
+        ? toneClasses[tone]
+        : filledStatusClasses[status];
 
   if (variant === 'count') {
     return (
@@ -102,9 +130,9 @@ export const Badge: React.FC<BadgeProps> = ({
     block && 'block',
     variantClasses,
     'leading-none',
-    isSubtle
-      ? 'font-mono text-[10px] uppercase tracking-wider font-bold rounded-pill'
-      : 'text-xs rounded',
+    isSubtle && 'font-mono text-[10px] uppercase tracking-wider font-bold rounded-pill',
+    isSoft && 'text-xs font-medium rounded-pill',
+    !isSubtle && !isSoft && 'text-xs rounded',
   );
 
   if (definition && label) {
@@ -113,7 +141,7 @@ export const Badge: React.FC<BadgeProps> = ({
         <dt
           className={cn(
             'px-2 py-2 font-medium uppercase tracking-wide',
-            isSubtle ? 'bg-(--text-muted)/10' : 'bg-black/20',
+            isSubtle || isSoft ? 'bg-(--text-muted)/10' : 'bg-black/20',
           )}
         >
           {label}
@@ -124,7 +152,9 @@ export const Badge: React.FC<BadgeProps> = ({
   }
 
   return (
-    <span className={cn(base, isSubtle ? 'px-2 py-1' : 'p-2', className)}>
+    <span
+      className={cn(base, isSubtle ? 'px-2 py-1' : isSoft ? 'px-2 py-1' : 'p-2', className)}
+    >
       {children}
     </span>
   );
