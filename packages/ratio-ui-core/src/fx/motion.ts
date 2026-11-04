@@ -38,11 +38,13 @@ export interface FxAllowance {
   fallback: boolean;
 }
 
-const ALLOWANCE: Record<FxMotion, FxAllowance> = {
-  full: { particles: true, flash: true, shake: true, fallback: false },
-  reduced: { particles: false, flash: false, shake: false, fallback: true },
-  none: { particles: false, flash: false, shake: false, fallback: false },
-};
+// Frozen, and copied out: a caller that edits its answer must not loosen the
+// rule for every effect after it.
+const ALLOWANCE: Readonly<Record<FxMotion, Readonly<FxAllowance>>> = Object.freeze({
+  full: Object.freeze({ particles: true, flash: true, shake: true, fallback: false }),
+  reduced: Object.freeze({ particles: false, flash: false, shake: false, fallback: true }),
+  none: Object.freeze({ particles: false, flash: false, shake: false, fallback: false }),
+});
 
-/** What an effect may do. Only `full` moves anything. */
-export const fxAllowance = (motion: FxMotion): FxAllowance => ALLOWANCE[motion];
+/** What an effect may do. Only `full` moves anything. A fresh object each call. */
+export const fxAllowance = (motion: FxMotion): FxAllowance => ({ ...ALLOWANCE[motion] });

@@ -15,13 +15,13 @@ export type FxColors = readonly string[] | `tier:${BadgeTier}`;
  * Used when neither the app nor the renderer gives colours: the status
  * hues and gold, bright on light and dark alike.
  */
-export const FX_DEFAULT_COLORS: readonly string[] = [
+export const FX_DEFAULT_COLORS: readonly string[] = Object.freeze([
   '#2f7fa0',
   '#d4a017',
   '#d64545',
   '#2e9a62',
   '#8e6bbf',
-];
+]);
 
 const mixRgba = (a: Rgba, b: Rgba, t: number): Rgba => ({
   r: Math.round(a.r + (b.r - a.r) * t),

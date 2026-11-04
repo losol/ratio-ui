@@ -155,9 +155,16 @@ describe('confetti', () => {
     expect(confetti.spawn(origin, {}, fxRandom(9))).toEqual(confetti.spawn(origin, {}, fxRandom(9)));
   });
 
-  it('never asks for more than its budget', () => {
+  it('never asks for more than its budget, and the budget cannot be raised', () => {
     expect(confetti.spawn(origin, { count: 5000 }, fxRandom(1))).toHaveLength(confetti.budget);
     expect(confetti.spawn(origin, { count: -3 }, fxRandom(1))).toHaveLength(0);
+    expect(() => {
+      (confetti as { budget: number }).budget = 1e6;
+    }).toThrow(TypeError);
+    expect(() => {
+      (sparkles as { budget: number }).budget = 1e6;
+    }).toThrow(TypeError);
+    expect(confetti.spawn(origin, { count: 5000 }, fxRandom(1))).toHaveLength(300);
   });
 
   it('starts from the middle of an element and throws in its tier colours', () => {
@@ -177,17 +184,42 @@ describe('confetti', () => {
 describe('sparkles', () => {
   const box = { x: 100, y: 100, width: 60, height: 60 };
 
+  /** How far outside the box a point is: its distance past the nearer edge. */
+  const outside = (p: { x: number; y: number }, b: typeof box) =>
+    Math.max(
+      Math.abs(p.x - (b.x + b.width / 2)) - b.width / 2,
+      Math.abs(p.y - (b.y + b.height / 2)) - b.height / 2,
+    );
+
   it('rings the element with twinkling stars that drift outward', () => {
     const ps = sparkles.spawn(box, {}, fxRandom(4));
     expect(ps).toHaveLength(18);
     for (const p of ps) {
       expect(p.shape).toBe('star');
       expect(p.twinkle).toBeGreaterThan(0);
-      const dx = p.x - 130;
-      const dy = p.y - 130;
-      // On the ring 12px outside the 60px box: radius 42.
-      expect(Math.hypot(dx, dy)).toBeCloseTo(42, 6);
-      expect(dx * p.vx + dy * p.vy).toBeGreaterThan(0);
+      expect((p.x - 130) * p.vx + (p.y - 130) * p.vy).toBeGreaterThan(0);
+    }
+  });
+
+  it('starts every star on the box grown by the inset, never on the content', () => {
+    const boxes = [
+      box,
+      { x: 0, y: 0, width: 200, height: 200 },
+      { x: 50, y: 300, width: 600, height: 80 },
+      { x: 10, y: 10, width: 4, height: 120 },
+    ];
+    for (const b of boxes) {
+      for (const inset of [0, 12, 30]) {
+        for (const p of sparkles.spawn(b, { inset, count: 60 }, fxRandom(inset + b.width))) {
+          expect(outside(p, b)).toBeCloseTo(inset, 6);
+        }
+      }
+    }
+  });
+
+  it('rings a bare point on a circle', () => {
+    for (const p of sparkles.spawn({ x: 50, y: 50 }, {}, fxRandom(6))) {
+      expect(Math.hypot(p.x - 50, p.y - 50)).toBeCloseTo(36, 6);
     }
   });
 
@@ -212,6 +244,9 @@ describe('colours', () => {
     expect(resolveFxColors([])).toBe(FX_DEFAULT_COLORS);
     expect(resolveFxColors(['#fff'])).toEqual(['#fff']);
     expect(() => resolveFxColors('tier:platinum' as never)).toThrow();
+    expect(() => {
+      (FX_DEFAULT_COLORS as string[]).push('#000000');
+    }).toThrow(TypeError);
   });
 });
 
@@ -221,6 +256,13 @@ describe('motion', () => {
     expect(fxMotion({ prefersReducedMotion: true, motionNone: false })).toBe('reduced');
     expect(fxMotion({ prefersReducedMotion: false, motionNone: true })).toBe('none');
     expect(fxMotion({ prefersReducedMotion: true, motionNone: true })).toBe('none');
+  });
+
+  it('gives a fresh answer each time, so editing one cannot loosen the rule', () => {
+    const answer = fxAllowance('reduced');
+    answer.flash = true;
+    answer.particles = true;
+    expect(fxAllowance('reduced')).toEqual({ particles: false, flash: false, shake: false, fallback: true });
   });
 
   it('moves only under full motion, and is fully still under none', () => {
@@ -249,6 +291,13 @@ describe('the flash cap', () => {
     const later = admitFlash(history, 1000);
     expect(later.allowed).toBe(true);
     expect(later.history).toEqual([100, 200, 1000]);
+  });
+
+  it('cannot be raised from outside', () => {
+    expect(() => {
+      (FX_FLASH as { perSecond: number }).perSecond = 10;
+    }).toThrow(TypeError);
+    expect(admitFlash([0, 100, 200], 300).allowed).toBe(false);
   });
 
   it('never lets a flash past the opacity cap', () => {

@@ -35,15 +35,18 @@ const SHAPES: readonly FxShape[] = ['rect', 'rect', 'rect', 'circle'];
 
 const DEG = Math.PI / 180;
 
+/** The most pieces one salvo may throw. */
+const BUDGET = 300;
+
 /** The confetti salvo. `play(confetti, …)` on the web; any renderer can draw its particles. */
-export const confetti: FxBurst<ConfettiOptions> = {
+export const confetti: FxBurst<ConfettiOptions> = Object.freeze<FxBurst<ConfettiOptions>>({
   name: 'confetti',
   kind: 'burst',
-  budget: 300,
+  budget: BUDGET,
   spawn(origin, options, random) {
     const o = { ...DEFAULTS, ...options };
     const colors = resolveFxColors(options.colors);
-    const count = Math.max(0, Math.min(Math.round(o.count), confetti.budget));
+    const count = Math.max(0, Math.min(Math.round(o.count), BUDGET));
     const from = centerOf(origin);
     const particles: FxParticle[] = [];
     for (let i = 0; i < count; i++) {
@@ -70,4 +73,4 @@ export const confetti: FxBurst<ConfettiOptions> = {
     }
     return particles;
   },
-};
+});
