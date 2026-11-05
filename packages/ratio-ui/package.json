@@ -130,6 +130,7 @@
     "@tailwindcss/postcss": "^4.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "axe-core": "^4.14.0",
     "eslint-plugin-storybook": "^10.6.2",
     "postcss": "^8.5.31",
     "react-hook-form": "^7.90.0",
