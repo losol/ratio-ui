@@ -19,14 +19,19 @@ const meta = {
 } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
+type ContrastState = 'default' | 'mention' | 'highlighted' | 'active' | 'users';
 
-function Matrix() {
+function Matrix({
+  modes = ['light', 'dark'],
+}: {
+  modes?: ('light' | 'dark')[];
+}) {
   return (
     <div data-contrast-fixture>
       <h1>Chat nickname contrast</h1>
       <p>Voice and self nicknames · normal text requires 4.5:1</p>
       <div className="grid grid-cols-2 gap-4">
-        {['light', 'dark'].map((mode) => (
+        {modes.map((mode) => (
           <section
             key={mode}
             className={`surface-${mode} bg-surface p-4 text-(--text)`}
@@ -116,7 +121,7 @@ const hex = (rgb: number[]) =>
     .map((v) => Math.round(v).toString(16).padStart(2, '0'))
     .join('');
 
-const play: Story['play'] = async ({ canvasElement }) => {
+const play: Story['play'] = async ({ canvasElement, parameters }) => {
   const pointer =
     '__vitest_browser__' in globalThis
       ? (await import('vitest/browser')).userEvent
@@ -158,8 +163,19 @@ const play: Story['play'] = async ({ canvasElement }) => {
   const targets = canvasElement.querySelectorAll(
     '[class*="text-(--chat-nick-voice)"]',
   );
-  await expect(targets).toHaveLength(28);
-  for (const element of targets) {
+  await expect(targets).toHaveLength(
+    canvasElement.querySelectorAll('section').length * 14,
+  );
+  const state = parameters.contrastState as ContrastState | undefined;
+  const selected = [...targets].filter(
+    (element) =>
+      !state ||
+      (state === 'users'
+        ? element.closest('li')
+        : element.closest(`[data-state="${state}"]`)),
+  );
+  if (state) await expect(selected).toHaveLength(state === 'users' ? 2 : 3);
+  for (const element of selected) {
     measure(element);
     await checkAxe(element);
     if (!pointer) continue;
@@ -209,9 +225,114 @@ const play: Story['play'] = async ({ canvasElement }) => {
   ).toHaveTextContent('@');
 };
 
-export const Tabula: Story = { render: () => <Matrix />, play };
+// Keep the paired visual previews used by the evidence screenshots. Automated
+// cases split by palette, mode, and state so the same real-hover/axe assertions
+// fit the existing 15-second timeout under full-suite concurrency.
+export const Tabula: Story = {
+  tags: ['!test'],
+  render: () => <Matrix />,
+  play,
+};
 export const Standard: Story = {
+  tags: ['!test'],
   parameters: { theme: 'light' },
   render: () => <Matrix />,
   play,
 };
+
+function contrastCase(
+  theme: 'tabula' | 'light',
+  mode: 'light' | 'dark',
+  state: ContrastState,
+): Story {
+  return {
+    parameters: { theme, contrastState: state },
+    render: () => <Matrix modes={[mode]} />,
+    play,
+  };
+}
+
+export const TabulaLightDefault: Story = contrastCase(
+  'tabula',
+  'light',
+  'default',
+);
+export const TabulaLightMention: Story = contrastCase(
+  'tabula',
+  'light',
+  'mention',
+);
+export const TabulaLightHighlighted: Story = contrastCase(
+  'tabula',
+  'light',
+  'highlighted',
+);
+export const TabulaLightActive: Story = contrastCase(
+  'tabula',
+  'light',
+  'active',
+);
+export const TabulaLightUsers: Story = contrastCase('tabula', 'light', 'users');
+export const TabulaDarkDefault: Story = contrastCase(
+  'tabula',
+  'dark',
+  'default',
+);
+export const TabulaDarkMention: Story = contrastCase(
+  'tabula',
+  'dark',
+  'mention',
+);
+export const TabulaDarkHighlighted: Story = contrastCase(
+  'tabula',
+  'dark',
+  'highlighted',
+);
+export const TabulaDarkActive: Story = contrastCase('tabula', 'dark', 'active');
+export const TabulaDarkUsers: Story = contrastCase('tabula', 'dark', 'users');
+export const StandardLightDefault: Story = contrastCase(
+  'light',
+  'light',
+  'default',
+);
+export const StandardLightMention: Story = contrastCase(
+  'light',
+  'light',
+  'mention',
+);
+export const StandardLightHighlighted: Story = contrastCase(
+  'light',
+  'light',
+  'highlighted',
+);
+export const StandardLightActive: Story = contrastCase(
+  'light',
+  'light',
+  'active',
+);
+export const StandardLightUsers: Story = contrastCase(
+  'light',
+  'light',
+  'users',
+);
+export const StandardDarkDefault: Story = contrastCase(
+  'light',
+  'dark',
+  'default',
+);
+export const StandardDarkMention: Story = contrastCase(
+  'light',
+  'dark',
+  'mention',
+);
+export const StandardDarkHighlighted: Story = contrastCase(
+  'light',
+  'dark',
+  'highlighted',
+);
+export const StandardDarkActive: Story = contrastCase(
+  'light',
+  'dark',
+  'active',
+);
+export const StandardDarkUsers: Story = contrastCase('light', 'dark', 'users');
