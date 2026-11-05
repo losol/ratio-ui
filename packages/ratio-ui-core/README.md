@@ -95,3 +95,16 @@ Until the generator lands, `ratio-ui/src/themes/bureau.css` is the web's
 source and `themes/bureau.test.ts` holds this package to it.
 
 See [docs/adr/0001-vanilla-tier.md](docs/adr/0001-vanilla-tier.md) for why.
+
+Ambient `snow` and `rain` implement `FxAmbient<AmbientOptions>`: `spawn(viewport,
+options, random)` creates a bounded field and `stepAmbient(effect, particles,
+viewport, random, dt)` advances and recycles it immutably. Snow has 120 live
+particles at most, rain 200; `intensity` (default 0.4) selects a share of that
+budget. `wind` is horizontal px/s and `colors` overrides the weather palette.
+Particles use infinite life and no twinkle; renderers stop the field explicitly.
+The `line` shape is a vertical streak of length `size` and width 1.2 CSS px,
+rotated by `rotation`. Native renderers can implement the same shape.
+
+`nationalDay`, `newYear` and `winter` are effect definitions with preset defaults,
+usable with the same model and renderer APIs. See the web
+[effects guide](../ratio-ui/docs/fx.md) and [ADR-0003](docs/adr/0003-fx.md).

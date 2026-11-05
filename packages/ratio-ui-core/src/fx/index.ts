@@ -8,6 +8,7 @@
 // Nothing here draws; `@eventuras/ratio-ui/fx` does on the web.
 
 export {
+  type FxAmbient,
   type FxBolt,
   type FxBurst,
   type FxEffect,
@@ -30,3 +31,5 @@ export { confetti, type ConfettiOptions } from './confetti';
 export { sparkles, type SparklesOptions } from './sparkles';
 export { fireworks, type FireworksOptions } from './fireworks';
 export { lightning, shakeOffset, type LightningOptions } from './lightning';
+export { snow, rain, stepAmbient, type AmbientOptions } from './ambient';
+export { nationalDay, newYear, winter } from './occasions';

@@ -5,6 +5,7 @@
 // The shape every effect is made of. Units are the viewport's CSS pixels and
 // seconds; y grows downward, as on a screen.
 
+import type { FxColors } from './colors';
 import type { FxRandom } from './random';
 
 /** A point in the viewport. */
@@ -25,7 +26,7 @@ export interface FxRect {
 export type FxOrigin = FxPoint | FxRect;
 
 /** What a renderer draws for a particle. */
-export type FxShape = 'rect' | 'circle' | 'star';
+export type FxShape = 'rect' | 'circle' | 'star' | 'line';
 
 /**
  * One particle. Each carries its own physics, so one `stepParticles` moves
@@ -50,7 +51,7 @@ export interface FxParticle {
    */
   flip: number;
   flipSpeed: number;
-  /** Width in px; a `rect` is drawn half as tall. */
+  /** Width in px; a `rect` is half as tall. A `line` is this long and 1.2 px wide. */
   size: number;
   color: string;
   shape: FxShape;
@@ -93,6 +94,8 @@ export type FxMotion = 'full' | 'reduced' | 'none';
 export interface FxBurst<Options> {
   readonly name: string;
   readonly kind: 'burst';
+  /** Optional palette supplied by an effect or occasion preset before theme colors. */
+  readonly colors?: FxColors;
   readonly budget: number;
   spawn(origin: FxOrigin, options: Partial<Options>, random: FxRandom): FxParticle[];
 }
@@ -133,6 +136,16 @@ export interface FxStrike<Options> {
   strike(origin: FxOrigin, options: Partial<Options>, random: FxRandom): FxStrikePlan;
 }
 
+/** A continuous field. Its budget limits live particles, including replacements. */
+export interface FxAmbient<Options> {
+  readonly name: string;
+  readonly kind: 'ambient';
+  readonly budget: number;
+  spawn(viewport: FxRect, options: Partial<Options>, random: FxRandom): FxParticle[];
+  /** Replace a particle that left the viewport. No DOM or clock access. */
+  recycle(particle: FxParticle, viewport: FxRect, random: FxRandom): FxParticle;
+}
+
 /** Any effect a renderer can play. */
-export type FxEffect<Options> = FxBurst<Options> | FxStrike<Options>;
+export type FxEffect<Options> = FxBurst<Options> | FxStrike<Options> | FxAmbient<Options>;
 
