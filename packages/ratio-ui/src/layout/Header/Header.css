@@ -1,0 +1,44 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Header — a heading block on the leading edge and its actions on the
+ * trailing edge, in one row that wraps. The leading block grows and keeps
+ * at least --header-lead-min before the actions drop under it, so a long
+ * title wraps on its own line on a phone instead of being squeezed beside
+ * a button.
+ */
+.ratio-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-xs) var(--space-m);
+}
+
+.ratio-header[data-align='center'] { align-items: center; }
+.ratio-header[data-align='end'] { align-items: flex-end; }
+.ratio-header[data-align='baseline'] { align-items: baseline; }
+
+.ratio-header > :not(.ratio-header__actions) {
+  flex: 1 1 var(--header-lead-min, 16rem);
+  min-width: 0;
+}
+
+/* The surrounding layout owns the space around the header: the leading
+   block's outer margins are trimmed — its own, when it is a bare `Heading`
+   on the prose scale, and its first and last child's, when it groups a
+   paragraph or a heading that carries them. */
+.ratio-header > :not(.ratio-header__actions) { margin-block: 0; }
+.ratio-header > :not(.ratio-header__actions) > :first-child { margin-top: 0; }
+.ratio-header > :not(.ratio-header__actions) > :last-child { margin-bottom: 0; }
+
+.ratio-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+}
