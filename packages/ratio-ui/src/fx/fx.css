@@ -1,0 +1,33 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * The canvas every effect draws on: over the page, never in the way.
+ * `--fx-z-index` lifts it above an app's own top layer if it needs to.
+ */
+.ratio-fx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: var(--fx-z-index, 9999);
+}
+
+/*
+ * The still acknowledgement under reduced motion: a ring round the element
+ * the effect was for, shown for a moment and taken away. Nothing moves.
+ */
+[data-fx-ack] {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+
+@media (forced-colors: active) {
+  [data-fx-ack] {
+    outline-color: Highlight;
+  }
+}
