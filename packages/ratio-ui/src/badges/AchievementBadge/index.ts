@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-export { AchievementBadge, AchievementBadgeArt } from './AchievementBadge';
+export { AchievementBadge } from './AchievementBadge';
 export type {
-  AchievementBadgeArtProps,
   AchievementBadgeLabels,
   AchievementBadgeLayout,
   AchievementBadgeProps,
-  BadgeArtColors,
 } from './AchievementBadge';
+export { AchievementBadgeArt } from './AchievementBadgeArt';
+export type { AchievementBadgeArtProps, BadgeArtColors } from './AchievementBadgeArt';

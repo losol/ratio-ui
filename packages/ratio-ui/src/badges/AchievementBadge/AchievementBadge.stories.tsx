@@ -5,7 +5,7 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within } from 'storybook/test';
+import { expect, waitFor, within } from 'storybook/test';
 import { BookOpen, Calculator, Compass } from 'lucide-react';
 import { AchievementBadge, AchievementBadgeArt } from './AchievementBadge';
 import {
@@ -332,5 +332,66 @@ export const ForAFile: Story = {
     const img = canvas.getByRole('img', { name: /SVG file/ });
     const { credential } = unbakeSvg(decodeURIComponent(img.getAttribute('src')!.split(',')[1]!));
     await expect(credential).toEqual(award);
+  },
+};
+
+/**
+ * Explicit opt-in: `celebrate` throws one burst when earned, including on
+ * mount. It uses the badge tier (theme colours for an untiered badge).
+ * Recreated display/credential objects and ordinary rerenders do not replay it.
+ * Set `celebrate={false}` to stop and rearm, or leave earned state and earn
+ * again. Remounts are new opt-ins: persist the app's award-event state when
+ * navigating, rather than celebrating every historical credential.
+ *
+ * The app announces the achievement in a live region; confetti is decoration.
+ * Reduced motion gets only the renderer's still ring; data-motion="none"
+ * suppresses even that. Playback stops on unmount or when disabled/unearned.
+ */
+export const Celebrate: Story = {
+  render: function Celebration(args) {
+    const [earned, setEarned] = React.useState(false);
+    const [renders, setRenders] = React.useState(0);
+    const [quiet, setQuiet] = React.useState(false);
+    return (
+      <div data-motion={quiet ? 'none' : undefined} className="flex flex-col items-start gap-4">
+        <AchievementBadge {...args} credential={earned ? award : undefined} state={earned ? 'earned' : 'locked'} display={{ ...args.display }} celebrate />
+        <p role="status">{earned ? 'You earned Times Tables Master.' : 'Ready to earn.'}</p>
+        <button onClick={() => setEarned(true)}>Earn badge</button>
+        <button onClick={() => setEarned(false)}>Reset badge</button>
+        <button onClick={() => setRenders(renders + 1)}>Rerender ({renders})</button>
+        <label><input type="checkbox" checked={quiet} onChange={event => setQuiet(event.target.checked)} /> Suppress motion for the next award</label>
+      </div>
+    );
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement);
+    const doc = canvasElement.ownerDocument;
+    await userEvent.click(canvas.getByRole('button', { name: 'Earn badge' }));
+    await expect(canvas.getByRole('status')).toHaveTextContent('You earned Times Tables Master.');
+    const reduced = doc.defaultView?.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduced) {
+      await waitFor(() => expect(doc.querySelector('[data-ratio-fx]')).not.toBeNull());
+      const overlay = doc.querySelector('[data-ratio-fx]')!;
+      await expect(overlay).toHaveAttribute('aria-hidden', 'true');
+      await expect(getComputedStyle(overlay).pointerEvents).toBe('none');
+    }
+    // Let the burst (or reduced-motion still ring) finish naturally, then
+    // prove a normal rerender does not launch another celebration.
+    await waitFor(() => {
+      expect(doc.querySelector('[data-ratio-fx]')).toBeNull();
+      expect(canvasElement.querySelector('[data-fx-ack]')).toBeNull();
+    }, { timeout: 5000 });
+    await userEvent.click(canvas.getByRole('button', { name: 'Rerender (0)' }));
+    await expect(doc.querySelector('[data-ratio-fx]')).toBeNull();
+    await expect(canvasElement.querySelector('[data-fx-ack]')).toBeNull();
+    await userEvent.click(canvas.getByRole('button', { name: 'Reset badge' }));
+    await waitFor(() => expect(doc.querySelector('[data-ratio-fx]')).toBeNull());
+    await expect(canvasElement.querySelector('[data-fx-ack]')).toBeNull();
+    await userEvent.click(canvas.getByRole('checkbox'));
+    await userEvent.click(canvas.getByRole('button', { name: 'Earn badge' }));
+    await expect(canvasElement.querySelector('[data-fx-ack]')).toBeNull();
+    await expect(doc.querySelector('[data-ratio-fx]')).toBeNull();
+    await userEvent.click(canvas.getByRole('button', { name: 'Rerender (1)' }));
+    await expect(doc.querySelector('[data-ratio-fx]')).toBeNull();
   },
 };
