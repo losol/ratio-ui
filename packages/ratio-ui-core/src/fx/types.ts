@@ -59,6 +59,24 @@ export interface FxParticle {
   life: number;
   /** Flicker in Hz; 0 for a steady particle that only fades at the end. */
   twinkle: number;
+  /**
+   * What the particle bursts into when its life is over: a firework's
+   * rocket carries its shell. `stepParticles` spawns it where the rocket is.
+   */
+  shell?: FxShell;
+}
+
+/** The sparks a rocket bursts into. */
+export interface FxShell {
+  /** How many sparks. */
+  count: number;
+  /** Their launch speed, px/s; each varies between 60 and 100 % of it. */
+  speed: number;
+  colors: readonly string[];
+  /** How long they live, s; each varies ±20 %. */
+  life: number;
+  /** The shell's own randomness, so the burst is the same every time. */
+  seed: number;
 }
 
 /**
@@ -69,7 +87,8 @@ export type FxMotion = 'full' | 'reduced' | 'none';
 
 /**
  * A burst: it spawns its particles once and ends when the last one dies.
- * `budget` is the most particles it may ever ask for, whatever the options.
+ * `budget` is the most particles it may ever ask for, whatever the options
+ * — the sparks its rockets burst into included.
  */
 export interface FxBurst<Options> {
   readonly name: string;
@@ -77,4 +96,43 @@ export interface FxBurst<Options> {
   readonly budget: number;
   spawn(origin: FxOrigin, options: Partial<Options>, random: FxRandom): FxParticle[];
 }
+
+/** One stroke of a lightning bolt: the main channel or a branch. */
+export interface FxBolt {
+  points: readonly FxPoint[];
+  /** Line width, px. */
+  width: number;
+  /** A branch is thinner and fades sooner than the main channel. */
+  branch: boolean;
+}
+
+/** Everything a strike does, laid out in time from its start. */
+export interface FxStrikePlan {
+  bolts: readonly FxBolt[];
+  /**
+   * When the page flashes, ms from the start. Each still goes through
+   * `admitFlash`; the renderer drops one the cap refuses.
+   */
+  flashes: readonly number[];
+  /** How long the bolt shows, ms. */
+  duration: number;
+  /** How far the target shakes at most, px; 0 for no shake. */
+  shake: number;
+  /** How long it shakes, ms. */
+  shakeDuration: number;
+  /** The randomness of the shake, for `shakeOffset`. */
+  seed: number;
+}
+
+/**
+ * A strike: a drawing laid out in time rather than particles — lightning.
+ */
+export interface FxStrike<Options> {
+  readonly name: string;
+  readonly kind: 'strike';
+  strike(origin: FxOrigin, options: Partial<Options>, random: FxRandom): FxStrikePlan;
+}
+
+/** Any effect a renderer can play. */
+export type FxEffect<Options> = FxBurst<Options> | FxStrike<Options>;
 

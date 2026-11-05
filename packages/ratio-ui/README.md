@@ -91,7 +91,7 @@ src/visuals/    Visual and progress components
 src/commerce/   Commerce-specific UI components
 src/console/    Console layout components
 src/toast/      Toast queue, renderer, and hook
-src/fx/         Visual effects (confetti, sparkles): play() and useFx()
+src/fx/         Visual effects (confetti, sparkles, fireworks, lightning): play() and useFx()
 ```
 
 Component examples live in `*.stories.tsx` files next to the component source.

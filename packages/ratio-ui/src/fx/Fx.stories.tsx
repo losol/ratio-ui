@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../core/Button';
 import { Card } from '../core/Card';
-import { confetti, sparkles, useFx, type FxMotion } from './index';
+import { confetti, fireworks, lightning, sparkles, useFx, type FxMotion } from './index';
 
 const meta: Meta = {
   title: 'Visuals/Fx (beta)',
@@ -77,6 +77,73 @@ export const Sparkles: Story = {
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'Level up' }));
     await expect(overlay()).not.toBeNull();
     await waitFor(() => expect(overlay()).toBeNull(), { timeout: 3000 });
+  },
+};
+
+/** Fireworks: rockets that rise one after another and burst into a sphere of sparks. */
+export const Fireworks: Story = {
+  render: function FireworksStory() {
+    const fx = useFx();
+    return (
+      <div className="pt-80">
+        <Button variant="primary" onPress={e => fx(fireworks, { origin: e.target, rockets: 4, height: 320 })}>
+          Happy New Year
+        </Button>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Happy New Year' }));
+    await expect(overlay()).not.toBeNull();
+    await waitFor(() => expect(overlay()).toBeNull(), { timeout: 7000 });
+  },
+};
+
+/**
+ * Lightning: a bolt from the top of the page to the card, a flash of the
+ * page and a shake of what was struck. The flash goes through the model's
+ * cap — at most three a second, never white-out — however often it is
+ * pressed.
+ */
+export const Lightning: Story = {
+  render: function LightningStory() {
+    const fx = useFx();
+    const card = useRef<HTMLDivElement>(null);
+    return (
+      <div className="flex flex-col items-center gap-6 pt-60">
+        <div ref={card} data-testid="target">
+          <Card padding="md">Streak: 0 days</Card>
+        </div>
+        <Button variant="secondary" onPress={() => fx(lightning, { origin: card.current, shake: 8 })}>
+          Streak broken
+        </Button>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Streak broken' }));
+    await expect(overlay()).not.toBeNull();
+    await expect(canvas.getByTestId('target').getAnimations()).toHaveLength(1);
+    await waitFor(() => expect(overlay()).toBeNull(), { timeout: 2000 });
+  },
+};
+
+/**
+ * `sound: true` adds thunder: a low rumble a moment after the bolt. Off by
+ * default, played only after the reader has interacted with the page, and
+ * only under full motion.
+ */
+export const Thunder: Story = {
+  render: function ThunderStory() {
+    const fx = useFx();
+    return (
+      <div className="pt-60">
+        <Button variant="secondary" onPress={e => fx(lightning, { origin: e.target, sound: true })}>
+          Reveal
+        </Button>
+      </div>
+    );
   },
 };
 
