@@ -5,6 +5,7 @@
 import React from 'react';
 import type { Status } from '../../tokens/colors';
 import { cn } from '../../utils/cn';
+import './Timeline.css';
 
 const dotStatusClasses: Record<Status, string> = {
   neutral: 'bg-border-2',
@@ -24,10 +25,27 @@ const ringStatusClasses: Record<Status, string> = {
 
 export type TimelineMarker = 'dot' | 'ring';
 
-export type TimelineItemLayout = 'stacked' | 'inline';
+export type TimelineItemLayout = 'stacked' | 'inline' | 'activity';
 
 export interface TimelineProps {
   children: React.ReactNode;
+  /**
+   * Put every item's timestamp in a column to the left of the rail, aligned
+   * on its trailing edge, so a feed reads "10:22 · Ingrid Hansen registered".
+   * Pass short timestamps ("10:22"); the column is `--timeline-gutter` wide
+   * (3.5rem) and can be widened by setting that property on the root, e.g.
+   * `className="[--timeline-gutter:6rem]"` or `style`.
+   * @default false
+   */
+  gutter?: boolean;
+  className?: string;
+  testId?: string;
+}
+
+export interface TimelineGroupProps {
+  children: React.ReactNode;
+  /** The group's header: a day ("Today", "Yesterday", "12 Nov"), a phase, a version. */
+  label: React.ReactNode;
   className?: string;
   testId?: string;
 }
@@ -48,6 +66,10 @@ export interface TimelineItemProps {
    * - `'stacked'` (default) — timestamp · actor above the title. Audit-log voice.
    * - `'inline'` — title first, timestamp and actor trailing as muted meta.
    *   Release-notes voice; the wider gap replaces the `·`.
+   * - `'activity'` — the title is the sentence, in normal weight: who did
+   *   what to which target, with the actor in bold and the target a link
+   *   inside `title`. Timestamp trails, or sits in the gutter. Children are
+   *   the detail line. Activity-feed voice.
    */
   layout?: TimelineItemLayout;
   /**
@@ -63,10 +85,28 @@ export interface TimelineItemProps {
   testId?: string;
 }
 
-const Root: React.FC<TimelineProps> = ({ children, className, testId }) => (
-  <ol className={cn('relative m-0 list-none p-0', className)} data-testid={testId}>
+const Root: React.FC<TimelineProps> = ({ children, gutter = false, className, testId }) => (
+  <ol
+    className={cn('relative m-0 list-none p-0', gutter && 'ratio-timeline--gutter', className)}
+    data-gutter={gutter || undefined}
+    data-testid={testId}
+  >
     {children}
   </ol>
+);
+
+/**
+ * A run of items under one header — the day in an activity feed ("Today",
+ * "Yesterday"), a phase, a release. Each group draws its own rail; the gap
+ * between groups is the header's.
+ */
+const Group: React.FC<TimelineGroupProps> = ({ children, label, className, testId }) => (
+  <li className={cn('mt-6 list-none first:mt-0', className)} data-testid={testId}>
+    <div className="mb-3 ml-0.5 pl-6 text-xs font-medium uppercase tracking-wider text-(--text-muted)">
+      {label}
+    </div>
+    <ol className="relative m-0 list-none p-0">{children}</ol>
+  </li>
 );
 
 const Item: React.FC<TimelineItemProps> = ({
@@ -81,8 +121,9 @@ const Item: React.FC<TimelineItemProps> = ({
   icon,
   testId,
 }) => {
-  const isInline = layout === 'inline';
+  const isInline = layout === 'inline' || layout === 'activity';
   const hasMeta = timestamp != null || actor != null;
+  const titleClass = layout === 'activity' ? 'text-sm text-(--text)' : 'text-sm font-medium text-(--text)';
 
   return (
     <li
@@ -107,19 +148,26 @@ const Item: React.FC<TimelineItemProps> = ({
       {isInline ? (
         <div className="flex flex-wrap items-baseline gap-x-3">
           {/* Block wrapper, like the stacked layout — titles may be headings. */}
-          <div className="text-sm font-medium text-(--text)">{title}</div>
-          {timestamp != null && <time className="text-xs text-(--text-muted)">{timestamp}</time>}
+          <div className={titleClass}>{title}</div>
+          {timestamp != null && (
+            <time className="ratio-timeline__time text-xs text-(--text-muted)">{timestamp}</time>
+          )}
           {actor != null && <span className="text-xs text-(--text-muted)">{actor}</span>}
         </div>
       ) : (
         <>
           {hasMeta && (
             <div className="flex flex-wrap items-baseline gap-x-2 text-xs text-(--text-muted)">
-              {timestamp != null && <time>{timestamp}</time>}
-              {actor != null && <span>{timestamp != null ? '· ' : null}{actor}</span>}
+              {timestamp != null && <time className="ratio-timeline__time">{timestamp}</time>}
+              {actor != null && (
+                <span>
+                  {timestamp != null && <span className="ratio-timeline__sep">· </span>}
+                  {actor}
+                </span>
+              )}
             </div>
           )}
-          <div className={cn('text-sm font-medium text-(--text)', hasMeta && 'mt-0.5')}>
+          <div className={cn(titleClass, hasMeta && 'mt-0.5')}>
             {title}
           </div>
         </>
@@ -145,6 +193,21 @@ const Item: React.FC<TimelineItemProps> = ({
  * </Timeline>
  *
  * @example
+ * // Activity feed — days as groups, the time in a gutter, the line a sentence.
+ * <Timeline gutter>
+ *   <Timeline.Group label="Today">
+ *     <Timeline.Item
+ *       layout="activity"
+ *       timestamp="10:22"
+ *       status="success"
+ *       title={<><strong>Ingrid Hansen</strong> registered for <Link href="/e/12">Autumn seminar</Link></>}
+ *     >
+ *       Seat 24 of 60
+ *     </Timeline.Item>
+ *   </Timeline.Group>
+ * </Timeline>
+ *
+ * @example
  * // Release-notes voice — version leads, hollow marker, cards as children.
  * <Timeline>
  *   <Timeline.Item
@@ -160,4 +223,5 @@ const Item: React.FC<TimelineItemProps> = ({
  */
 export const Timeline = Object.assign(Root, {
   Item,
+  Group,
 });
