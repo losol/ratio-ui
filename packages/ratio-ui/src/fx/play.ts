@@ -76,9 +76,31 @@ let last = 0;
 function resize() {
   if (!canvas || !ctx) return;
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.round(window.innerWidth * dpr);
-  canvas.height = Math.round(window.innerHeight * dpr);
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  // CSS size and bitmap from one measure, so a particle lands where the
+  // element it started from is.
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+const canPopover = (el: HTMLElement) => typeof el.showPopover === 'function';
+
+/**
+ * Puts the canvas on top of the top layer: shown as a popover after any
+ * modal dialog opened since, so it is never under the UI it celebrates.
+ */
+function raise() {
+  if (!canvas || !canPopover(canvas)) return;
+  try {
+    if (canvas.matches(':popover-open')) canvas.hidePopover();
+    canvas.showPopover();
+  } catch {
+    // Not connected, or the browser refused: the z-index still stands.
+  }
 }
 
 /** The overlay, made on first use. Null where a canvas cannot draw. */
@@ -90,6 +112,7 @@ function overlay(): CanvasRenderingContext2D | null {
   el.className = 'ratio-fx-canvas';
   el.setAttribute('aria-hidden', 'true');
   el.dataset.ratioFx = '';
+  if (canPopover(el)) el.popover = 'manual';
   document.body.appendChild(el);
   canvas = el;
   ctx = context;
@@ -163,6 +186,7 @@ function tick(now: number) {
 
 function start(run: Run): boolean {
   if (!overlay()) return false;
+  raise();
   runs.add(run);
   if (!frame) {
     last = performance.now();
@@ -184,6 +208,34 @@ function originOf(origin: PlayOptions['origin']): { element: Element | null; at:
 function themeColors(scope: Element): string[] {
   const style = getComputedStyle(scope);
   return THEME_COLORS.map(name => style.getPropertyValue(name).trim()).filter(Boolean);
+}
+
+/** Rings showing per element, so overlapping acknowledgements end in turn. */
+const rings = new WeakMap<Element, number>();
+
+/** Shows the ring round `element` for `ACK_MS`; ends early on `stop()`, once. */
+function acknowledge(element: Element, motion: FxMotion): FxPlayback {
+  rings.set(element, (rings.get(element) ?? 0) + 1);
+  element.setAttribute('data-fx-ack', '');
+  let ended = false;
+  let resolve = () => {};
+  const finished = new Promise<void>(r => {
+    resolve = r;
+  });
+  const end = () => {
+    if (ended) return;
+    ended = true;
+    window.clearTimeout(timer);
+    const left = (rings.get(element) ?? 1) - 1;
+    if (left > 0) rings.set(element, left);
+    else {
+      rings.delete(element);
+      element.removeAttribute('data-fx-ack');
+    }
+    resolve();
+  };
+  const timer = window.setTimeout(end, ACK_MS);
+  return { motion, finished, stop: end };
 }
 
 const settled = (motion: FxMotion): FxPlayback => ({
@@ -219,19 +271,7 @@ export function play<Options>(
 
   if (!allowed.particles) {
     if (!allowed.fallback || !element) return settled(motion);
-    element.setAttribute('data-fx-ack', '');
-    let timer = 0;
-    let resolve = () => {};
-    const finished = new Promise<void>(r => {
-      resolve = r;
-    });
-    const end = () => {
-      window.clearTimeout(timer);
-      element.removeAttribute('data-fx-ack');
-      resolve();
-    };
-    timer = window.setTimeout(end, ACK_MS);
-    return { motion, finished, stop: end };
+    return acknowledge(element, motion);
   }
 
   const palette = colors ?? themeColors(scope);

@@ -5,16 +5,27 @@
  */
 
 /*
- * The canvas every effect draws on: over the page, never in the way.
- * `--fx-z-index` lifts it above an app's own top layer if it needs to.
+ * The canvas every effect draws on: over the page, never in the way. Its
+ * size is set in pixels from the same measure as its bitmap (100vh is the
+ * large viewport on a phone, taller than what shows). Where the browser
+ * has popovers it is one, in the top layer above a modal dialog; elsewhere
+ * `--fx-z-index` lifts it. The popover's own box (border, padding, Canvas
+ * background, centring margin) is taken away.
  */
 .ratio-fx-canvas {
   position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0 auto auto 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
   pointer-events: none;
   z-index: var(--fx-z-index, 9999);
+}
+
+.ratio-fx-canvas::backdrop {
+  display: none;
 }
 
 /*
