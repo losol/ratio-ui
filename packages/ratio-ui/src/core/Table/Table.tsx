@@ -49,7 +49,7 @@ export const Table: React.FC<TableProps> & {
   Caption: React.FC<TableCaptionProps>;
 } = ({ children, className = '', ...rest }) => {
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <table className={`min-w-full border-collapse ${className}`} {...rest}>
         {children}
       </table>

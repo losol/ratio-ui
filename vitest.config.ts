@@ -20,6 +20,25 @@ export default defineConfig({
       './packages/markdown-core',
       './packages/ratio-ui-core',
 
+      // Layout regressions need actual mobile viewports, independent of the
+      // Storybook manager/preview iframe size.
+      {
+        test: {
+          name: 'table-layout',
+          include: ['tests/browser/Table.test.tsx'],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [360, 390].map((width) => ({
+              browser: 'chromium' as const,
+              name: `table-${width}`,
+              viewport: { width, height: 800 },
+            })),
+          },
+        },
+      },
+
       // Browser-backed Storybook tests, see note above.
       {
         plugins: [
