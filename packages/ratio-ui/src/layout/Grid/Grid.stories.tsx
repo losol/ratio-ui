@@ -1,4 +1,5 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
 import { Grid } from './Grid';
 
 const meta: Meta<typeof Grid> = {
@@ -61,6 +62,38 @@ export const ResponsiveGrid: GridStory = () => (
     <DemoCard>Item 8</DemoCard>
   </Grid>
 );
+
+/**
+ * `base` sets the columns from the narrowest screen — two tiles side by side
+ * on a phone, four on a desktop — and `gap` takes the spacing scale.
+ */
+export const FromBase: GridStory = () => (
+  <Grid cols={{ base: 2, lg: 4 }} gap="sm">
+    <DemoCard>Item 1</DemoCard>
+    <DemoCard>Item 2</DemoCard>
+    <DemoCard>Item 3</DemoCard>
+    <DemoCard>Item 4</DemoCard>
+  </Grid>
+);
+FromBase.play = async ({ canvasElement }) => {
+  const grid = canvasElement.querySelector('.grid');
+  await expect(grid).toHaveClass('grid-cols-2', 'lg:grid-cols-4', 'gap-sm');
+};
+
+/** A count beyond the bundled 1–6 still renders its class, for an app whose own Tailwind build supplies it. */
+export const BeyondBundledRange: GridStory = () => {
+  const cols = { base: 2, lg: 8 };
+  return (
+    <Grid cols={cols}>
+      {Array.from({ length: 8 }, (_, i) => (
+        <DemoCard key={i}>{i + 1}</DemoCard>
+      ))}
+    </Grid>
+  );
+};
+BeyondBundledRange.play = async ({ canvasElement }) => {
+  await expect(canvasElement.querySelector('.grid')).toHaveClass('grid-cols-2', 'lg:grid-cols-8');
+};
 
 export const WithContainer: GridStory = () => (
   <Grid cols={{ md: 3 }} container>

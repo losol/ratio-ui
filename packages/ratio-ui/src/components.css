@@ -32,12 +32,15 @@
  *   - spacing: p/m families and gap on steps 0–16 and 20/24/28/32/40
  *   - stacking: z-0 … z-50 in tens
  *   - responsive display: sm/md/lg × block/hidden/inline/flex/inline-flex
+ *   - grid columns: grid-cols-1 … 6, bare and under sm/md/lg
  * Anything beyond needs the consumer's own Tailwind build — see
  * docs/css-exports.md.
  */
 @source inline("{p,px,py,pt,pb,pl,pr,m,mx,my,mt,mb,ml,mr,gap}-{{0..16},20,24,28,32,40}");
 @source inline("z-{0,10,20,30,40,50}");
 @source inline("{sm,md,lg}:{block,hidden,inline,flex,inline-flex}");
+/* Equal-column grids, as `layout/Grid` sets them and as an app writes them. */
+@source inline("{,sm:,md:,lg:}grid-cols-{1..6}");
 /* Hero/section viewport heights. */
 @source inline("min-h-[20vh] min-h-[30vh] min-h-[33vh] min-h-[40vh] min-h-[50vh] min-h-[60vh] min-h-[66vh] min-h-[70vh] min-h-[80vh]");
 /* Dialog size variants — safelisted because the class name is looked up
