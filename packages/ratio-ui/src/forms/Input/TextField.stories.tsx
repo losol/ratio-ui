@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Checkbox } from './Checkbox';
 import { Label } from '../common/Label';
 import { TextField } from './TextField';
@@ -115,5 +115,72 @@ export const ClassNameAndUnstyled: Story = {
     await expect(box).toHaveClass('w-6', 'h-6', 'accent-(--primary)');
     await expect(box).not.toHaveClass('w-5');
     await expect(canvas.getByText('Merged checkbox')).toHaveClass('italic', 'font-bold');
+  },
+};
+
+/** Hints and errors describe the control without becoming part of its name. */
+export const AccessibleDescriptions: Story = {
+  render: () => {
+    const [hint, setHint] = useState(true);
+    const [error, setError] = useState(true);
+    return (
+      <div>
+        <p id="caller-help">Caller guidance.</p>
+        <p id="caller-extra">Extra guidance.</p>
+        <button onClick={() => setHint(!hint)}>Toggle hint</button>
+        <button onClick={() => setError(!error)}>Toggle error</button>
+        {[false, true].map((multiline) => {
+          const id = multiline ? 'custom-bio' : 'custom-email';
+          const name = multiline ? 'bio' : 'email';
+          return (
+            <TextField
+              key={id}
+              id={id}
+              name={name}
+              label={multiline ? 'Biography' : 'Email'}
+              multiline={multiline}
+              noWrapper={multiline}
+              description={hint ? 'Field guidance.' : undefined}
+              errors={error ? { [name]: { message: 'Please correct this field.' } } : { [name]: {} }}
+              aria-describedby=" caller-help  caller-extra caller-help "
+            />
+          );
+        })}
+        <TextField name="fallback" label="Fallback" description="Name-derived hint." />
+        <TextField name="dedup" label="Deduplicated" description="One hint." errors={{ dedup: { message: 'One error.' } }} aria-describedby="dedup-description dedup-error dedup-description" />
+        <TextField name="empty" id={undefined} label="Empty" errors={{ empty: {} }} />
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const fields = ['Email', 'Biography'].map((name) => canvas.getByRole('textbox', { name }));
+    const check = async (hint: boolean, error: boolean) => {
+      for (const field of fields) {
+        const ids = ['caller-help', 'caller-extra', ...(hint ? [`${field.id}-description`] : []), ...(error ? [`${field.id}-error`] : [])];
+        await expect(field).toHaveAttribute('aria-describedby', ids.join(' '));
+        await expect(field).toHaveAccessibleDescription(`Caller guidance. Extra guidance.${hint ? ' Field guidance.' : ''}${error ? ' Please correct this field.' : ''}`);
+        for (const id of ids) {
+          await expect(canvasElement.querySelectorAll(`[id="${id}"]`)).toHaveLength(1);
+        }
+        await expect(field).toHaveAccessibleName(field.tagName === 'TEXTAREA' ? 'Biography' : 'Email');
+      }
+    };
+    await check(true, true);
+    await userEvent.click(canvas.getByRole('button', { name: 'Toggle hint' }));
+    await check(false, true);
+    await userEvent.click(canvas.getByRole('button', { name: 'Toggle error' }));
+    await check(false, false);
+    await expect(canvas.queryAllByRole('alert')).toHaveLength(1); // Only the separate dedup field.
+    await userEvent.click(canvas.getByRole('button', { name: 'Toggle hint' }));
+    await check(true, false);
+    await userEvent.click(canvas.getByRole('button', { name: 'Toggle error' }));
+    await check(true, true);
+    await expect(canvas.getByRole('textbox', { name: 'Fallback' })).toHaveAttribute('aria-describedby', 'fallback-description');
+    await expect(canvas.getByRole('textbox', { name: 'Deduplicated' })).toHaveAttribute('aria-describedby', 'dedup-description dedup-error');
+    const empty = canvas.getByRole('textbox', { name: 'Empty' });
+    await expect(empty).toHaveAttribute('id', 'empty');
+    await expect(empty).not.toHaveAttribute('aria-describedby');
+    await expect(canvasElement.querySelectorAll('label[role="alert"]')).toHaveLength(0);
   },
 };

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
+import { expect, within } from 'storybook/test';
 
 import { NumberField } from './NumberField';
 
@@ -132,4 +133,21 @@ const ControlledExample = () => {
 
 export const Controlled: Story = {
   render: () => <ControlledExample />,
+};
+
+/** React Aria slots already merge the hint/error with caller descriptions. */
+export const AccessibleDescriptions: Story = {
+  render: () => (
+    <div>
+      <p id="quantity-help">Caller quantity guidance.</p>
+      <NumberField label="Quantity" description="Choose a quantity." errorMessage="Quantity is invalid." isInvalid aria-describedby="quantity-help" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('textbox', { name: 'Quantity' });
+    await expect(input).toHaveAccessibleDescription('Choose a quantity. Quantity is invalid. Caller quantity guidance.');
+    const ids = input.getAttribute('aria-describedby')!.split(/\s+/);
+    await expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) await expect(document.getElementById(id)).not.toBeNull();
+  },
 };

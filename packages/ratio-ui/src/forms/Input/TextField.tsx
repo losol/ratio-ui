@@ -11,6 +11,7 @@ import { formStyles } from '../styles/formStyles';
 import { Label } from '../common/Label';
 import { InputError } from '../common/InputError';
 import { InputDescription } from '../common/InputDescription';
+import { mergeDescribedBy } from '../common/mergeDescribedBy';
 import { CopyButton } from '../../core/CopyButton';
 import { cn } from '../../utils/cn';
 
@@ -78,6 +79,8 @@ type CommonProps = InputHTMLAttributes<HTMLInputElement> &
  */
 export function TextField({
   name,
+  id: providedId,
+  'aria-describedby': ariaDescribedBy,
   type = 'text',
   placeholder,
   label,
@@ -113,7 +116,9 @@ export function TextField({
     className,
   );
 
-  const id = rest.id ?? name;
+  const id = providedId ?? name;
+  const descriptionId = description ? `${id}-description` : undefined;
+  const errorId = errors?.[name]?.message ? `${id}-error` : undefined;
 
   const assignRef = (
     element: HTMLInputElement | HTMLTextAreaElement | null
@@ -132,6 +137,7 @@ export function TextField({
     className: inputClassName,
     placeholder,
     disabled,
+    'aria-describedby': mergeDescribedBy(ariaDescribedBy, descriptionId, errorId),
     'aria-invalid': hasError ? true : undefined,
     'data-testid': testId,
     name,
@@ -176,9 +182,9 @@ export function TextField({
   const content = (
     <>
       {label && <Label htmlFor={id}>{label}</Label>}
-      {description && <InputDescription>{description}</InputDescription>}
+      {description && <InputDescription id={descriptionId}>{description}</InputDescription>}
       {fieldControl}
-      {hasError && <InputError errors={errors} name={name} />}
+      {hasError && <InputError id={errorId} errors={errors} name={name} />}
     </>
   );
 

@@ -126,3 +126,50 @@ export const Localized: Story = {
     await expect(await canvas.findByText('Nummeret må ha 8 sifre')).toBeInTheDocument();
   },
 };
+
+/** The national number keeps its label while hints and both error sources describe it. */
+export const AccessibleDescriptions: Story = {
+  render: () => {
+    const [externalError, setExternalError] = useState(true);
+    const [hint, setHint] = useState(true);
+    return (
+      <div>
+        <p id="phone-caller-help">Caller phone guidance.</p>
+        <button onClick={() => setExternalError(!externalError)}>Toggle server error</button>
+        <button onClick={() => setHint(!hint)}>Toggle phone hint</button>
+        <PhoneInput
+          id="custom-phone"
+          name="contactPhone"
+          label="Contact phone"
+          description={hint ? 'National number only.' : undefined}
+          errors={externalError ? { contactPhone: { message: 'Server rejected number.' } } : { contactPhone: {} }}
+          aria-describedby="phone-caller-help phone-caller-help"
+        />
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const number = canvas.getByRole('textbox', { name: 'Contact phone' });
+    await expect(number).toHaveAttribute('id', 'custom-phone');
+    await expect(number).toHaveAttribute('name', 'contactPhone');
+    await expect(number).toHaveAttribute('aria-describedby', 'phone-caller-help custom-phone-description custom-phone-error');
+    await expect(number).toHaveAccessibleDescription('Caller phone guidance. National number only. Server rejected number.');
+    await userEvent.click(canvas.getByRole('button', { name: 'Toggle server error' }));
+    await expect(number).toHaveAccessibleDescription('Caller phone guidance. National number only.');
+    await expect(number).not.toHaveAttribute('aria-invalid');
+    await userEvent.type(number, '123');
+    await userEvent.tab();
+    await expect(number).toHaveAccessibleDescription('Caller phone guidance. National number only. Norwegian phone numbers must be exactly 8 digits');
+    await expect(number).toHaveAttribute('aria-invalid', 'true');
+    await expect(number).toHaveAccessibleName('Contact phone');
+    await userEvent.type(number, '45678');
+    await userEvent.tab();
+    await expect(number).toHaveAccessibleDescription('Caller phone guidance. National number only.');
+    await userEvent.click(canvas.getByRole('button', { name: 'Toggle phone hint' }));
+    await expect(number).toHaveAttribute('aria-describedby', 'phone-caller-help');
+    await expect(canvas.queryByRole('alert')).not.toBeInTheDocument();
+    await expect(canvasElement.querySelector('#custom-phone-description')).toBeNull();
+    await expect(canvasElement.querySelector('#custom-phone-error')).toBeNull();
+  },
+};
