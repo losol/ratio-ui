@@ -75,6 +75,16 @@ theme generator.
   inside its picture the way the spec says. No signing: a `proof` is
   carried, never made or checked. See
   [docs/adr/0002-open-badges.md](docs/adr/0002-open-badges.md).
+- **Effects** in `@eventuras/ratio-ui-core/fx` (beta): the model behind
+  confetti and the like, with nothing that draws. Particles that carry
+  their own physics (`FxParticle`, `stepParticles`, `particleOpacity`),
+  seeded randomness so a burst is the same burst everywhere (`fxRandom`),
+  the effects themselves (`confetti`, `sparkles`), their colours
+  (`resolveFxColors`, `tierPalette` for a badge's metal), and the rules
+  every renderer obeys: `fxMotion`/`fxAllowance` for the reader's
+  `prefers-reduced-motion` and the page's `data-motion="none"`, and
+  `admitFlash`/`flashOpacity`, which hold any flash of the page to three a
+  second and under white-out. See [docs/adr/0003-fx.md](docs/adr/0003-fx.md).
 - **The schema**: `defineTheme`, `mix`, `Theme` and friends.
 - **Colour maths**: `parseColor`, `oklchToRgba`, `formatColor`. Out-of-gamut
   OKLCH is clipped, not gamut-mapped as CSS does — a step at the edge of

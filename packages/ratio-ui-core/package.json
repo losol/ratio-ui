@@ -6,7 +6,8 @@
     "design-tokens",
     "theme",
     "ratio-ui",
-    "open-badges"
+    "open-badges",
+    "confetti"
   ],
   "license": "MPL-2.0",
   "homepage": "https://github.com/losol/ratio-ui/tree/main/packages/ratio-ui-core#readme",
@@ -32,6 +33,10 @@
     "./badges": {
       "types": "./dist/badges/index.d.ts",
       "import": "./dist/badges/index.js"
+    },
+    "./fx": {
+      "types": "./dist/fx/index.d.ts",
+      "import": "./dist/fx/index.js"
     },
     "./themes/*": {
       "types": "./dist/themes/*.d.ts",
