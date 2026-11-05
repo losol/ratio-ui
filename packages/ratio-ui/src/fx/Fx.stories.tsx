@@ -144,6 +144,113 @@ export const Lightning: Story = {
 };
 
 /**
+ * Records every paint of the page flash, by its tint, and counts onsets: a
+ * paint with no paint in the frame before it.
+ */
+function recordFlashes() {
+  const proto = CanvasRenderingContext2D.prototype;
+  const original = proto.fillRect;
+  const paints: number[] = [];
+  proto.fillRect = function (this: CanvasRenderingContext2D, ...args: Parameters<typeof original>) {
+    if (String(this.fillStyle).startsWith('rgba(235, 242, 255')) paints.push(performance.now());
+    return original.apply(this, args);
+  };
+  return {
+    onsets: () => paints.filter((t, i) => i === 0 || t - paints[i - 1]! > 25),
+    restore: () => {
+      proto.fillRect = original;
+    },
+  };
+}
+
+const nextFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
+
+/**
+ * The flash cap holds even when strikes are stopped as soon as they start:
+ * six strikes closer together than a flash lasts, each stopped after two
+ * frames, light the page at most three times in a second.
+ */
+export const FlashCap: Story = {
+  render: function FlashCapStory() {
+    return (
+      <Button variant="secondary" onPress={() => {}}>
+        Target
+      </Button>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const target = within(canvasElement).getByRole('button', { name: 'Target' });
+    // A second clear of the last test's flashes.
+    await wait(1100);
+    const flashes = recordFlashes();
+    try {
+      for (let i = 0; i < 6; i++) {
+        const strike = playFx(lightning, { origin: target, restrike: false });
+        await nextFrame();
+        await nextFrame();
+        strike.stop();
+        // A dark frame between strikes, so each flash is its own onset;
+        // still sooner than a flash lasts.
+        await wait(25);
+      }
+      await wait(200);
+      const onsets = flashes.onsets();
+      const worst = Math.max(...onsets.map(t => onsets.filter(u => u >= t && u < t + 1000).length));
+      await expect(worst).toBeLessThanOrEqual(3);
+    } finally {
+      flashes.restore();
+    }
+  },
+};
+
+/**
+ * Thunder belongs to the strike: `stop()` before it starts silences it, and
+ * `finished` waits for the rumble to end, not only the bolt.
+ */
+export const ThunderLifecycle: Story = {
+  render: function ThunderLifecycleStory() {
+    return (
+      <Button variant="secondary" onPress={() => {}}>
+        Target
+      </Button>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const target = within(canvasElement).getByRole('button', { name: 'Target' });
+    const Original = window.AudioContext;
+    const contexts: AudioContext[] = [];
+    window.AudioContext = class extends Original {
+      constructor(...args: ConstructorParameters<typeof AudioContext>) {
+        super(...args);
+        contexts.push(this);
+      }
+    };
+    // As if the reader had pressed something: browsers allow sound after that.
+    const hadActivation = Object.getOwnPropertyDescriptor(navigator, 'userActivation');
+    Object.defineProperty(navigator, 'userActivation', {
+      configurable: true,
+      value: { hasBeenActive: true, isActive: true },
+    });
+    try {
+      const stopped = playFx(lightning, { origin: target, sound: true });
+      await expect(contexts).toHaveLength(1);
+      stopped.stop();
+      await stopped.finished;
+      await waitFor(() => expect(contexts[0]!.state).toBe('closed'), { timeout: 1000 });
+
+      const began = performance.now();
+      await playFx(lightning, { origin: target, sound: true }).finished;
+      // The bolt is gone after 450 ms; the rumble starts at 350 ms and lasts 2.6 s.
+      await expect(performance.now() - began).toBeGreaterThan(2500);
+    } finally {
+      window.AudioContext = Original;
+      if (hadActivation) Object.defineProperty(navigator, 'userActivation', hadActivation);
+      else delete (navigator as { userActivation?: unknown }).userActivation;
+    }
+  },
+};
+
+/**
  * `sound: true` adds thunder: a low rumble a moment after the bolt. Off by
  * default, played only after the reader has interacted with the page, and
  * only under full motion.

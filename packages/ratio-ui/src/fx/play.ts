@@ -150,6 +150,9 @@ function overlay(): CanvasRenderingContext2D | null {
 function teardown() {
   if (frame) cancelAnimationFrame(frame);
   frame = 0;
+  // The flash went with the canvas. A new canvas shows only flashes the cap
+  // admits from now on; the history of earlier ones stays.
+  flashUntil = 0;
   window.removeEventListener('resize', resize);
   canvas?.remove();
   canvas = null;
@@ -288,13 +291,48 @@ function shake(element: Element, plan: FxStrikePlan): Animation | null {
 const activated = () =>
   (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation?.hasBeenActive ?? false;
 
-/** A low rumble of filtered noise, after a delay. Fails quietly where there is no audio. */
-function thunder(delaySeconds: number) {
+/** Thunder that is playing: stop it, or wait for it to end. */
+interface Rumble {
+  stop(): void;
+  ended: Promise<void>;
+}
+
+/**
+ * A low rumble of filtered noise, after a delay. Null where there is no
+ * audio. `ended` settles when the sound is over, when it is stopped, or —
+ * if the browser keeps the audio suspended — when it would have been over.
+ */
+function thunder(delaySeconds: number): Rumble | null {
+  const Audio = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Audio) return null;
+  let audio: AudioContext;
   try {
-    const Audio = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Audio) return;
-    const audio = new Audio();
-    const length = 2.6;
+    audio = new Audio();
+  } catch {
+    return null;
+  }
+  const length = 2.6;
+  let source: AudioBufferSourceNode | null = null;
+  let done = false;
+  let resolve = () => {};
+  const ended = new Promise<void>(r => {
+    resolve = r;
+  });
+  const finish = () => {
+    if (done) return;
+    done = true;
+    window.clearTimeout(cap);
+    try {
+      source?.stop();
+    } catch {
+      // Already stopped.
+    }
+    void audio.close().catch(() => {});
+    resolve();
+  };
+  // A suspended context never plays or ends; end by the clock instead.
+  const cap = window.setTimeout(finish, (delaySeconds + length) * 1000 + 250);
+  try {
     const buffer = audio.createBuffer(1, Math.floor(audio.sampleRate * length), audio.sampleRate);
     const data = buffer.getChannelData(0);
     // Brown noise: white noise, integrated, so the energy is low.
@@ -303,7 +341,7 @@ function thunder(delaySeconds: number) {
       level = (level + 0.02 * (Math.random() * 2 - 1)) / 1.02;
       data[i] = level * 3.5;
     }
-    const source = audio.createBufferSource();
+    source = audio.createBufferSource();
     source.buffer = buffer;
     const filter = audio.createBiquadFilter();
     filter.type = 'lowpass';
@@ -315,11 +353,13 @@ function thunder(delaySeconds: number) {
     gain.gain.exponentialRampToValueAtTime(0.35, at + 0.6);
     gain.gain.exponentialRampToValueAtTime(0.0001, at + length);
     source.connect(filter).connect(gain).connect(audio.destination);
+    source.onended = finish;
     source.start(at);
-    source.onended = () => void audio.close();
   } catch {
     // No sound is never an error worth surfacing.
+    finish();
   }
+  return { stop: finish, ended };
 }
 
 function originOf(origin: PlayOptions['origin']): { element: Element | null; at: FxOrigin } {
@@ -405,10 +445,11 @@ export function play<Options>(
 
   const random = fxRandom(seed ?? Math.floor(Math.random() * 2 ** 32));
   let resolve = () => {};
-  const finished = new Promise<void>(r => {
+  const drawn = new Promise<void>(r => {
     resolve = r;
   });
   let shaking: Animation | null = null;
+  let rumble: Rumble | null = null;
   let run: Run;
 
   if (effect.kind === 'strike') {
@@ -416,10 +457,10 @@ export function play<Options>(
     run = { particles: [], strike: { plan, start: performance.now(), asked: 0 }, done: resolve };
     if (!start(run)) {
       resolve();
-      return { motion, finished, stop() {} };
+      return { motion, finished: drawn, stop() {} };
     }
     if (element && allowed.shake) shaking = shake(element, plan);
-    if (sound && activated()) thunder(0.35);
+    if (sound && activated()) rumble = thunder(0.35);
   } else {
     const palette = colors ?? themeColors(scope);
     const particles = effect.spawn(
@@ -430,15 +471,17 @@ export function play<Options>(
     run = { particles, done: resolve };
     if (particles.length === 0 || !start(run)) {
       resolve();
-      return { motion, finished, stop() {} };
+      return { motion, finished: drawn, stop() {} };
     }
   }
 
   return {
     motion,
-    finished,
+    // Over when the drawing is over and the thunder has ended.
+    finished: rumble ? Promise.all([drawn, rumble.ended]).then(() => {}) : drawn,
     stop() {
       shaking?.cancel();
+      rumble?.stop();
       if (!runs.delete(run)) return;
       resolve();
       if (runs.size === 0) teardown();
