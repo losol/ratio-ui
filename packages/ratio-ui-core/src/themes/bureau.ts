@@ -121,7 +121,7 @@ export const bureau = defineTheme({
     chatMentionBg: accent[100],
     chatNick: neutral700,
     chatNickOp: primary[700],
-    chatNickVoice: accent[700],
+    chatNickVoice: accent[800],
     chatAvatarBg: primary[700],
     chatAvatarFg: secondary100,
     chatAvatarAltBg: accent[200],

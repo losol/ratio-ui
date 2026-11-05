@@ -22,7 +22,7 @@
   --chat-mention-bg: var(--color-accent-100);
   --chat-nick: var(--color-neutral-700);
   --chat-nick-op: var(--color-primary-700);
-  --chat-nick-voice: var(--color-accent-700);
+  --chat-nick-voice: var(--color-accent-800);
   --chat-avatar-bg: var(--color-primary-700);
   --chat-avatar-fg: var(--color-secondary-100);
   --chat-avatar-alt-bg: var(--color-accent-200);
