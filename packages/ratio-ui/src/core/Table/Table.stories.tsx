@@ -1,4 +1,5 @@
 import { Meta, StoryFn } from '@storybook/react-vite';
+import { Card } from '../Card';
 import { Table } from './Table';
 
 const meta: Meta<typeof Table> = {
@@ -188,4 +189,25 @@ export const WithCustomStyling: TableStory = () => (
       </Table.Row>
     </Table.Body>
   </Table>
+);
+
+// Issue #276: hidden date labels in unpositioned cells must stay inside
+// the table's scroll container, even when a Card is positioned outside it.
+export const MobileAvailability: TableStory = () => (
+  <div style={{ maxWidth: 358, margin: 16 }}>
+    <Card>
+      <Table aria-label="Availability">
+        <Table.Header>
+          <Table.Row>
+            {Array.from({ length: 6 }, (_, i) => (
+              <Table.HeadCell key={i}>
+                <span className="sr-only">lørdag 31. oktober kl. 19:00</span>
+                <span aria-hidden="true">19:00</span>
+              </Table.HeadCell>
+            ))}
+          </Table.Row>
+        </Table.Header>
+      </Table>
+    </Card>
+  </div>
 );
