@@ -8,13 +8,18 @@
 // Nothing here draws; `@eventuras/ratio-ui/fx` does on the web.
 
 export {
+  type FxBolt,
   type FxBurst,
+  type FxEffect,
   type FxMotion,
   type FxOrigin,
   type FxParticle,
   type FxPoint,
   type FxRect,
   type FxShape,
+  type FxShell,
+  type FxStrike,
+  type FxStrikePlan,
 } from './types';
 export { fxRandom, type FxRandom } from './random';
 export { FX_MAX_STEP, centerOf, isRect, particleOpacity, stepParticles } from './step';
@@ -23,3 +28,5 @@ export { fxAllowance, fxMotion, type FxAllowance, type FxMotionInput } from './m
 export { FX_FLASH, admitFlash, flashOpacity, type FlashDecision } from './flash';
 export { confetti, type ConfettiOptions } from './confetti';
 export { sparkles, type SparklesOptions } from './sparkles';
+export { fireworks, type FireworksOptions } from './fireworks';
+export { lightning, shakeOffset, type LightningOptions } from './lightning';

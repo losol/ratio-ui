@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../core/Button';
 import { Card } from '../core/Card';
-import { confetti, play as playFx, sparkles, useFx, type FxMotion } from './index';
+import { confetti, fireworks, lightning, play as playFx, sparkles, useFx, type FxMotion } from './index';
 
 const meta: Meta = {
   title: 'Visuals/Fx (beta)',
@@ -91,6 +91,180 @@ export const Sparkles: Story = {
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'Level up' }));
     await expect(overlay()).not.toBeNull();
     await waitFor(() => expect(overlay()).toBeNull(), { timeout: 3000 });
+  },
+};
+
+/** Fireworks: rockets that rise one after another and burst into a sphere of sparks. */
+export const Fireworks: Story = {
+  render: function FireworksStory() {
+    const fx = useFx();
+    return (
+      <div className="pt-80">
+        <Button variant="primary" onPress={e => fx(fireworks, { origin: e.target, rockets: 4, height: 320 })}>
+          Happy New Year
+        </Button>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Happy New Year' }));
+    await expect(overlay()).not.toBeNull();
+    await waitFor(() => expect(overlay()).toBeNull(), { timeout: 7000 });
+  },
+};
+
+/**
+ * Lightning: a bolt from the top of the page to the card, a flash of the
+ * page and a shake of what was struck. The flash goes through the model's
+ * cap — at most three a second, never white-out — however often it is
+ * pressed.
+ */
+export const Lightning: Story = {
+  render: function LightningStory() {
+    const fx = useFx();
+    const card = useRef<HTMLDivElement>(null);
+    return (
+      <div className="flex flex-col items-center gap-6 pt-60">
+        <div ref={card} data-testid="target">
+          <Card padding="md">Streak: 0 days</Card>
+        </div>
+        <Button variant="secondary" onPress={() => fx(lightning, { origin: card.current, shake: 8 })}>
+          Streak broken
+        </Button>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Streak broken' }));
+    await expect(overlay()).not.toBeNull();
+    await expect(canvas.getByTestId('target').getAnimations()).toHaveLength(1);
+    await waitFor(() => expect(overlay()).toBeNull(), { timeout: 2000 });
+  },
+};
+
+/**
+ * Records every paint of the page flash, by its tint, and counts onsets: a
+ * paint with no paint in the frame before it.
+ */
+function recordFlashes() {
+  const proto = CanvasRenderingContext2D.prototype;
+  const original = proto.fillRect;
+  const paints: number[] = [];
+  proto.fillRect = function (this: CanvasRenderingContext2D, ...args: Parameters<typeof original>) {
+    if (String(this.fillStyle).startsWith('rgba(235, 242, 255')) paints.push(performance.now());
+    return original.apply(this, args);
+  };
+  return {
+    onsets: () => paints.filter((t, i) => i === 0 || t - paints[i - 1]! > 25),
+    restore: () => {
+      proto.fillRect = original;
+    },
+  };
+}
+
+const nextFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
+
+/**
+ * The flash cap holds even when strikes are stopped as soon as they start:
+ * six strikes closer together than a flash lasts, each stopped after two
+ * frames, light the page at most three times in a second.
+ */
+export const FlashCap: Story = {
+  render: function FlashCapStory() {
+    return (
+      <Button variant="secondary" onPress={() => {}}>
+        Target
+      </Button>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const target = within(canvasElement).getByRole('button', { name: 'Target' });
+    // A second clear of the last test's flashes.
+    await wait(1100);
+    const flashes = recordFlashes();
+    try {
+      for (let i = 0; i < 6; i++) {
+        const strike = playFx(lightning, { origin: target, restrike: false });
+        await nextFrame();
+        await nextFrame();
+        strike.stop();
+        // A dark frame between strikes, so each flash is its own onset;
+        // still sooner than a flash lasts.
+        await wait(25);
+      }
+      await wait(200);
+      const onsets = flashes.onsets();
+      const worst = Math.max(...onsets.map(t => onsets.filter(u => u >= t && u < t + 1000).length));
+      await expect(worst).toBeLessThanOrEqual(3);
+    } finally {
+      flashes.restore();
+    }
+  },
+};
+
+/**
+ * Thunder belongs to the strike: `stop()` before it starts silences it, and
+ * `finished` waits for the rumble to end, not only the bolt.
+ */
+export const ThunderLifecycle: Story = {
+  render: function ThunderLifecycleStory() {
+    return (
+      <Button variant="secondary" onPress={() => {}}>
+        Target
+      </Button>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const target = within(canvasElement).getByRole('button', { name: 'Target' });
+    const Original = window.AudioContext;
+    const contexts: AudioContext[] = [];
+    window.AudioContext = class extends Original {
+      constructor(...args: ConstructorParameters<typeof AudioContext>) {
+        super(...args);
+        contexts.push(this);
+      }
+    };
+    // As if the reader had pressed something: browsers allow sound after that.
+    const hadActivation = Object.getOwnPropertyDescriptor(navigator, 'userActivation');
+    Object.defineProperty(navigator, 'userActivation', {
+      configurable: true,
+      value: { hasBeenActive: true, isActive: true },
+    });
+    try {
+      const stopped = playFx(lightning, { origin: target, sound: true });
+      await expect(contexts).toHaveLength(1);
+      stopped.stop();
+      await stopped.finished;
+      await waitFor(() => expect(contexts[0]!.state).toBe('closed'), { timeout: 1000 });
+
+      const began = performance.now();
+      await playFx(lightning, { origin: target, sound: true }).finished;
+      // The bolt is gone after 450 ms; the rumble starts at 350 ms and lasts 2.6 s.
+      await expect(performance.now() - began).toBeGreaterThan(2500);
+    } finally {
+      window.AudioContext = Original;
+      if (hadActivation) Object.defineProperty(navigator, 'userActivation', hadActivation);
+      else delete (navigator as { userActivation?: unknown }).userActivation;
+    }
+  },
+};
+
+/**
+ * `sound: true` adds thunder: a low rumble a moment after the bolt. Off by
+ * default, played only after the reader has interacted with the page, and
+ * only under full motion.
+ */
+export const Thunder: Story = {
+  render: function ThunderStory() {
+    const fx = useFx();
+    return (
+      <div className="pt-60">
+        <Button variant="secondary" onPress={e => fx(lightning, { origin: e.target, sound: true })}>
+          Reveal
+        </Button>
+      </div>
+    );
   },
 };
 

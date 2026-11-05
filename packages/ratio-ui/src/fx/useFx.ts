@@ -5,7 +5,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import type { FxBurst } from '@eventuras/ratio-ui-core/fx';
+import type { FxEffect } from '@eventuras/ratio-ui-core/fx';
 import { play, type FxPlayback, type PlayOptions } from './play';
 
 /**
@@ -28,7 +28,7 @@ export function useFx() {
   }, []);
 
   return useCallback(
-    <Options,>(effect: FxBurst<Options>, options?: Partial<Options> & PlayOptions): FxPlayback => {
+    <Options,>(effect: FxEffect<Options>, options?: Partial<Options> & PlayOptions): FxPlayback => {
       const playback = play(effect, options);
       playing.current.add(playback);
       void playback.finished.then(() => playing.current.delete(playback));

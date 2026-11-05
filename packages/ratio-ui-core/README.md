@@ -79,7 +79,8 @@ theme generator.
   confetti and the like, with nothing that draws. Particles that carry
   their own physics (`FxParticle`, `stepParticles`, `particleOpacity`),
   seeded randomness so a burst is the same burst everywhere (`fxRandom`),
-  the effects themselves (`confetti`, `sparkles`), their colours
+  the effects themselves (`confetti`, `sparkles`, `fireworks`, and
+  `lightning` as a strike laid out in time, with `shakeOffset`), their colours
   (`resolveFxColors`, `tierPalette` for a badge's metal), and the rules
   every renderer obeys: `fxMotion`/`fxAllowance` for the reader's
   `prefers-reduced-motion` and the page's `data-motion="none"`, and
