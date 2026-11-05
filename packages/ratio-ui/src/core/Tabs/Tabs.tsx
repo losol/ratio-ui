@@ -28,11 +28,20 @@ export type TabItemProps = {
   testId?: string;
 };
 
+export type TabsSize = 'sm' | 'md';
+
 export type TabsProps = {
   children: React.ReactNode;
   defaultSelectedKey?: string;
   selectedKey?: string;
   onSelectionChange?: (key: string) => void;
+  /**
+   * `'md'` (default) is the page-level tab bar. `'sm'` is the compact bar for
+   * filtering what a panel shows — "All · Registrations · Orders" above an
+   * activity feed — smaller text, tighter padding, less room above the panel.
+   * @default 'md'
+   */
+  size?: TabsSize;
   className?: string;
 };
 
@@ -44,13 +53,17 @@ export interface TabsComponent extends React.FC<TabsProps> {
 // list's hairline rule via -mb-px; inactive tabs are muted text only, and the
 // panel has no frame — content sits directly on the surface.
 const styles = {
-  tabList: 'flex gap-1 list-none overflow-x-auto border-b border-border-1',
+  tabList: 'flex list-none overflow-x-auto border-b border-border-1',
   tab: {
-    base: 'flex items-center gap-2 font-semibold py-2.5 px-4 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring) transition-colors whitespace-nowrap -mb-px border-b-2',
+    base: 'flex items-center cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring) transition-colors whitespace-nowrap -mb-px border-b-2',
     selected: 'border-(--primary) text-(--text)',
     notSelected: 'border-transparent text-(--text-muted) hover:text-(--text)',
   },
-  panel: 'pt-4',
+};
+
+const sizeStyles: Record<TabsSize, { tabList: string; tab: string; panel: string }> = {
+  md: { tabList: 'gap-1', tab: 'gap-2 font-semibold py-2.5 px-4', panel: 'pt-4' },
+  sm: { tabList: 'gap-0.5', tab: 'gap-1.5 text-sm font-medium py-1.5 px-3', panel: 'pt-3' },
 };
 
 /**
@@ -97,9 +110,11 @@ export const TabsRoot: React.FC<TabsProps> = ({
   defaultSelectedKey,
   selectedKey,
   onSelectionChange,
+  size = 'md',
   className,
 }) => {
   const validChildren = collectItems(children);
+  const sized = sizeStyles[size];
 
   return (
     <AriaTabs
@@ -108,7 +123,7 @@ export const TabsRoot: React.FC<TabsProps> = ({
       selectedKey={selectedKey}
       onSelectionChange={(key) => onSelectionChange?.(String(key))}
     >
-      <TabList className={styles.tabList}>
+      <TabList className={cn(styles.tabList, sized.tabList)} data-size={size}>
         {validChildren.map((child, index) => {
           const id = itemKey(child, index);
           return (
@@ -121,6 +136,7 @@ export const TabsRoot: React.FC<TabsProps> = ({
               className={({ isSelected, isDisabled }) =>
                 cn(
                   styles.tab.base,
+                  sized.tab,
                   isSelected ? styles.tab.selected : styles.tab.notSelected,
                   isDisabled &&
                   'opacity-50 cursor-not-allowed hover:bg-transparent hover:text-(--text-muted)',
@@ -140,7 +156,7 @@ export const TabsRoot: React.FC<TabsProps> = ({
             key={id}
             id={id}
             className={cn(
-              styles.panel,
+              sized.panel,
               'outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring)',
             )}
           >
