@@ -18,6 +18,7 @@ import { formStyles, textStyles, componentStyles } from '../styles/formStyles';
 import { Label } from '../common/Label';
 import { InputDescription } from '../common/InputDescription';
 import { InputError } from '../common/InputError';
+import { mergeDescribedBy } from '../common/mergeDescribedBy';
 import type { FieldErrorMap } from './InputProps';
 import { COUNTRY_CODES } from './PhoneInputCountryCodes';
 
@@ -45,6 +46,10 @@ export interface PhoneInputChange {
 export interface PhoneInputProps {
   /** Form field name */
   name?: string;
+  /** ID of the phone number input. Defaults to `name`. */
+  id?: string;
+  /** Additional elements describing the phone number input. */
+  'aria-describedby'?: string;
   /** Visible label */
   label?: string;
   /** Help text */
@@ -154,6 +159,8 @@ CountryItem.displayName = 'CountryItem';
 
 export function PhoneInput({
   name = 'phone',
+  id = name,
+  'aria-describedby': ariaDescribedBy,
   label = 'Phone Number',
   description,
   defaultCode = '+47',
@@ -332,10 +339,14 @@ export function PhoneInput({
     });
   }, [filteredCountries]);
 
+  const errorMessage = localError || errors?.[name]?.message;
+  const descriptionId = description ? `${id}-description` : undefined;
+  const errorId = errorMessage ? `${id}-error` : undefined;
+
   return (
     <div className={formStyles.inputWrapper}>
-      {label && <Label>{label}</Label>}
-      {description && <InputDescription>{description}</InputDescription>}
+      {label && <Label htmlFor={id}>{label}</Label>}
+      {description && <InputDescription id={descriptionId}>{description}</InputDescription>}
 
       <div className={`${componentStyles.phoneInputContainer} flex items-stretch`}>
         {/* Country Selector */}
@@ -387,7 +398,10 @@ export function PhoneInput({
 
         {/* Phone Number Input */}
         <Input
+          id={id}
           name={name}
+          aria-describedby={mergeDescribedBy(ariaDescribedBy, descriptionId, errorId)}
+          aria-invalid={errorMessage ? true : undefined}
           type="tel"
           inputMode="numeric"
           pattern="[0-9]*"
@@ -403,8 +417,8 @@ export function PhoneInput({
       </div>
 
       {/* Error Display */}
-      {(localError || errors?.[name]?.message) && (
-        <InputError errors={{ [name]: { message: localError || errors?.[name]?.message || '' } }} name={name} />
+      {errorMessage && (
+        <InputError id={errorId} errors={{ [name]: { message: errorMessage } }} name={name} />
       )}
     </div>
   );

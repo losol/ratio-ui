@@ -5,7 +5,8 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
 
-type LabelProps = {
+type DescriptionProps = {
+  id?: string;
   children?: React.ReactNode;
   /** Extra classes, merged on top of the defaults. */
   className?: string;
@@ -21,17 +22,17 @@ const styles = {
  * Renders a description element with optional custom styling.
  *
  * Designed to be used in conjunction with input elements, it provides an accessible
- * and stylized way to label forms. If no children are provided, the component renders
- * `null` to avoid rendering an empty label element.
+ * description for forms. If no children are provided, the component renders
+ * `null` to avoid rendering an empty description element.
  *
- * @param {LabelProps} props - The properties passed to the label component.
- * @returns {React.ReactElement | null} The Label component or null if no children are provided.
+ * @param {DescriptionProps} props - The properties passed to the description component.
+ * @returns {React.ReactElement | null} The description component or null if no children are provided.
  */
-const InputDescription: React.FC<LabelProps> = ({ children, className, unstyled = false }) => {
+const InputDescription: React.FC<DescriptionProps> = ({ id, children, className, unstyled = false }) => {
   if (!children) return null;
 
   return (
-    <p className={cn(!unstyled && styles.description, className)}>
+    <p id={id} className={cn(!unstyled && styles.description, className)}>
       {children}
     </p>
   );

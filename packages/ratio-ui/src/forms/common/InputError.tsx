@@ -7,20 +7,21 @@ import React from 'react';
 import type { FieldErrorMap } from '../Input/InputProps';
 
 type ErrorProps = {
+  id?: string;
   errors?: FieldErrorMap;
   name: string;
   className?: string;
 };
 
-const InputError: React.FC<ErrorProps> = ({ errors, name, className = 'text-error-text' }) => {
+const InputError: React.FC<ErrorProps> = ({ id, errors, name, className = 'text-error-text' }) => {
   const errorMessage = errors?.[name]?.message;
 
   if (!errorMessage) return null;
 
   return (
-    <label htmlFor={name} role="alert" className={className}>
+    <p id={id} role="alert" className={className}>
       {errorMessage}
-    </label>
+    </p>
   );
 };
 

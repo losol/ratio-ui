@@ -214,3 +214,17 @@ export const CustomClassName: Story = {
     await expect(wrapper).not.toHaveClass('w-full');
   },
 };
+
+/** Caller descriptions reach the focusable trigger through React Aria. */
+export const AccessibleDescription: Story = {
+  args: { options: disciplines },
+  render: (args) => (
+    <div>
+      <p id="discipline-help">Choose your area of study.</p>
+      <Select {...args} label="Discipline" aria-describedby="discipline-help" testId="described-select" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(within(canvasElement).getByTestId('described-select')).toHaveAccessibleDescription('Choose your area of study.');
+  },
+};
