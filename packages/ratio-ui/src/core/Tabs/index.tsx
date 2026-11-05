@@ -17,7 +17,7 @@ TabsShell.displayName = 'Tabs';
 
 export const Tabs: TabsComponent = Object.assign(TabsShell, { Item: TabItem });
 
-export type { TabsProps, TabItemProps, TabsComponent } from './Tabs';
+export type { TabsProps, TabsSize, TabItemProps, TabsComponent } from './Tabs';
 
 /** Same component as `Tabs.Item`, for consumers who prefer a plain import. */
 export { TabItem } from './Tabs';
