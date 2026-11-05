@@ -1,5 +1,18 @@
 # @eventuras/ratio-ui-core
 
+## 0.5.0
+
+### Minor Changes
+
+- 42aefdd: Add bounded snow and rain ambient models, immutable recycling, and named winter, nationalDay and newYear occasion presets. Export the ambient contract and line particle shape; allow burst definitions to supply a default palette.
+- 2fd0eb2: New `@eventuras/ratio-ui-core/fx` (beta): the model behind visual effects, with nothing that draws. Particles that carry their own physics (`FxParticle`, `stepParticles`, `particleOpacity`), seeded randomness (`fxRandom`), the `confetti` and `sparkles` bursts, their colours (`resolveFxColors`, `tierPalette` for a badge tier's metal), and the rules every renderer obeys: `fxMotion`/`fxAllowance` for `prefers-reduced-motion` and `data-motion="none"`, and `admitFlash`/`flashOpacity`, which hold any flash of the page to three a second (WCAG 2.3.1) and under white-out. See docs/adr/0003-fx.md.
+- 134c22d: `@eventuras/ratio-ui-core/fx` gains `fireworks` and `lightning`. A particle with a negative `age` waits to start, and one that carries a `shell` (`FxShell`) bursts into its sparks when its life ends, so fireworks need nothing from a renderer that confetti does not. `lightning` is an `FxStrike`: a jagged main channel and branches (`FxBolt`), the flashes to ask `admitFlash` for, and an optional shake of the target, read with `shakeOffset`. `FxEffect` covers both kinds.
+
+### Patch Changes
+
+- c5675a0: Improve light-mode chat voice and self nickname contrast by using the existing accent-800 semantic alias. Keep the matching ratio-ui-core theme reference in sync. Preserve the dark-mode voice alias and global palette.
+- f2e40a8: Relax the Node engine requirement to >=22 (drop the <25 upper bound).
+
 ## 0.4.0
 
 ### Minor Changes

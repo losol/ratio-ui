@@ -1,5 +1,11 @@
 # @eventuras/ratio-ui-shiki
 
+## 0.2.1
+
+### Patch Changes
+
+- f2e40a8: Relax the Node engine requirement to >=22 (drop the <25 upper bound).
+
 ## 0.2.0
 
 ### Minor Changes

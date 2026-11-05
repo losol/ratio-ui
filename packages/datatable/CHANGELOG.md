@@ -1,5 +1,11 @@
 # @eventuras/datatable
 
+## 0.8.2
+
+### Patch Changes
+
+- f2e40a8: Relax the Node engine requirement to >=22 (drop the <25 upper bound).
+
 ## 0.8.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @eventuras/ratio-ui-next
 
+## 1.0.2
+
+### Patch Changes
+
+- f2e40a8: Relax the Node engine requirement to >=22 (drop the <25 upper bound).
+
 ## 1.0.1
 
 ### Patch Changes

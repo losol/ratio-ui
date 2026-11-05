@@ -1,5 +1,13 @@
 # @eventuras/markdown
 
+## 0.16.1
+
+### Patch Changes
+
+- f2e40a8: Relax the Node engine requirement to >=22 (drop the <25 upper bound).
+- Updated dependencies [f2e40a8]
+  - @eventuras/markdown-react@0.2.1
+
 ## 0.16.0
 
 ### Minor Changes
