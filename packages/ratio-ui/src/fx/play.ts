@@ -18,6 +18,7 @@ import {
   particleOpacity,
   shakeOffset,
   stepParticles,
+  stepAmbient,
   type FxBolt,
   type FxColors,
   type FxEffect,
@@ -32,6 +33,7 @@ export interface PlayOptions {
   /**
    * Where the effect starts: an element (its box on the page), or a point
    * or box in viewport pixels. Default: the middle of the viewport.
+   * Ambient fields cover the viewport; origin only selects motion scope and fallback.
    */
   origin?: Element | FxOrigin | null;
   /**
@@ -40,7 +42,7 @@ export interface PlayOptions {
    * where the effect starts.
    */
   colors?: FxColors;
-  /** Fixes the randomness, for a burst that is the same every time. */
+  /** Fixes the randomness, including ambient recycling for the same frame steps. */
   seed?: number;
   /**
    * Thunder after lightning. Off by default, and only ever after the reader
@@ -69,6 +71,8 @@ interface Strike {
 interface Run {
   particles: FxParticle[];
   strike?: Strike;
+  permitted?: () => boolean;
+  ambient?: (particles: FxParticle[], dt: number) => FxParticle[];
   done: () => void;
 }
 
@@ -154,9 +158,11 @@ function teardown() {
   // admits from now on; the history of earlier ones stays.
   flashUntil = 0;
   window.removeEventListener('resize', resize);
+  document.removeEventListener('visibilitychange', visibility);
   canvas?.remove();
   canvas = null;
   ctx = null;
+  hiddenAt = null;
 }
 
 function drawStar(c: CanvasRenderingContext2D, size: number) {
@@ -178,7 +184,9 @@ function draw(c: CanvasRenderingContext2D, p: FxParticle) {
   c.fillStyle = p.color;
   c.translate(p.x, p.y);
   c.rotate(p.rotation);
-  if (p.shape === 'star') {
+  if (p.shape === 'line') {
+    c.fillRect(-0.6, -p.size / 2, 1.2, p.size);
+  } else if (p.shape === 'star') {
     drawStar(c, p.size);
   } else {
     // The flutter: a strip turning over shows its edge.
@@ -244,9 +252,14 @@ function tick(now: number) {
   // Asked for first, so this frame's flash sits under this frame's bolts.
   const lit: Run[] = [];
   for (const run of runs) {
-    run.particles = stepParticles(run.particles, dt);
+    if (run.permitted && !run.permitted()) {
+      runs.delete(run);
+      run.done();
+      continue;
+    }
+    run.particles = run.ambient ? run.ambient(run.particles, dt) : stepParticles(run.particles, dt);
     const striking = run.strike ? drawStrike(c, run.strike, now) : false;
-    if (run.particles.length === 0 && !striking) {
+    if (run.particles.length === 0 && !striking && !run.ambient) {
       runs.delete(run);
       run.done();
       continue;
@@ -265,11 +278,32 @@ function tick(now: number) {
   else teardown();
 }
 
+/** Freeze the shared clock while hidden, including strike timelines. */
+let hiddenAt: number | null = null;
+function visibility() {
+  if (document.hidden) {
+    hiddenAt ??= performance.now();
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+  } else if (runs.size > 0 && !frame) {
+    const now = performance.now();
+    for (const run of runs) {
+      if (run.strike) run.strike.start += now - Math.max(hiddenAt ?? now, run.strike.start);
+    }
+    hiddenAt = null;
+    last = now;
+    frame = requestAnimationFrame(tick);
+  }
+}
+
 function start(run: Run): boolean {
   if (!overlay()) return false;
   raise();
   runs.add(run);
-  if (!frame) {
+  document.addEventListener('visibilitychange', visibility);
+  if (document.hidden) {
+    visibility();
+  } else if (!frame) {
     last = performance.now();
     frame = requestAnimationFrame(tick);
   }
@@ -461,8 +495,25 @@ export function play<Options>(
     }
     if (element && allowed.shake) shaking = shake(element, plan);
     if (sound && activated()) rumble = thunder(0.35);
+  } else if (effect.kind === 'ambient') {
+    const viewport = () => ({ x: 0, y: 0, width: window.innerWidth, height: window.innerHeight });
+    const particles = effect.spawn(viewport(), { ...rest, ...(colors ? { colors } : {}) } as Partial<Options>, random)
+      .slice(0, effect.budget);
+    run = {
+      particles, done: resolve,
+      permitted: () => fxMotion({
+        prefersReducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
+        motionNone: scope.closest('[data-motion="none"]') !== null,
+      }) === 'full',
+      ambient: (current, dt) => stepAmbient(effect, current, viewport(), random, dt),
+    };
+    if (particles.length === 0 || !start(run)) {
+      resolve();
+      return { motion, finished: drawn, stop() {} };
+    }
   } else {
-    const palette = colors ?? themeColors(scope);
+    // Presets own their palette unless the caller explicitly supplies colors.
+    const palette = colors ?? effect.colors ?? themeColors(scope);
     const particles = effect.spawn(
       at,
       { ...(rest as Partial<Options>), colors: palette.length > 0 ? palette : undefined },

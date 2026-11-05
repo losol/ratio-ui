@@ -10,6 +10,13 @@
 export { play, type FxPlayback, type PlayOptions } from './play';
 export { useFx } from './useFx';
 export {
+  snow,
+  rain,
+  nationalDay,
+  newYear,
+  winter,
+  type AmbientOptions,
+  type FxAmbient,
   confetti,
   sparkles,
   fireworks,

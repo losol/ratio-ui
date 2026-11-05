@@ -91,7 +91,7 @@ src/visuals/    Visual and progress components
 src/commerce/   Commerce-specific UI components
 src/console/    Console layout components
 src/toast/      Toast queue, renderer, and hook
-src/fx/         Visual effects (confetti, sparkles, fireworks, lightning): play() and useFx()
+src/fx/         Visual effects (bursts, lightning, ambient weather, occasion presets): play() and useFx()
 ```
 
 Component examples live in `*.stories.tsx` files next to the component source.
@@ -124,3 +124,9 @@ example.
 
 Licensed under the [Mozilla Public License 2.0](LICENSE)
 (`MPL-2.0`). Copyright (c) 2026 Losol AS.
+
+### Ambient effects and occasions (beta)
+
+Import from `@eventuras/ratio-ui/fx`; the pure model is also exported from
+`@eventuras/ratio-ui-core/fx`. See [the effects guide](docs/fx.md) for budgets,
+lifecycle, motion rules and occasion preset choices.

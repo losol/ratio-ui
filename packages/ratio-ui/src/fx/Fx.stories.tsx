@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../core/Button';
 import { Card } from '../core/Card';
-import { confetti, fireworks, lightning, play as playFx, sparkles, useFx, type FxMotion } from './index';
+import { snow, rain, winter, nationalDay, newYear, type FxPlayback, confetti, fireworks, lightning, play as playFx, sparkles, useFx, type FxMotion } from './index';
 
 const meta: Meta = {
   title: 'Visuals/Fx (beta)',
@@ -366,5 +366,139 @@ export const StillPage: Story = {
     await expect(canvas.getByTestId('motion')).toHaveTextContent('motion: none');
     await expect(overlay()).toBeNull();
     await expect(canvas.getByRole('button', { name: 'Course passed' })).not.toHaveAttribute('data-fx-ack');
+  },
+};
+
+/** Ambient effects stay on until stopped; the hook also stops them on unmount. */
+function Weather({ effect }: { effect: typeof snow }) {
+  const fx = useFx();
+  const playing = useRef<FxPlayback | null>(null);
+  const [active, setActive] = useState(false);
+  return (
+    <div className="flex flex-col items-center gap-4 rounded-xl bg-slate-800 p-8 text-white">
+      <p>Decorative weather over the page. Stop it whenever you like.</p>
+      <Button variant="primary" onPress={() => {
+        playing.current?.stop();
+        playing.current = fx(effect, { intensity: 0.4, seed: 17 });
+        setActive(true);
+      }}>Start weather</Button>
+      <Button variant="secondary" onPress={() => {
+        playing.current?.stop();
+        setActive(false);
+      }}>Stop weather</Button>
+      <p role="status">{active ? 'Weather enabled' : 'Weather stopped'}</p>
+    </div>
+  );
+}
+
+export const Snow: Story = {
+  render: () => <Weather effect={snow} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Start weather' }));
+    await expect(overlay()).not.toBeNull();
+    await expect(overlay()).toHaveAttribute('aria-hidden', 'true');
+    await expect(getComputedStyle(overlay()!).pointerEvents).toBe('none');
+    await wait(150);
+    await userEvent.click(canvas.getByRole('button', { name: 'Stop weather' }));
+    await expect(overlay()).toBeNull();
+    await expect(canvas.getByRole('status')).toHaveTextContent('Weather stopped');
+  },
+};
+
+export const Rain: Story = {
+  ...Snow,
+  render: () => <Weather effect={rain} />,
+};
+
+/** Named presets use the same play(effect, options) API and motion rules. */
+export const Occasions: Story = {
+  render: function OccasionsStory() {
+    const fx = useFx();
+    const flurry = useRef<FxPlayback | null>(null);
+    return (
+      <div className="flex gap-4 pt-80">
+        <Button variant="primary" onPress={e => fx(nationalDay, { origin: e.target })}>17 May</Button>
+        <Button variant="secondary" onPress={e => fx(newYear, { origin: e.target })}>New Year</Button>
+        <Button variant="secondary" onPress={() => { flurry.current?.stop(); flurry.current = fx(winter); }}>Winter</Button>
+        <Button variant="secondary" onPress={() => flurry.current?.stop()}>Stop winter</Button>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const name of ['17 May', 'New Year']) {
+      await userEvent.click(canvas.getByRole('button', { name }));
+      await expect(overlay()).not.toBeNull();
+      await waitFor(() => expect(overlay()).toBeNull(), { timeout: 6000 });
+    }
+    await userEvent.click(canvas.getByRole('button', { name: /^Winter$/ }));
+    await expect(overlay()).not.toBeNull();
+    await userEvent.click(canvas.getByRole('button', { name: 'Stop winter' }));
+    await expect(overlay()).toBeNull();
+  },
+};
+
+/** Exercise ambient visibility and motion policies in a real canvas renderer. */
+export const AmbientLifecycle: Story = {
+  render: () => <Weather effect={snow} />,
+  play: async ({ canvasElement }) => {
+    const target = within(canvasElement).getByRole('button', { name: 'Start weather' });
+    const proto = CanvasRenderingContext2D.prototype;
+    const originalClear = proto.clearRect;
+    const originalHidden = Object.getOwnPropertyDescriptor(document, 'hidden');
+    let hidden = false;
+    let paints = 0;
+    let flurry: FxPlayback | null = null;
+    proto.clearRect = function (...args) {
+      paints++;
+      return originalClear.apply(this, args);
+    };
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => hidden });
+    const setHidden = (value: boolean) => {
+      hidden = value;
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+    try {
+      setHidden(true);
+      flurry = playFx(snow, { seed: 17 });
+      await wait(100);
+      await expect(paints).toBe(0);
+      setHidden(false);
+      await waitFor(() => expect(paints).toBeGreaterThan(0));
+      setHidden(true);
+      const frozen = paints;
+      await wait(100);
+      await expect(paints).toBe(frozen);
+      setHidden(false);
+      await waitFor(() => expect(paints).toBeGreaterThan(frozen));
+      flurry.stop();
+      await flurry.finished;
+      await expect(overlay()).toBeNull();
+
+      await withReducedMotion(async () => {
+        const reduced = playFx(winter, { origin: target });
+        await expect(reduced.motion).toBe('reduced');
+        await expect(overlay()).toBeNull();
+        reduced.stop();
+      });
+      target.dataset.motion = 'none';
+      const refused = playFx(rain, { origin: target });
+      await expect(refused.motion).toBe('none');
+      await expect(overlay()).toBeNull();
+      delete target.dataset.motion;
+      flurry = playFx(snow, { origin: target });
+      await expect(overlay()).not.toBeNull();
+      target.dataset.motion = 'none';
+      await waitFor(() => expect(overlay()).toBeNull());
+      await flurry.finished;
+    } finally {
+      flurry?.stop();
+      delete target.dataset.motion;
+      proto.clearRect = originalClear;
+      if (originalHidden) Object.defineProperty(document, 'hidden', originalHidden);
+      else delete (document as { hidden?: boolean }).hidden;
+      document.dispatchEvent(new Event('visibilitychange'));
+    }
   },
 };
