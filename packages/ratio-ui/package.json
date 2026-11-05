@@ -66,6 +66,10 @@
       "types": "./dist/toast/index.d.ts",
       "import": "./dist/toast/index.js"
     },
+    "./fx": {
+      "types": "./dist/fx/index.d.ts",
+      "import": "./dist/fx/index.js"
+    },
     "./console": {
       "types": "./dist/console/index.d.ts",
       "import": "./dist/console/index.js"
