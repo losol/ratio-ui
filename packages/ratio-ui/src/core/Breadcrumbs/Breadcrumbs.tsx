@@ -15,11 +15,14 @@ type LinkComponent = React.ComponentType<{
   href: string;
   children: React.ReactNode;
   className?: string;
+  'aria-current'?: React.AriaAttributes['aria-current'];
 }>;
 
 const LinkContext = createContext<LinkComponent | undefined>(undefined);
 
 export interface BreadcrumbsProps {
+  /** Localized accessible name for the breadcrumbs list. */
+  'aria-label'?: string;
   /** Custom className for the breadcrumbs container */
   className?: string;
   /** Custom Link component (e.g., Next.js Link) */
@@ -53,7 +56,7 @@ export function Breadcrumbs({ className = '', LinkComponent, children, ...props 
   return (
     <LinkContext.Provider value={LinkComponent}>
       <AriaBreadcrumbs
-        className={`flex items-center text-sm gap-2 ${className}`}
+        className={`flex items-center text-sm ${className}`}
         {...props}
       >
         {children}
@@ -70,37 +73,31 @@ export function Breadcrumb({ href, className = '', children, ...props }: Readonl
 
   const linkClasses = `text-(--primary) hover:underline ${className}`;
 
-  let content: React.ReactNode;
-  if (href && LinkComponent) {
-    content = (
-      // The link component comes from context and is stable across renders.
-      // eslint-disable-next-line react-hooks/static-components
-      <LinkComponent href={href} className={linkClasses}>
-        {children}
-      </LinkComponent>
-    );
-  } else if (href) {
-    content = (
-      <a href={href} className={linkClasses}>
-        {children}
-      </a>
-    );
-  } else {
-    content = (
-      <span className={`text-(--text-muted) ${className}`}>
-        {children}
-      </span>
-    );
-  }
-
   return (
-    <>
-      <AriaBreadcrumb {...props}>
-        {content}
-      </AriaBreadcrumb>
-      <span className="text-(--text-subtle) last:hidden" aria-hidden="true">
-        /
-      </span>
-    </>
+    <AriaBreadcrumb {...props}>
+      {({ isCurrent }) => (
+        <>
+          {href && LinkComponent ? (
+            <LinkComponent href={href} className={linkClasses} aria-current={isCurrent ? 'page' : undefined}>
+              {children}
+            </LinkComponent>
+          ) : href ? (
+            <a href={href} className={linkClasses} aria-current={isCurrent ? 'page' : undefined}>
+              {children}
+            </a>
+          ) : (
+            <span className={`text-(--text-muted) ${className}`} aria-current={isCurrent ? 'page' : undefined}>
+              {children}
+            </span>
+          )}
+          {/* Collection content must stay inside the item, including decoration. */}
+          {!isCurrent && (
+            <span className="text-(--text-subtle) mx-2" aria-hidden="true">
+              /
+            </span>
+          )}
+        </>
+      )}
+    </AriaBreadcrumb>
   );
 }
