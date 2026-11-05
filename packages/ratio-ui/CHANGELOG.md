@@ -1,5 +1,36 @@
 # @eventuras/ratio-ui
 
+## 2.36.0
+
+### Minor Changes
+
+- 42aefdd: Render continuous snow and rain with play() and useFx(), and export winter, nationalDay and newYear occasion presets. Pause the shared animation loop on hidden tabs, preserve preset palettes, and clean up ambient effects on stop, unmount or a change to reduced/disabled motion.
+- 107905b: `Badge` gets `variant="soft"`: a small tinted pill in sentence case with the status colour as text and no border, for the state of a row in a list or table ("Published", "Draft", "Full"). `tone` applies to it like to `filled` and `count`.
+- 134c22d: `@eventuras/ratio-ui/fx` plays `fireworks` and `lightning`. Lightning draws its bolt with a glow, lights the page through the model's flash cap (at most three flashes a second, under white-out, shared by every effect on the page), and with `shake` shakes the element it strikes on top of its own transform. `sound: true` adds thunder, a low rumble of filtered noise, only after the reader has interacted with the page and only under full motion.
+- 266676d: New `Header` layout (`@eventuras/ratio-ui/layout/Header`): the top of a page, a section or an article, as a `<header>` with a heading block on the leading edge and `Header.Actions` on the trailing edge, in one row that wraps the actions under the heading when the two do not fit (`--header-lead-min`, 16rem by default). The heading block is composed, not configured: a `Heading.Group` with an eyebrow, the title and a line of `Text`, or a title with a `Badge` beside it. `align` lines the actions up with the heading block's first line, middle, last line or baseline. No margins; server-safe.
+- d582ef6: New `Meter` in `@eventuras/ratio-ui/visuals/Progress`: a thin bar for a value against its ceiling (registrations against capacity), with `tone` and `thresholds` that change it as the value climbs, `role="meter"` with `aria-valuenow`/`aria-valuemax`/`aria-valuetext`, and `height`. `meterTone` resolves the tone for a fraction.
+- e3f540e: New `RowTable` (beta) in `@eventuras/ratio-ui/core/RowTable`: the list of an admin overview, one row per item with column definitions (`header`, `render`, `width`, `hideBelow`, `align`). `rowHref` makes every row a link through an overlay on the first cell, with a hover background and a chevron; `empty` takes the rows' place. Built as a grid with ARIA table roles, so the rows stack below `stackBelow` while the header stays readable to screen readers.
+- 3547cd1: `Tabs` gets `size="sm"`: the compact bar for filtering what a panel shows, with smaller text, tighter padding and less room above the panel. `TabsSize` is exported.
+- 8731436: Add opt-in `AchievementBadge celebrate` for one tier-coloured confetti burst when earned. Respect motion preferences and clean up on disable, loss of earned state or unmount; rerenders do not replay the celebration. Keep standalone badge art server-compatible.
+- 849e8af: `Timeline` (beta) gains what an activity feed needs: `Timeline.Group` with a `label` for day or phase headers, `gutter` on the root to put every item's timestamp in a column left of the rail, and `layout="activity"` on an item, where the title is the sentence (actor in bold, target a link) and children the detail line. `TimelineGroupProps`, `TimelineItemLayout` and `TimelineMarker` are exported.
+- 8c02eed: New `@eventuras/ratio-ui/fx` (beta): visual effects on the page. `play(effect, { origin, colors, seed, … })` draws `confetti` or `sparkles` from an element or a point on one canvas over the page (`pointer-events: none`, `aria-hidden`, removed when the effect is over), in the theme's primary, accent and status colours unless given others or a badge tier's metal. It returns `{ motion, finished, stop }`. Under `prefers-reduced-motion` nothing moves and the element gets a ring for a moment; inside `data-motion="none"` nothing happens. `useFx()` is the React hook that stops a component's effects when it unmounts. The effects and their rules come from `@eventuras/ratio-ui-core/fx` and are re-exported.
+
+### Patch Changes
+
+- af743d6: Keep every breadcrumb after hydration and render decorative separators inside collection items. Allow a localized aria-label and expose current-page semantics for native and custom router links.
+- c5675a0: Improve light-mode chat voice and self nickname contrast by using the existing accent-800 semantic alias. Keep the matching ratio-ui-core theme reference in sync. Preserve the dark-mode voice alias and global palette.
+- 2749129: `Grid`'s column classes are now written out instead of built from a template literal, so every `cols` value (1–6) reaches the bundle; `cols={{ lg: 2 }}` and other values no story used did nothing in an app. `cols.base` sets the columns from the narrowest screen, `gap` takes the spacing scale, and `className` is accepted. `cols` still takes any number; counts beyond 1–6 render their class as before and need the app's own Tailwind build. `grid-cols-1` … `6`, bare and under `sm:`/`md:`/`lg:`, are now among the utilities the bundled CSS guarantees; `docs/css-exports.md` lists them, the layout primitives to reach for first, and the status token names.
+- 1244dbe: `useKeyboardShortcut` (and `SearchField`'s `shortcut`) now works for single-key shortcuts such as `'/'`. A printable non-letter key is matched on the character it produces and Shift is ignored for it, so `/` matches on Norwegian and other layouts where it is Shift+7. A combo without a modifier no longer fires, or swallows the keystroke, while the user is typing in an input, textarea, select or contenteditable element; pass `allowInEditable: true` to opt in. `isEditableTarget` is exported from `hooks`.
+- f2e40a8: Relax the Node engine requirement to >=22 (drop the <25 upper bound).
+- 8acd553: Associate TextField and PhoneInput hints and errors with their resolved input IDs, merge caller aria-describedby references without duplicates, and expose errors as descriptions rather than extra labels.
+- f1ca27d: Keep absolutely positioned table-cell content, including screen-reader-only labels, inside the horizontal scroll wrapper so wide tables do not widen mobile pages.
+- Updated dependencies [42aefdd]
+- Updated dependencies [c5675a0]
+- Updated dependencies [2fd0eb2]
+- Updated dependencies [134c22d]
+- Updated dependencies [f2e40a8]
+  - @eventuras/ratio-ui-core@0.5.0
+
 ## 2.35.1
 
 ### Patch Changes

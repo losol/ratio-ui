@@ -1,5 +1,17 @@
 # @eventuras/ratio-ui-native
 
+## 0.3.1
+
+### Patch Changes
+
+- f2e40a8: Relax the Node engine requirement to >=22 (drop the <25 upper bound).
+- Updated dependencies [42aefdd]
+- Updated dependencies [c5675a0]
+- Updated dependencies [2fd0eb2]
+- Updated dependencies [134c22d]
+- Updated dependencies [f2e40a8]
+  - @eventuras/ratio-ui-core@0.5.0
+
 ## 0.3.0
 
 ### Minor Changes
