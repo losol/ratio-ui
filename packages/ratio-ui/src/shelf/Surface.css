@@ -1,0 +1,255 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Surface — where shelf tiles land: the drop zone, the items on it, the
+ * insertion line or footprint while a drag hovers, and the undo toolbar.
+ * The zone is a card (--card, --border-1, --radius-lg); a drag over it
+ * gives a dashed --border-2 edge (`[data-shelf-over]`, in Shelf.css). The
+ * selected item gets a --primary ring, focus adds --focus-ring. The only
+ * motion is the lift of a picked-up item; `data-motion="none"` and reduced
+ * motion stop it.
+ *
+ * Layout: `.surface[data-layout]` is `column`, `rows` or `grid`.
+ */
+.surface {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  color: var(--text);
+}
+
+.surface-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.surface-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0;
+  background: var(--card);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+}
+
+.surface-tool:hover:not(:disabled) {
+  border-color: var(--primary);
+}
+
+.surface-tool:focus-visible {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.surface-tool:disabled {
+  color: var(--text-subtle);
+  cursor: default;
+}
+
+/* --- The drop zone. ------------------------------------------------------- */
+.surface-zone {
+  position: relative;
+  min-width: 0;
+  background: var(--surface, var(--card));
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-lg);
+}
+
+.surface[data-layout='column'] .surface-zone,
+.surface[data-layout='rows'] .surface-zone {
+  min-height: var(--surface-min-height, 8rem);
+  padding: 0.75rem;
+}
+
+.surface-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: inherit;
+  outline: none;
+}
+
+.surface-list:focus-visible {
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.surface-empty {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 5rem;
+  padding: 0.75rem;
+  color: var(--text-subtle);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* --- Items. --------------------------------------------------------------- */
+.surface-item {
+  position: relative;
+  min-width: 0;
+  min-height: 2.75rem;
+  border-radius: var(--radius);
+  outline: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition:
+    box-shadow 120ms,
+    transform 120ms;
+}
+
+.surface-item[data-selected] {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.surface-item:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--primary),
+    0 0 0 5px var(--focus-ring);
+}
+
+/* Picked up with Enter: lifted until it is dropped. */
+.surface-item[data-grabbed] {
+  z-index: 2;
+  box-shadow:
+    var(--card-shadow-md),
+    0 0 0 2px var(--primary),
+    0 0 0 5px var(--focus-ring);
+  transform: translateY(-2px);
+}
+
+/* Dragged by a pointer: it follows the pointer (an inline transform), with no transition. */
+.surface-item[data-dragging] {
+  z-index: 3;
+  cursor: grabbing;
+  opacity: 0.9;
+  box-shadow:
+    var(--card-shadow-md),
+    0 0 0 2px var(--primary);
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface-item {
+    transition: none;
+  }
+
+  .surface-item[data-grabbed] {
+    transform: none;
+  }
+}
+
+[data-motion='none'] .surface-item[data-grabbed] {
+  transform: none;
+}
+
+/* --- Markers while a drag hovers. ----------------------------------------- */
+.surface-insert {
+  position: absolute;
+  z-index: 4;
+  background: var(--primary);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.surface-insert[data-axis='across'] {
+  height: 3px;
+  margin-top: -1.5px;
+}
+
+.surface-insert[data-axis='down'] {
+  width: 3px;
+  margin-left: -1.5px;
+}
+
+.surface-footprint {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  background: color-mix(in oklch, var(--primary) 12%, transparent);
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius);
+  pointer-events: none;
+}
+
+.surface-footprint[data-refused] {
+  background: var(--error-bg, transparent);
+  border-color: var(--error-solid, var(--border-2));
+}
+
+/* --- Rows: twelve columns a row, one below md (48rem). -------------------- */
+.surface-row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.surface-row > .surface-item {
+  grid-column: span var(--surface-span, 12);
+}
+
+@media (max-width: 47.99rem) {
+  .surface-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .surface-row > .surface-item {
+    grid-column: auto;
+  }
+}
+
+/* --- Grid: cells of --surface-cell, scrolling inside its box. ------------- */
+.surface[data-layout='grid'] .surface-zone {
+  width: fit-content;
+  max-width: 100%;
+  max-height: var(--surface-grid-max-height, 32rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.surface-grid {
+  position: relative;
+  display: block;
+  flex: none;
+  min-height: 0;
+}
+
+.surface-grid[data-cells] {
+  background-image: radial-gradient(circle, var(--border-2) 1.5px, transparent 2px);
+  background-size: var(--surface-cell) var(--surface-cell);
+  background-position: calc(var(--surface-cell) / -2) calc(var(--surface-cell) / -2);
+}
+
+.surface-grid > .surface-item {
+  position: absolute;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.surface-grid > .surface-empty {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: 100%;
+  min-height: 0;
+  justify-content: flex-start;
+}

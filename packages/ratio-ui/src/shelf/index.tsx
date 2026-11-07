@@ -11,6 +11,7 @@
 import type { ReactElement } from 'react';
 
 import { ShelfGroup, ShelfRoot, ShelfTile, type ShelfProps } from './Shelf';
+import { SurfaceColumn, SurfaceGrid, SurfaceRows } from './Surface';
 
 /** Server-safe carrier for the compound statics; renders the client root. */
 function ShelfShell(props: Readonly<ShelfProps>): ReactElement {
@@ -27,6 +28,40 @@ ShelfShell.displayName = 'Shelf';
 export const Shelf = Object.assign(ShelfShell, { Group: ShelfGroup, Tile: ShelfTile });
 
 export type { ShelfProps, ShelfGroupProps, ShelfTileProps, ShelfLabels, ShelfShape, ShelfTileLayout } from './Shelf';
-export type { ShelfItem, ShelfOver, ShelfPoint, ShelfVia } from './shelfDrag';
+export type { ShelfItem, ShelfOver, ShelfPoint, ShelfSize, ShelfVia } from './shelfDrag';
 export { useShelfSurface } from './useShelfSurface';
 export type { UseShelfSurfaceOptions, UseShelfSurfaceResult } from './useShelfSurface';
+
+/**
+ * Surface — where shelf tiles land, in one of three layouts:
+ * `Surface.Column` (one ordered column), `Surface.Rows` (rows of items
+ * with widths in twelfths) and `Surface.Grid` (cells, snapped, no
+ * overlap). Each takes drops from a `Shelf`, keeps one item selected, and
+ * moves items by pointer or keyboard; the app keeps the list. A plain
+ * object, so `<Surface.Grid>` works from a server component too.
+ */
+export const Surface = { Column: SurfaceColumn, Rows: SurfaceRows, Grid: SurfaceGrid } as const;
+
+export type {
+  SurfaceBaseProps,
+  SurfaceColumnBase,
+  SurfaceColumnProps,
+  SurfaceGridBase,
+  SurfaceGridProps,
+  SurfaceHistory,
+  SurfaceItemState,
+  SurfaceLabels,
+  SurfaceRowsBase,
+  SurfaceRowsProps,
+} from './Surface';
+export type {
+  SurfaceCell,
+  SurfaceColumnPlace,
+  SurfaceDirection,
+  SurfaceGridItem,
+  SurfaceItem,
+  SurfaceRowsItem,
+  SurfaceRowsPlace,
+  SurfaceSize,
+} from './surfaceLayout';
+export { findFreeCell, nextRow } from './surfaceLayout';

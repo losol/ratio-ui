@@ -11,10 +11,12 @@ import { Lock } from '../icons';
 import { cn } from '../utils/cn';
 import {
   claimPointer,
+  notifyShelfAdd,
   pointIn,
   releasePointer,
   surfaceAt,
   type ShelfItem,
+  type ShelfSize,
   type ShelfVia,
   type SurfaceEntry,
 } from './shelfDrag';
@@ -151,6 +153,7 @@ export function ShelfRoot({
   const announce = (message: string) => setSaid((prev) => (prev === message ? `${message}\u00a0` : message));
 
   const added = (item: ShelfItem, via: ShelfVia) => {
+    notifyShelfAdd(item, via);
     latest.current.onAdd?.(item, via);
     announce(latest.current.text.added(item, via));
   };
@@ -355,19 +358,25 @@ export interface ShelfTileProps {
    * visible, dimmed with a lock, and says why on hover and focus.
    */
   locked?: string;
+  /**
+   * The footprint the thing takes on a grid surface, in cells (a battery
+   * might be `{ w: 6, h: 4 }`). It travels with the item, so a
+   * `Surface.Grid` knows where a drop fits before it lands.
+   */
+  size?: ShelfSize;
   /** A layout of the tile's own, in place of picture, name and count. `name` still names the item. */
   children?: ReactNode;
   className?: string;
 }
 
 /** A thing on the shelf. Tap, Enter or drag it onto a surface. */
-export function ShelfTile({ id, name, picture, count, locked, children, className }: Readonly<ShelfTileProps>) {
+export function ShelfTile({ id, name, picture, count, locked, size, children, className }: Readonly<ShelfTileProps>) {
   const ctx = useContext(ShelfContext);
   if (!ctx) throw new Error('[ratio-ui] Shelf.Tile must be rendered inside a Shelf.');
   const reasonId = useId();
   // When the keyboard last added: the click a key can leave behind is not a tap.
   const keyedAt = useRef(-Infinity);
-  const item: ShelfItem = { id, name };
+  const item: ShelfItem = size ? { id, name, size: { w: size.w, h: size.h } } : { id, name };
 
   const visual = children ?? (
     <>
