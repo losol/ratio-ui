@@ -56,9 +56,13 @@ follows its container's width with no measuring and no layout shift. Text
 is HTML text. The line is drawn in a stretched SVG box with a stroke that
 does not stretch.
 
-The parts share a model through context, so they render on the client;
-their props are plain data (`format` takes a locale and `Intl.NumberFormat`
-options, not a function), so a server component can render a `Chart`.
+It renders on the server. There is no context, no hook and no
+`'use client'`: the root computes the model and hands it to each part as a
+prop, walking its own JSX through fragments and any element that holds the
+parts (a `Card`, a `<div>`). A part rendered inside a component of your own
+is out of the root's reach, so write the parts in the chart's JSX. A server
+component renders a `Chart` with no client JavaScript; the tooltips are
+`title`s and the table is a `<details>`, so nothing needs hydrating.
 
 ## Tokens
 

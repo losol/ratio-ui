@@ -1,16 +1,17 @@
-'use client';
-
 // ratio-ui · design system for knowledge sharing
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-// The chart's parts read one model from context: the rows, the series, and
-// the scales from @eventuras/ratio-ui-core/charts. The root computes it once,
-// so the grid, the bars, the line and the axes cannot disagree on where a
-// value sits. Context makes this a client module; the compound statics are
-// attached in ./index.tsx, which has no directive (see core/Navbar/index.tsx).
+// The chart's parts draw from one model: the rows, the series, and the
+// scales from @eventuras/ratio-ui-core/charts. The root computes it once and
+// hands it to every part in its tree, so the grid, the bars, the line and
+// the axes cannot disagree on where a value sits.
+//
+// No context, no hooks, no 'use client': the root walks its own children
+// and gives each part the model as a prop. A chart renders on the server as
+// it does in the browser, and its props never cross a client boundary.
 
-import React, { createContext, useContext, type ReactNode } from 'react';
+import React, { Children, cloneElement, isValidElement, type ReactNode } from 'react';
 import {
   bandScale,
   linearScale,
@@ -76,12 +77,41 @@ interface ChartModel {
   formatValue: (value: number) => string;
 }
 
-const ChartContext = createContext<ChartModel | null>(null);
+/** The model a part is handed by its `Chart`. @internal */
+interface Injected {
+  /** @internal Set by the enclosing `Chart`; never pass it yourself. */
+  model?: ChartModel;
+}
 
-function useChart(part: string): ChartModel {
-  const model = useContext(ChartContext);
-  if (!model) throw new Error(`<${part}> must be inside <Chart>.`);
+function need(model: ChartModel | undefined, part: string): ChartModel {
+  if (!model) throw new Error(`<${part}> must be inside <Chart>, in its own JSX.`);
   return model;
+}
+
+/** The parts the root hands its model to. Filled in at the end of the module. */
+const PARTS = new Set<unknown>();
+
+/**
+ * Gives every part in `node` the model, walking through any element that
+ * holds children: a fragment, a `<div>`, a `Card`. A part rendered inside
+ * a component of your own (not written in the chart's JSX) is out of reach.
+ */
+function hand(node: ReactNode, model: ChartModel): ReactNode {
+  return Children.map(node, (child) => {
+    if (!isValidElement(child)) return child;
+    const props = child.props as { children?: ReactNode };
+    const children = props.children === undefined ? undefined : hand(props.children, model);
+    const extra = PARTS.has(child.type) ? { model } : undefined;
+    return children === undefined
+      ? extra
+        ? cloneElement(child as React.ReactElement<Injected>, extra)
+        : child
+      : cloneElement(
+          child as React.ReactElement<Injected & { children?: ReactNode }>,
+          extra,
+          children,
+        );
+  });
 }
 
 const pct = (fraction: number): string => `${(fraction * 100).toFixed(4)}%`;
@@ -177,17 +207,15 @@ export function ChartRoot({
   };
 
   return (
-    <ChartContext.Provider value={model}>
-      <figure className={cn('ratio-chart', className)} {...rest}>
-        {children}
-      </figure>
-    </ChartContext.Provider>
+    <figure className={cn('ratio-chart', className)} {...rest}>
+      {hand(children, model)}
+    </figure>
   );
 }
 
 /** The series by name and colour: a square for bars, a dash for a line. */
-export function ChartLegend({ className }: { className?: string }) {
-  const { series } = useChart('Chart.Legend');
+export function ChartLegend({ className, model }: { className?: string } & Injected) {
+  const { series } = need(model, 'Chart.Legend');
   return (
     <ul className={cn('ratio-chart__legend', className)}>
       {series.map((s) => (
@@ -218,8 +246,8 @@ export interface ChartPlotProps {
  * The drawing: an image to assistive technology, named by the chart's
  * `label`. The numbers themselves are in `Chart.Table`.
  */
-export function ChartPlot({ height, className, children }: ChartPlotProps) {
-  const { label } = useChart('Chart.Plot');
+export function ChartPlot({ height, className, children, model }: ChartPlotProps & Injected) {
+  const { label } = need(model, 'Chart.Plot');
   const style =
     height === undefined
       ? undefined
@@ -234,8 +262,8 @@ export function ChartPlot({ height, className, children }: ChartPlotProps) {
 }
 
 /** A line at every tick of the value axis; the zero line a shade stronger. */
-export function ChartGrid() {
-  const { ticks, y } = useChart('Chart.Grid');
+export function ChartGrid({ model }: Injected) {
+  const { ticks, y } = need(model, 'Chart.Grid');
   return (
     <div className="ratio-chart__layer">
       {ticks.ticks.map((t) => (
@@ -261,8 +289,11 @@ export interface ChartBarsProps {
  * zero for positive values and down from it for negative ones. A tooltip
  * names each segment and its value.
  */
-export function ChartBars({ keys }: ChartBarsProps) {
-  const { rows, x, band, y, groups, segments, series, formatValue, unit } = useChart('Chart.Bars');
+export function ChartBars({ keys, model }: ChartBarsProps & Injected) {
+  const { rows, x, band, y, groups, segments, series, formatValue, unit } = need(
+    model,
+    'Chart.Bars',
+  );
   if (groups.length === 0) return null;
   const slot = band.bandwidth / groups.length;
   const inset = groups.length > 1 ? slot * 0.06 : 0;
@@ -336,8 +367,8 @@ function runs(rows: readonly ChartRow[], key: string): number[][] {
  * stretched 100-unit box with a stroke that does not stretch, so it
  * follows the plot's width at any size.
  */
-export function ChartLine({ keys }: ChartLineProps) {
-  const { rows, band, y, series } = useChart('Chart.Line');
+export function ChartLine({ keys, model }: ChartLineProps & Injected) {
+  const { rows, band, y, series } = need(model, 'Chart.Line');
   const lines = series.filter((s) => s.kind === 'line' && (!keys || keys.includes(s.key)));
   if (lines.length === 0) return null;
   return (
@@ -372,8 +403,8 @@ export function ChartLine({ keys }: ChartLineProps) {
 }
 
 /** The value axis, on the leading edge: a label at every tick, the unit after the top one. */
-export function ChartYAxis() {
-  const { ticks, y, formatTick, unit } = useChart('Chart.YAxis');
+export function ChartYAxis({ model }: Injected) {
+  const { ticks, y, formatTick, unit } = need(model, 'Chart.YAxis');
   const last = ticks.ticks.length - 1;
   const labels = ticks.ticks.map((t, i) =>
     unit && i === last ? `${formatTick(t)} ${unit}` : formatTick(t),
@@ -403,8 +434,8 @@ export interface ChartXAxisProps {
 }
 
 /** The category axis, under the plot: each row's `x`, centred under its band. */
-export function ChartXAxis({ every }: ChartXAxisProps) {
-  const { rows, x, band } = useChart('Chart.XAxis');
+export function ChartXAxis({ every, model }: ChartXAxisProps & Injected) {
+  const { rows, x, band } = need(model, 'Chart.XAxis');
   const n = Math.max(1, Math.round(every ?? Math.ceil(rows.length / 12)));
   return (
     <div className="ratio-chart__xaxis">
@@ -433,8 +464,13 @@ export interface ChartTableProps {
  * reads, and what anyone can check a bar against. Built from the same rows,
  * so it cannot drift from the drawing.
  */
-export function ChartTable({ summary = 'Show as table', open, className }: ChartTableProps) {
-  const { rows, x, xLabel, label, series, formatValue, unit } = useChart('Chart.Table');
+export function ChartTable({
+  summary = 'Show as table',
+  open,
+  className,
+  model,
+}: ChartTableProps & Injected) {
+  const { rows, x, xLabel, label, series, formatValue, unit } = need(model, 'Chart.Table');
   return (
     <details className={cn('ratio-chart__table', className)} open={open}>
       <summary>{summary}</summary>
@@ -467,3 +503,16 @@ export function ChartTable({ summary = 'Show as table', open, className }: Chart
     </details>
   );
 }
+
+[
+  ChartLegend,
+  ChartPlot,
+  ChartGrid,
+  ChartBars,
+  ChartLine,
+  ChartYAxis,
+  ChartXAxis,
+  ChartTable,
+].forEach((part) => PARTS.add(part));
+
+ChartRoot.displayName = 'Chart';

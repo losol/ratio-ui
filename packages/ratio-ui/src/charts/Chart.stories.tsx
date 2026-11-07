@@ -285,6 +285,44 @@ export const InAnotherLanguage: Story = {
   },
 };
 
+/**
+ * The parts can sit anywhere in the chart's own JSX — inside a fragment, a
+ * `<div>` of your layout, a `Card` — and the root still hands each one the
+ * model. Here the legend stands beside the plot. (A part rendered inside a
+ * component of your own is out of reach; write it in the chart's JSX.)
+ */
+export const InALayoutOfYourOwn: Story = {
+  render: () => (
+    <Chart
+      data={months.slice(0, 6)}
+      x="month"
+      series={[{ key: 'registrations', label: 'Registrations' }]}
+      label="Registrations per month, first half of 2026"
+    >
+      <div style={{ display: 'grid', gridTemplateColumns: '10rem 1fr', gap: '1.5rem', alignItems: 'start' }}>
+        <aside>
+          <Text variant="muted" size="sm">
+            First half of 2026
+          </Text>
+          <Chart.Legend />
+        </aside>
+        <>
+          <Chart.Plot height={180}>
+            <Chart.Grid />
+            <Chart.Bars />
+            <Chart.YAxis />
+            <Chart.XAxis />
+          </Chart.Plot>
+        </>
+      </div>
+    </Chart>
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelectorAll('aside .ratio-chart__legend-item')).toHaveLength(1);
+    await expect(canvasElement.querySelectorAll('.ratio-chart__bar')).toHaveLength(6);
+  },
+};
+
 /** On the printed sheet: square bars, as every corner in Tabula. */
 export const OnTabula: Story = {
   parameters: { theme: 'tabula' },
