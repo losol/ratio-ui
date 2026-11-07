@@ -86,6 +86,14 @@ theme generator.
   `prefers-reduced-motion` and the page's `data-motion="none"`, and
   `admitFlash`/`flashOpacity`, which hold any flash of the page to three a
   second and under white-out. See [docs/adr/0003-fx.md](docs/adr/0003-fx.md).
+- **Charts** in `@eventuras/ratio-ui-core/charts` (beta): the arithmetic
+  of a chart, shared by every renderer. `niceTicks` puts an axis on nice
+  numbers (steps of 1, 2, 2.5 and 5); `linearScale` and `bandScale` map
+  values and categories to a fraction 0–1 of the plot, which each renderer
+  multiplies by its own size; `stackSeries` stacks positives up and
+  negatives down from zero; `valueExtent` measures what a chart must hold;
+  `numberFormatter` writes ticks with the step's decimals in the reader's
+  locale. The web's `Chart` (`@eventuras/ratio-ui/charts`) draws from them.
 - **The schema**: `defineTheme`, `mix`, `Theme` and friends.
 - **Colour maths**: `parseColor`, `oklchToRgba`, `formatColor`. Out-of-gamut
   OKLCH is clipped, not gamut-mapped as CSS does — a step at the edge of

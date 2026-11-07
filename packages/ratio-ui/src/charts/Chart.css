@@ -1,0 +1,199 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Chart — every mark is placed in percent of the plot, from the scales in
+ * @eventuras/ratio-ui-core/charts, so the chart follows its container's
+ * width with no measuring and no script, and text stays text. The plot is
+ * a grid: the y axis beside it, the x axis under it, and the layers (grid,
+ * bars, line) stacked in one cell, in the order they are written.
+ */
+.ratio-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  margin: 0;
+  min-width: 0;
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+/* Legend */
+.ratio-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs) var(--space-s);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.ratio-chart__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.ratio-chart__swatch {
+  flex: none;
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: var(--chart-bar-radius);
+  background: currentColor;
+}
+
+.ratio-chart__swatch[data-kind='line'] {
+  width: 1.1em;
+  height: var(--chart-line-width);
+  border-radius: 0;
+}
+
+/* Plot */
+.ratio-chart__plot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: var(--chart-height) auto;
+  grid-template-areas:
+    'yaxis plot'
+    '. xaxis';
+  column-gap: var(--space-2xs);
+  row-gap: var(--space-3xs);
+  /* Room for the top tick's label, which is centred on the line. */
+  padding-block-start: 0.6em;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ratio-chart__layer {
+  grid-area: plot;
+  position: relative;
+  min-width: 0;
+}
+
+/* Grid */
+.ratio-chart__gridline {
+  position: absolute;
+  inset-inline: 0;
+  height: 0;
+  border-top: 1px solid var(--chart-grid);
+  transform: translateY(0.5px);
+}
+
+.ratio-chart__gridline[data-zero] {
+  border-top-color: var(--chart-zero);
+}
+
+/* Bars */
+.ratio-chart__bar {
+  position: absolute;
+  box-sizing: border-box;
+  background: currentColor;
+}
+
+.ratio-chart__bar[data-cap='top'] {
+  border-start-start-radius: var(--chart-bar-radius);
+  border-start-end-radius: var(--chart-bar-radius);
+}
+
+.ratio-chart__bar[data-cap='bottom'] {
+  border-end-start-radius: var(--chart-bar-radius);
+  border-end-end-radius: var(--chart-bar-radius);
+}
+
+/* A segment resting on another gets a hairline of paper between them. */
+.ratio-chart__bar[data-joined='below'] { border-bottom: 1.5px solid var(--chart-gap); }
+.ratio-chart__bar[data-joined='above'] { border-top: 1.5px solid var(--chart-gap); }
+
+/* Line */
+.ratio-chart__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ratio-chart__line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--chart-line-width);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Axes */
+.ratio-chart__yaxis,
+.ratio-chart__xaxis {
+  position: relative;
+  color: var(--chart-axis);
+  white-space: nowrap;
+}
+
+.ratio-chart__yaxis { grid-area: yaxis; text-align: end; }
+.ratio-chart__xaxis { grid-area: xaxis; min-height: 1.4em; }
+
+/* The longest label, invisible and in flow, gives the y axis its width. */
+.ratio-chart__sizer {
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.ratio-chart__tick {
+  position: absolute;
+  line-height: 1;
+}
+
+.ratio-chart__yaxis .ratio-chart__tick { inset-inline-end: 0; transform: translateY(50%); }
+.ratio-chart__xaxis .ratio-chart__tick { top: 0; transform: translateX(-50%); }
+
+/* Table */
+.ratio-chart__table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.ratio-chart__table summary {
+  width: fit-content;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.ratio-chart__table table {
+  margin-block-start: var(--space-xs);
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ratio-chart__table caption {
+  padding-block-end: var(--space-3xs);
+  color: var(--text-muted);
+  text-align: start;
+}
+
+.ratio-chart__table th,
+.ratio-chart__table td {
+  padding: 0.25em 0.75em;
+  border-bottom: 1px solid var(--chart-grid);
+  text-align: end;
+}
+
+.ratio-chart__table th:first-child,
+.ratio-chart__table td:first-child {
+  padding-inline-start: 0;
+  text-align: start;
+}
+
+.ratio-chart__table thead th {
+  color: var(--text-muted);
+  font-weight: 600;
+}

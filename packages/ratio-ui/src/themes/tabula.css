@@ -150,6 +150,9 @@
   --badge-font-family: var(--font-display);
   --diploma-frame-width: 6px;
 
+  /* A chart: square bars, as every corner on the sheet. */
+  --chart-bar-radius: 0;
+
   /* A chart's boxes and lines: as thick as a choice, in the condensed face. */
   --flowchart-frame: 4px;
   --flowchart-line: 4px;
