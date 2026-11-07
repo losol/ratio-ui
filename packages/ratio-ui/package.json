@@ -62,6 +62,10 @@
       "types": "./dist/badges/index.d.ts",
       "import": "./dist/badges/index.js"
     },
+    "./shelf": {
+      "types": "./dist/shelf/index.d.ts",
+      "import": "./dist/shelf/index.js"
+    },
     "./toast": {
       "types": "./dist/toast/index.d.ts",
       "import": "./dist/toast/index.js"

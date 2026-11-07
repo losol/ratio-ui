@@ -91,6 +91,7 @@ src/visuals/    Visual and progress components
 src/commerce/   Commerce-specific UI components
 src/console/    Console layout components
 src/toast/      Toast queue, renderer, and hook
+src/shelf/      Shelf: a palette of tiles to drag, tap or press onto a work surface, and useShelfSurface()
 src/fx/         Visual effects (bursts, lightning, ambient weather, occasion presets): play() and useFx()
 ```
 

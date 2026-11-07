@@ -1,0 +1,356 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Shelf — a rail beside the surface or a tray along the bottom, its groups,
+ * its tiles, and the ghost that follows a drag. Tiles are small cards
+ * (--card, --border-1, --radius); the ghost lifts with --card-shadow-md; a
+ * surface a drag hovers gets a dashed --border-2 edge. `data-motion="none"`
+ * (tokens/animations.css) stops the one motion there is, the lift.
+ *
+ * Shape: `.shelf[data-shape]` is `rail`, `tray` or `auto` (a tray, a rail
+ * from lg / 64rem). Tile layout: stacked in a rail, inline in a tray, unless
+ * `data-tile` says which.
+ */
+.shelf {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface, var(--card));
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-lg);
+  color: var(--text);
+}
+
+.shelf-scroller {
+  --shelf-fade: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem;
+  min-width: 0;
+  min-height: 0;
+  /* The edge with more beyond it fades (data-edge-*, measured by the shelf). */
+  --shelf-mask-start: #000;
+  --shelf-mask-end: #000;
+  -webkit-mask-image: linear-gradient(
+    var(--shelf-fade-to),
+    var(--shelf-mask-start),
+    #000 var(--shelf-fade),
+    #000 calc(100% - var(--shelf-fade)),
+    var(--shelf-mask-end)
+  );
+  mask-image: linear-gradient(
+    var(--shelf-fade-to),
+    var(--shelf-mask-start),
+    #000 var(--shelf-fade),
+    #000 calc(100% - var(--shelf-fade)),
+    var(--shelf-mask-end)
+  );
+}
+
+.shelf-scroller[data-edge-start] {
+  --shelf-mask-start: transparent;
+}
+
+.shelf-scroller[data-edge-end] {
+  --shelf-mask-end: transparent;
+}
+
+.shelf-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.shelf-group-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.shelf-group-tiles {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shelf-item {
+  display: flex;
+  min-width: 0;
+}
+
+/* --- Tray: along the bottom, scrolling sideways. -------------------------- */
+.shelf[data-shape='tray'] .shelf-scroller,
+.shelf[data-shape='auto'] .shelf-scroller {
+  --shelf-fade-to: to right;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.shelf[data-shape='tray'] .shelf-group,
+.shelf[data-shape='auto'] .shelf-group {
+  flex: none;
+}
+
+.shelf[data-shape='tray'] .shelf-group-tiles,
+.shelf[data-shape='auto'] .shelf-group-tiles {
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(7.5rem, max-content);
+}
+
+/* A sideways swipe scrolls the tray; a press that heads for the surface drags. */
+.shelf[data-shape='tray'] .shelf-tile,
+.shelf[data-shape='auto'] .shelf-tile {
+  touch-action: pan-x;
+}
+
+/* --- Rail: beside the surface, scrolling down. ---------------------------- */
+.shelf[data-shape='rail'] {
+  width: var(--shelf-rail-width, 14rem);
+  max-height: 100%;
+}
+
+.shelf[data-shape='rail'] .shelf-scroller {
+  --shelf-fade-to: to bottom;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+.shelf[data-shape='rail'] .shelf-group-tiles {
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+}
+
+.shelf[data-shape='rail'][data-tile='inline'] .shelf-group-tiles {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.shelf[data-shape='rail'] .shelf-tile {
+  touch-action: pan-y;
+}
+
+@media (min-width: 64rem) {
+  .shelf[data-shape='auto'] {
+    width: var(--shelf-rail-width, 14rem);
+    max-height: 100%;
+  }
+
+  .shelf[data-shape='auto'] .shelf-scroller {
+    --shelf-fade-to: to bottom;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+
+  .shelf[data-shape='auto'] .shelf-group {
+    flex: initial;
+  }
+
+  .shelf[data-shape='auto'] .shelf-group-tiles {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  }
+
+  .shelf[data-shape='auto'][data-tile='inline'] .shelf-group-tiles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shelf[data-shape='auto'] .shelf-tile {
+    touch-action: pan-y;
+  }
+}
+
+/* --- Tiles: small cards, 44px or taller. ---------------------------------- */
+.shelf-tile {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.375rem 0.625rem;
+  background: var(--card);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  text-align: left;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  outline: none;
+  transition:
+    border-color 120ms,
+    box-shadow 120ms;
+}
+
+/* Stacked: the picture over the name — a rail's default, or asked for. */
+.shelf[data-tile='stacked'] .shelf-tile,
+.shelf[data-shape='rail']:not([data-tile]) .shelf-tile,
+.shelf-tile[data-layout='stacked'] {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+@media (min-width: 64rem) {
+  .shelf[data-shape='auto']:not([data-tile]) .shelf-tile {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    text-align: center;
+  }
+}
+
+.shelf-tile:hover:not([data-locked]) {
+  border-color: var(--primary);
+}
+
+.shelf-tile:focus-visible {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.shelf-tile-picture {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.shelf-tile-picture > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.shelf-tile-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.shelf-tile-name {
+  overflow-wrap: anywhere;
+}
+
+.shelf-tile-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.shelf-tile-lock {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
+/* Locked: still there, dimmed, saying why on hover and focus. */
+.shelf-tile[data-locked] {
+  cursor: not-allowed;
+  color: var(--text-subtle);
+  background: color-mix(in oklch, var(--card) 60%, transparent);
+  border-style: dashed;
+}
+
+.shelf-tile[data-locked] .shelf-tile-picture {
+  color: var(--text-subtle);
+  opacity: 0.6;
+}
+
+.shelf-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0 0.75rem 0.625rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* In a tray the reason floats over it, so the tray keeps its height. */
+.shelf[data-shape='tray'] .shelf-hint,
+.shelf[data-shape='auto'] .shelf-hint {
+  position: absolute;
+  bottom: calc(100% + 0.375rem);
+  left: 0.75rem;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.375rem 0.625rem;
+  background: var(--card);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow-md);
+  z-index: 10;
+}
+
+@media (min-width: 64rem) {
+  .shelf[data-shape='auto'] .shelf-hint {
+    position: static;
+    max-width: none;
+    padding: 0 0.75rem 0.625rem;
+    background: none;
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+/* --- The ghost that follows a drag. --------------------------------------- */
+.shelf-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  pointer-events: none;
+}
+
+.shelf-ghost-tile {
+  box-shadow: var(--card-shadow-md);
+  border-color: var(--primary);
+  cursor: grabbing;
+  transform: translateY(-2px) scale(1.04);
+  animation: shelf-lift 120ms ease-out;
+}
+
+@keyframes shelf-lift {
+  from {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shelf-ghost-tile {
+    animation: none;
+  }
+}
+
+/* --- A surface a drag hovers (useShelfSurface). --------------------------- */
+[data-shelf-over] {
+  outline: 2px dashed var(--border-2);
+  outline-offset: -2px;
+}

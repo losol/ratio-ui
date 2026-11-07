@@ -85,6 +85,9 @@ export {
   OctagonAlert,
   ShieldX,
 
+  // Access
+  Lock,
+
   // Theme
   Sun,
   Moon,
