@@ -62,6 +62,10 @@
       "types": "./dist/badges/index.d.ts",
       "import": "./dist/badges/index.js"
     },
+    "./charts": {
+      "types": "./dist/charts/index.d.ts",
+      "import": "./dist/charts/index.js"
+    },
     "./shelf": {
       "types": "./dist/shelf/index.d.ts",
       "import": "./dist/shelf/index.js"

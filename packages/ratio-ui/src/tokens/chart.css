@@ -1,0 +1,39 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Chart tokens — the series palette and the furniture of `charts/Chart`.
+ * The six series colours alias the theme's own, so every theme and mode
+ * gets a palette that belongs to it: the brand, green, the accent, the ink
+ * itself (a neutral, for a total or a reference line), then red and orange.
+ * Red comes late, so a fourth series is not read as a warning. A series can
+ * still take any colour of its own.
+ */
+
+/* Also on the surface scopes: an alias like `var(--card)` resolves where
+   it's declared, so `:root` alone would ignore `.surface-dark`. */
+:root,
+.surface-light,
+.surface-dark {
+  --chart-1: var(--primary);
+  --chart-2: var(--success-solid);
+  --chart-3: var(--accent);
+  --chart-4: var(--text);
+  --chart-5: var(--error-solid);
+  --chart-6: var(--warning-solid);
+
+  --chart-grid: var(--border-1);
+  --chart-zero: var(--border-2);
+  --chart-axis: var(--text-subtle);
+  /* The hairline between the segments of a stacked bar: the paper's colour. */
+  --chart-gap: var(--card);
+}
+
+:root {
+  --chart-height: 15rem;
+  --chart-bar-radius: 3px;
+  --chart-line-width: 2.5px;
+}
