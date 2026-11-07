@@ -8,11 +8,22 @@
  * surface can sit anywhere in the tree — beside the shelf, not under it.
  */
 
+/** A footprint in cells: `w` across, `h` down. */
+export interface ShelfSize {
+  w: number;
+  h: number;
+}
+
 /** A thing on the shelf, as the shelf hands it to the app. */
 export interface ShelfItem {
   id: string;
   /** The tile's name, as shown and spoken. */
   name: string;
+  /**
+   * The footprint the thing takes on a grid, when its tile gives one, so a
+   * surface knows it before the drop lands. Absent when the tile has none.
+   */
+  size?: ShelfSize;
 }
 
 /** How a tile came onto the surface. */
@@ -77,4 +88,19 @@ export function claimPointer(id: number): boolean {
 
 export function releasePointer(id: number): void {
   if (activePointer === id) activePointer = null;
+}
+
+// Adds the shelves report, for surfaces that move focus to what came in by
+// a tap or a key (the app adds those itself, from `onAdd`).
+const addListeners = new Set<(item: ShelfItem, via: ShelfVia) => void>();
+
+export function subscribeShelfAdds(listener: (item: ShelfItem, via: ShelfVia) => void): () => void {
+  addListeners.add(listener);
+  return () => {
+    addListeners.delete(listener);
+  };
+}
+
+export function notifyShelfAdd(item: ShelfItem, via: ShelfVia): void {
+  addListeners.forEach((listener) => listener(item, via));
 }

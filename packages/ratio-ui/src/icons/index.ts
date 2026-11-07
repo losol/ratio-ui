@@ -111,4 +111,8 @@ export {
 
   // Subtract/Remove
   Minus,
+
+  // History
+  Undo2,
+  Redo2,
 } from 'lucide-react';
