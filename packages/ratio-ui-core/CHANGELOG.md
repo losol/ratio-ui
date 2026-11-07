@@ -1,5 +1,12 @@
 # @eventuras/ratio-ui-core
 
+## 0.6.0
+
+### Minor Changes
+
+- eeeabd8: New `@eventuras/ratio-ui-core/charts` (beta): the arithmetic of a chart, shared by every renderer. `niceTicks` and `niceStep` put an axis on nice numbers and widen the domain to whole steps; `linearScale` and `bandScale` map values and categories to a fraction 0–1 of the plot; `stackSeries` stacks positives up and negatives down from zero; `valueExtent` measures what stacks and lines reach; `numberFormatter` writes ticks with the step's decimals in the reader's locale.
+- 84ed491: `@eventuras/ratio-ui-core/charts`: `CHART_PALETTE` and `chartColorKey`, the series palette as the theme's colour keys (the brand, green, the accent, the ink, red, orange), so the web's `--chart-*` tokens and the native chart use the same colours in the same order.
+
 ## 0.5.0
 
 ### Minor Changes
