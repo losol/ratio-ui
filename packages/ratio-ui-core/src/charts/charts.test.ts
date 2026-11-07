@@ -4,6 +4,8 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  CHART_PALETTE,
+  chartColorKey,
   bandScale,
   linearScale,
   niceStep,
@@ -117,5 +119,15 @@ describe('numberFormatter', () => {
 
   it('never writes minus zero', () => {
     expect(numberFormatter({ locale: 'en' }, 0.5)(-0)).toBe('0.0');
+  });
+});
+
+describe('the palette', () => {
+  it('is six theme colours, wrapping after the sixth', () => {
+    expect(CHART_PALETTE).toHaveLength(6);
+    expect(chartColorKey(0)).toBe('primary');
+    expect(chartColorKey(3)).toBe('text');
+    expect(chartColorKey(6)).toBe('primary');
+    expect(chartColorKey(-1)).toBe('warningSolid');
   });
 });

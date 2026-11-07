@@ -6,8 +6,8 @@ looks like its web sibling — Bureau's paper and navy, the hard shadows, the
 pixel display face — without installing the web renderer.
 
 **Beta.** Built for Expo SDK 57 (React Native 0.86, React 19.2). The
-components are `Text`, `Heading`, `Button`, `Card`, `ChatLog` and, on its
-own subpath, `AchievementBadge`; more follow as apps need them. Every component and prop may still change.
+components are `Text`, `Heading`, `Button`, `Card`, `ChatLog` and, on their
+own subpaths, `AchievementBadge` and `Chart`; more follow as apps need them. Every component and prop may still change.
 
 ## Installation
 
@@ -99,6 +99,40 @@ The ink is the theme's primary and the paper its card; the metals are the
 same in every theme. An `emblem` is a 24-unit glyph as react-native-svg
 elements, as `lucide-react-native` gives. `AchievementBadgeArt` is the
 medallion alone.
+
+## Charts
+
+`@eventuras/ratio-ui-native/charts` is the web's `Chart` for the app: the
+same parts, the same model in `@eventuras/ratio-ui-core/charts` and the same
+palette, so the app and the site agree on every tick and every stack. The
+line needs `react-native-svg`, which is why it is its own subpath.
+
+```tsx
+import { Chart } from '@eventuras/ratio-ui-native/charts';
+
+<Chart data={hours} x="hour" unit="kW" label="Production and consumption, hour by hour"
+  series={[
+    { key: 'wind', label: 'Wind', stack: 'production' },
+    { key: 'use', label: 'Consumption', kind: 'line' },
+  ]}>
+  <Chart.Legend interactive />
+  <Chart.Plot height={200}>
+    <Chart.Grid />
+    <Chart.Bars />
+    <Chart.Line />
+    <Chart.YAxis />
+    <Chart.XAxis every={6} />
+    <Chart.Tooltip />
+  </Chart.Plot>
+  <Chart.Table />
+</Chart>
+```
+
+The layers and axes are direct children of `Chart.Plot`. `Chart.Tooltip`
+shows a category's values on a tap; `Chart.Legend interactive` fades a
+series out and back; `Chart.Table` lists the numbers behind a toggle, for
+a screen reader. The colours are the theme's: `CHART_PALETTE`, in the web's
+order.
 
 ## Fonts
 

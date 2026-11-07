@@ -1,10 +1,11 @@
 import { defineReactLibConfig } from '@eventuras/vite-config/react-lib';
 
-// One entry per public subpath: `.` and `./badges`.
+// One entry per public subpath: `.`, `./badges` and `./charts`.
 export default defineReactLibConfig({
   entry: {
     index: 'src/index.ts',
     'badges/index': 'src/badges/index.ts',
+    'charts/index': 'src/charts/index.ts',
   },
   // React Native and react-native-svg are the app's, like React; core is a
   // dependency, not bundled.
