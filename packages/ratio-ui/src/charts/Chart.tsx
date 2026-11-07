@@ -28,6 +28,7 @@ import {
   type StackSegment,
 } from '@eventuras/ratio-ui-core/charts';
 import { cn } from '../utils/cn';
+import { LegendToggles } from './LegendToggles';
 import './Chart.css';
 
 /** How a series is drawn. */
@@ -88,8 +89,13 @@ function need(model: ChartModel | undefined, part: string): ChartModel {
   return model;
 }
 
-/** The parts the root hands its model to. Filled in at the end of the module. */
+/** The parts the root hands its model to: `Chart`'s statics, registered in ./index.tsx. */
 const PARTS = new Set<unknown>();
+
+/** @internal Called once by ./index.tsx with every static of `Chart`. */
+export function registerChartParts(parts: readonly unknown[]): void {
+  parts.forEach((part) => PARTS.add(part));
+}
 
 /**
  * Gives every part in `node` the model, walking through any element that
@@ -213,9 +219,28 @@ export function ChartRoot({
   );
 }
 
+/** @beta Prop shape may change before release. */
+export interface ChartLegendProps {
+  /**
+   * Each entry a toggle button that mutes its series: the chart's only
+   * client part, a few hundred bytes over the server-rendered figure. A
+   * muted series fades rather than vanishes, so the scale holds still.
+   */
+  interactive?: boolean;
+  className?: string;
+}
+
 /** The series by name and colour: a square for bars, a dash for a line. */
-export function ChartLegend({ className, model }: { className?: string } & Injected) {
+export function ChartLegend({ interactive, className, model }: ChartLegendProps & Injected) {
   const { series } = need(model, 'Chart.Legend');
+  if (interactive) {
+    return (
+      <LegendToggles
+        className={className}
+        items={series.map(({ key, label, kind, color }) => ({ key, label, kind, color }))}
+      />
+    );
+  }
   return (
     <ul className={cn('ratio-chart__legend', className)}>
       {series.map((s) => (
@@ -402,6 +427,52 @@ export function ChartLine({ keys, model }: ChartLineProps & Injected) {
   );
 }
 
+/**
+ * A tooltip for every category: hover a column to see its label and every
+ * series' value. Rendered on the server and shown with CSS, with no
+ * script. For the pointer only; the plot is an image to assistive
+ * technology, and `Chart.Table` holds the numbers for everyone. Write it
+ * last in `Chart.Plot`, so its columns lie over the marks.
+ */
+export function ChartTooltip({ model }: Injected) {
+  const { rows, x, band, series, formatValue, unit } = need(model, 'Chart.Tooltip');
+  const gutter = band.step - band.bandwidth;
+  return (
+    <div className="ratio-chart__layer ratio-chart__columns" aria-hidden="true">
+      {rows.map((row, i) => (
+        <div
+          key={i}
+          className="ratio-chart__column"
+          data-side={band.center(i) > 0.5 ? 'start' : 'end'}
+          style={{ left: pct(band.start(i) - gutter / 2), width: pct(band.step) }}
+        >
+          <div className="ratio-chart__tip">
+            <span className="ratio-chart__tip-title">{String(row[x] ?? '')}</span>
+            {series.map((s) => {
+              const value = valueOf(row, s.key);
+              if (value === undefined) return null;
+              return (
+                <span key={s.key} className="ratio-chart__tip-row" data-series={s.key}>
+                  <span
+                    className="ratio-chart__swatch"
+                    data-kind={s.kind}
+                    style={{ color: s.color }}
+                  />
+                  <span>{s.label}</span>
+                  <span className="ratio-chart__tip-value">
+                    {formatValue(value)}
+                    {unit ? ` ${unit}` : ''}
+                  </span>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** The value axis, on the leading edge: a label at every tick, the unit after the top one. */
 export function ChartYAxis({ model }: Injected) {
   const { ticks, y, formatTick, unit } = need(model, 'Chart.YAxis');
@@ -503,16 +574,5 @@ export function ChartTable({
     </details>
   );
 }
-
-[
-  ChartLegend,
-  ChartPlot,
-  ChartGrid,
-  ChartBars,
-  ChartLine,
-  ChartYAxis,
-  ChartXAxis,
-  ChartTable,
-].forEach((part) => PARTS.add(part));
 
 ChartRoot.displayName = 'Chart';

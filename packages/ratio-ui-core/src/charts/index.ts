@@ -24,3 +24,4 @@ export {
   type StackSegment,
 } from './stack';
 export { numberFormatter, type ChartNumberFormat } from './format';
+export { CHART_PALETTE, chartColorKey } from './palette';

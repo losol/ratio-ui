@@ -128,6 +128,92 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* Tooltip: a column per category over the marks, its tip shown on hover. */
+.ratio-chart__columns {
+  z-index: 1;
+}
+
+.ratio-chart__column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.ratio-chart__column:hover {
+  background: var(--chart-hover);
+}
+
+.ratio-chart__tip {
+  display: none;
+  position: absolute;
+  top: 0;
+  gap: 0.25em;
+  min-width: 10rem;
+  padding: 0.5em 0.65em;
+  border: 1px solid var(--chart-tip-border);
+  border-radius: var(--radius-sm);
+  background: var(--chart-tip-bg);
+  box-shadow: var(--chart-tip-shadow);
+  color: var(--text);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.ratio-chart__column:hover .ratio-chart__tip { display: grid; }
+.ratio-chart__column[data-side='end'] .ratio-chart__tip { left: calc(100% + 0.4rem); }
+.ratio-chart__column[data-side='start'] .ratio-chart__tip { right: calc(100% + 0.4rem); }
+
+.ratio-chart__tip-title {
+  font-weight: 600;
+}
+
+.ratio-chart__tip-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.ratio-chart__tip-value {
+  padding-inline-start: 1em;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+/* Muted series, set by the legend's toggles: faded, not gone. */
+.ratio-chart [data-muted] {
+  opacity: var(--chart-muted-opacity);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ratio-chart__bar,
+  .ratio-chart__line,
+  .ratio-chart__tip-row {
+    transition: opacity 0.2s ease;
+  }
+}
+
+/* The legend's toggles */
+.ratio-chart__legend-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: -0.15em -0.35em;
+  padding: 0.15em 0.35em;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ratio-chart__legend-button:hover { color: var(--text); }
+.ratio-chart__legend-button:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+.ratio-chart__legend-button[aria-pressed='false'] { text-decoration: line-through; opacity: 0.55; }
+
 /* Axes */
 .ratio-chart__yaxis,
 .ratio-chart__xaxis {

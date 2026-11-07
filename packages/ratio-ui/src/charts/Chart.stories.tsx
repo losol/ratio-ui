@@ -248,6 +248,50 @@ export const HourByHour: Story = {
 };
 
 /**
+ * Interactive, and still server-first. `Chart.Tooltip` gives every
+ * category a tooltip with each series' value, rendered on the server and
+ * shown on hover with CSS. `Chart.Legend interactive` turns the legend into
+ * toggles that fade a series out and back — the only client script, a thin
+ * layer that marks the server-rendered marks as muted. A muted series fades
+ * rather than vanishes, so the stacks and the scale hold still.
+ */
+export const Interactive: Story = {
+  render: () => (
+    <Card>
+      <Chart data={hours} x="hour" xLabel="Hour" unit="kW" series={energySeries} label="Production and consumption, hour by hour">
+        <Chart.Legend interactive />
+        <Chart.Plot height={240}>
+          <Chart.Grid />
+          <Chart.Bars />
+          <Chart.Line />
+          <Chart.YAxis />
+          <Chart.XAxis every={6} />
+          <Chart.Tooltip />
+        </Chart.Plot>
+      </Chart>
+    </Card>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // A column and its tooltip for each of the 24 hours, the noon one with every series' value.
+    const columns = canvasElement.querySelectorAll('.ratio-chart__column');
+    await expect(columns).toHaveLength(24);
+    await expect(columns[12]!.textContent).toContain('Wind, the turbine on the ridge0.5 kW');
+    await expect(columns[12]!.getAttribute('data-side')).toBe('start');
+
+    const sun = canvas.getByRole('button', { name: 'Sun, the panel by the boathouse' });
+    await expect(sun).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(sun);
+    await expect(sun).toHaveAttribute('aria-pressed', 'false');
+    const sunMarks = canvasElement.querySelectorAll('[data-series="sun"]');
+    await expect([...sunMarks].every((el) => el.hasAttribute('data-muted'))).toBe(true);
+    await expect(canvasElement.querySelector('[data-series="wind"][data-muted]')).toBeNull();
+    await userEvent.click(sun);
+    await expect(canvasElement.querySelector('[data-muted]')).toBeNull();
+  },
+};
+
+/**
  * In the reader's language: `format` takes a locale and any
  * `Intl.NumberFormat` options, for the ticks, the tooltips and the table;
  * the words are your own. Here, Norwegian.

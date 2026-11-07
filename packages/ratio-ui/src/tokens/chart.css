@@ -9,8 +9,9 @@
  * The six series colours alias the theme's own, so every theme and mode
  * gets a palette that belongs to it: the brand, green, the accent, the ink
  * itself (a neutral, for a total or a reference line), then red and orange.
- * Red comes late, so a fourth series is not read as a warning. A series can
- * still take any colour of its own.
+ * Red comes late, so a fourth series is not read as a warning. The order is
+ * `CHART_PALETTE` in @eventuras/ratio-ui-core/charts, which the native chart
+ * reads; keep the two in step. A series can still take any colour of its own.
  */
 
 /* Also on the surface scopes: an alias like `var(--card)` resolves where
@@ -30,10 +31,17 @@
   --chart-axis: var(--text-subtle);
   /* The hairline between the segments of a stacked bar: the paper's colour. */
   --chart-gap: var(--card);
+  /* The column under the pointer, and the tooltip's paper and frame. */
+  --chart-hover: color-mix(in oklch, var(--text) 6%, transparent);
+  --chart-tip-bg: var(--card);
+  --chart-tip-border: var(--border-2);
+  --chart-tip-shadow: 0 6px 18px color-mix(in oklch, var(--text) 16%, transparent);
 }
 
 :root {
   --chart-height: 15rem;
   --chart-bar-radius: 3px;
   --chart-line-width: 2.5px;
+  /* How far a muted series fades. */
+  --chart-muted-opacity: 0.15;
 }

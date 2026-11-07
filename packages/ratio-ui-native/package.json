@@ -29,6 +29,10 @@
     "./badges": {
       "types": "./dist/badges/index.d.ts",
       "import": "./dist/badges/index.js"
+    },
+    "./charts": {
+      "types": "./dist/charts/index.d.ts",
+      "import": "./dist/charts/index.js"
     }
   },
   "main": "./dist/index.js",
