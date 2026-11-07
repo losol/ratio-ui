@@ -1,5 +1,28 @@
 # @eventuras/ratio-ui
 
+## 2.37.0
+
+### Minor Changes
+
+- 84ed491: `Chart.Tooltip`: a tooltip per category with every series' value, rendered on the server and shown on hover with CSS alone. `Chart.Legend interactive`: legend entries become toggles that fade a series out and back — the chart's only client component, a thin layer that marks the server-rendered marks as muted, so the stacks and the scale hold still. New tokens `--chart-hover`, `--chart-tip-bg`, `--chart-tip-border`, `--chart-tip-shadow` and `--chart-muted-opacity`.
+- eeeabd8: New `@eventuras/ratio-ui/charts` (beta): `Chart`, bars and lines over categories, composed from parts — `Chart.Legend`, `Chart.Plot` with `Chart.Grid`, `Chart.Bars` (stacked, grouped, negative values), `Chart.Line`, `Chart.YAxis` and `Chart.XAxis`, and `Chart.Table`, the numbers behind a disclosure for screen readers. The root computes the scales once from `@eventuras/ratio-ui-core/charts` and hands them to every part, so the bars, the line, the grid and the axes agree on where zero is. Server-safe: no hooks, no context, no `'use client'`; marks are placed in percent, so a chart follows its container's width with no measuring. `format` takes a locale and `Intl.NumberFormat` options. New `--chart-*` tokens: a six-colour series palette from the theme's own colours, and the grid, axis, height, bar radius and line width; Tabula squares the bars.
+- 10e16e5: `Shelf` (beta), at `@eventuras/ratio-ui/shelf`: a palette of tiles to pull onto a work surface, such as field types onto a form or parts onto a bench. `Shelf.Group` titles a run of tiles; `Shelf.Tile` has a picture, a name, an optional count, and an optional `locked` reason that keeps it visible but dimmed and says why on hover and focus. It is a rail beside the surface from `lg` and a tray along the bottom below (`shape`), with tiles stacked or inline (`tile`).
+  
+  Three ways in, all equal: drag a tile (a ghost follows the pointer, and a drop outside any surface or Escape cancels), tap it, or press Enter or Space on it. `onAdd(item, via)` reports each add once, and a live region reads adds and cancels out in the app's words (`labels`). `useShelfSurface({ onDrop })` makes any element a drop surface: it learns where a drop lands in its own coordinates, and `over` follows a drag across it. Pointer events only, one pointer at a time, with no drag-and-drop library.
+  
+  The icon set gains `Lock`.
+- 9454e5e: `Surface` (beta), at `@eventuras/ratio-ui/shelf`: where the things from a `Shelf` land, in three layouts. `Surface.Column` is one ordered column with an insertion line; `Surface.Rows` is a column of rows with item widths in twelfths, where a drop between rows makes a new row and a drop beside an item splits its row, wrapping to one column below `md`; `Surface.Grid` is `columns × rows` cells of `cell` pixels, where items snap to cells, never overlap, and keep their cell positions when the grid or cell size changes, with optional corner dots (`showCells`).
+  
+  Each layout shares one frame: a drop zone with an empty state, one selected item, the keyboard (arrow keys select; Enter picks up, arrow keys move, Enter drops, Escape puts back; Delete removes), pointer drags of items already on it, focus on the item just added from a shelf however it came, an optional undo/redo toolbar over the app's own stack (`history`), and a live region in the app's words (`labels`). The app keeps the list: every change goes to `onChange`, and `onDrop` can refuse a tile. `findFreeCell` and `nextRow` help place a tapped tile.
+  
+  `Shelf.Tile` takes an optional `size` (`{ w, h }`), handed on as `item.size`, so a grid knows a drop's footprint before it lands. The icon set gains `Undo2` and `Redo2`.
+
+### Patch Changes
+
+- Updated dependencies [eeeabd8]
+- Updated dependencies [84ed491]
+  - @eventuras/ratio-ui-core@0.6.0
+
 ## 2.36.0
 
 ### Minor Changes
