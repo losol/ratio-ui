@@ -642,3 +642,304 @@ export const FollowNewMessages: Story = {
     );
   },
 };
+
+// ---------------------------------------------------------------------------
+// The cards layout
+// ---------------------------------------------------------------------------
+
+const yesterday: ChatLogMessage[] = [
+  { id: 'c-d1', type: 'divider', text: 'Yesterday' },
+  { id: 'c1', time: '16:58', nick: 'ingrid', role: 'op', text: 'Thanks, everyone — the doors ran smoothly today.' },
+  { id: 'c2', time: '16:59', nick: 'ingrid', role: 'op', text: 'Same plan tomorrow: badges from nine.' },
+  { id: 'c-e1', type: 'event', time: '17:02', text: 'aisha has left #volunteers' },
+];
+
+const today: ChatLogMessage[] = [
+  { id: 'c-d2', type: 'divider', text: 'Today' },
+  { id: 'c-e2', type: 'event', time: '09:41', text: 'marcus has joined #volunteers' },
+  { id: 'c3', time: '09:42', nick: 'ingrid', role: 'op', text: 'Morning all — badge printing starts at 10 in the foyer.' },
+  {
+    id: 'c4',
+    time: '09:42',
+    nick: 'ingrid',
+    role: 'op',
+    text: 'The venue map is up: https://example.org/venue/map',
+    preview: {
+      url: 'https://example.org/venue/map',
+      siteName: 'Example Venue',
+      title: 'Map of the conference centre',
+      description: 'Halls, rooms, coffee and the quiet corners — on one page.',
+      image: { src: thumbnail(210), width: 64, height: 64 },
+    },
+  },
+  {
+    id: 'c5',
+    time: '09:44',
+    nick: 'aisha',
+    role: 'voice',
+    text: '@tor do we have extra lanyards?',
+    reactions: [{ emoji: '👍', count: 2, me: true }],
+  },
+  { id: 'c6', time: '09:46', nick: 'tor', role: 'op', text: 'Two boxes behind the desk.' },
+  { id: 'c7', time: '09:46', nick: 'tor', role: 'op', text: 'Ask for @jonas if they run out.' },
+  { id: 'c-a1', type: 'action', time: '09:53', nick: 'marcus', text: 'heads to room 2.04' },
+  { id: 'c-d3', type: 'divider', text: 'New messages' },
+  {
+    id: 'c8',
+    time: '10:03',
+    nick: 'ingrid',
+    role: 'op',
+    text: 'Printers are live. Queue is short, come by if you have five minutes.',
+    reactions: [
+      { emoji: '🎉', count: 3 },
+      { emoji: '🙏', count: 1 },
+    ],
+  },
+  { id: 'c9', time: '10:04', nick: 'sofie', role: 'op', text: 'The keynote hall opens at 10:30 and we need four people on doors.' },
+  { id: 'c10', time: '10:04', nick: 'sofie', role: 'op', text: 'Doors A to D, one person each.' },
+  { id: 'c11', time: '10:05', nick: 'marcus', text: 'B' },
+  { id: 'c12', time: '10:05', nick: 'aisha', role: 'voice', text: 'C for me' },
+  { id: 'c-e3', type: 'event', time: '10:06', text: 'lena has joined #volunteers' },
+  { id: 'c13', time: '10:06', nick: 'lena', text: 'back — D is mine' },
+  { id: 'c14', time: '10:14', nick: 'lena', text: 'Door D is open; the queue reaches the stairs.' },
+];
+
+/** Adds the machine time beside the display time, so the five-minute rule can run. */
+const sentOn = (day: number) => (m: ChatLogMessage): ChatLogMessage => {
+  if (!m.time) return m;
+  const [hours = 0, minutes = 0] = m.time.split(':').map(Number);
+  return { ...m, timestamp: new Date(2026, 10, day, hours, minutes) };
+};
+
+const conversation = [...yesterday.map(sentOn(7)), ...today.map(sentOn(8))];
+
+/** The rows of the log, by message id. */
+const rowOf = (root: HTMLElement, id: string) =>
+  root.querySelector<HTMLElement>(`[data-message-id="${id}"]`)!;
+
+/** A row's avatar: the hidden square beside the name line. */
+const avatarOf = (row: HTMLElement) => row.querySelector<HTMLElement>(':scope > [aria-hidden="true"]');
+
+/**
+ * `layout="cards"` gives each message a small card: a square avatar with
+ * the nick's initial, the nick and time on one line, and the text below at
+ * body size, lined up with the nick. One nick's consecutive messages share
+ * the avatar and name line; a divider, an event, an action or another nick
+ * starts a new group. So does a pause of more than five minutes, when the
+ * messages carry a `timestamp` — lena's last message here. Without one,
+ * the nick alone decides.
+ *
+ * Dividers are a small capital label and a rule; join, part and topic
+ * events stay one quiet line with no avatar. The avatar takes the theme's
+ * corner (`--chat-avatar-radius`), so it is square in Tabula.
+ */
+export const Cards: Story = {
+  args: {
+    layout: 'cards',
+    messages: conversation,
+    me: 'tor',
+    highlightedId: 'c10',
+    'aria-label': '#volunteers',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // A group opens with the avatar and the name line; later messages have neither.
+    const head = rowOf(canvasElement, 'c3');
+    const avatar = avatarOf(head)!;
+    await expect(avatar).toHaveTextContent('I');
+    await expect(avatar.getBoundingClientRect().width).toBe(avatar.getBoundingClientRect().height);
+    await expect(avatarOf(rowOf(canvasElement, 'c4'))).toBeNull();
+    // The preview card still sits under the grouped message's text.
+    await expect(
+      within(rowOf(canvasElement, 'c4')).getByRole('link', { name: /Map of the conference centre/ }),
+    ).toBeInTheDocument();
+    // An event between two messages ends the group, as does a divider.
+    await expect(avatarOf(rowOf(canvasElement, 'c3'))).not.toBeNull();
+    await expect(avatarOf(rowOf(canvasElement, 'c8'))).not.toBeNull();
+    // Each group has one head: ten groups of messages here.
+    const avatars = conversation.filter(m => {
+      const row = rowOf(canvasElement, m.id);
+      return avatarOf(row) !== null;
+    });
+    await expect(avatars.map(m => m.id)).toEqual(['c1', 'c3', 'c5', 'c6', 'c8', 'c9', 'c11', 'c12', 'c13', 'c14']);
+    // Same nick, but eight minutes on: the pause starts a new group.
+    await expect(avatarOf(rowOf(canvasElement, 'c14'))).toHaveTextContent('L');
+
+    // The text lines up with the nick, not under the avatar.
+    const text = within(head).getByText(/badge printing/);
+    const nick = within(head).getByText('ingrid');
+    await expect(Math.round(text.getBoundingClientRect().left)).toBe(Math.round(nick.getBoundingClientRect().left));
+    await expect(text.getBoundingClientRect().left).toBeGreaterThan(avatar.getBoundingClientRect().right);
+    await expect(text.getBoundingClientRect().top).toBeGreaterThanOrEqual(nick.getBoundingClientRect().bottom - 1);
+    // The text of a later message lines up with the head's text.
+    const later = within(rowOf(canvasElement, 'c4')).getByText(/venue map is up/);
+    await expect(Math.round(later.getBoundingClientRect().left)).toBe(Math.round(text.getBoundingClientRect().left));
+    // Screen readers still hear who wrote a later message.
+    await expect(within(rowOf(canvasElement, 'c7')).getByText('tor', { exact: true })).toHaveClass('sr-only');
+
+    // Role glyphs are hidden and named; your own nick is tinted, a mention is said.
+    for (const glyph of canvas.getAllByText('@', { exact: true })) {
+      await expect(glyph).toHaveAttribute('aria-hidden', 'true');
+    }
+    await expect(canvas.getAllByText('(op)', { exact: false }).length).toBeGreaterThan(0);
+    await expect(within(rowOf(canvasElement, 'c5')).getByText('Mentions you:', { exact: false })).toBeInTheDocument();
+
+    // A divider is a capital label with a rule after it.
+    const divider = rowOf(canvasElement, 'c-d2');
+    await expect(getComputedStyle(divider).textTransform).toBe('uppercase');
+    await expect(getComputedStyle(divider, '::after').borderTopStyle).toBe('solid');
+
+    // Events and actions are one line in the text's column, with no avatar.
+    for (const id of ['c-e2', 'c-a1']) {
+      const row = rowOf(canvasElement, id);
+      await expect(avatarOf(row)).toBeNull();
+      const line = row.firstElementChild!;
+      await expect(Math.round(line.getBoundingClientRect().left)).toBe(Math.round(text.getBoundingClientRect().left));
+      await expect(line.getClientRects()).toHaveLength(1);
+    }
+    await expect(rowOf(canvasElement, 'c-a1')).toHaveTextContent('* marcus heads to room 2.04');
+
+    // The highlighted message is current, and shows its time though it is a later one.
+    const highlighted = rowOf(canvasElement, 'c10');
+    await expect(highlighted).toHaveAttribute('aria-current', 'true');
+    await expect(getComputedStyle(within(highlighted).getByText('10:04')).opacity).toBe('1');
+    await expect(getComputedStyle(within(rowOf(canvasElement, 'c7')).getByText('09:46')).opacity).toBe('0');
+    // …and is scrolled into view inside the log.
+    const log = canvas.getByRole('log');
+    await waitFor(() => expect(log.scrollTop).toBeGreaterThan(0));
+  },
+};
+
+/** A neutral portrait, so the stories load nothing from the network. */
+const portrait = (hue: number) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" fill="hsl(${hue} 35% 72%)"/><circle cx="18" cy="14" r="7" fill="hsl(${hue} 30% 45%)"/><path d="M4 36c2-9 8-13 14-13s12 4 14 13z" fill="hsl(${hue} 30% 45%)"/></svg>`,
+  )}`;
+
+const pictures: Record<string, string> = { ingrid: portrait(200), tor: portrait(30) };
+
+/**
+ * `avatar` puts the app's own avatar in the square — here a picture for
+ * the people who have one. Return nothing for the rest and they keep their
+ * initial. The square clips what you pass to its size and corner.
+ */
+export const CardsWithAvatars: Story = {
+  args: {
+    layout: 'cards',
+    messages: conversation,
+    me: 'tor',
+    'aria-label': '#volunteers',
+    avatar: ({ nick }) => nick && pictures[nick] && <img src={pictures[nick]} alt="" />,
+  },
+  play: async ({ canvasElement }) => {
+    const picture = avatarOf(rowOf(canvasElement, 'c3'))!.querySelector('img')!;
+    await expect(picture).toHaveAttribute('src', pictures.ingrid);
+    // The picture fills the square.
+    await expect(picture.getBoundingClientRect().width).toBe(avatarOf(rowOf(canvasElement, 'c3'))!.getBoundingClientRect().width);
+    // No picture, so the initial.
+    await expect(avatarOf(rowOf(canvasElement, 'c5'))).toHaveTextContent('A');
+    await expect(avatarOf(rowOf(canvasElement, 'c5'))!.querySelector('img')).toBeNull();
+  },
+};
+
+/**
+ * Everything the log does works in the cards layout: the bar over a
+ * message on hover or keyboard focus, with quick reactions, the picker and
+ * "Copy link"; the time as a permalink through `LinkComponent`; and a tap
+ * opening the bar through `activeId` and `onActivate`. A later message in a
+ * group keeps its time in the avatar's column, shown with the bar.
+ */
+export const CardsInteractive: Story = {
+  render: function CardsInteractiveStory(args) {
+    const [messages, setMessages] = useState(conversation.map(withHref));
+    const [activeId, setActiveId] = useState<string | undefined>(undefined);
+    const toggleReaction = (messageId: string, emoji: string) => {
+      args.onToggleReaction?.(messageId, emoji);
+      setMessages(prev =>
+        prev.map(m => (m.id !== messageId ? m : { ...m, reactions: toggle(m.reactions, emoji) })),
+      );
+    };
+    return (
+      <ChatLog
+        {...args}
+        messages={messages}
+        activeId={activeId}
+        onActivate={setActiveId}
+        onToggleReaction={toggleReaction}
+      />
+    );
+  },
+  args: {
+    layout: 'cards',
+    messages: conversation,
+    me: 'tor',
+    'aria-label': '#volunteers',
+    LinkComponent: RouterLink,
+    onToggleReaction: fn(),
+    onCopyLink: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const body = within(canvasElement.ownerDocument.body);
+
+    // The time is the permalink, through the router's Link.
+    const link = within(rowOf(canvasElement, 'c3')).getByRole('link', { name: 'Message from ingrid at 09:42' });
+    await expect(link).toHaveAttribute('href', '#/rooms/volunteers/c3');
+    await expect(link).toHaveAttribute('data-router');
+    // A later message's time is a permalink too, hidden until its row is open.
+    const later = rowOf(canvasElement, 'c7');
+    const laterTime = within(later).getByRole('link', { name: 'Message from tor at 09:46' });
+    await expect(getComputedStyle(laterTime).opacity).toBe('0');
+    await expect(getComputedStyle(laterTime).pointerEvents).toBe('none');
+
+    // The bar: a quick reaction adds one, the picker adds another, and "Copy link" reports the message.
+    const bar = within(within(rowOf(canvasElement, 'c3')).getByRole('toolbar', { name: 'React to message' }));
+    const press = async (name: string) => {
+      bar.getByRole('button', { name }).focus();
+      await userEvent.keyboard('{Enter}');
+    };
+    await press('React with ❤️');
+    await expect(args.onToggleReaction).toHaveBeenCalledWith('c3', '❤️');
+    await waitFor(() => expect(within(rowOf(canvasElement, 'c3')).getByText('❤️ 1')).toBeInTheDocument());
+    await press('More reactions');
+    const party = await body.findByRole('menuitem', { name: 'React with 🎉' });
+    party.focus();
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(within(rowOf(canvasElement, 'c3')).getByText('🎉 1')).toBeInTheDocument());
+    await press('Copy link');
+    await expect(args.onCopyLink).toHaveBeenCalledWith(expect.objectContaining({ id: 'c3' }));
+    // The reactions under a message toggle too: taking back your 👍.
+    const reactions = within(rowOf(canvasElement, 'c5')).getByRole('toolbar', { name: 'Reactions' });
+    within(reactions).getByRole('button', { name: /👍/ }).focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onToggleReaction).toHaveBeenCalledWith('c5', '👍');
+
+    // A tap opens the row, which shows the bar and the later message's time.
+    await tap(within(later).getByText(/if they run out/));
+    await waitFor(() => expect(later).toHaveAttribute('data-active'));
+    await waitFor(() => expect(getComputedStyle(laterTime).opacity).toBe('1'));
+    await expect(getComputedStyle(laterTime).pointerEvents).toBe('auto');
+    // The same message again closes it; a tap on the permalink is left alone.
+    await tap(within(later).getByText(/if they run out/));
+    await waitFor(() => expect(later).not.toHaveAttribute('data-active'));
+    await tap(link);
+    await expect(rowOf(canvasElement, 'c3')).not.toHaveAttribute('data-active');
+  },
+};
+
+/** In a narrow log the cards keep their shape; the preview spans the text's column. */
+export const CardsNarrow: Story = {
+  args: { layout: 'cards', messages: conversation, me: 'tor', 'aria-label': '#volunteers' },
+  decorators: [Story => <div className="flex h-full w-[360px] flex-col"><Story /></div>],
+  play: async ({ canvasElement }) => {
+    // A long message never widens the log.
+    const log = within(canvasElement).getByRole('log');
+    await expect(log.scrollWidth).toBe(log.clientWidth);
+  },
+};
+
+/** The cards on a dark surface, with the same tokens. */
+export const CardsDark: Story = {
+  args: { layout: 'cards', messages: conversation, me: 'tor', highlightedId: 'c10', 'aria-label': '#volunteers' },
+  decorators: [Story => <div className="surface-dark flex flex-1 flex-col bg-surface"><Story /></div>],
+};

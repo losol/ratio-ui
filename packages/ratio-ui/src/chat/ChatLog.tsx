@@ -8,12 +8,15 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import type { NavTreeProps } from '../core/NavTree';
 import { cn } from '../utils/cn';
 import {
+  continuesGroup,
   hasPreviewContent,
   mentionsNick,
+  nickInitial,
   sameNick,
   segmentChatText,
   type ChatLogMessage,
   type ChatRole,
+  type ChatTextSegment,
 } from '@eventuras/ratio-ui-core/chat';
 import { ChatReactions } from './ChatReactions';
 import { ChatReactionBar } from './ChatReactionBar';
@@ -48,12 +51,36 @@ export interface ChatLogLabels {
   copyLink?: string;
 }
 
+/**
+ * How `Chat.Log` lays out its messages: `log` is one line per message,
+ * `cards` a small card with an avatar.
+ * @beta Shape may change before release.
+ */
+export type ChatLogLayout = 'log' | 'cards';
+
 const QUICK_REACTIONS = ['👍', '❤️', '😄'];
 const MORE_REACTIONS = ['👍', '❤️', '😄', '🎉', '🙏', '👀', '✅', '☕', '🔥', '😮', '😢', '🤔'];
 
 /** @beta Prop shape may change before release. */
 export interface ChatLogProps {
   messages: ChatLogMessage[];
+  /**
+   * `log` puts time, nick and text on one line. `cards` sets an avatar
+   * beside the nick and time, with the text below, and one nick's
+   * consecutive messages share the avatar and that line — within five
+   * minutes of each other, when they carry a `timestamp`.
+   * @default 'log'
+   * @beta Prop shape may change before release.
+   */
+  layout?: ChatLogLayout;
+  /**
+   * The avatar beside a group's first message, in the `cards` layout. Its
+   * root fills a square sized and rounded by the `--chat-avatar-*` tokens,
+   * hidden from screen readers since the nick sits beside it. Return
+   * nothing (`null`, `undefined`, `false`) for the nick's initial, the default.
+   * @beta Prop shape may change before release.
+   */
+  avatar?: (message: ChatLogMessage) => React.ReactNode;
   /** Your own nick — tinted in the log, and rows that mention it are highlighted. */
   me?: string;
   /**
@@ -122,6 +149,7 @@ const TAP_SLOP = 10;
  * Chat.Log — the dense, one-line-per-message log for channels: time, nick
  * with its role glyph, text. Join/part and topic changes are `event` rows,
  * `/me` is an `action`, and a `divider` marks a day or "new messages".
+ * `layout="cards"` gives each message an avatar and more room instead.
  *
  * Purely presentational, and it does not scroll itself — same contract as
  * `Console.Body`. The ref is the scroll container, so the caller decides
@@ -132,6 +160,8 @@ const TAP_SLOP = 10;
 export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function ChatLog(
   {
     messages,
+    layout = 'log',
+    avatar,
     me,
     onToggleReaction,
     quickReactions = QUICK_REACTIONS,
@@ -234,25 +264,35 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
         '@container/chat [--chat-log-px:1.375rem]',
         'flex min-h-0 flex-1 flex-col gap-px overflow-y-auto px-(--chat-log-px) py-3',
         'text-[0.875rem] leading-normal text-(--text)',
+        layout === 'cards' && 'gap-0 text-base',
         'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none focus-visible:ring-inset',
         className,
       )}
     >
-      {messages.map(message => (
-        <ChatLogRow
-          key={message.id}
-          message={message}
-          me={me}
-          onToggleReaction={onToggleReaction}
-          onCopyLink={onCopyLink}
-          linkTag={linkTag}
-          active={message.id === activeId}
-          highlighted={message.id === highlightedId}
-          quickReactions={quickReactions}
-          moreReactions={moreReactions}
-          labels={rowLabels}
-        />
-      ))}
+      {messages.map((message, i) => {
+        const row: ChatLogRowProps = {
+          message,
+          me,
+          onToggleReaction,
+          onCopyLink,
+          linkTag,
+          active: message.id === activeId,
+          highlighted: message.id === highlightedId,
+          quickReactions,
+          moreReactions,
+          labels: rowLabels,
+        };
+        return layout === 'cards' ? (
+          <ChatCardRow
+            key={message.id}
+            {...row}
+            continued={continuesGroup(messages[i - 1], message)}
+            avatar={avatar}
+          />
+        ) : (
+          <ChatLogRow key={message.id} {...row} />
+        );
+      })}
     </div>
   );
 });
@@ -269,19 +309,142 @@ type ChatLogRowProps = {
 } & Pick<ChatLogProps, 'me' | 'onToggleReaction' | 'onCopyLink'> &
   Required<Pick<ChatLogProps, 'quickReactions' | 'moreReactions'>>;
 
+// The pointed-at message outranks a mention band.
+const rowBand = (highlighted: boolean, mentionsMe: boolean) =>
+  highlighted
+    ? 'border-(--primary) bg-(--chat-active-bg)'
+    : mentionsMe
+      ? 'border-(--accent) bg-(--chat-mention-bg)'
+      : 'border-transparent hover:bg-(--chat-row-hover-bg) has-[[data-focus-visible]]:bg-(--chat-row-hover-bg)';
+
+type MessageBarProps = Pick<
+  ChatLogRowProps,
+  'onToggleReaction' | 'quickReactions' | 'moreReactions' | 'labels'
+> & { id: string; copyLink?: () => void };
+
+/** The bar over a message: quick reactions, the picker and "Copy link". */
+const MessageBar: React.FC<MessageBarProps> = ({
+  id,
+  copyLink,
+  onToggleReaction,
+  quickReactions,
+  moreReactions,
+  labels,
+}) =>
+  onToggleReaction || copyLink ? (
+    <ChatReactionBar
+      quick={onToggleReaction ? quickReactions : []}
+      more={onToggleReaction ? moreReactions : []}
+      onReact={onToggleReaction ? onToggleReaction.bind(null, id) : () => {}}
+      label={labels.reactionBar}
+      moreLabel={labels.moreReactions}
+      reactWith={labels.reactWith}
+      onCopyLink={copyLink}
+      copyLinkLabel={labels.copyLink}
+      // In the DOM from the start, so keyboard users reach it. Shown on
+      // hover, on keyboard focus in the row (not after a click, or it
+      // would stay up once the pointer leaves), and while its picker is open.
+      className={cn(
+        'absolute -top-[15px] right-[18px] z-[3]',
+        // Hidden bars must not catch clicks meant for the row above.
+        'pointer-events-none opacity-0 transition-opacity duration-100',
+        'group-hover/row:pointer-events-auto group-hover/row:opacity-100',
+        'group-has-[[data-focus-visible]]/row:pointer-events-auto group-has-[[data-focus-visible]]/row:opacity-100',
+        'group-data-active/row:pointer-events-auto group-data-active/row:opacity-100',
+        'data-[open]:pointer-events-auto data-[open]:opacity-100',
+      )}
+    />
+  ) : null;
+
+type MessageTimeProps = Pick<ChatLogRowProps, 'message' | 'linkTag' | 'labels'> & {
+  className: string;
+};
+
+/** The time, and with an `href` the message's permalink. */
+const MessageTime: React.FC<MessageTimeProps> = ({
+  message: { href, nick, time },
+  linkTag: LinkTag,
+  labels,
+  className,
+}) =>
+  href ? (
+    // The usual chat permalink: in-app, same tab, through the router's Link.
+    <LinkTag
+      href={href}
+      aria-label={labels.messageLink(nick ?? '', time ?? '')}
+      className={cn(
+        className,
+        'rounded-xs no-underline hover:text-(--text-muted) hover:underline',
+        'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none',
+      )}
+    >
+      {time}
+    </LinkTag>
+  ) : (
+    <span className={className}>{time}</span>
+  );
+
+type NickProps = Pick<ChatLogRowProps, 'message' | 'me' | 'labels'> & { className: string };
+
+/** The nick, its role glyph and your own nick's tint. */
+const Nick: React.FC<NickProps> = ({ message: { nick, role }, me, labels, className }) => (
+  <span className={cn(className, sameNick(nick, me) ? NICK_COLOR.voice : NICK_COLOR[role ?? 'none'])}>
+    {/* The glyph is read as "at" or "plus", so screen readers get the role's name instead. */}
+    {role && <span aria-hidden>{ROLE_GLYPH[role]}</span>}
+    {nick}
+    {role && <span className="sr-only"> ({labels[role]})</span>}
+  </span>
+);
+
+type MessageBodyProps = Pick<ChatLogRowProps, 'message' | 'onToggleReaction' | 'labels'> & {
+  segments: ChatTextSegment[];
+  mentionsMe: boolean;
+  className: string;
+};
+
+/** The text, the link preview and the reactions. */
+const MessageBody: React.FC<MessageBodyProps> = ({
+  message: { id, preview, reactions },
+  segments,
+  mentionsMe,
+  onToggleReaction,
+  labels,
+  className,
+}) => (
+  <div className={className}>
+    <span className="break-words text-pretty">
+      {/* The band and stripe only show it; this says it. */}
+      {mentionsMe && <span className="sr-only">{labels.mentionsYou}: </span>}
+      <ChatText segments={segments} opensInNewTab={labels.opensInNewTab} />
+    </span>
+    {preview && hasPreviewContent(preview) && (
+      <ChatLinkPreviewCard preview={preview} opensInNewTab={labels.opensInNewTab} />
+    )}
+    {reactions && reactions.length > 0 && (
+      <ChatReactions
+        reactions={reactions}
+        // `bind`, not a closure: a Server Action bound here can still cross
+        // into the client component; a closure made on the server cannot.
+        onToggle={onToggleReaction?.bind(null, id)}
+        aria-label={labels.reactions}
+      />
+    )}
+  </div>
+);
+
 const ChatLogRow: React.FC<ChatLogRowProps> = ({
   message,
   me,
   onToggleReaction,
   onCopyLink,
-  linkTag: LinkTag,
+  linkTag,
   highlighted,
   active,
   quickReactions,
   moreReactions,
   labels,
 }) => {
-  const { id, type = 'msg', time, nick, role, text, preview, reactions, href } = message;
+  const { id, type = 'msg', time, nick, text, href } = message;
 
   if (type === 'divider') {
     return (
@@ -328,7 +491,6 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
   const segments = segmentChatText(text);
   const mentionsMe = mentionsNick(segments, me);
   const copyLink = onCopyLink && href ? () => onCopyLink(message) : undefined;
-  const timeClass = cn(TIME, '@max-lg/chat:col-start-2 @max-lg/chat:row-start-1');
 
   return (
     <div
@@ -342,85 +504,207 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
         'border-l-3 py-0.5 pr-(--chat-log-px) pl-[calc(var(--chat-log-px)-3px)] transition-colors duration-100',
         // Narrow: nick and time on one line, the text on its own below.
         '@max-lg/chat:grid-cols-[auto_minmax(0,1fr)] @max-lg/chat:gap-x-2 @max-lg/chat:gap-y-0.5 @max-lg/chat:py-1.5',
-        // The pointed-at message outranks a mention band.
-        highlighted
-          ? 'border-(--primary) bg-(--chat-active-bg)'
-          : mentionsMe
-            ? 'border-(--accent) bg-(--chat-mention-bg)'
-            : 'border-transparent hover:bg-(--chat-row-hover-bg) has-[[data-focus-visible]]:bg-(--chat-row-hover-bg)',
+        rowBand(highlighted, mentionsMe),
       )}
     >
-      {(onToggleReaction || copyLink) && (
-        <ChatReactionBar
-          quick={onToggleReaction ? quickReactions : []}
-          more={onToggleReaction ? moreReactions : []}
-          onReact={onToggleReaction ? onToggleReaction.bind(null, id) : () => {}}
-          label={labels.reactionBar}
-          moreLabel={labels.moreReactions}
-          reactWith={labels.reactWith}
-          onCopyLink={copyLink}
-          copyLinkLabel={labels.copyLink}
-          // In the DOM from the start, so keyboard users reach it. Shown on
-          // hover, on keyboard focus in the row (not after a click, or it
-          // would stay up once the pointer leaves), and while its picker is open.
-          className={cn(
-            'absolute -top-[15px] right-[18px] z-[3]',
-            // Hidden bars must not catch clicks meant for the row above.
-            'pointer-events-none opacity-0 transition-opacity duration-100',
-            'group-hover/row:pointer-events-auto group-hover/row:opacity-100',
-            'group-has-[[data-focus-visible]]/row:pointer-events-auto group-has-[[data-focus-visible]]/row:opacity-100',
-            'group-data-active/row:pointer-events-auto group-data-active/row:opacity-100',
-            'data-[open]:pointer-events-auto data-[open]:opacity-100',
-          )}
-        />
-      )}
-      {href ? (
-        // The usual chat permalink: in-app, same tab, through the router's Link.
-        <LinkTag
-          href={href}
-          aria-label={labels.messageLink(nick ?? '', time ?? '')}
-          className={cn(
-            timeClass,
-            'rounded-xs no-underline hover:text-(--text-muted) hover:underline',
-            'focus-visible:ring-2 focus-visible:ring-(--focus-ring) focus-visible:outline-none',
-          )}
-        >
-          {time}
-        </LinkTag>
-      ) : (
-        <span className={timeClass}>{time}</span>
-      )}
-      <span
+      <MessageBar
+        id={id}
+        copyLink={copyLink}
+        onToggleReaction={onToggleReaction}
+        quickReactions={quickReactions}
+        moreReactions={moreReactions}
+        labels={labels}
+      />
+      <MessageTime
+        message={message}
+        linkTag={linkTag}
+        labels={labels}
+        className={cn(TIME, '@max-lg/chat:col-start-2 @max-lg/chat:row-start-1')}
+      />
+      <Nick
+        message={message}
+        me={me}
+        labels={labels}
         className={cn(
           'truncate text-right font-semibold',
           '@max-lg/chat:col-start-1 @max-lg/chat:row-start-1 @max-lg/chat:max-w-[60cqw] @max-lg/chat:text-left',
-          sameNick(nick, me) ? NICK_COLOR.voice : NICK_COLOR[role ?? 'none'],
+        )}
+      />
+      <MessageBody
+        message={message}
+        segments={segments}
+        mentionsMe={mentionsMe}
+        onToggleReaction={onToggleReaction}
+        labels={labels}
+        className="flex min-w-0 flex-col gap-1 @max-lg/chat:col-span-2 @max-lg/chat:row-start-2"
+      />
+    </div>
+  );
+};
+
+type ChatCardRowProps = ChatLogRowProps &
+  Pick<ChatLogProps, 'avatar'> & {
+    /** Continues the previous message's group, so it has no avatar or name line. */
+    continued: boolean;
+  };
+
+// The avatar's column first; everything else lines up with the text after it.
+const CARD_GRID = 'grid grid-cols-[var(--chat-avatar-size)_minmax(0,1fr)] gap-x-3';
+
+// A later message's time waits in the avatar's column and shows with the
+// bar: on hover, on keyboard focus in the row, on an open row, and on its
+// own focus. Hidden, it must not catch a tap meant for the row.
+const REVEAL = cn(
+  'pointer-events-none opacity-0 transition-opacity duration-100',
+  'group-hover/row:pointer-events-auto group-hover/row:opacity-100',
+  'group-has-[[data-focus-visible]]/row:pointer-events-auto group-has-[[data-focus-visible]]/row:opacity-100',
+  'group-data-active/row:pointer-events-auto group-data-active/row:opacity-100',
+  'focus-visible:pointer-events-auto focus-visible:opacity-100',
+);
+
+/** The avatar of a group's first message: the caller's, or the nick's initial. */
+const CardAvatar: React.FC<Pick<ChatCardRowProps, 'message' | 'avatar'>> = ({ message, avatar }) => {
+  // `cond && <img />` gives false or '' when there is no picture.
+  const own = avatar?.(message) || undefined;
+  return (
+    // The nick beside it says who this is, so screen readers skip it.
+    <span
+      aria-hidden
+      className={cn(
+        'row-span-2 flex size-(--chat-avatar-size) items-center justify-center overflow-hidden rounded-(--chat-avatar-radius) select-none',
+        own == null
+          ? 'bg-(--chat-avatar-bg) text-[length:calc(var(--chat-avatar-size)*0.42)] leading-none font-bold text-(--chat-avatar-fg)'
+          : '*:size-full *:object-cover',
+      )}
+    >
+      {own ?? nickInitial(message.nick)}
+    </span>
+  );
+};
+
+/**
+ * A message as a small card: avatar, then nick and time on one line and
+ * the text below at body size. A group's later messages keep only the text.
+ */
+const ChatCardRow: React.FC<ChatCardRowProps> = ({
+  message,
+  continued,
+  avatar,
+  me,
+  onToggleReaction,
+  onCopyLink,
+  linkTag,
+  highlighted,
+  active,
+  quickReactions,
+  moreReactions,
+  labels,
+}) => {
+  const { id, type = 'msg', time, nick, text, href } = message;
+
+  if (type === 'divider') {
+    return (
+      <div
+        data-message-id={id}
+        className={cn(
+          'mt-4 mb-1 flex items-center gap-3 font-mono text-[11px] tracking-[0.08em] uppercase text-(--text-subtle)',
+          "after:flex-1 after:border-t after:border-border-1 after:content-['']",
         )}
       >
-        {/* The glyph is read as "at" or "plus", so screen readers get the role's name instead. */}
-        {role && <span aria-hidden>{ROLE_GLYPH[role]}</span>}
-        {nick}
-        {role && <span className="sr-only"> ({labels[role]})</span>}
-      </span>
-      <div className="flex min-w-0 flex-col gap-1 @max-lg/chat:col-span-2 @max-lg/chat:row-start-2">
-        <span className="break-words text-pretty">
-          {/* The band and stripe only show it; this says it. */}
-          {mentionsMe && <span className="sr-only">{labels.mentionsYou}: </span>}
-          <ChatText segments={segments} opensInNewTab={labels.opensInNewTab} />
-        </span>
-        {preview && hasPreviewContent(preview) && (
-          <ChatLinkPreviewCard preview={preview} opensInNewTab={labels.opensInNewTab} />
-        )}
-        {reactions && reactions.length > 0 && (
-          <ChatReactions
-            reactions={reactions}
-            // `bind`, not a closure: a Server Action bound here can still cross
-            // into the client component; a closure made on the server cannot.
-            onToggle={onToggleReaction?.bind(null, id)}
-            aria-label={labels.reactions}
-          />
-        )}
+        {text}
       </div>
+    );
+  }
+
+  // One quiet line in the text's column, no avatar; it ends a group.
+  if (type === 'event' || type === 'action') {
+    return (
+      <div
+        data-message-id={id}
+        className={cn(
+          CARD_GRID,
+          'mt-1 py-0.5 italic',
+          type === 'event' ? 'text-sm text-(--text-subtle)' : 'text-(--text-muted)',
+        )}
+      >
+        <span className="col-start-2 break-words text-pretty">
+          {type === 'event' ? (
+            text
+          ) : (
+            <>
+              {['*', nick].filter(Boolean).join(' ')}{' '}
+              <ChatText
+                segments={segmentChatText(text, { mentions: false })}
+                opensInNewTab={labels.opensInNewTab}
+              />
+            </>
+          )}
+          {time && (
+            <>
+              {' '}
+              <span className={TIME}>{time}</span>
+            </>
+          )}
+        </span>
+      </div>
+    );
+  }
+
+  const segments = segmentChatText(text);
+  const mentionsMe = mentionsNick(segments, me);
+  const copyLink = onCopyLink && href ? () => onCopyLink(message) : undefined;
+
+  return (
+    <div
+      data-message-id={id}
+      data-active={active || undefined}
+      aria-current={highlighted || undefined}
+      className={cn(
+        // Bleeds to the log's edges like a log row, for the same full-width bands.
+        'group/row relative -mx-(--chat-log-px) border-l-3 pr-(--chat-log-px) pl-[calc(var(--chat-log-px)-3px)] transition-colors duration-100',
+        CARD_GRID,
+        // A group opens with room above it; its later messages follow close.
+        continued ? 'items-baseline py-0.5' : 'mt-2.5 items-start pt-1.5 pb-0.5 first:mt-0',
+        rowBand(highlighted, mentionsMe),
+      )}
+    >
+      <MessageBar
+        id={id}
+        copyLink={copyLink}
+        onToggleReaction={onToggleReaction}
+        quickReactions={quickReactions}
+        moreReactions={moreReactions}
+        labels={labels}
+      />
+      {continued ? (
+        <>
+          {/* The group's name line shows who; screen readers get it on every message. */}
+          <span className="sr-only">{nick}</span>
+          <MessageTime
+            message={message}
+            linkTag={linkTag}
+            labels={labels}
+            // The pointed-at message shows its time without a hover.
+            className={cn(TIME, 'justify-self-end text-[0.6875rem] whitespace-nowrap', !highlighted && REVEAL)}
+          />
+        </>
+      ) : (
+        <>
+          <CardAvatar message={message} avatar={avatar} />
+          <span className="flex min-w-0 items-baseline gap-2">
+            <Nick message={message} me={me} labels={labels} className="truncate font-bold" />
+            <MessageTime message={message} linkTag={linkTag} labels={labels} className={cn(TIME, 'shrink-0')} />
+          </span>
+        </>
+      )}
+      <MessageBody
+        message={message}
+        segments={segments}
+        mentionsMe={mentionsMe}
+        onToggleReaction={onToggleReaction}
+        labels={labels}
+        className="col-start-2 flex min-w-0 flex-col gap-1.5"
+      />
     </div>
   );
 };
