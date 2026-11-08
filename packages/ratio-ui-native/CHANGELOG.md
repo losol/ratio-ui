@@ -1,5 +1,13 @@
 # @eventuras/ratio-ui-native
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [e48a538]
+- Updated dependencies [b2c9738]
+  - @eventuras/ratio-ui-core@0.7.0
+
 ## 0.4.0
 
 ### Minor Changes

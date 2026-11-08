@@ -1,5 +1,20 @@
 # @eventuras/ratio-ui-core
 
+## 0.7.0
+
+### Minor Changes
+
+- e48a538: `Chat.Log`: a roomier `cards` layout, beside the one-line log.
+  
+  - New `layout`: `'log'` (the default, unchanged) or `'cards'`. In `cards` each message gets a square avatar with the nick's initial, the nick and time on one line, and the text below at body size, lined up with the nick. One nick's consecutive messages share the avatar and that line, as long as they are at most five minutes apart; a later message's time waits in the avatar's column and shows with the bar. Dividers become a small capital label and a rule; events and `/me` actions stay one quiet line with no avatar.
+  - New `avatar`: renders the app's own avatar into the square. Return nothing for the nick's initial.
+  - Everything else works in both layouts: highlighted messages, mentions of `me`, role glyphs, reactions, the bar with "Copy link", the time as a permalink through `LinkComponent`, and `activeId` / `onActivate` taps.
+  - New optional `timestamp` on a message (`Date` or epoch milliseconds), never shown, read for that five-minute rule. When either of two messages has none, the nick alone decides, so a pause does not split a group; put a divider in to do that.
+  - New tokens `--chat-avatar-size` (36px) and `--chat-avatar-radius` (the theme's `--radius`, so square in Tabula). The square uses the existing `--chat-avatar-bg` and `--chat-avatar-fg`.
+  
+  `@eventuras/ratio-ui-core/chat`, for every renderer to share, gains the optional `ChatLogMessage.timestamp`; `continuesGroup(previous, message)`, the grouping rule, and its window `CHAT_GROUP_WINDOW_MS`; and `nickInitial(nick)`, a nick's first character upper-cased.
+- b2c9738: `@eventuras/ratio-ui-core/themes/tabula`: Tabula as theme data, beside Bureau. The printed sheet for a renderer without CSS: white sheets in petrol frames on a sand page, every radius 0, no shadow on cards and the soft one on buttons only (none when pressed, no press offset or growth), the 10px primary frame of a featured card, Fira Sans Condensed for display and Fira Sans for body, the petrol primary scale, and the standard theme's accent, status families and chat colours written out as the CSS cascades them. `themes/tabula.test.ts` holds the data to `ratio-ui/src/themes/tabula.css`. Pass it to `RatioProvider` in `@eventuras/ratio-ui-native` as `theme={tabula}`.
+
 ## 0.6.0
 
 ### Minor Changes
