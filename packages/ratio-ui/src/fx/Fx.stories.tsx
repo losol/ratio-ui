@@ -144,21 +144,36 @@ export const Lightning: Story = {
 };
 
 /**
- * Records every paint of the page flash, by its tint, and counts onsets: a
- * paint with no paint in the frame before it.
+ * Records the fx canvas frame by frame and counts flash onsets: a lit frame
+ * after a dark one, or the first lit frame of a new canvas. Each `clearRect`
+ * opens a frame; a fill in the flash's tint lights it. Counting frames rather
+ * than the time between paints keeps one flash one onset on a slow runner,
+ * where two frames of the same flash can be more than 25 ms apart.
  */
 function recordFlashes() {
   const proto = CanvasRenderingContext2D.prototype;
-  const original = proto.fillRect;
-  const paints: number[] = [];
-  proto.fillRect = function (this: CanvasRenderingContext2D, ...args: Parameters<typeof original>) {
-    if (String(this.fillStyle).startsWith('rgba(235, 242, 255')) paints.push(performance.now());
-    return original.apply(this, args);
+  const { clearRect, fillRect } = proto;
+  const frames: { canvas: HTMLCanvasElement; lit: boolean; at: number }[] = [];
+  proto.clearRect = function (this: CanvasRenderingContext2D, ...args: Parameters<typeof clearRect>) {
+    if (this.canvas.dataset.ratioFx !== undefined) frames.push({ canvas: this.canvas, lit: false, at: performance.now() });
+    return clearRect.apply(this, args);
+  };
+  proto.fillRect = function (this: CanvasRenderingContext2D, ...args: Parameters<typeof fillRect>) {
+    const frame = frames.at(-1);
+    if (frame?.canvas === this.canvas && String(this.fillStyle).startsWith('rgba(235, 242, 255')) frame.lit = true;
+    return fillRect.apply(this, args);
   };
   return {
-    onsets: () => paints.filter((t, i) => i === 0 || t - paints[i - 1]! > 25),
+    onsets: () =>
+      frames
+        .filter((frame, i) => {
+          const before = frames[i - 1];
+          return frame.lit && !(before?.lit && before.canvas === frame.canvas);
+        })
+        .map(frame => frame.at),
     restore: () => {
-      proto.fillRect = original;
+      proto.clearRect = clearRect;
+      proto.fillRect = fillRect;
     },
   };
 }
