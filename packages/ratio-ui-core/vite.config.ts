@@ -9,5 +9,6 @@ export default defineVanillaLibConfig({
     'fx/index': 'src/fx/index.ts',
     'charts/index': 'src/charts/index.ts',
     'themes/bureau': 'src/themes/bureau.ts',
+    'themes/tabula': 'src/themes/tabula.ts',
   },
 });

@@ -36,7 +36,8 @@ export default function App() {
 }
 ```
 
-`RatioProvider` takes a `theme` (Bureau by default) and a `colorScheme`
+`RatioProvider` takes a `theme` (Bureau by default; Tabula, the printed
+sheet, is `@eventuras/ratio-ui-core/themes/tabula`) and a `colorScheme`
 (the device's light or dark setting by default). Without a provider the
 components use Bureau in the device's mode. `useTheme()` gives a component
 of your own the same values: `colors`, `radius`, `space`, `fontSize`,
