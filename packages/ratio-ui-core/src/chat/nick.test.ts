@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import { describe, expect, it } from 'vitest';
-import { mentionsNick, sameNick } from './nick';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { mentionsNick, nickInitial, sameNick } from './nick';
 import { segmentChatText } from './segments';
 
 describe('sameNick', () => {
@@ -31,5 +31,36 @@ describe('mentionsNick', () => {
 
   it('ignores a nick inside a link', () => {
     expect(mentionsNick(segmentChatText('https://example.org/@tor'), 'tor')).toBe(false);
+  });
+});
+
+describe('nickInitial', () => {
+  it('is the first character, upper-cased', () => {
+    expect(nickInitial('ingrid')).toBe('I');
+    expect(nickInitial('  tor ')).toBe('T');
+  });
+
+  it('keeps a decomposed letter whole', () => {
+    expect(nickInitial('a\u030Ase')).toBe('Å');
+  });
+
+  it('keeps an emoji whole', () => {
+    expect(nickInitial('🦊fox')).toBe('🦊');
+    expect(nickInitial('👩‍💻dev')).toBe('👩‍💻');
+  });
+
+  describe('without Intl.Segmenter, as on Hermes', () => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('falls back to the first code point', () => {
+      vi.stubGlobal('Intl', { ...Intl, Segmenter: undefined });
+      expect(nickInitial('a\u030Ase')).toBe('Å');
+      expect(nickInitial('🦊fox')).toBe('🦊');
+    });
+  });
+
+  it('is empty without a nick', () => {
+    expect(nickInitial(undefined)).toBe('');
+    expect(nickInitial('   ')).toBe('');
   });
 });

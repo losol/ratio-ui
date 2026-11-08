@@ -46,6 +46,12 @@ export interface ChatLogMessage {
   type?: 'msg' | 'event' | 'action' | 'divider';
   /** Display time, formatted by the caller, e.g. `'09:42'`. */
   time?: string;
+  /**
+   * When it was sent, as a `Date` or epoch milliseconds. Never shown;
+   * read to group messages, which split after a five-minute pause.
+   * @beta May change before release.
+   */
+  timestamp?: Date | number;
   /** Author of a `msg` or an `action`. */
   nick?: string;
   role?: ChatRole;

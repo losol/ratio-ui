@@ -12,6 +12,13 @@
  * Beta, like the chat components: names and values may change before release.
  */
 
+/* Measures, the same in every mode. The avatar in `Chat.Log`'s cards layout
+   takes the theme's corner, so it is square where the theme is (Tabula). */
+:root {
+  --chat-avatar-size: 2.25rem;
+  --chat-avatar-radius: var(--radius);
+}
+
 /* Also on the surface scopes: an alias like `var(--card)` resolves where
    it's declared, so `:root` alone would ignore `.surface-dark`. */
 :root,
