@@ -50,12 +50,15 @@ theme generator.
 
 ## What is here, and what is not
 
-- **Themes** in `themes/`: Bureau today — semantic tokens with all four
-  status families, the chat's colours (`chatNick`, `chatMentionBg`, …;
+- **Themes** in `themes/`: Bureau and Tabula — semantic tokens with all
+  four status families, the chat's colours (`chatNick`, `chatMentionBg`, …;
   beta), the primary and accent scales, and the button, card and chat
-  shadow tokens (`theme.components`). The rest of the component tokens
-  (`--menu-*` and the like) stay in the CSS until a renderer needs them. Ink and the
-  standard theme follow by the same mechanism.
+  shadow tokens (`theme.components`). Tabula (`themes/tabula`) is the
+  printed sheet: white sheets in petrol frames on a sand page, no corner
+  and no shadow but the button's, Fira Sans Condensed for the big words.
+  The rest of the component tokens (`--menu-*` and the like) stay in the
+  CSS until a renderer needs them. Ink and the standard theme follow by
+  the same mechanism.
 - **Shared scales**: `fontSize` and `space`, the web's fluid sizes as the
   two ends of their `clamp()`. `resolveTheme()` gives them in points at
   the small end, a phone's.
@@ -99,8 +102,9 @@ theme generator.
   OKLCH is clipped, not gamut-mapped as CSS does — a step at the edge of
   sRGB can land a notch off.
 
-Until the generator lands, `ratio-ui/src/themes/bureau.css` is the web's
-source and `themes/bureau.test.ts` holds this package to it.
+Until the generator lands, `ratio-ui/src/themes/bureau.css` and
+`ratio-ui/src/themes/tabula.css` are the web's sources, and
+`themes/bureau.test.ts` and `themes/tabula.test.ts` hold this package to them.
 
 See [docs/adr/0001-vanilla-tier.md](docs/adr/0001-vanilla-tier.md) for why.
 

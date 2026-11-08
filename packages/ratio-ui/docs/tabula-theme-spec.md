@@ -33,6 +33,10 @@ The fonts file declares Fira Sans Condensed (700 and 800) and, through
 `bureau-fonts.css`, Fira Sans. Without it the theme falls back to the system
 stacks in its font tokens.
 
+For a renderer without CSS (React Native through `@eventuras/ratio-ui-native`),
+the same theme is data: `tabula` from `@eventuras/ratio-ui-core/themes/tabula`,
+held to this stylesheet by `ratio-ui-core/src/themes/tabula.test.ts`.
+
 ## What it changes against the standard theme
 
 | | Standard | Tabula |
