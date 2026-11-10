@@ -42,6 +42,10 @@
       "types": "./dist/fx/index.d.ts",
       "import": "./dist/fx/index.js"
     },
+    "./posters": {
+      "types": "./dist/posters/index.d.ts",
+      "import": "./dist/posters/index.js"
+    },
     "./themes/*": {
       "types": "./dist/themes/*.d.ts",
       "import": "./dist/themes/*.js"

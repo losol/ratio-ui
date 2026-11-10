@@ -66,6 +66,10 @@
       "types": "./dist/charts/index.d.ts",
       "import": "./dist/charts/index.js"
     },
+    "./posters": {
+      "types": "./dist/posters/index.d.ts",
+      "import": "./dist/posters/index.js"
+    },
     "./shelf": {
       "types": "./dist/shelf/index.d.ts",
       "import": "./dist/shelf/index.js"

@@ -97,6 +97,17 @@ theme generator.
   negatives down from zero; `valueExtent` measures what a chart must hold;
   `numberFormatter` writes ticks with the step's decimals in the reader's
   locale. The web's `Chart` (`@eventuras/ratio-ui/charts`) draws from them.
+- **Posters** in `@eventuras/ratio-ui-core/posters` (beta): a poster as
+  data. A `PosterTemplate` names the places on the poster (text and
+  picture slots, a frame, colours); `layoutPoster` fills them with content
+  and sets each text at the largest size that fits its box (`fitText`,
+  `wrapText`), returning layers in pixels for a renderer to draw. Text is
+  set in the theme's display and body faces (`posterTypefaces(theme.font)`)
+  and measured from tables of the widths of every face the themes ship, not
+  in a browser, so the server and the browser break the same lines; bring
+  your own `typefaces` for another face. `POSTER_SIZES` holds the common
+  social formats. The web's `Poster` (`@eventuras/ratio-ui/posters`) draws
+  the layers as SVG.
 - **The schema**: `defineTheme`, `mix`, `Theme` and friends.
 - **Colour maths**: `parseColor`, `oklchToRgba`, `formatColor`. Out-of-gamut
   OKLCH is clipped, not gamut-mapped as CSS does — a step at the edge of
