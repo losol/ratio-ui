@@ -45,7 +45,21 @@ const notice: PosterTemplate = {
 Ratio UI lays the poster out, draws it and turns it into an image. Which
 templates exist, what the content says, who may make a poster and where
 drafts are kept belong to the app. The `Generator example` story shows one
-way to put the two together.
+way to put the two together, with the draft saved and opened as JSON that
+names the template and the size and holds the words:
+
+```json
+{
+  "version": 1,
+  "template": "notice",
+  "format": "square",
+  "content": { "code": "SE10EP5", "series": "…", "body": "…", "signature": "…" }
+}
+```
+
+The template stays in the app's code, so a change to it reaches every saved
+poster. Templates and content are plain JSON too, if an app would rather
+keep them whole.
 
 ## The pieces
 

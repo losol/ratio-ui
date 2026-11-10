@@ -339,7 +339,14 @@ export const PictureBehindText: Story = {
 };
 
 const STORAGE_KEY = 'ratio-ui:poster-generator-story';
-type Draft = { code: string; series: string; body: string; signature: string; format: keyof typeof POSTER_SIZES };
+const FORMATS = ['square', 'portrait', 'story'] as const;
+type Draft = {
+  code: string;
+  series: string;
+  body: string;
+  signature: string;
+  format: (typeof FORMATS)[number];
+};
 const firstDraft: Draft = {
   code: notice.code as string,
   series: notice.series as string,
@@ -348,22 +355,69 @@ const firstDraft: Draft = {
   format: 'square',
 };
 
-/** The app's part: fields, a draft kept in this browser, a download. */
+/**
+ * What the generator saves and opens, in the browser's storage and as a
+ * file: which template, at which size, with what words. The template itself
+ * stays in the app's code, so a change to it reaches every saved poster.
+ */
+type PosterFile = {
+  version: 1;
+  template: 'notice';
+  format: Draft['format'];
+  content: Omit<Draft, 'format'>;
+};
+
+function toPosterFile({ format, ...content }: Draft): PosterFile {
+  return { version: 1, template: 'notice', format, content };
+}
+
+/**
+ * A draft from a file's JSON, or `null` for anything this generator did not
+ * write. Unknown fields are ignored and a missing text is empty.
+ */
+function fromPosterFile(json: unknown): Draft | null {
+  if (typeof json !== 'object' || json === null) return null;
+  const file = json as Record<string, unknown>;
+  if (file.version !== 1 || file.template !== 'notice') return null;
+  const format = FORMATS.find(name => name === file.format);
+  if (!format) return null;
+  const content =
+    typeof file.content === 'object' && file.content !== null ? (file.content as Record<string, unknown>) : {};
+  const text = (key: keyof PosterFile['content']) => {
+    const value = content[key];
+    return typeof value === 'string' ? value : '';
+  };
+  return { code: text('code'), series: text('series'), body: text('body'), signature: text('signature'), format };
+}
+
+/** Hands the reader a file to save. */
+function save(blob: Blob, name: string) {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = name;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+/** The app's part: fields, a draft kept in this browser, files in and out. */
 function Generator() {
-  // Persistence is the app's: here the browser keeps the draft.
+  // Persistence is the app's: here the browser keeps the draft, in the same
+  // shape as the file.
   const [draft, setDraft] = useState<Draft>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return { ...firstDraft, ...(JSON.parse(stored) as Partial<Draft>) };
+      if (stored) return fromPosterFile(JSON.parse(stored)) ?? firstDraft;
     } catch {
       // No storage, or something unreadable in it: start from the example.
     }
     return firstDraft;
   });
+  const [openError, setOpenError] = useState<string | null>(null);
   const svg = useRef<SVGSVGElement>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toPosterFile(draft)));
     } catch {
       // The draft lives as long as the page.
     }
@@ -372,7 +426,7 @@ function Generator() {
   const template = noticeTemplate(POSTER_SIZES[draft.format]);
   // Laying out first lets the app warn before anyone downloads.
   const layout = layoutPoster(template, { ...notice, ...draft });
-  const field = (name: keyof Omit<Draft, 'format'>, label: string, multiline = false) => (
+  const field = (name: keyof PosterFile['content'], label: string, multiline = false) => (
     <TextField
       name={name}
       label={label}
@@ -385,14 +439,32 @@ function Generator() {
     />
   );
 
-  const download = async () => {
-    if (!svg.current) return;
-    const blob = await posterToBlob(svg.current);
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${draft.code || 'poster'}.png`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+  const name = draft.code || 'poster';
+  const downloadPng = async () => {
+    if (svg.current) save(await posterToBlob(svg.current), `${name}.png`);
+  };
+  const downloadJson = () =>
+    save(
+      new Blob([`${JSON.stringify(toPosterFile(draft), null, 2)}\n`], { type: 'application/json' }),
+      `${name}.json`,
+    );
+  const open = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    // The same file can be opened again after editing.
+    event.target.value = '';
+    if (!file) return;
+    let opened: Draft | null = null;
+    try {
+      opened = fromPosterFile(JSON.parse(await file.text()));
+    } catch {
+      // Not JSON: reported below.
+    }
+    if (opened) {
+      setDraft(opened);
+      setOpenError(null);
+    } else {
+      setOpenError(`${file.name} is not a poster from this generator.`);
+    }
   };
 
   return (
@@ -403,7 +475,7 @@ function Generator() {
         {field('body', 'Message', true)}
         {field('signature', 'Signed')}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {(['square', 'portrait', 'story'] as const).map(format => (
+          {FORMATS.map(format => (
             <Button
               key={format}
               variant={draft.format === format ? 'primary' : 'outline'}
@@ -420,11 +492,30 @@ function Generator() {
             <Text size="sm">The message is too long for the poster and has been cut.</Text>
           </div>
         )}
-        <div>
-          <Button variant="primary" onClick={download}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <Button variant="primary" onClick={downloadPng}>
             Download PNG
           </Button>
+          <Button variant="outline" onClick={downloadJson}>
+            Download JSON
+          </Button>
+          <Button variant="outline" onClick={() => fileInput.current?.click()}>
+            Open JSON
+          </Button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            data-testid="open-json"
+            onChange={open}
+          />
         </div>
+        {openError && (
+          <div role="alert">
+            <Text size="sm">{openError}</Text>
+          </div>
+        )}
       </div>
       <PosterSvg layout={layout} label={`${draft.code}. ${draft.body}`} ref={svg} />
     </div>
@@ -433,8 +524,15 @@ function Generator() {
 
 /**
  * A generator, as an app might build one around `Poster`: the fields, the
- * draft kept in this browser and the download are the app's. Ratio UI lays
- * the poster out, draws it and turns it into an image.
+ * draft kept in this browser, and the files in and out are the app's. The
+ * JSON names the template and the size and holds the words:
+ *
+ * ```json
+ * { "version": 1, "template": "notice", "format": "square",
+ *   "content": { "code": "SE10EP5", "series": "…", "body": "…", "signature": "…" } }
+ * ```
+ *
+ * Ratio UI lays the poster out, draws it and turns it into an image.
  */
 export const GeneratorExample: Story = {
   render: () => <Generator />,
@@ -460,5 +558,49 @@ export const GeneratorExample: Story = {
     await expect(blob.type).toBe('image/png');
     const bitmap = await createImageBitmap(blob);
     await expect([bitmap.width, bitmap.height]).toEqual([1080, 1920]);
+
+    // Download JSON hands over the draft as a file.
+    const saved: Blob[] = [];
+    const createObjectURL = URL.createObjectURL;
+    URL.createObjectURL = (object: Blob | MediaSource) => {
+      if (object instanceof Blob) saved.push(object);
+      return createObjectURL.call(URL, object);
+    };
+    try {
+      await userEvent.click(canvas.getByRole('button', { name: 'Download JSON' }));
+    } finally {
+      URL.createObjectURL = createObjectURL;
+    }
+    await expect(saved[0]?.type).toBe('application/json');
+    await expect(JSON.parse(await saved[0]!.text())).toMatchObject({
+      version: 1,
+      template: 'notice',
+      format: 'story',
+      content: { code: 'SE10EP5', body: 'Lunch is moved to noon.' },
+    });
+
+    // Open JSON loads a file back, with what it lacks left empty.
+    const input = canvas.getByTestId('open-json');
+    const json = (value: unknown, name = 'poster.json') =>
+      new File([JSON.stringify(value)], name, { type: 'application/json' });
+    await userEvent.upload(
+      input,
+      json({ version: 1, template: 'notice', format: 'square', content: { code: 'SE10EP6', body: 'Snow clearing starts at six.' } }),
+    );
+    // The file is read in the background.
+    await waitFor(() => expect(canvas.getByLabelText('Episode')).toHaveValue('SE10EP6'));
+    await expect(canvas.getByLabelText('Signed')).toHaveValue('');
+    await expect(poster).toHaveAttribute('height', '1080');
+    await expect(poster.querySelector('text[data-slot="body"]')?.textContent).toBe('Snow clearing starts at six.');
+    await expect(canvas.queryByRole('alert')).toBeNull();
+
+    // Anything else is refused, and the draft stays as it was.
+    await userEvent.upload(input, json({ version: 2, template: 'notice', format: 'square', content: {} }, 'later.json'));
+    await expect(await canvas.findByRole('alert')).toHaveTextContent('later.json is not a poster from this generator.');
+    await userEvent.upload(input, new File(['not json'], 'notes.json', { type: 'application/json' }));
+    await waitFor(() =>
+      expect(canvas.getByRole('alert')).toHaveTextContent('notes.json is not a poster from this generator.'),
+    );
+    await expect(canvas.getByLabelText('Episode')).toHaveValue('SE10EP6');
   },
 };
