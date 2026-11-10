@@ -1,0 +1,159 @@
+// ratio-ui · design system for knowledge sharing
+// SPDX-FileCopyrightText: 2026 Losol AS
+// SPDX-License-Identifier: MPL-2.0
+
+import { fitText, linesHeight, POSTER_SANS } from './text';
+import type {
+  PosterContent,
+  PosterImage,
+  PosterLayer,
+  PosterLayout,
+  PosterTemplate,
+  PosterTextSlot,
+  PosterTypeface,
+} from './types';
+
+/** Common sizes, in pixels: what the social networks show without cropping. */
+export const POSTER_SIZES = {
+  /** 1:1, a feed post. */
+  square: { width: 1080, height: 1080 },
+  /** 4:5, the tallest a feed shows whole. */
+  portrait: { width: 1080, height: 1350 },
+  /** 9:16, a story or a reel. */
+  story: { width: 1080, height: 1920 },
+  /** 1.91:1, a link preview. */
+  landscape: { width: 1200, height: 630 },
+} as const;
+
+const INK = '#1f2328';
+
+export interface LayoutOptions {
+  /** The face the text is set in. Default `POSTER_SANS`. */
+  typeface?: PosterTypeface;
+}
+
+/**
+ * Lays a poster out: the template's slots filled with the content, every
+ * text set at the largest size that fits its box. The result is plain data
+ * in poster units, for any renderer to draw; it does no drawing itself.
+ */
+export function layoutPoster(
+  template: PosterTemplate,
+  content: PosterContent,
+  options: LayoutOptions = {},
+): PosterLayout {
+  const typeface = options.typeface ?? POSTER_SANS;
+  const layers: PosterLayer[] = [
+    {
+      kind: 'rect',
+      x: 0,
+      y: 0,
+      width: template.width,
+      height: template.height,
+      fill: template.background ?? '#ffffff',
+    },
+  ];
+  const overflow: string[] = [];
+
+  for (const [name, slot] of Object.entries(template.slots)) {
+    const value = content[name];
+    if (value === null || value === undefined) continue;
+    if (slot.kind === 'image') {
+      const image: PosterImage | undefined =
+        typeof value === 'string' ? (value ? { src: value } : undefined) : value;
+      if (!image?.src) continue;
+      layers.push({
+        kind: 'image',
+        slot: name,
+        href: image.src,
+        alt: image.alt,
+        ...slot.box,
+        fit: slot.fit ?? 'contain',
+      });
+      continue;
+    }
+    if (typeof value !== 'string' || value.trim() === '') continue;
+    const layer = setText(name, value, slot, template.color ?? INK, typeface);
+    if (layer.overflow) overflow.push(name);
+    layers.push(layer);
+  }
+
+  if (template.frame) {
+    const { width, color, inset = 0 } = template.frame;
+    const offset = inset + width / 2;
+    layers.push({
+      kind: 'rect',
+      x: offset,
+      y: offset,
+      width: template.width - offset * 2,
+      height: template.height - offset * 2,
+      stroke: color,
+      strokeWidth: width,
+    });
+  }
+
+  return { width: template.width, height: template.height, layers, overflow };
+}
+
+function setText(
+  name: string,
+  source: string,
+  slot: PosterTextSlot,
+  ink: string,
+  typeface: PosterTypeface,
+): PosterLayer & { kind: 'text' } {
+  const lineHeight = slot.lineHeight ?? 1.15;
+  const paragraphGap = slot.paragraphGap ?? 1;
+  const { box } = slot;
+  const fitted = fitText(
+    slot.uppercase ? source.toLocaleUpperCase() : source,
+    {
+      width: box.width,
+      height: box.height,
+      size: slot.size,
+      weight: slot.weight ?? 'bold',
+      letterSpacing: slot.letterSpacing ?? 0,
+      lineHeight,
+      paragraphGap,
+      maxLines: slot.maxLines,
+    },
+    typeface.measure,
+  );
+  const { size } = fitted.font;
+  const block = linesHeight(fitted.lines, size, lineHeight, paragraphGap);
+  const valign = slot.valign ?? 'top';
+  const top =
+    valign === 'top'
+      ? box.y
+      : valign === 'bottom'
+        ? box.y + box.height - block
+        : box.y + (box.height - block) / 2;
+  const align = slot.align ?? 'start';
+  const x = align === 'start' ? box.x : align === 'end' ? box.x + box.width : box.x + box.width / 2;
+  // The glyphs sit centred in each line box, as CSS places them.
+  const lineBox = size * lineHeight;
+  const baseline = (lineBox - (typeface.ascent + typeface.descent) * size) / 2 + typeface.ascent * size;
+
+  let y = top;
+  const lines = [];
+  for (const line of fitted.lines) {
+    if (line.gap) {
+      y += lineBox * paragraphGap;
+      continue;
+    }
+    lines.push({ text: line.text, x, y: y + baseline });
+    y += lineBox;
+  }
+
+  return {
+    kind: 'text',
+    slot: name,
+    source,
+    lines,
+    family: typeface.family,
+    font: fitted.font,
+    color: slot.color ?? ink,
+    anchor: align === 'start' ? 'start' : align === 'end' ? 'end' : 'middle',
+    overflow: fitted.overflow,
+  };
+}

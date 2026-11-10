@@ -1,0 +1,16 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Poster — the SVG keeps its own pixel size for export, and scales to its
+ * container's width on the page.
+ */
+.ratio-poster {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
