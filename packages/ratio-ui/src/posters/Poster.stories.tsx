@@ -128,9 +128,9 @@ async function fontsLoaded(svg: Element) {
 }
 
 /**
- * Every line must fit its slot and be as wide as it was laid out to be, less
- * kerning: the tables the server measures with, against the font the
- * browser draws.
+ * Every line must fit its slot and be about as wide as it was laid out to
+ * be: the tables the server measures with, against the font the browser
+ * draws.
  */
 async function expectLinesMeasured(
   svg: SVGSVGElement,
@@ -150,10 +150,11 @@ async function expectLinesMeasured(
     for (const tspan of text.querySelectorAll('tspan')) {
       const drawn = tspan.getComputedTextLength();
       const planned = faces[slot.font ?? 'body'].measure(tspan.textContent ?? '', font);
-      await expect(drawn).toBeLessThanOrEqual(slot.box.width + 0.5);
-      // Kerning only tightens a line, by a few percent at most; another face
-      // standing in for a missing one would miss by more.
-      await expect(drawn).toBeLessThanOrEqual(planned + 0.5);
+      await expect(drawn).toBeLessThanOrEqual(slot.box.width);
+      // Kerning narrows a line and hinting can widen it, each by a few
+      // percent at most; another face standing in for a missing one would
+      // miss by more.
+      await expect(drawn).toBeLessThanOrEqual(planned * 1.02 + 0.5);
       await expect(drawn).toBeGreaterThan(planned * 0.95);
     }
   }

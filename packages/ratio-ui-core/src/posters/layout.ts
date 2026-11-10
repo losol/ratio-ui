@@ -26,6 +26,14 @@ export const POSTER_SIZES = {
 
 const INK = '#1f2328';
 
+/**
+ * The share of a text box kept spare when breaking lines. Browsers draw a
+ * line a little narrower than its table width (kerning) or, where glyphs
+ * are hinted to whole pixels, up to a percent or two wider; the spare keeps
+ * the wider case inside the box.
+ */
+export const POSTER_TEXT_SPARE = 0.02;
+
 export interface LayoutOptions {
   /**
    * The theme's faces, by role: its `font`, for example `bureau.font`.
@@ -112,7 +120,7 @@ function setText(
   const fitted = fitText(
     slot.uppercase ? source.toLocaleUpperCase() : source,
     {
-      width: box.width,
+      width: box.width * (1 - POSTER_TEXT_SPARE),
       height: box.height,
       size: slot.size,
       weight: slot.weight ?? 'bold',

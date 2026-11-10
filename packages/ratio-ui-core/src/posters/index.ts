@@ -10,7 +10,7 @@
 // the browser break the same lines.
 // What the content is, and where it is kept, is the app's business.
 
-export { layoutPoster, POSTER_SIZES, type LayoutOptions } from './layout';
+export { layoutPoster, POSTER_SIZES, POSTER_TEXT_SPARE, type LayoutOptions } from './layout';
 export {
   fitText,
   POSTER_STANDARD_FONTS,

@@ -205,8 +205,9 @@ describe('layoutPoster', () => {
     const body = fitted.layers.find((l): l is PosterTextLayer => l.kind === 'text')!;
     expect(body.font.size).toBeLessThan(64);
     expect(body.overflow).toBe(false);
+    // Each line keeps two percent of the box spare.
     for (const line of body.lines) {
-      expect(posterTypeface('Source Sans 3').measure(line.text, body.font)).toBeLessThanOrEqual(780);
+      expect(posterTypeface('Source Sans 3').measure(line.text, body.font)).toBeLessThanOrEqual(780 * 0.98);
     }
     expect(fitted.overflow).toEqual([]);
 

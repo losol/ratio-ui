@@ -101,9 +101,10 @@ for the standard theme, `themes/bureau-fonts.css` or
 
 Text is measured from tables of the widths of every face the themes ship
 (Source Sans 3, Source Serif 4, Fira Sans, Fira Sans Condensed), not in a
-browser, so the server and every browser break the same lines. Kerning
-only tightens a line, so a line drawn is never wider than it was laid out
-to be. Regular is weight 400 and bold 700. Source Serif 4 is drawn at its
+browser, so the server and every browser break the same lines. A browser
+draws a line a little narrower (kerning) or, where it rounds glyphs to
+whole pixels, up to a percent or two wider, so each text box keeps 2%
+spare (`POSTER_TEXT_SPARE`). Regular is weight 400 and bold 700. Source Serif 4 is drawn at its
 default optical size (`font-optical-sizing: none`), as it is measured.
 
 When a text does not fit at its smallest size it is cut with an ellipsis,
