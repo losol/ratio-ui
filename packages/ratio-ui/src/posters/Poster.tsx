@@ -13,7 +13,7 @@ import {
   type PosterLayer,
   type PosterLayout,
   type PosterTemplate,
-  type PosterTypeface,
+  type PosterTypefaces,
 } from '@eventuras/ratio-ui-core/posters';
 import { cn } from '../utils/cn';
 import './Poster.css';
@@ -28,16 +28,23 @@ export interface PosterProps {
    * drawing order.
    */
   label?: string;
-  /** The face the text is set in. Default `POSTER_SANS` (Arial and its metric twins). */
-  typeface?: PosterTypeface;
+  /**
+   * The theme's faces, by role: its `font`, for example `bureau.font` from
+   * `@eventuras/ratio-ui-core/themes/bureau`. Default: the standard theme's,
+   * Source Serif 4 and Source Sans 3. The page must load them, as the
+   * theme's font stylesheet does.
+   */
+  fonts?: { display: string; body: string };
+  /** Faces of your own, measured your way. Wins over `fonts`. */
+  typefaces?: PosterTypefaces;
   className?: string;
   /** The `<svg>`, to export it with `posterToBlob`. */
   ref?: Ref<SVGSVGElement>;
 }
 
 /** A poster as SVG, sized in its own pixels and scaled to its container on the page. */
-export function Poster({ template, content, label, typeface, className, ref }: PosterProps) {
-  const layout = layoutPoster(template, content, { typeface });
+export function Poster({ template, content, label, fonts, typefaces, className, ref }: PosterProps) {
+  const layout = layoutPoster(template, content, { fonts, typefaces });
   return (
     <PosterSvg
       layout={layout}
@@ -112,6 +119,8 @@ function Layer({ layer }: { layer: PosterLayer }) {
           letterSpacing={layer.font.letterSpacing ? layer.font.letterSpacing * layer.font.size : undefined}
           fill={layer.color}
           textAnchor={layer.anchor}
+          // Measured at each face's default optical size.
+          style={{ fontOpticalSizing: 'none' }}
           data-slot={layer.slot}
         >
           {layer.lines.map((line, i) => (

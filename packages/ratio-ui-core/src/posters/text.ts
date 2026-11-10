@@ -6,7 +6,7 @@
 // the largest size at which the lines fit the height. Pure arithmetic over a
 // measure, so it gives the same lines on the server and in the browser.
 
-import { SANS_ASCENT, SANS_BOLD, SANS_CHARS, SANS_DESCENT, SANS_REGULAR } from './metrics';
+import { POSTER_CHARS, POSTER_FACES, type FaceMetrics } from './metrics';
 import type { MeasureText, PosterFont, PosterTypeface } from './types';
 
 /**
@@ -45,17 +45,47 @@ function tableOf(chars: string, widths: readonly number[]) {
   return { map, average };
 }
 
+/** The standard theme's faces, as `tokens/typography.css` names them. */
+export const POSTER_STANDARD_FONTS = { display: 'Source Serif 4', body: 'Source Sans 3' } as const;
+
+const typefaces = new Map<string, PosterTypeface>();
+
 /**
- * Arial and its metric twins (Liberation Sans, and Helvetica within a hair):
- * a face every system draws without loading a font, so a poster exported
- * to an image looks like the poster on the page.
+ * The typeface for a family Ratio UI's themes ship: Source Sans 3, Source
+ * Serif 4, Fira Sans or Fira Sans Condensed. Another family is set in that
+ * name but measured as Source Sans 3, so its lines may run short or long:
+ * give it a typeface of its own (`tableMeasure`) to set it exactly.
  */
-export const POSTER_SANS: PosterTypeface = {
-  family: 'Arial, "Liberation Sans", Helvetica, sans-serif',
-  ascent: SANS_ASCENT / 1000,
-  descent: SANS_DESCENT / 1000,
-  measure: tableMeasure(SANS_CHARS, { regular: SANS_REGULAR, bold: SANS_BOLD }),
-};
+export function posterTypeface(family: string): PosterTypeface {
+  const cached = typefaces.get(family);
+  if (cached) return cached;
+  const face: FaceMetrics = POSTER_FACES[family] ?? POSTER_FACES[POSTER_STANDARD_FONTS.body]!;
+  const typeface: PosterTypeface = {
+    family: `"${family.replace(/"/g, '')}", ${face.generic}`,
+    ascent: face.ascent / 1000,
+    descent: face.descent / 1000,
+    measure: tableMeasure(POSTER_CHARS, face),
+  };
+  typefaces.set(family, typeface);
+  return typeface;
+}
+
+/** The two faces a poster sets text in, by role. */
+export interface PosterTypefaces {
+  display: PosterTypeface;
+  body: PosterTypeface;
+}
+
+/**
+ * A theme's display and body faces, from its `font` (for example
+ * `bureau.font`). Default: the standard theme's, Source Serif 4 and
+ * Source Sans 3.
+ */
+export function posterTypefaces(
+  font: { display: string; body: string } = POSTER_STANDARD_FONTS,
+): PosterTypefaces {
+  return { display: posterTypeface(font.display), body: posterTypeface(font.body) };
+}
 
 /** A line of set text, or the empty line between two paragraphs. */
 export interface SetLine {

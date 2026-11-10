@@ -25,8 +25,9 @@ export interface PosterFont {
 export type MeasureText = (text: string, font: PosterFont) => number;
 
 /**
- * The face the text is set in: the CSS family a renderer writes, and how to
- * measure it. Ascent and descent are in em, to place each line's baseline.
+ * The face text is set in: the CSS family a renderer writes, and how to
+ * measure it. Ascent and descent are in em, to place each line's baseline
+ * as CSS does.
  */
 export interface PosterTypeface {
   family: string;
@@ -41,6 +42,8 @@ export interface PosterTextSlot {
   box: PosterBox;
   /** Font size in poster units. A range lets the text shrink to fit the box. */
   size: number | { max: number; min: number };
+  /** The theme's face to set it in. Default `body`. */
+  font?: 'display' | 'body';
   /** Default `bold`. */
   weight?: PosterWeight;
   /** Default: the template's `color`. */

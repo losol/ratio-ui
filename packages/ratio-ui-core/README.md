@@ -102,9 +102,10 @@ theme generator.
   picture slots, a frame, colours); `layoutPoster` fills them with content
   and sets each text at the largest size that fits its box (`fitText`,
   `wrapText`), returning layers in pixels for a renderer to draw. Text is
-  measured from a table of Arial-compatible widths (`POSTER_SANS`), not a
-  browser, so the server and the browser break the same lines; bring a
-  `PosterTypeface` for another face. `POSTER_SIZES` holds the common
+  set in the theme's display and body faces (`posterTypefaces(theme.font)`)
+  and measured from tables of the widths of every face the themes ship, not
+  in a browser, so the server and the browser break the same lines; bring
+  your own `typefaces` for another face. `POSTER_SIZES` holds the common
   social formats. The web's `Poster` (`@eventuras/ratio-ui/posters`) draws
   the layers as SVG.
 - **The schema**: `defineTheme`, `mix`, `Theme` and friends.

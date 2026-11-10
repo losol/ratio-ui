@@ -9,16 +9,20 @@
 // content says and where it is kept belong to the app.
 
 export { Poster, PosterSvg, type PosterProps, type PosterSvgProps } from './Poster';
-export { posterMarkup, posterToBlob, type PosterImageOptions } from './toImage';
+export { embedPosterFonts, posterMarkup, posterToBlob, type PosterImageOptions } from './toImage';
 // The model, for a renderer or a check of your own; re-exported so an app
 // needs one import.
 export {
   fitText,
   layoutPoster,
-  POSTER_SANS,
+  POSTER_FACES,
   POSTER_SIZES,
+  POSTER_STANDARD_FONTS,
+  posterTypeface,
+  posterTypefaces,
   tableMeasure,
   wrapText,
+  type FaceMetrics,
   type FitOptions,
   type FittedText,
   type LayoutOptions,
@@ -39,6 +43,7 @@ export {
   type PosterTextLine,
   type PosterTextSlot,
   type PosterTypeface,
+  type PosterTypefaces,
   type PosterWeight,
   type SetLine,
 } from '@eventuras/ratio-ui-core/posters';

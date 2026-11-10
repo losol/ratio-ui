@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-import { fitText, linesHeight, POSTER_SANS } from './text';
+import { fitText, linesHeight, posterTypefaces, type PosterTypefaces } from './text';
 import type {
   PosterContent,
   PosterImage,
@@ -10,7 +10,6 @@ import type {
   PosterLayout,
   PosterTemplate,
   PosterTextSlot,
-  PosterTypeface,
 } from './types';
 
 /** Common sizes, in pixels: what the social networks show without cropping. */
@@ -28,8 +27,13 @@ export const POSTER_SIZES = {
 const INK = '#1f2328';
 
 export interface LayoutOptions {
-  /** The face the text is set in. Default `POSTER_SANS`. */
-  typeface?: PosterTypeface;
+  /**
+   * The theme's faces, by role: its `font`, for example `bureau.font`.
+   * Default: the standard theme's, Source Serif 4 and Source Sans 3.
+   */
+  fonts?: { display: string; body: string };
+  /** Faces of your own, measured your way. Wins over `fonts`. */
+  typefaces?: PosterTypefaces;
 }
 
 /**
@@ -42,7 +46,7 @@ export function layoutPoster(
   content: PosterContent,
   options: LayoutOptions = {},
 ): PosterLayout {
-  const typeface = options.typeface ?? POSTER_SANS;
+  const faces = options.typefaces ?? posterTypefaces(options.fonts);
   const layers: PosterLayer[] = [
     {
       kind: 'rect',
@@ -73,7 +77,7 @@ export function layoutPoster(
       continue;
     }
     if (typeof value !== 'string' || value.trim() === '') continue;
-    const layer = setText(name, value, slot, template.color ?? INK, typeface);
+    const layer = setText(name, value, slot, template.color ?? INK, faces[slot.font ?? 'body']);
     if (layer.overflow) overflow.push(name);
     layers.push(layer);
   }
@@ -100,7 +104,7 @@ function setText(
   source: string,
   slot: PosterTextSlot,
   ink: string,
-  typeface: PosterTypeface,
+  typeface: PosterTypefaces['body'],
 ): PosterLayer & { kind: 'text' } {
   const lineHeight = slot.lineHeight ?? 1.15;
   const paragraphGap = slot.paragraphGap ?? 1;

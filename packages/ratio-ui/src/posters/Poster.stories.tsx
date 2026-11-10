@@ -5,15 +5,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { bureau } from '@eventuras/ratio-ui-core/themes/bureau';
+import { tabula } from '@eventuras/ratio-ui-core/themes/tabula';
 import {
+  embedPosterFonts,
   layoutPoster,
   Poster,
   POSTER_SIZES,
+  posterMarkup,
   posterToBlob,
+  posterTypefaces,
   PosterSvg,
   type PosterContent,
   type PosterTemplate,
 } from './index';
+// The standard theme's faces, as an app loads them. Bureau's and Tabula's
+// load with their themes in Storybook's preview.
+import '../fonts.css';
 import { Button } from '../core/Button';
 import { Text } from '../core/Text';
 import { TextField } from '../forms/Input/TextField';
@@ -111,13 +119,42 @@ const notice: PosterContent = {
   motto: 'Steep, salty and stubborn',
 };
 
-/** Every line drawn must fit its slot: the server's metrics against the browser's font. */
-async function expectLinesInside(svg: SVGSVGElement, template: PosterTemplate) {
+/** Waits for the faces the poster uses, as the page loads them. */
+async function fontsLoaded(svg: Element) {
+  const families = new Set([...svg.querySelectorAll('text')].map(text => text.getAttribute('font-family')!));
+  await Promise.all(
+    [...families].flatMap(family => [document.fonts.load(`400 40px ${family}`), document.fonts.load(`700 40px ${family}`)]),
+  );
+}
+
+/**
+ * Every line must fit its slot and be as wide as it was laid out to be, less
+ * kerning: the tables the server measures with, against the font the
+ * browser draws.
+ */
+async function expectLinesMeasured(
+  svg: SVGSVGElement,
+  template: PosterTemplate,
+  fonts?: { display: string; body: string },
+) {
+  await fontsLoaded(svg);
+  const faces = posterTypefaces(fonts);
   for (const text of svg.querySelectorAll<SVGTextElement>('text[data-slot]')) {
     const slot = template.slots[text.dataset.slot!]!;
+    if (slot.kind !== 'text') continue;
+    const font = {
+      size: Number(text.getAttribute('font-size')),
+      weight: text.getAttribute('font-weight') === '700' ? ('bold' as const) : ('regular' as const),
+      letterSpacing: 0,
+    };
     for (const tspan of text.querySelectorAll('tspan')) {
-      // One percent for a font that is Helvetica rather than Arial.
-      await expect(tspan.getComputedTextLength()).toBeLessThanOrEqual(slot.box.width * 1.01);
+      const drawn = tspan.getComputedTextLength();
+      const planned = faces[slot.font ?? 'body'].measure(tspan.textContent ?? '', font);
+      await expect(drawn).toBeLessThanOrEqual(slot.box.width + 0.5);
+      // Kerning only tightens a line, by a few percent at most; another face
+      // standing in for a missing one would miss by more.
+      await expect(drawn).toBeLessThanOrEqual(planned + 0.5);
+      await expect(drawn).toBeGreaterThan(planned * 0.95);
     }
   }
 }
@@ -135,7 +172,7 @@ export const Notice: Story = {
     await expect(poster.getAttribute('aria-label')).toContain('Secret Santa');
     await expect(poster).toHaveAttribute('width', '1080');
     await expect(poster).not.toHaveAttribute('data-overflow');
-    await expectLinesInside(poster as unknown as SVGSVGElement, noticeTemplate(POSTER_SIZES.square));
+    await expectLinesMeasured(poster as unknown as SVGSVGElement, noticeTemplate(POSTER_SIZES.square));
   },
 };
 
@@ -191,6 +228,59 @@ export const Formats: Story = {
       ))}
     </div>
   ),
+};
+
+const themes = [
+  { name: 'Standard', fonts: undefined },
+  { name: 'Bureau', fonts: bureau.font },
+  { name: 'Tabula', fonts: tabula.font },
+] as const;
+
+/** The notice, with the series in the theme's display face. */
+function themedTemplate(): PosterTemplate {
+  const template = noticeTemplate(POSTER_SIZES.square);
+  const series = template.slots.series;
+  if (series?.kind === 'text') template.slots.series = { ...series, font: 'display' };
+  return template;
+}
+
+/**
+ * The text is set in the theme's faces: `fonts` takes a theme's `font`,
+ * and a slot picks its `display` or `body` face. The same notice in the
+ * standard theme (Source Sans 3, with Source Serif 4 for display), Bureau
+ * (Fira Sans) and Tabula (Fira Sans, with Fira Sans Condensed for display).
+ * Here the series is set in the display face.
+ */
+export const ThemeFonts: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+      {themes.map(theme => (
+        <figure key={theme.name} style={{ margin: 0 }}>
+          <Poster template={themedTemplate()} content={notice} fonts={theme.fonts} />
+          <figcaption>
+            <Text as="span" size="sm">
+              {theme.name}
+            </Text>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const posters = within(canvasElement).getAllByRole('img');
+    const family = (poster: HTMLElement, slot: string) =>
+      poster.querySelector(`text[data-slot="${slot}"]`)!.getAttribute('font-family');
+    await expect(posters.map(poster => family(poster, 'body'))).toEqual([
+      '"Source Sans 3", sans-serif',
+      '"Fira Sans", sans-serif',
+      '"Fira Sans", sans-serif',
+    ]);
+    await expect(family(posters[0]!, 'series')).toBe('"Source Serif 4", serif');
+    await expect(family(posters[2]!, 'series')).toBe('"Fira Sans Condensed", sans-serif');
+    for (const [i, theme] of themes.entries()) {
+      await expectLinesMeasured(posters[i] as unknown as SVGSVGElement, themedTemplate(), theme.fonts);
+    }
+  },
 };
 
 /**
@@ -360,6 +450,10 @@ export const GeneratorExample: Story = {
 
     await userEvent.click(canvas.getByRole('button', { name: 'story' }));
     await expect(poster).toHaveAttribute('height', '1920');
+
+    // The file carries the theme's face, so it draws the same anywhere.
+    const file = await embedPosterFonts(posterMarkup(poster as unknown as SVGSVGElement));
+    await expect(file).toMatch(/<style>@font-face\{font-family:\s*"Source Sans 3";[^}]*src:url\("data:/);
 
     const blob = await posterToBlob(poster as unknown as SVGSVGElement);
     await expect(blob.type).toBe('image/png');

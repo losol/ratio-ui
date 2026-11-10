@@ -6,8 +6,9 @@ import { describe, expect, it } from 'vitest';
 import {
   fitText,
   layoutPoster,
-  POSTER_SANS,
   POSTER_SIZES,
+  posterTypeface,
+  posterTypefaces,
   tableMeasure,
   wrapText,
   type MeasureText,
@@ -20,18 +21,44 @@ const half: MeasureText = (text, font) =>
   Array.from(text).length * (0.5 + font.letterSpacing) * font.size;
 const bold10 = { size: 10, weight: 'bold' as const, letterSpacing: 0 };
 
-describe('POSTER_SANS', () => {
-  it('measures with the Arial-compatible widths', () => {
-    // Arial Bold: "H" 722, "i" 278 thousandths of an em.
-    expect(POSTER_SANS.measure('Hi', { size: 100, weight: 'bold', letterSpacing: 0 })).toBeCloseTo(100);
-    // Regular "i" is 222.
-    expect(POSTER_SANS.measure('i', { size: 100, weight: 'regular', letterSpacing: 0 })).toBeCloseTo(22.2);
+describe('posterTypeface', () => {
+  const at100 = { size: 100, weight: 'bold' as const, letterSpacing: 0 };
+
+  it('measures the standard theme\'s body face, Source Sans 3', () => {
+    const sans = posterTypeface('Source Sans 3');
+    expect(sans.family).toBe('"Source Sans 3", sans-serif');
+    // "a": 504 regular, 527 bold, thousandths of an em.
+    expect(sans.measure('a', { ...at100, weight: 'regular' })).toBeCloseTo(50.4);
+    expect(sans.measure('a', at100)).toBeCloseTo(52.7);
   });
 
   it('knows the Nordic letters, and adds letter spacing per character', () => {
-    const font = { size: 100, weight: 'bold' as const, letterSpacing: 0 };
-    expect(POSTER_SANS.measure('ø', font)).toBeCloseTo(61.1);
-    expect(POSTER_SANS.measure('øø', { ...font, letterSpacing: 0.1 })).toBeCloseTo(142.2);
+    const sans = posterTypeface('Source Sans 3');
+    expect(sans.measure('ø', at100)).toBeCloseTo(55.5);
+    expect(sans.measure('øø', { ...at100, letterSpacing: 0.1 })).toBeCloseTo(131);
+  });
+
+  it('has every face the themes ship, each with its own widths', () => {
+    const widths = ['Source Sans 3', 'Source Serif 4', 'Fira Sans', 'Fira Sans Condensed'].map(family =>
+      posterTypeface(family).measure('Secret Santa', at100),
+    );
+    expect(new Set(widths).size).toBe(4);
+    expect(posterTypeface('Source Serif 4').family).toBe('"Source Serif 4", serif');
+    // Condensed is narrower than its full-width sibling.
+    expect(widths[3]).toBeLessThan(widths[2]!);
+  });
+
+  it('sets an unknown family in its name, measured as Source Sans 3', () => {
+    const other = posterTypeface('Comic Neue');
+    expect(other.family).toBe('"Comic Neue", sans-serif');
+    expect(other.measure('Hello', at100)).toBe(posterTypeface('Source Sans 3').measure('Hello', at100));
+  });
+
+  it('gives a theme\'s display and body faces, by default the standard theme\'s', () => {
+    expect(posterTypefaces().display.family).toBe('"Source Serif 4", serif');
+    expect(posterTypefaces().body.family).toBe('"Source Sans 3", sans-serif');
+    const bureau = posterTypefaces({ display: 'Fira Sans', body: 'Fira Sans' });
+    expect(bureau.body.family).toBe('"Fira Sans", sans-serif');
   });
 
   it('measures an unknown character at the average width', () => {
@@ -179,12 +206,28 @@ describe('layoutPoster', () => {
     expect(body.font.size).toBeLessThan(64);
     expect(body.overflow).toBe(false);
     for (const line of body.lines) {
-      expect(POSTER_SANS.measure(line.text, body.font)).toBeLessThanOrEqual(780);
+      expect(posterTypeface('Source Sans 3').measure(line.text, body.font)).toBeLessThanOrEqual(780);
     }
     expect(fitted.overflow).toEqual([]);
 
     const tooLong = layoutPoster(template, { body: long.repeat(10) });
     expect(tooLong.overflow).toEqual(['body']);
+  });
+
+  it('sets each slot in the theme\'s face for its role', () => {
+    const slots: PosterTemplate['slots'] = {
+      title: { kind: 'text', box: { x: 0, y: 0, width: 400, height: 100 }, size: 20, font: 'display' },
+      body: { kind: 'text', box: { x: 0, y: 100, width: 400, height: 100 }, size: 20 },
+    };
+    const families = (fonts?: { display: string; body: string }) =>
+      layoutPoster({ width: 400, height: 200, slots }, { title: 'A', body: 'B' }, { fonts })
+        .layers.filter((l): l is PosterTextLayer => l.kind === 'text')
+        .map(l => l.family);
+    expect(families()).toEqual(['"Source Serif 4", serif', '"Source Sans 3", sans-serif']);
+    expect(families({ display: 'Fira Sans Condensed', body: 'Fira Sans' })).toEqual([
+      '"Fira Sans Condensed", sans-serif',
+      '"Fira Sans", sans-serif',
+    ]);
   });
 
   it('upper-cases text set as capitals, keeping the source', () => {
