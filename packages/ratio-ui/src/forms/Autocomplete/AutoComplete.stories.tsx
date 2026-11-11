@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { useAsyncList } from 'react-stately';
-import type { Selection } from 'react-aria-components';
+import { useAsyncList, type Selection } from 'react-aria-components';
 
 import {
   AutoComplete,

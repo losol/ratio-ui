@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import React from 'react';
-import clsx from 'clsx';
+import { cn } from '../../utils/cn';
 import { ChevronDown } from '../../icons';
 import { Stack } from '../../layout/Stack/Stack';
 
@@ -42,7 +42,7 @@ function Root({ children }: Readonly<AccordionProps>) {
 function Item({ children, className, ...rest }: Readonly<AccordionItemProps>) {
   return (
     <details
-      className={clsx(
+      className={cn(
         'group rounded-md border border-border-1 bg-card',
         className,
       )}
@@ -61,7 +61,7 @@ function Summary({
 }: Readonly<AccordionSummaryProps>) {
   return (
     <summary
-      className={clsx(
+      className={cn(
         'flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-3 font-medium',
         'hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--focus-ring)',
         '[&::-webkit-details-marker]:hidden',
@@ -87,7 +87,7 @@ function Content({
 }: Readonly<AccordionContentProps>) {
   return (
     <div
-      className={clsx(
+      className={cn(
         'p-3 text-sm',
         'transition-discrete transition-opacity duration-200 starting:opacity-0',
         className,
