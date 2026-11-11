@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 import React from 'react';
-import clsx from 'clsx';
+import { cn } from '../../utils/cn';
 import type { Status } from '../../tokens/colors';
 
 /** Error type for semantic meaning */
@@ -43,7 +43,7 @@ function ErrorIcon({ type = 'generic', status = 'error' }: Readonly<{ type: Erro
   if (type === 'not-found') {
     return (
       <svg
-        className={clsx(baseClass, colorClass)}
+        className={cn(baseClass, colorClass)}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -62,7 +62,7 @@ function ErrorIcon({ type = 'generic', status = 'error' }: Readonly<{ type: Erro
   if (type === 'forbidden') {
     return (
       <svg
-        className={clsx(baseClass, colorClass)}
+        className={cn(baseClass, colorClass)}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -81,7 +81,7 @@ function ErrorIcon({ type = 'generic', status = 'error' }: Readonly<{ type: Erro
   if (type === 'server-error') {
     return (
       <svg
-        className={clsx(baseClass, colorClass)}
+        className={cn(baseClass, colorClass)}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -100,7 +100,7 @@ function ErrorIcon({ type = 'generic', status = 'error' }: Readonly<{ type: Erro
   if (type === 'network-error') {
     return (
       <svg
-        className={clsx(baseClass, colorClass)}
+        className={cn(baseClass, colorClass)}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -119,7 +119,7 @@ function ErrorIcon({ type = 'generic', status = 'error' }: Readonly<{ type: Erro
   // generic error
   return (
     <svg
-      className={clsx(baseClass, colorClass)}
+      className={cn(baseClass, colorClass)}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -144,7 +144,7 @@ function Root({
 }: Readonly<ErrorProps>) {
   return (
     <div
-      className={clsx('py-12 text-center', className)}
+      className={cn('py-12 text-center', className)}
       role="alert"
       aria-live="polite"
     >
@@ -165,7 +165,7 @@ function Title({
   className?: string;
 }>) {
   return (
-    <h1 className={clsx('text-2xl font-bold mb-4', className)}>
+    <h1 className={cn('text-2xl font-bold mb-4', className)}>
       {children}
     </h1>
   );
@@ -180,7 +180,7 @@ function Description({
   className?: string;
 }>) {
   return (
-    <p className={clsx('text-base mb-2 max-w-2xl', className)}>
+    <p className={cn('text-base mb-2 max-w-2xl', className)}>
       {children}
     </p>
   );
@@ -195,7 +195,7 @@ function Details({
   className?: string;
 }>) {
   return (
-    <div className={clsx('text-sm text-(--text-muted) mb-6 max-w-2xl', className)}>
+    <div className={cn('text-sm text-(--text-muted) mb-6 max-w-2xl', className)}>
       {children}
     </div>
   );
@@ -210,7 +210,7 @@ function Actions({
   className?: string;
 }>) {
   return (
-    <div className={clsx('flex flex-wrap gap-4 justify-center mt-6', className)}>
+    <div className={cn('flex flex-wrap gap-4 justify-center mt-6', className)}>
       {children}
     </div>
   );

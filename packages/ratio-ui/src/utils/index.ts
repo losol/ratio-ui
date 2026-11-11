@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
-export { cn } from './cn';
+export { cn, type ClassValue } from './cn';
 export { buildCoverImageStyle } from './buildCoverImageStyle';
 export { slugify } from './slugify';
 export { getTextContent } from './getTextContent';

@@ -10,8 +10,8 @@ import {
   Input,
   type Key,
   type Selection,
+  useAsyncList,
 } from 'react-aria-components';
-import { useAsyncList } from 'react-stately';
 
 import { AutoComplete } from '../../forms/Autocomplete/AutoComplete';
 import { ListBox, ListBoxItem, SearchField } from '../../forms/Autocomplete/StyledComponents';

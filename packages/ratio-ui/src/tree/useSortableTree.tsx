@@ -10,8 +10,8 @@ import {
   type Key,
   type TextDropItem,
   useDragAndDrop,
+  useTreeData,
 } from 'react-aria-components';
-import { useTreeData } from 'react-stately';
 
 /**
  * A tree node. Identity is `id`; a `children` array marks the node as a

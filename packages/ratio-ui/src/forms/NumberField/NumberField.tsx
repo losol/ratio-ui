@@ -4,7 +4,7 @@
 
 import React from 'react';
 
-import clsx from 'clsx';
+import { cn } from '../../utils/cn';
 import {
   Button,
   FieldError,
@@ -134,14 +134,14 @@ export function NumberField({
     <AriaNumberField
       data-testid={testId}
       {...props}
-      className={clsx(styles.wrapper, className)}
+      className={cn(styles.wrapper, className)}
     >
       {label && <Label>{label}</Label>}
 
       <Group className={groupClassName}>
         <Button
           slot="decrement"
-          className={clsx(
+          className={cn(
             buttonClassName,
             variant === 'segmented'
               ? sizeConfig[size].segmentedButton
@@ -153,7 +153,7 @@ export function NumberField({
         </Button>
 
         <Input
-          className={clsx(
+          className={cn(
             inputClassName,
             variant === 'segmented'
               ? sizeConfig[size].segmentedInput
@@ -164,7 +164,7 @@ export function NumberField({
 
         <Button
           slot="increment"
-          className={clsx(
+          className={cn(
             buttonClassName,
             variant === 'segmented'
               ? sizeConfig[size].segmentedButton
