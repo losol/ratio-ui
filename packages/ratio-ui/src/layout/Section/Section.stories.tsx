@@ -162,6 +162,26 @@ export const WithHeaderAndLink: Story = {
   ),
 };
 
+/**
+ * `Section.Title display` sets one word very large and light in the primary
+ * colour, with the link still pushed to the right of the header row.
+ */
+export const DisplayTitle: Story = {
+  render: () => (
+    <Section paddingY="lg">
+      <Container>
+        <Section.Header>
+          <Section.Title display>
+            <em>Notes</em>
+          </Section.Title>
+          <Section.Link href="#">All notes</Section.Link>
+        </Section.Header>
+        <p className="text-(--text-muted)">Too short for an article, too good to forget.</p>
+      </Container>
+    </Section>
+  ),
+};
+
 export const GridLayout: Story = {
   render: () => (
     <Section paddingY="xl" className="grid grid-cols-1 md:grid-cols-2" gap="lg">

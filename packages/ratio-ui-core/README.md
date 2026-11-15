@@ -67,7 +67,10 @@ theme generator.
   the rules every renderer reads it by — `segmentChatText` for links and
   mentions, `sameNick`/`mentionsNick`, and `hostOf`/`previewLabel`/
   `hasPreviewContent` for link previews. The web's `Chat.Log` uses them
-  and `ChatLog` in `@eventuras/ratio-ui-native` both use them.
+  and `ChatLog` in `@eventuras/ratio-ui-native` both use them. A message
+  can carry a `ChatPrompt`, a small form to answer in the message
+  (`confirm` or `choice`), read by `promptStatus` and
+  `describePromptResponse`; the web renders it, native does not yet.
 - **Badges** in `@eventuras/ratio-ui-core/badges` (beta): an Open Badges
   3.0 credential's shape (`OpenBadgeCredential`, `OBAchievement`,
   `OBProfile`, …), `defineAchievement`/`defineCredential`/`defineProfile`

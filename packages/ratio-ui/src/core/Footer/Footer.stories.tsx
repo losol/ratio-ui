@@ -189,6 +189,40 @@ export const EditorialDark: FooterStory = () => (
   </Footer>
 );
 
+/**
+ * `Footer.Brand display` sets the wordmark very large and light, as the
+ * footer's closing line. An `<em>` in the name takes the accent italic. Give
+ * it a row of its own and put the columns under a rule.
+ */
+export const DisplayWordmark: FooterStory = () => (
+  <Footer surface="dark">
+    <Footer.Brand
+      display
+      name={
+        <>
+          Kunnskaps<em>kollektivet</em>
+        </>
+      }
+    />
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '24px 96px',
+        marginTop: 48,
+        paddingTop: 28,
+        borderTop: '1px solid var(--border-2)',
+      }}
+    >
+      <Footer.Publisher publisher={samplePublisher} />
+      <Footer.LinkColumn title="Read">
+        <Footer.Link href="#">Articles</Footer.Link>
+        <Footer.Link href="#">Notes</Footer.Link>
+      </Footer.LinkColumn>
+    </div>
+  </Footer>
+);
+
 const SURFACES: FooterSurface[] = ['default', 'transparent', 'primary', 'secondary', 'accent', 'dark'];
 
 /**
