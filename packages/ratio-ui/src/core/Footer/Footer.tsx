@@ -61,6 +61,13 @@ export interface FooterBrandProps {
   logo?: React.ReactNode;
   /** The wordmark / site name. */
   name: React.ReactNode;
+  /**
+   * Set the wordmark very large and light, as the footer's closing line
+   * instead of a label. An `<em>` inside `name` takes the accent italic:
+   * `name={<>Kunnskaps<em>kollektivet</em></>}`. Give the brand a row of its
+   * own; it scales with the viewport and wraps on a narrow one.
+   */
+  display?: boolean;
   /** A short mission line, set in the display serif italic. */
   mission?: React.ReactNode;
   className?: string;
@@ -68,11 +75,20 @@ export interface FooterBrandProps {
   children?: React.ReactNode;
 }
 
-const FooterBrand: React.FC<FooterBrandProps> = ({ logo, name, mission, className, children }) => (
+const FooterBrand: React.FC<FooterBrandProps> = ({
+  logo,
+  name,
+  display,
+  mission,
+  className,
+  children,
+}) => (
   <div className={className}>
     <div className="ratio-footer__brand-row">
       {logo}
-      <span className="ratio-footer__wordmark">{name}</span>
+      <span className={cn('ratio-footer__wordmark', display && 'ratio-footer__wordmark--display')}>
+        {name}
+      </span>
     </div>
     {mission ? <p className="ratio-footer__mission">{mission}</p> : null}
     {children ? <div className="mt-5">{children}</div> : null}
