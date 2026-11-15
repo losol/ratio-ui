@@ -6,6 +6,7 @@ export { Hero } from './Hero';
 export type {
   HeroProps,
   HeroVariant,
+  HeroSurface,
   HeroSlotProps,
   HeroTitleProps,
   HeroMotifProps,

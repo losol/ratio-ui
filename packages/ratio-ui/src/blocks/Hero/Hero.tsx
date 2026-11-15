@@ -44,9 +44,32 @@ export interface HeroProps {
    * ancestor.
    */
   variant?: HeroVariant;
+  /**
+   * A full-width fill, in the words `Footer` uses for its bands.
+   * - `primary`: a deep field of the brand colour (`--hero-primary-bg` /
+   *   `--hero-primary-fg`), the same depth in light and dark.
+   * - `accent`: a bright accent field with dark ink (`--hero-accent-bg` /
+   *   `--hero-accent-fg`).
+   * - `dark`: a `--color-primary-950` block in a `surface-dark` scope; the
+   *   same as `dark` with the fill included.
+   *
+   * On `primary` and `accent` the text tones, borders, `--primary` and
+   * `--accent` are re-derived from the field's ink, so titles, leads and
+   * buttons stay legible without per-block styling. Ignored by
+   * `variant="memorial"`, which owns its surface.
+   */
+  surface?: HeroSurface;
+  /**
+   * A filled circle off the top-right corner, cropped by the hero's edge,
+   * with two fine rings stepping away from it in the surface's ink. The
+   * sibling of `arcs` for a coloured `surface`, where `arcs`' multiply blend
+   * would sink into the fill. Its colour is `--hero-disc`. Decorative.
+   */
+  disc?: boolean;
 }
 
 export type HeroVariant = 'memorial';
+export type HeroSurface = 'primary' | 'accent' | 'dark';
 
 export interface HeroSlotProps {
   children?: ReactNode;
@@ -56,6 +79,14 @@ export interface HeroSlotProps {
 export interface HeroTitleProps extends HeroSlotProps {
   /** Heading level. Defaults to 1 — heroes are usually the page's primary heading. */
   as?: 'h1' | 'h2';
+  /**
+   * Set the title very large and light, the way `Footer.Brand display` sets
+   * a wordmark: a name or a short statement as the page's poster line. An
+   * `<em>` inside takes the accent italic. The size follows the viewport;
+   * set `--hero-display-size` (a `vw` length) to fit a long word on one line.
+   */
+  display?: boolean;
+  style?: CSSProperties;
 }
 
 export type HeroMotifProps = HeroSlotProps;
@@ -109,6 +140,8 @@ const HeroRoot: React.FC<HeroProps> = ({
   backgroundImageUrl,
   arcs,
   variant,
+  surface,
+  disc,
 }) => {
   // Unwrap fragments when collecting children — Children.toArray treats
   // <>…</> as a single opaque child (same fix as Navbar and Tabs), which
@@ -135,6 +168,7 @@ const HeroRoot: React.FC<HeroProps> = ({
   );
   const content = layers.length ? childArray.filter(child => !layers.includes(child)) : childArray;
   const memorial = variant === 'memorial';
+  const fill = memorial ? undefined : surface;
 
   // The memorial variant owns its surface (ink + grain); a cover image
   // would paint over the grain, so it is ignored there.
@@ -142,14 +176,23 @@ const HeroRoot: React.FC<HeroProps> = ({
 
   return (
     <section
+      data-surface={fill}
       className={cn(
         'ratio-hero py-(--space-2xl) border-b border-border-1 relative overflow-hidden',
-        (dark || memorial) && 'surface-dark',
+        (dark || memorial || fill === 'dark') && 'surface-dark',
+        fill === 'dark' && 'bg-primary-950 border-primary-900',
         memorial && 'ratio-hero--memorial bg-primary-950 border-primary-900',
         className,
       )}
       style={combinedStyle}
     >
+      {disc && (
+        <>
+          <span aria-hidden className="ratio-hero__disc" />
+          <span aria-hidden className="ratio-hero__ring ratio-hero__ring--near" />
+          <span aria-hidden className="ratio-hero__ring ratio-hero__ring--far" />
+        </>
+      )}
       {arcs && arcs.length > 0 && (
         <div
           aria-hidden
@@ -197,11 +240,21 @@ const HeroEyebrow: React.FC<HeroSlotProps> = ({ children, className }) => (
   </Heading.Eyebrow>
 );
 
-const HeroTitle: React.FC<HeroTitleProps> = ({ children, className, as = 'h1' }) => (
+const HeroTitle: React.FC<HeroTitleProps> = ({
+  children,
+  className,
+  as = 'h1',
+  display,
+  style,
+}) => (
   <Heading
     as={as}
+    style={style}
     className={cn(
-      'ratio-hero__title font-serif font-normal text-5xl lg:text-6xl leading-[1.05] tracking-tight text-balance text-(--primary)',
+      'ratio-hero__title font-serif',
+      display
+        ? 'ratio-hero__title--display'
+        : 'font-normal text-5xl lg:text-6xl leading-[1.05] tracking-tight text-balance text-(--primary)',
       className,
     )}
   >
