@@ -6,15 +6,24 @@ import React, { type ElementType, type ReactNode } from 'react';
 import { cn } from '../../utils/cn';
 import './Teaser.css';
 
-/** `md` is a card in a grid, `lg` the lead story, `row` a line in a compact list. */
-export type TeaserVariant = 'md' | 'lg' | 'row';
+/**
+ * `md` is a card in a grid, `lg` the lead story, `row` a line in a compact
+ * list. `feature` is the one story on a raised card, its title very large
+ * and its lead set as a pull line beside it. `numbered` is a line in a
+ * numbered list, behind a large italic numeral: put each in an `<li>` of an
+ * `<ol>`, which is where the number comes from.
+ */
+export type TeaserVariant = 'md' | 'lg' | 'row' | 'feature' | 'numbered';
 
 export interface TeaserProps {
   href: string;
   title: ReactNode;
   /** A kicker above the title: the topic and the date, say. */
   eyebrow?: ReactNode;
-  /** The lead; left out in the `row` variant, which has no room for it. */
+  /**
+   * The lead; left out in the `row` and `numbered` variants, which have no
+   * room for it. In `feature` it is the large pull line beside the title.
+   */
   lead?: ReactNode;
   /**
    * The picture, an `<img>` or a framework image. It is fitted to the
@@ -56,16 +65,23 @@ export const Teaser: React.FC<TeaserProps> = ({
   titleAs: TitleTag = 'h3',
   LinkComponent = 'a',
   className,
-}) => (
-  <LinkComponent
-    href={href}
-    className={cn('ratio-teaser', variant !== 'md' && `ratio-teaser--${variant}`, className)}
-  >
-    {image && <div className="ratio-teaser__frame">{image}</div>}
-    <div className="ratio-teaser__body">
-      {eyebrow && <p className="ratio-teaser__eyebrow">{eyebrow}</p>}
-      <TitleTag className="ratio-teaser__title">{title}</TitleTag>
-      {lead && variant !== 'row' && <p className="ratio-teaser__lead">{lead}</p>}
-    </div>
-  </LinkComponent>
-);
+}) => {
+  const leadLine = lead && variant !== 'row' && variant !== 'numbered' && (
+    <p className="ratio-teaser__lead">{lead}</p>
+  );
+  return (
+    <LinkComponent
+      href={href}
+      className={cn('ratio-teaser', variant !== 'md' && `ratio-teaser--${variant}`, className)}
+    >
+      {image && variant !== 'numbered' && <div className="ratio-teaser__frame">{image}</div>}
+      <div className="ratio-teaser__body">
+        {eyebrow && <p className="ratio-teaser__eyebrow">{eyebrow}</p>}
+        <TitleTag className="ratio-teaser__title">{title}</TitleTag>
+        {variant !== 'feature' && leadLine}
+      </div>
+      {/* Beside the body, not in it: the pull line is the card's second column. */}
+      {variant === 'feature' && leadLine && <div className="ratio-teaser__aside">{leadLine}</div>}
+    </LinkComponent>
+  );
+};
