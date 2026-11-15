@@ -21,6 +21,7 @@ import {
 import { ChatReactions } from './ChatReactions';
 import { ChatReactionBar } from './ChatReactionBar';
 import { ChatLinkPreviewCard } from './ChatLinkPreview';
+import { ChatPrompt, type ChatPromptLabels, type ChatPromptResponse } from './ChatPrompt';
 import { ChatText } from './ChatText';
 
 // The message's shape and the rules for reading it live in ratio-ui-core,
@@ -49,6 +50,8 @@ export interface ChatLogLabels {
   messageLink?: (nick: string, time: string) => string;
   /** Name of the "Copy link" button in the bar. @default 'Copy link' */
   copyLink?: string;
+  /** Built-in text of the prompt in a message; see `Chat.Prompt`. @beta */
+  prompt?: ChatPromptLabels;
 }
 
 /**
@@ -90,6 +93,14 @@ export interface ChatLogProps {
    * read-only and there is no bar.
    */
   onToggleReaction?: (messageId: string, emoji: string) => void;
+  /**
+   * Called with the message and the answer when the reader answers its
+   * `prompt`. The caller updates the message's prompt: `status: 'sending'`
+   * with the `response` while it is on its way, `answered` once it has
+   * arrived. Without it prompts are read-only.
+   * @beta Prop shape may change before release.
+   */
+  onRespond?: (messageId: string, response: ChatPromptResponse) => void;
   /** One-click reactions in the bar that shows on hover or focus. @default ['👍', '❤️', '😄'] */
   quickReactions?: string[];
   /** Reactions in the bar's picker. Pass `[]` to leave the picker out. @default twelve common emoji */
@@ -150,6 +161,8 @@ const TAP_SLOP = 10;
  * with its role glyph, text. Join/part and topic changes are `event` rows,
  * `/me` is an `action`, and a `divider` marks a day or "new messages".
  * `layout="cards"` gives each message an avatar and more room instead.
+ * A message's `prompt` is a small form under its text (see `Chat.Prompt`),
+ * answered through `onRespond`.
  *
  * Purely presentational, and it does not scroll itself — same contract as
  * `Console.Body`. The ref is the scroll container, so the caller decides
@@ -164,6 +177,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     avatar,
     me,
     onToggleReaction,
+    onRespond,
     quickReactions = QUICK_REACTIONS,
     moreReactions = MORE_REACTIONS,
     highlightedId,
@@ -228,8 +242,9 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     // A scroll ends in a pointerup too, so only a gesture that stayed put counts.
     if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > TAP_SLOP) return;
     const target = event.target as HTMLElement;
-    // The text's own links, the time, and the bar's buttons keep their taps.
-    if (target.closest('a, button')) return;
+    // The text's own links, the time, the bar's buttons and a prompt's
+    // options keep their taps.
+    if (target.closest('a, button, input, label')) return;
     const id = target.closest<HTMLElement>('[data-message-id]')?.dataset.messageId;
     onActivate(id && id !== activeId ? id : undefined);
   };
@@ -247,6 +262,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
     opensInNewTab: labels?.opensInNewTab ?? 'opens in a new tab',
     messageLink: labels?.messageLink ?? ((nick, time) => `Message from ${nick} at ${time}`),
     copyLink: labels?.copyLink ?? 'Copy link',
+    prompt: labels?.prompt ?? {},
   };
   return (
     <div
@@ -274,6 +290,7 @@ export const ChatLog = React.forwardRef<HTMLDivElement, ChatLogProps>(function C
           message,
           me,
           onToggleReaction,
+          onRespond,
           onCopyLink,
           linkTag,
           active: message.id === activeId,
@@ -306,7 +323,7 @@ type ChatLogRowProps = {
   active: boolean;
   /** Resolved from `LinkComponent`, the deprecated `linkAs`, or `'a'`. */
   linkTag: React.ElementType;
-} & Pick<ChatLogProps, 'me' | 'onToggleReaction' | 'onCopyLink'> &
+} & Pick<ChatLogProps, 'me' | 'onToggleReaction' | 'onRespond' | 'onCopyLink'> &
   Required<Pick<ChatLogProps, 'quickReactions' | 'moreReactions'>>;
 
 // The pointed-at message outranks a mention band.
@@ -396,18 +413,22 @@ const Nick: React.FC<NickProps> = ({ message: { nick, role }, me, labels, classN
   </span>
 );
 
-type MessageBodyProps = Pick<ChatLogRowProps, 'message' | 'onToggleReaction' | 'labels'> & {
+type MessageBodyProps = Pick<
+  ChatLogRowProps,
+  'message' | 'onToggleReaction' | 'onRespond' | 'labels'
+> & {
   segments: ChatTextSegment[];
   mentionsMe: boolean;
   className: string;
 };
 
-/** The text, the link preview and the reactions. */
+/** The text, the link preview, the prompt and the reactions. */
 const MessageBody: React.FC<MessageBodyProps> = ({
-  message: { id, preview, reactions },
+  message: { id, preview, prompt, reactions },
   segments,
   mentionsMe,
   onToggleReaction,
+  onRespond,
   labels,
   className,
 }) => (
@@ -419,6 +440,10 @@ const MessageBody: React.FC<MessageBodyProps> = ({
     </span>
     {preview && hasPreviewContent(preview) && (
       <ChatLinkPreviewCard preview={preview} opensInNewTab={labels.opensInNewTab} />
+    )}
+    {prompt && (
+      // `bind` for the reason given at the reactions below.
+      <ChatPrompt prompt={prompt} onRespond={onRespond?.bind(null, id)} labels={labels.prompt} />
     )}
     {reactions && reactions.length > 0 && (
       <ChatReactions
@@ -436,6 +461,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
   message,
   me,
   onToggleReaction,
+  onRespond,
   onCopyLink,
   linkTag,
   highlighted,
@@ -535,6 +561,7 @@ const ChatLogRow: React.FC<ChatLogRowProps> = ({
         segments={segments}
         mentionsMe={mentionsMe}
         onToggleReaction={onToggleReaction}
+        onRespond={onRespond}
         labels={labels}
         className="flex min-w-0 flex-col gap-1 @max-lg/chat:col-span-2 @max-lg/chat:row-start-2"
       />
@@ -592,6 +619,7 @@ const ChatCardRow: React.FC<ChatCardRowProps> = ({
   avatar,
   me,
   onToggleReaction,
+  onRespond,
   onCopyLink,
   linkTag,
   highlighted,
@@ -702,6 +730,7 @@ const ChatCardRow: React.FC<ChatCardRowProps> = ({
         segments={segments}
         mentionsMe={mentionsMe}
         onToggleReaction={onToggleReaction}
+        onRespond={onRespond}
         labels={labels}
         className="col-start-2 flex min-w-0 flex-col gap-1.5"
       />

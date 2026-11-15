@@ -13,7 +13,7 @@ these docs cover package-level contracts and decisions.
 | [`bureau-theme-spec.md`](bureau-theme-spec.md) | Captures the Bureau theme direction and token choices. |
 | [`tabula-theme-spec.md`](tabula-theme-spec.md) | The Tabula theme: the printed sheet, its tokens and what Ratio learned for it. |
 | [`autocomplete-api-design.md`](autocomplete-api-design.md) | Records the Autocomplete API design notes. |
-| [`chat-prompt-api-design.md`](chat-prompt-api-design.md) | Draft: small forms inside chat messages (confirm, choice, fields). |
+| [`chat-prompt-api-design.md`](chat-prompt-api-design.md) | `Chat.Prompt`, small forms inside chat messages: what is built (confirm, choice) and what is proposed (fields, native). |
 
 ## Architecture Decisions
 
