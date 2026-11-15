@@ -108,3 +108,49 @@ export const WithoutPicture: Story = {
     </div>
   ),
 };
+
+export const Feature: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The one story on a raised card: the title very large, the lead as a pull line beside it. The columns stack on a narrow screen.',
+      },
+    },
+  },
+  render: () => (
+    <Teaser
+      href="#"
+      variant="feature"
+      titleAs="h2"
+      eyebrow="Latest article · 15 Nov 2026"
+      title="ROT13, a slightly secret code"
+      lead="Urv, qh xynegr qrg!"
+    />
+  ),
+};
+
+export const Numbered: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Titles behind large italic numerals. Each teaser sits in an `<li>` of an `<ol>`: the number is the list item\'s own.',
+      },
+    },
+  },
+  render: () => (
+    <ol className="m-0 grid list-none gap-x-12 p-0 md:grid-cols-2">
+      {[
+        'Guided internet treatment is safe and effective',
+        'When statistics meets a bestseller',
+        'The GP paradox: more capacity, the same queue',
+        'Missing Per Fugelli',
+      ].map(title => (
+        <li key={title}>
+          <Teaser href="#" variant="numbered" title={title} />
+        </li>
+      ))}
+    </ol>
+  ),
+};

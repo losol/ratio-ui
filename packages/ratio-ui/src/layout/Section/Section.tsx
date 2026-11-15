@@ -40,6 +40,12 @@ export interface SectionTitleProps {
   children?: ReactNode;
   className?: string;
   as?: 'h1' | 'h2' | 'h3';
+  /**
+   * Set the title very large and light in the primary colour, the way
+   * `Hero.Title display` and `Footer.Brand display` do: one word that names
+   * the section, e.g. `<Section.Title display><em>Notes</em></Section.Title>`.
+   */
+  display?: boolean;
 }
 
 export interface SectionLinkProps extends React.ComponentPropsWithoutRef<'a'> {
@@ -148,11 +154,19 @@ const SectionEyebrow: React.FC<SectionEyebrowProps> = ({ children, className }) 
  *
  * Delegates to `Heading` with section-tier serif styling.
  */
-const SectionTitle: React.FC<SectionTitleProps> = ({ children, className, as = 'h2' }) => (
+const SectionTitle: React.FC<SectionTitleProps> = ({
+  children,
+  className,
+  as = 'h2',
+  display,
+}) => (
   <Heading
     as={as}
     className={cn(
-      'font-serif font-medium text-3xl md:text-4xl leading-[1.1] tracking-tight m-0',
+      'font-serif m-0',
+      display
+        ? 'font-light text-[clamp(4rem,12vw,11.25rem)] leading-[0.82] tracking-[-0.05em] text-(--primary)'
+        : 'font-medium text-3xl md:text-4xl leading-[1.1] tracking-tight',
       className,
     )}
   >
