@@ -71,6 +71,23 @@
   line-height: 1;
   color: var(--text);
 }
+/* display: the wordmark as the footer's closing line, very large and light.
+   An <em> in the name is the accent italic; on a coloured band, where the
+   accent may sit too close to the fill, it keeps the band's ink. */
+.ratio-footer__wordmark--display {
+  font-size: clamp(2.125rem, 6.4vw, 6rem);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  overflow-wrap: anywhere;
+}
+.ratio-footer__wordmark--display em {
+  font-style: italic;
+  color: var(--accent);
+}
+.ratio-footer:is([data-surface='primary'], [data-surface='secondary'], [data-surface='accent']) .ratio-footer__wordmark--display em {
+  color: inherit;
+}
 .ratio-footer__mission {
   font-family: var(--font-display);
   font-style: italic;
