@@ -1,5 +1,42 @@
 # @eventuras/ratio-ui
 
+## 2.40.0
+
+### Minor Changes
+
+- 6a1e414: `Chat.Prompt` (beta): a small form in a chat message, for a question the reader answers in the log.
+  
+  - A message's new optional `prompt` is data, so an agent can ask with a tool call. Two kinds: `confirm` (confirm or decline, one press, with its own button text and `tone: 'danger'`) and `choice` (pick one option, or several with `multiple`, then send). `dismissible` adds "Skip".
+  - A prompt has a status. `open` shows the controls, `sending` holds them while the answer is on its way, `answered` replaces them with a receipt that stays in the log, and `closed` says it no longer takes an answer, with an optional `closedNote`. A prompt with a `response` and no `status` is answered.
+  - `Chat.Log` renders the prompt under the message's text and reports the answer through the new `onRespond(messageId, response)`. The caller updates the message; the log keeps no state. Without `onRespond` prompts are read-only. `labels.prompt` holds the prompt's built-in text.
+  - `ChatPrompt` is exported for use on its own, for example above a composer. The name is also the type of the prompt's data.
+  - `Chat.MessageCard` shows a message's prompt read-only.
+  - A prompt never takes focus when it arrives. After an answer, focus waits on the prompt, where the receipt appears. A tap on a prompt's options or buttons does not open the message's bar.
+  - A `kind` the renderer does not know shows its title and description and no controls, so the message's `text` should still ask the question.
+  
+  `@eventuras/ratio-ui-core/chat`, for every renderer to share, gains `ChatLogMessage.prompt`, the types `ChatPrompt`, `ChatConfirmPrompt`, `ChatChoicePrompt`, `ChatPromptOption`, `ChatPromptResponse` and `ChatPromptStatus`, and the rules `promptStatus(prompt)` and `describePromptResponse(prompt, response, labels)`. `ChatLog` in `@eventuras/ratio-ui-native` does not render prompts yet.
+- 7b59b68: `Footer.Brand` takes `display`: the wordmark very large and light, as the footer's closing line instead of a label. An `<em>` inside `name` is set in the accent italic, e.g. `name={<>Kunnskaps<em>kollektivet</em></>}`. It scales with the viewport and wraps on a narrow one. On a `primary`, `secondary` or `accent` surface the `<em>` keeps the band's ink.
+- be7fcd0: Three additions to `Hero`, each usable alone; together they make a front page's poster.
+  
+  - `surface="primary" | "accent" | "dark"`: a full-width fill, in the words `Footer` uses. On `primary` and `accent` the text tones, borders, `--primary` and `--accent` are re-derived from the field's ink, so titles, leads and buttons stay legible. New tokens `--hero-primary-bg`, `--hero-primary-fg`, `--hero-primary-accent`, `--hero-accent-bg`, `--hero-accent-fg` let a theme reskin the fields.
+  - `disc`: a filled circle cropped by the top-right corner with two fine rings stepping away from it, in `--hero-disc`.
+  - `Hero.Title display`: the title very large and light, like `Footer.Brand display`. An `<em>` takes the accent italic; `--hero-display-size` fits a long word on one line. `Hero.Title` also takes `style`.
+- 2cd0114: Two `Teaser` variants and a display section title, the rest of the front-page poster.
+  
+  - `Teaser variant="feature"`: the one story on a raised card, its title very large and its lead set as a large italic pull line beside it. The columns stack on a narrow screen; a picture runs across the top.
+  - `Teaser variant="numbered"`: a line in a numbered list behind a large italic numeral. Put each in an `<li>` of an `<ol>`; the number is the list item's own. Lead and picture are left out.
+  - `Section.Title display`: one word very large and light in the primary colour, like `Hero.Title display` and `Footer.Brand display`.
+
+### Patch Changes
+
+- 59170f6: Fewer direct dependencies: `clsx` and `react-stately` are gone.
+  
+  - `useAsyncList` and `useTreeData` come from `react-aria-components`, which pins the `react-stately` they belong to, so an app can no longer end up with two copies of it.
+  - `cn` joins class values itself, taking the same shapes as `clsx` (strings, arrays, objects, falsy values), and still lets a later Tailwind class win a conflict. Its `ClassValue` type is exported from `@eventuras/ratio-ui/utils`.
+  - `Error`, `Accordion` and `NumberField` merge `className` with `cn`, like every other component: a class you pass now wins a conflict with the default.
+- Updated dependencies [6a1e414]
+  - @eventuras/ratio-ui-core@0.9.0
+
 ## 2.39.0
 
 ### Minor Changes
