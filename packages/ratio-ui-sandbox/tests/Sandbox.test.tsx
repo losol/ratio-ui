@@ -1,12 +1,12 @@
 import React from 'react';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Sandbox } from '../src/core/Sandbox/Sandbox';
+import { Sandbox } from '../src/Sandbox/Sandbox';
 import {
   buildSandboxDocument,
   runtimeOrigins,
   type SandboxRuntime,
-} from '../src/core/Sandbox/buildSandboxDocument';
+} from '../src/Sandbox/buildSandboxDocument';
 
 const runtime: SandboxRuntime = {
   imports: {

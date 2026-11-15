@@ -1,11 +1,10 @@
-// ratio-ui · design system for knowledge sharing
+// @eventuras/ratio-ui-sandbox · isolated frames for interactive examples
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
 'use client';
 
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { cn } from '../../utils/cn';
 import {
   buildSandboxDocument,
   SANDBOX_FRAME_SOURCE,
@@ -64,6 +63,17 @@ const readFrameMessage = (data: unknown, id: string): FrameMessage | null => {
   }
   if (message.type === 'error') return { type: 'error', message: String(message.message) };
   return null;
+};
+
+// Inline, so the component needs no stylesheet of its own. The tokens are
+// Ratio UI's; without them the text falls back to the page's own colours.
+const errorStyle: React.CSSProperties = {
+  margin: 0,
+  padding: '1rem',
+  border: '1px solid var(--border-1, currentColor)',
+  borderRadius: '0.375rem',
+  color: 'var(--text-muted, inherit)',
+  fontSize: '0.875rem',
 };
 
 const hostTheme = (): { theme?: string; colorScheme?: string } => {
@@ -208,11 +218,7 @@ export const Sandbox: React.FC<SandboxProps> = ({
 
   if (failed || srcDoc === null) {
     return (
-      <p
-        role="alert"
-        className={cn('rounded-md border border-border-1 p-4 text-sm text-(--text-muted)', className)}
-        data-testid={testId}
-      >
+      <p role="alert" className={className} style={errorStyle} data-testid={testId}>
         {labels?.error ?? 'This interactive example could not be shown.'}
       </p>
     );
@@ -228,8 +234,8 @@ export const Sandbox: React.FC<SandboxProps> = ({
       sandbox="allow-scripts"
       referrerPolicy="no-referrer"
       loading="lazy"
-      className={cn('block w-full border-0', className)}
-      style={{ height }}
+      className={className}
+      style={{ display: 'block', width: '100%', border: 0, height }}
       data-testid={testId}
     />
   );

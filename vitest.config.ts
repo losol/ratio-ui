@@ -20,6 +20,7 @@ export default defineConfig({
       './packages/markdown-core',
       './packages/ratio-ui-core',
       './packages/ratio-ui',
+      './packages/ratio-ui-sandbox',
 
       // Layout regressions need actual mobile viewports, independent of the
       // Storybook manager/preview iframe size.

@@ -3,9 +3,10 @@ import { Sandbox } from './Sandbox';
 import type { SandboxRuntime } from './buildSandboxDocument';
 
 /**
- * Stories load React from esm.sh so they run without a build step. They need
- * network access, so they are left out of the automated story tests. An app
- * should serve its own runtime instead — see the README.
+ * Stories load React from esm.sh, because Storybook does not serve the built
+ * runtime to a frame without an origin. They need network access, so they are
+ * left out of the automated story tests. An app serves the runtime in
+ * `dist/runtime` instead — see the README.
  */
 const runtime: SandboxRuntime = {
   imports: {
@@ -16,7 +17,7 @@ const runtime: SandboxRuntime = {
 };
 
 const meta: Meta<typeof Sandbox> = {
-  title: 'Core/Sandbox',
+  title: 'Sandbox/Sandbox',
   component: Sandbox,
   parameters: {
     layout: 'padded',
