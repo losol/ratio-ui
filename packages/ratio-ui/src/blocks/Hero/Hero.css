@@ -55,3 +55,84 @@
     color: color-mix(in oklch, var(--text) 10%, transparent);
   }
 }
+
+/*
+ * Surface (`Hero surface="primary|accent"`): a full-width field in a brand
+ * colour, as a local token scope like the coloured footers. The fill and ink
+ * come from the --hero-*-bg/fg tokens; the text tones, borders, --primary
+ * and --accent are re-derived from them, so a title, a lead and buttons
+ * inside stay legible without per-block styling.
+ */
+.ratio-hero[data-surface='primary'] {
+  --hero-bg: var(--hero-primary-bg);
+  --hero-fg: var(--hero-primary-fg);
+  --accent: var(--hero-primary-accent);
+}
+.ratio-hero[data-surface='accent'] {
+  --hero-bg: var(--hero-accent-bg);
+  --hero-fg: var(--hero-accent-fg);
+  --accent: var(--hero-fg);
+  /* The disc would vanish in its own colour: the primary field's instead. */
+  --hero-disc: var(--hero-primary-bg);
+}
+.ratio-hero:is([data-surface='primary'], [data-surface='accent']) {
+  background: var(--hero-bg);
+  color: var(--hero-fg);
+  border-bottom-color: transparent;
+  --text: var(--hero-fg);
+  --text-muted: color-mix(in oklab, var(--hero-fg) 94%, var(--hero-bg));
+  --text-subtle: color-mix(in oklab, var(--hero-fg) 91%, var(--hero-bg));
+  --border-1: color-mix(in oklab, var(--hero-fg) 35%, var(--hero-bg));
+  --border-2: color-mix(in oklab, var(--hero-fg) 55%, var(--hero-bg));
+  --primary: var(--hero-fg);
+  --text-on-primary: var(--hero-bg);
+  --focus-ring: var(--hero-fg);
+}
+
+/*
+ * Disc (`Hero disc`): a filled circle cropped by the top-right corner, and
+ * two fine rings stepping away from it in the surface's ink.
+ */
+.ratio-hero__disc,
+.ratio-hero__ring {
+  position: absolute;
+  width: 40vw;
+  height: 40vw;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+.ratio-hero__disc {
+  top: -12vw;
+  right: -6vw;
+  background: var(--hero-disc);
+}
+.ratio-hero__ring {
+  border: 1px solid var(--text);
+}
+.ratio-hero__ring--near {
+  top: -2vw;
+  right: 12vw;
+  opacity: 0.35;
+}
+.ratio-hero__ring--far {
+  top: 8vw;
+  right: 30vw;
+  opacity: 0.16;
+}
+
+/*
+ * Display title (`Hero.Title display`): very large and light, a name or a
+ * short statement as the page's poster line. An <em> is the accent italic.
+ */
+.ratio-hero__title--display {
+  font-weight: 300;
+  font-size: clamp(2.75rem, var(--hero-display-size, 11vw), 12.75rem);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  color: var(--text);
+  overflow-wrap: break-word;
+}
+.ratio-hero__title--display em {
+  font-style: italic;
+  color: var(--accent);
+}

@@ -1,0 +1,30 @@
+/*
+ * ratio-ui · design system for knowledge sharing
+ * SPDX-FileCopyrightText: 2026 Losol AS
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+/*
+ * Hero surface tokens: the fill and the ink of the coloured heroes
+ * (`<Hero surface="primary|accent">`, rules in blocks/Hero/Hero.css), and the
+ * colour of the `disc`. Override per theme or scope to reskin a field
+ * without touching the component.
+ */
+:root {
+  /* Deeper than --primary: a field this size wants weight, and light ink. */
+  --hero-primary-bg: color-mix(in oklch, var(--primary) 70%, black);
+  --hero-primary-fg: var(--text-on-primary);
+  --hero-primary-accent: var(--color-accent-300);
+  --hero-accent-bg: var(--color-accent-300);
+  --hero-accent-fg: var(--color-accent-950);
+  --hero-disc: var(--color-accent-400);
+}
+
+/* Dark: --primary is a light tone there, so the field is mixed down into the
+   surface instead and takes the page's own ink. The accent field is the same
+   in both. Both dark arms, as for every shared token (see theme.css). */
+:root[data-theme="dark"],
+:root[data-color-scheme="dark"] {
+  --hero-primary-bg: color-mix(in oklch, var(--primary) 35%, var(--surface));
+  --hero-primary-fg: var(--text);
+}

@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Button } from '../../core/Button';
@@ -223,6 +224,68 @@ export const Motif: Story = {
       <Hero.Motif className="h-40 text-accent-300">
         <svg viewBox="0 0 240 120" fill="currentColor"><path d="M0 118 C 70 96, 140 70, 196 50 L 200 62 C 150 84, 80 104, 0 118 Z" opacity=".55" /><polygon points="204.0,28.0 209.3,42.7 224.9,43.2 212.6,52.8 216.9,67.8 204.0,59.0 191.1,67.8 195.4,52.8 183.1,43.2 198.7,42.7" /></svg>
       </Hero.Motif>
+    </Hero>
+  ),
+};
+
+/**
+ * `surface="primary"` is a deep field of the brand colour, `disc` the filled
+ * circle and rings off its corner, and `Hero.Title display` the title very
+ * large and light with an `<em>` in the accent italic: a front page's poster.
+ * Each of the three works alone. The soft hyphen lets the name break and turn
+ * where it should.
+ */
+export const DisplayOnPrimary: Story = {
+  render: () => (
+    <Hero surface="primary" disc className="pt-[18vw]">
+      <Hero.Main>
+        <Hero.Title display>
+          Kunnskaps{'\u00AD'}
+          <em>kollektivet</em>
+        </Hero.Title>
+        <Hero.Lead>
+          Articles and short notes on health, technology and knowledge worth sharing.
+        </Hero.Lead>
+      </Hero.Main>
+    </Hero>
+  ),
+};
+
+/**
+ * The `accent` field takes dark ink, and the disc borrows the primary
+ * field's colour. Text, buttons and the `<em>` follow the field's ink.
+ */
+export const DisplayOnAccent: Story = {
+  render: () => (
+    <Hero surface="accent" disc>
+      <Hero.Main>
+        <Hero.Eyebrow>Article · 13 December 2025</Hero.Eyebrow>
+        <Hero.Title display style={{ '--hero-display-size': '7vw' } as React.CSSProperties}>
+          Metadata still matters. <em>For people and machines</em>
+        </Hero.Title>
+        <Hero.Lead>It is not only about Facebook.</Hero.Lead>
+        <Hero.Actions>
+          <Button variant="primary" size="lg">Read the article</Button>
+          <Button variant="outline" size="lg">All articles</Button>
+        </Hero.Actions>
+      </Hero.Main>
+    </Hero>
+  ),
+};
+
+/**
+ * `Hero.Title display` on the page's own surface, with no fill: the large
+ * light title is not tied to a coloured field.
+ */
+export const DisplayTitle: Story = {
+  render: () => (
+    <Hero>
+      <Hero.Main>
+        <Hero.Title display>
+          Worth <em>sharing</em>
+        </Hero.Title>
+        <Hero.Lead>A place for long-form articles and editorial collections.</Hero.Lead>
+      </Hero.Main>
     </Hero>
   ),
 };
