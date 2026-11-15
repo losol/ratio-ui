@@ -200,7 +200,7 @@ export const DisplayWordmark: FooterStory = () => (
       display
       name={
         <>
-          Kunnskaps<em>kollektivet</em>
+          Common<em>place</em>
         </>
       }
     />

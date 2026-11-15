@@ -123,9 +123,9 @@ export const Feature: Story = {
       href="#"
       variant="feature"
       titleAs="h2"
-      eyebrow="Latest article · 15 Nov 2026"
-      title="ROT13, a slightly secret code"
-      lead="Urv, qh xynegr qrg!"
+      eyebrow={`Latest · ${lead.eyebrow}`}
+      title={lead.title}
+      lead="Answer the question the reader has not asked yet."
     />
   ),
 };
@@ -142,10 +142,10 @@ export const Numbered: Story = {
   render: () => (
     <ol className="m-0 grid list-none gap-x-12 p-0 md:grid-cols-2">
       {[
-        'Guided internet treatment is safe and effective',
-        'When statistics meets a bestseller',
-        'The GP paradox: more capacity, the same queue',
-        'Missing Per Fugelli',
+        'Writing for readers who skim',
+        'Peer review in the classroom',
+        'Teaching with worked examples',
+        'What a margin note is for',
       ].map(title => (
         <li key={title}>
           <Teaser href="#" variant="numbered" title={title} />
