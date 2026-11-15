@@ -15,7 +15,7 @@
   - A `kind` the renderer does not know shows its title and description and no controls, so the message's `text` should still ask the question.
   
   `@eventuras/ratio-ui-core/chat`, for every renderer to share, gains `ChatLogMessage.prompt`, the types `ChatPrompt`, `ChatConfirmPrompt`, `ChatChoicePrompt`, `ChatPromptOption`, `ChatPromptResponse` and `ChatPromptStatus`, and the rules `promptStatus(prompt)` and `describePromptResponse(prompt, response, labels)`. `ChatLog` in `@eventuras/ratio-ui-native` does not render prompts yet.
-- 7b59b68: `Footer.Brand` takes `display`: the wordmark very large and light, as the footer's closing line instead of a label. An `<em>` inside `name` is set in the accent italic, e.g. `name={<>Kunnskaps<em>kollektivet</em></>}`. It scales with the viewport and wraps on a narrow one. On a `primary`, `secondary` or `accent` surface the `<em>` keeps the band's ink.
+- 7b59b68: `Footer.Brand` takes `display`: the wordmark very large and light, as the footer's closing line instead of a label. An `<em>` inside `name` is set in the accent italic, e.g. `name={<>Common<em>place</em></>}`. It scales with the viewport and wraps on a narrow one. On a `primary`, `secondary` or `accent` surface the `<em>` keeps the band's ink.
 - be7fcd0: Three additions to `Hero`, each usable alone; together they make a front page's poster.
   
   - `surface="primary" | "accent" | "dark"`: a full-width fill, in the words `Footer` uses. On `primary` and `accent` the text tones, borders, `--primary` and `--accent` are re-derived from the field's ink, so titles, leads and buttons stay legible. New tokens `--hero-primary-bg`, `--hero-primary-fg`, `--hero-primary-accent`, `--hero-accent-bg`, `--hero-accent-fg` let a theme reskin the fields.

@@ -64,7 +64,7 @@ export interface FooterBrandProps {
   /**
    * Set the wordmark very large and light, as the footer's closing line
    * instead of a label. An `<em>` inside `name` takes the accent italic:
-   * `name={<>Kunnskaps<em>kollektivet</em></>}`. Give the brand a row of its
+   * `name={<>Common<em>place</em></>}`. Give the brand a row of its
    * own; it scales with the viewport and wraps on a narrow one.
    */
   display?: boolean;

@@ -240,8 +240,8 @@ export const DisplayOnPrimary: Story = {
     <Hero surface="primary" disc className="pt-[18vw]">
       <Hero.Main>
         <Hero.Title display>
-          Kunnskaps{'\u00AD'}
-          <em>kollektivet</em>
+          Common{'\u00AD'}
+          <em>place</em>
         </Hero.Title>
         <Hero.Lead>
           Articles and short notes on health, technology and knowledge worth sharing.
@@ -259,11 +259,11 @@ export const DisplayOnAccent: Story = {
   render: () => (
     <Hero surface="accent" disc>
       <Hero.Main>
-        <Hero.Eyebrow>Article · 13 December 2025</Hero.Eyebrow>
+        <Hero.Eyebrow>Research · 19 Oct 2026</Hero.Eyebrow>
         <Hero.Title display style={{ '--hero-display-size': '7vw' } as React.CSSProperties}>
-          Metadata still matters. <em>For people and machines</em>
+          Spaced repetition works. <em>Most courses ignore it</em>
         </Hero.Title>
-        <Hero.Lead>It is not only about Facebook.</Hero.Lead>
+        <Hero.Lead>Forty years of evidence, and a schedule that fits a term.</Hero.Lead>
         <Hero.Actions>
           <Button variant="primary" size="lg">Read the article</Button>
           <Button variant="outline" size="lg">All articles</Button>
