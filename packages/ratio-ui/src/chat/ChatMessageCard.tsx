@@ -8,6 +8,7 @@ import { cn } from '../utils/cn';
 import type { ChatLogMessage } from './ChatLog';
 import { hasPreviewContent, segmentChatText } from '@eventuras/ratio-ui-core/chat';
 import { ChatLinkPreviewCard } from './ChatLinkPreview';
+import { ChatPrompt, type ChatPromptLabels } from './ChatPrompt';
 import { ChatReactions } from './ChatReactions';
 import { ChatText } from './ChatText';
 
@@ -21,6 +22,8 @@ export interface ChatMessageCardLabels {
   reactions?: string;
   /** Screen-reader note on every link in the text. @default 'opens in a new tab' */
   opensInNewTab?: string;
+  /** Built-in text of the message's prompt; see `Chat.Prompt`. @beta */
+  prompt?: ChatPromptLabels;
 }
 
 /** @beta Prop shape may change before release. */
@@ -48,8 +51,8 @@ export interface ChatMessageCardProps {
 /**
  * Chat.MessageCard — one message on its own page: author, date and room on
  * a small line, the text at body size with links and mentions as in the
- * log, the link preview, and the reactions, read-only. A link back to the
- * message in its room when `roomHref` is set.
+ * log, the link preview, and the prompt and the reactions, both read-only.
+ * A link back to the message in its room when `roomHref` is set.
  *
  * Shares the text rendering and the preview card with `Chat.Log`.
  *
@@ -67,13 +70,14 @@ export const ChatMessageCard: React.FC<ChatMessageCardProps> = ({
   className,
   testId,
 }) => {
-  const { id, nick, text, preview, reactions } = message;
+  const { id, nick, text, preview, prompt, reactions } = message;
   const LinkTag = (LinkComponent ?? linkAs ?? 'a') as React.ElementType;
   const l: Required<ChatMessageCardLabels> = {
     seeInRoom: labels?.seeInRoom ?? 'See in the room',
     removed: labels?.removed ?? 'This message was removed.',
     reactions: labels?.reactions ?? 'Reactions',
     opensInNewTab: labels?.opensInNewTab ?? 'opens in a new tab',
+    prompt: labels?.prompt ?? {},
   };
   const name = [nick, dateTime].filter(Boolean).join(', ');
 
@@ -108,6 +112,8 @@ export const ChatMessageCard: React.FC<ChatMessageCardProps> = ({
       {!removed && preview && hasPreviewContent(preview) && (
         <ChatLinkPreviewCard preview={preview} opensInNewTab={l.opensInNewTab} />
       )}
+      {/* Answered in the room, not here: what was asked, or the receipt. */}
+      {!removed && prompt && <ChatPrompt prompt={prompt} labels={l.prompt} />}
       {reactions && reactions.length > 0 && (
         <ChatReactions reactions={reactions} aria-label={l.reactions} />
       )}

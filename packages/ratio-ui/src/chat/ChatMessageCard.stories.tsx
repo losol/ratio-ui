@@ -116,3 +116,61 @@ export const Dark: Story = {
     ),
   ],
 };
+
+/**
+ * A message's prompt is read-only on its own page: it is answered in the
+ * room. An answered one shows its receipt, an open one what was asked.
+ */
+export const WithPrompt: Story = {
+  render: args => (
+    <div className="flex flex-col gap-3">
+      <ChatMessageCard
+        {...args}
+        testId="answered"
+        message={{
+          id: 'p1',
+          nick: 'concierge',
+          text: 'Three rooms are free at 14:00. Which one should I book?',
+          prompt: {
+            kind: 'choice',
+            title: 'Room for the briefing',
+            options: [
+              { value: 'a', label: 'Room 2.04' },
+              { value: 'b', label: 'Room 2.11' },
+            ],
+            response: { kind: 'choice', values: ['b'] },
+          },
+        }}
+      />
+      <ChatMessageCard
+        {...args}
+        testId="open"
+        message={{
+          id: 'p2',
+          nick: 'concierge',
+          text: 'Which shift can you take?',
+          prompt: {
+            kind: 'choice',
+            options: [
+              { value: 'doors', label: 'Doors' },
+              { value: 'badges', label: 'Badges' },
+            ],
+          },
+        }}
+      />
+    </div>
+  ),
+  args: {
+    dateTime: 'Thursday 2 October 2026, 13:40',
+    room: '#briefing',
+    labels: { prompt: { answered: 'Svart' } },
+  },
+  play: async ({ canvasElement }) => {
+    const answered = within(within(canvasElement).getByTestId('answered'));
+    await expect(answered.getByRole('group', { name: 'Room for the briefing' })).toHaveTextContent('Svart Room 2.11');
+    const open = within(within(canvasElement).getByTestId('open'));
+    await expect(open.getAllByRole('listitem')).toHaveLength(2);
+    await expect(open.queryByRole('button')).toBeNull();
+    await expect(open.queryByRole('radio')).toBeNull();
+  },
+};

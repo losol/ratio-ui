@@ -5,6 +5,16 @@
 export { ChatLog } from './ChatLog';
 export type { ChatLogLabels, ChatLogLayout, ChatLogProps, ChatLogMessage, ChatRole } from './ChatLog';
 export type { ChatLinkPreview } from './ChatLinkPreview';
+export { ChatPrompt } from './ChatPrompt';
+export type {
+  ChatChoicePrompt,
+  ChatConfirmPrompt,
+  ChatPromptLabels,
+  ChatPromptOption,
+  ChatPromptProps,
+  ChatPromptResponse,
+  ChatPromptStatus,
+} from './ChatPrompt';
 export { ChatMessageCard } from './ChatMessageCard';
 export type { ChatMessageCardLabels, ChatMessageCardProps } from './ChatMessageCard';
 export { ChatReactionBar } from './ChatReactionBar';

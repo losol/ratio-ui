@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { ChatLog, type ChatLogMessage } from './ChatLog';
+import type { ChatPromptResponse } from './ChatPrompt';
 import { Button } from '../core/Button';
 
 const meta: Meta<typeof ChatLog> = {
@@ -942,4 +943,189 @@ export const CardsNarrow: Story = {
 export const CardsDark: Story = {
   args: { layout: 'cards', messages: conversation, me: 'tor', highlightedId: 'c10', 'aria-label': '#volunteers' },
   decorators: [Story => <div className="surface-dark flex flex-1 flex-col bg-surface"><Story /></div>],
+};
+
+const briefing: ChatLogMessage[] = [
+  {
+    id: 'p1',
+    time: '13:40',
+    nick: 'tor',
+    role: 'op',
+    text: '@concierge find a room for the volunteer briefing at 14:00.',
+  },
+  {
+    id: 'p2',
+    time: '13:40',
+    nick: 'concierge',
+    text: 'Three rooms are free at 14:00. Which one should I book?',
+    prompt: {
+      kind: 'choice',
+      title: 'Room for the briefing',
+      dismissible: true,
+      options: [
+        { value: 'a', label: 'Room 2.04', description: 'Seats 24, with a projector' },
+        { value: 'b', label: 'Room 2.11', description: 'Seats 12' },
+        { value: 'c', label: 'The foyer corner', description: 'Standing only' },
+      ],
+    },
+  },
+  {
+    id: 'p3',
+    time: '13:41',
+    nick: 'concierge',
+    text: 'Should I tell #volunteers about the briefing?',
+    prompt: { kind: 'confirm', confirmLabel: 'Yes, tell them', declineLabel: 'No' },
+  },
+  {
+    id: 'p4',
+    time: '13:41',
+    nick: 'concierge',
+    text: 'Coffee for twelve at the briefing?',
+    prompt: {
+      kind: 'confirm',
+      confirmLabel: 'Yes',
+      declineLabel: 'No',
+      response: { kind: 'confirm', accepted: true },
+    },
+    reactions: [{ emoji: '☕', count: 2 }],
+  },
+  {
+    id: 'p5',
+    time: '13:42',
+    nick: 'concierge',
+    text: 'The 13:45 shuttle had two seats left. Want one?',
+    prompt: { kind: 'confirm', status: 'closed', closedNote: 'The shuttle has left' },
+  },
+];
+
+const rowOfPrompt = (canvasElement: HTMLElement, id: string) =>
+  within(canvasElement.querySelector<HTMLElement>(`[data-message-id="${id}"]`)!);
+
+/**
+ * A message's `prompt` is a small form under its text: an agent asks, and
+ * the reader answers in the log. `onRespond` reports the message and the
+ * answer; the caller sets the prompt to `sending`, then `answered`, and the
+ * controls give way to a receipt that stays in the log. The message's text
+ * still asks the question, for notifications and for a client that shows
+ * no prompt.
+ */
+export const Prompts: Story = {
+  render: function PromptsStory({ onRespond, ...args }) {
+    const [messages, setMessages] = useState(args.messages);
+    const patch = (id: string, change: object) =>
+      setMessages(prev =>
+        prev.map(m => (m.id === id && m.prompt ? { ...m, prompt: { ...m.prompt, ...change } } : m)),
+      );
+    const respond = (id: string, response: ChatPromptResponse) => {
+      onRespond?.(id, response);
+      patch(id, { status: 'sending', response });
+      setTimeout(() => patch(id, { status: 'answered' }), 300);
+    };
+    return <ChatLog {...args} messages={messages} onRespond={respond} />;
+  },
+  args: { messages: briefing, me: 'tor', 'aria-label': '#briefing', onRespond: fn() },
+  play: async ({ canvasElement, args }) => {
+    const log = within(canvasElement).getByRole('log', { name: '#briefing' });
+    // A prompt arriving takes no focus.
+    await expect(log.contains(log.ownerDocument.activeElement)).toBe(false);
+
+    // One press answers a confirm, and the log names the message.
+    const confirm = rowOfPrompt(canvasElement, 'p3');
+    await userEvent.click(confirm.getByRole('button', { name: 'Yes, tell them' }));
+    await expect(args.onRespond).toHaveBeenLastCalledWith('p3', { kind: 'confirm', accepted: true });
+    await waitFor(() => expect(confirm.getByRole('group')).toHaveTextContent('Answered Yes, tell them'));
+    await expect(confirm.queryByRole('button', { name: 'No' })).toBeNull();
+
+    // A choice is picked, then sent.
+    const choice = rowOfPrompt(canvasElement, 'p2');
+    await userEvent.click(choice.getByRole('radio', { name: 'Room 2.11' }));
+    await userEvent.click(choice.getByRole('button', { name: 'Send' }));
+    await expect(args.onRespond).toHaveBeenLastCalledWith('p2', { kind: 'choice', values: ['b'] });
+    await waitFor(() =>
+      expect(choice.getByRole('group', { name: 'Room for the briefing' })).toHaveTextContent('Answered Room 2.11'),
+    );
+    await expect(choice.queryByRole('radio')).toBeNull();
+
+    // What was answered or closed before stays as it was, beside the reactions.
+    await expect(rowOfPrompt(canvasElement, 'p4').getByRole('group', { name: 'Question' })).toHaveTextContent('Answered Yes');
+    await expect(rowOfPrompt(canvasElement, 'p4').getByText('☕ 2')).toBeInTheDocument();
+    await expect(rowOfPrompt(canvasElement, 'p5').getByText('The shuttle has left')).toBeInTheDocument();
+    await expect(args.onRespond).toHaveBeenCalledTimes(2);
+  },
+};
+
+/**
+ * Without `onRespond` the prompts are read-only: a choice lists its
+ * options, and there is nothing to press. `labels.prompt` holds the
+ * prompt's built-in text.
+ */
+export const PromptsReadOnly: Story = {
+  args: {
+    messages: briefing,
+    me: 'tor',
+    'aria-label': '#briefing',
+    labels: { prompt: { answered: 'Svart', question: 'Spørsmål' } },
+  },
+  play: async ({ canvasElement }) => {
+    const log = within(within(canvasElement).getByRole('log'));
+    // The reactions are buttons in a group too, so look inside the prompts.
+    const prompts = canvasElement.querySelectorAll<HTMLElement>('[data-message-id] [data-status]');
+    // The confirm that is still open has no title, so it has nothing to show.
+    await expect(prompts).toHaveLength(3);
+    for (const prompt of prompts) await expect(within(prompt).queryByRole('button')).toBeNull();
+    await expect(log.queryByRole('radio')).toBeNull();
+    await expect(log.getAllByRole('listitem')).toHaveLength(3);
+    await expect(rowOfPrompt(canvasElement, 'p4').getByRole('group', { name: 'Spørsmål' })).toHaveTextContent('Svart Yes');
+  },
+};
+
+/**
+ * A tap on a prompt's option or button is the prompt's own: it does not
+ * open the message's bar. A tap on the message's text still does.
+ */
+export const PromptsTap: Story = {
+  render: function PromptsTapStory(args) {
+    const [activeId, setActiveId] = useState<string | undefined>(undefined);
+    return <ChatLog {...args} activeId={activeId} onActivate={setActiveId} />;
+  },
+  args: {
+    messages: briefing,
+    me: 'tor',
+    'aria-label': '#briefing',
+    onRespond: fn(),
+    onToggleReaction: fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const row = canvasElement.querySelector<HTMLElement>('[data-message-id="p2"]')!;
+    const choice = within(row);
+
+    await tap(choice.getByText('Room 2.11'));
+    await tap(choice.getByText('Seats 12'));
+    await tap(choice.getByRole('radio', { name: 'Room 2.04' }));
+    await tap(choice.getByRole('button', { name: 'Skip' }));
+    await expect(row).not.toHaveAttribute('data-active');
+
+    await tap(choice.getByText(/Three rooms are free/));
+    await waitFor(() => expect(row).toHaveAttribute('data-active'));
+  },
+};
+
+/** Prompts in the `cards` layout, lined up with the text. */
+export const PromptsCards: Story = {
+  args: { layout: 'cards', messages: briefing, me: 'tor', 'aria-label': '#briefing', onRespond: fn() },
+  play: async ({ canvasElement, args }) => {
+    const confirm = rowOfPrompt(canvasElement, 'p3');
+    await userEvent.click(confirm.getByRole('button', { name: 'No' }));
+    await expect(args.onRespond).toHaveBeenLastCalledWith('p3', { kind: 'confirm', accepted: false });
+  },
+};
+
+/** In a narrow log a prompt spans the row, and never widens the log. */
+export const PromptsNarrow: Story = {
+  args: { messages: briefing, me: 'tor', 'aria-label': '#briefing', onRespond: fn() },
+  decorators: [Story => <div className="flex h-full w-[360px] flex-col"><Story /></div>],
+  play: async ({ canvasElement }) => {
+    const log = within(canvasElement).getByRole('log');
+    await expect(log.scrollWidth).toBe(log.clientWidth);
+  },
 };
