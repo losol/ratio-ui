@@ -1,5 +1,11 @@
 # @eventuras/ratio-ui
 
+## 2.40.1
+
+### Patch Changes
+
+- b819ae6: The `Footer.Brand` `display` example in the doc comment and the 2.40.0 changelog entry use an invented name.
+
 ## 2.40.0
 
 ### Minor Changes
