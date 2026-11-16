@@ -1,6 +1,6 @@
 import type { StorybookConfig } from '@storybook/react-vite';
-import { existsSync, readdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { createReadStream, existsSync, readdirSync, statSync } from 'node:fs';
+import { dirname, extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // Resolve `packages/` relative to THIS config file rather than process.cwd(),
@@ -21,6 +21,53 @@ if (!existsSync(packagesDir)) {
 const packages = readdirSync(packagesDir, { withFileTypes: true })
   .filter((d) => d.isDirectory() && existsSync(join(packagesDir, d.name, 'src')))
   .map((d) => d.name);
+
+// The sandbox stories need a frame on another origin than Storybook's own.
+// Locally `localhost` and `127.0.0.1` are two origins for one dev server, so
+// serving the built runtime here is enough: a story opened on one loads its
+// frame from the other. Skipped when the runtime has not been built — the
+// stories then say what is missing.
+const sandboxRuntimeDir = join(packagesDir, 'ratio-ui-sandbox', 'dist', 'runtime');
+const sandboxRuntimeTypes: Record<string, string> = {
+  '.css': 'text/css',
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.json': 'application/json',
+  '.txt': 'text/plain',
+  '.woff2': 'font/woff2',
+};
+const sandboxRuntime = {
+  name: 'ratio-ui-sandbox-runtime',
+  configureServer(server: {
+    middlewares: {
+      use: (
+        route: string,
+        handler: (
+          req: { url?: string },
+          res: {
+            statusCode: number;
+            setHeader: (name: string, value: string) => void;
+            end: (body?: string) => void;
+          } & NodeJS.WritableStream,
+          next: () => void,
+        ) => void,
+      ) => void;
+    };
+  }) {
+    server.middlewares.use('/sandbox-runtime', (req, res, next) => {
+      const path = decodeURIComponent((req.url ?? '/').split('?')[0]);
+      const file = normalize(join(sandboxRuntimeDir, path));
+      const inside = file.startsWith(sandboxRuntimeDir + sep);
+      if (!inside || !existsSync(file) || !statSync(file).isFile()) return next();
+      res.statusCode = 200;
+      res.setHeader('Content-Type', sandboxRuntimeTypes[extname(file)] ?? 'application/octet-stream');
+      // The frame is another origin than this server: its module scripts and
+      // fonts are cross-origin requests.
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      createReadStream(file).pipe(res);
+    });
+  },
+};
 
 const config: StorybookConfig = {
   stories: packages.flatMap((name) => [
@@ -123,6 +170,7 @@ const config: StorybookConfig = {
     // calls without the alias above; the TurboModuleRegistry they import is
     // shimmed to `undefined` there, as nothing on the web calls them.
     rolldownOptions.shimMissingExports = true;
+    (viteConfig.plugins ??= []).push(sandboxRuntime);
     return viteConfig;
   },
 };
