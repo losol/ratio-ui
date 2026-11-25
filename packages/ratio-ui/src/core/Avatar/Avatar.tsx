@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Losol AS
 // SPDX-License-Identifier: MPL-2.0
 
+'use client';
+
 import { useState, type FC } from 'react';
 import { cn } from '../../utils/cn';
 
@@ -43,6 +45,13 @@ export interface AvatarProps {
   'aria-label'?: string;
   /** @deprecated Use the native `aria-label`. Still honoured until the next major. */
   ariaLabel?: string;
+  /**
+   * Hide the avatar from assistive technology. Use it when the person's
+   * name is shown next to the avatar, as in a byline or a list of people:
+   * a labelled avatar there makes a screen reader say the name twice, and
+   * the initials once more. `aria-label` is ignored when this is set.
+   */
+  decorative?: boolean;
   className?: string;
   testId?: string;
 }
@@ -78,6 +87,7 @@ function deriveInitials(name?: string): string {
  * <Avatar name="Leo Losen" />                  // initials "ll"
  * <Avatar name="Ola" initials="o" size="sm" /> // override + small
  * <Avatar name="Ola" src="/avatar.jpg" size="lg" /> // image + lg
+ * <Avatar name="Ola" decorative /> <span>Ola</span> // name shown beside it
  * ```
  */
 export const Avatar: FC<AvatarProps> = ({
@@ -87,6 +97,7 @@ export const Avatar: FC<AvatarProps> = ({
   size = 'md',
   'aria-label': ariaLabelAttr,
   ariaLabel,
+  decorative = false,
   className,
   testId,
 }) => {
@@ -95,9 +106,12 @@ export const Avatar: FC<AvatarProps> = ({
   // role="img" requires a name. When the avatar has no accessible
   // label and no visible text, leave the role off so axe doesn't flag
   // an unlabelled image role; the empty span is then ignored by AT.
-  const a11yProps = wrapperLabel
-    ? { role: 'img' as const, 'aria-label': wrapperLabel }
-    : {};
+  // A decorative avatar is hidden altogether, initials included.
+  const a11yProps = decorative
+    ? { 'aria-hidden': true as const }
+    : wrapperLabel
+      ? { role: 'img' as const, 'aria-label': wrapperLabel }
+      : {};
 
   // Track the URL that failed instead of a boolean flag — comparing
   // against `src` lets a new URL re-show the image without an effect
