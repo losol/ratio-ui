@@ -79,6 +79,32 @@ export const Sizes: Story = {
   ),
 };
 
+/**
+ * Beside a visible name, as in a byline or a list of people, the avatar is
+ * `decorative`: hidden from assistive technology, so a screen reader reads
+ * the name once instead of the label, the initials and the name.
+ */
+export const BesideAName: Story = {
+  render: () => (
+    <ul className="flex flex-wrap gap-x-7 gap-y-4 list-none p-0 m-0">
+      <li className="flex items-center gap-3">
+        <Avatar name="Kari Nordmann" src="https://i.pravatar.cc/100?img=5" size="lg" decorative />
+        <span className="flex flex-col leading-tight">
+          <span className="font-semibold">Kari Nordmann</span>
+          <span className="text-sm text-(--text-muted)">Text</span>
+        </span>
+      </li>
+      <li className="flex items-center gap-3">
+        <Avatar name="Ola Hansen" size="lg" decorative />
+        <span className="flex flex-col leading-tight">
+          <span className="font-semibold">Ola Hansen</span>
+          <span className="text-sm text-(--text-muted)">Photos</span>
+        </span>
+      </li>
+    </ul>
+  ),
+};
+
 export const InsideMenuTrigger: Story = {
   render: () => (
     <button
